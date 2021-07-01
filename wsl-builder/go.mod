@@ -1,4 +1,4 @@
-module github.com/ubuntu/WSL-DistroLauncher/build/update-releases
+module github.com/ubuntu/WSL-DistroLauncher/wsl-builder
 
 go 1.16
 

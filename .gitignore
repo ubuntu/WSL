@@ -296,3 +296,6 @@ DistroLauncher/messages.h
 *.dll
 *.exe
 *.tar.gz
+
+# Our own components
+wsl-builder/
