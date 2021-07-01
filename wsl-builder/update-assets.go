@@ -15,8 +15,8 @@ import (
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
 
-// updateReleases orchestrates the distro launcher metadata and assets generation from a csv file path.
-func updateReleases(csvPath string) error {
+// updateAssets orchestrates the distro launcher metadata and assets generation from a csv file path.
+func updateAssets(csvPath string) error {
 	imagick.Initialize()
 	defer imagick.Terminate()
 

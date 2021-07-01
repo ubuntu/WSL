@@ -38,8 +38,8 @@ func main() {
 		},
 	}
 
-	updateCmd := &cobra.Command{
-		Use:   "update CSV_FILE",
+	assetsCmd := &cobra.Command{
+		Use:   "assets CSV_FILE",
 		Short: "Update all releases in WSL distribution info and assets from template",
 		Long: `This tool update all releases from an incoming CSV file and generate
 		       every icons and xml files needed to build a WSL application`,
@@ -48,11 +48,11 @@ func main() {
 				return errors.New("this command accepts exactly one CSV file")
 			}
 
-			return updateReleases(args[0])
+			return updateAssets(args[0])
 		},
 	}
 
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(assetsCmd)
 
 	err := rootCmd.Execute()
 	if err != nil {
