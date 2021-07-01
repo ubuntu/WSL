@@ -13,81 +13,99 @@ type wslReleaseInfo struct {
 	BuildVersion string
 	LauncherName string
 	IconVersion  string
+
+	codeName    string
+	shouldBuild bool
 }
 
-// ReleaseInfos returns all releases we care about from a csvPath.
-func ReleaseInfos(csvPath string) (releasesInfo []wslReleaseInfo, err error) {
+// ReleasesInfo returns all releases we care about from a csvPath.
+func ReleasesInfo(csvPath string) (releasesInfo []wslReleaseInfo, err error) {
 	releases, err := readCSV(csvPath)
 	if err != nil {
 		return nil, err
 	}
 
-	wslReleases := activeReleases(releases)
-	releasesInfo = buildReleasesInfo(wslReleases)
-
-	return releasesInfo, nil
+	return buildWSLReleaseInfo(releases), nil
 }
 
-// activeReleases extracts WSL supported releases from the releases content
-// and returns a map of WslID to version string.
-func activeReleases(releases [][]string) (wslReleases map[string]string) {
-	wslReleases = make(map[string]string)
-	var latestLTS, latestLTSReleasedDate string
+// buildWSLReleaseInfo extracts WSL supported releases from the releases content
+// and returns a slice of wslReleaseInfo, ready to be used from templates.
+func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo) {
+	var latestLTSReleasedDate string
+	var ubuntuWSL wslReleaseInfo
 
 	for _, release := range releases {
+
+		version := fmt.Sprintf("%s.%s", release[0], release[1])
+		buildVersion := strings.Replace(version, ".", "", 1)
+		launcherName := fmt.Sprintf("ubuntu%s", strings.Replace(release[0], ".", "", 1))
+		codeName := release[2]
+
 		// There is always a development release, LTS or not
 		if release[4] == "Active Development" {
-			wslReleases["Ubuntu-Preview"] = fmt.Sprintf("%s.0", release[0])
+			wslReleases = append(wslReleases, wslReleaseInfo{
+				WslID:        "Ubuntu-Preview",
+				FullName:     "Ubuntu (Preview)",
+				BuildVersion: buildVersion,
+				LauncherName: "ubuntupreview",
+				IconVersion:  "Preview",
+
+				codeName:    codeName,
+				shouldBuild: true,
+			})
 		}
 
 		// We have one application per LTSes, starting with 18.04 LTSes and onwards.
 		if release[7] == "False" || release[0] < "18.04" {
 			continue
 		}
-		wslID := fmt.Sprintf("Ubuntu-%s-LTS", release[0])
-		wslReleases[wslID] = fmt.Sprintf("%s.%s", release[0], release[1])
 
-		// Pin latest supported LTS as the "Ubuntu" application
+		// Add per-release application
+		wsl := wslReleaseInfo{
+			WslID:        fmt.Sprintf("Ubuntu-%s-LTS", release[0]),
+			FullName:     fmt.Sprintf("Ubuntu %s LTS", version),
+			BuildVersion: buildVersion,
+			LauncherName: launcherName,
+			IconVersion:  fmt.Sprintf("%s LTS", version),
+
+			codeName: codeName,
+			//TODO: shouldBuild: //it’s complicated,
+		}
+		wslReleases = append(wslReleases, wsl)
+
+		// Pin latest supported (ie non in Active Development) LTS as the "Ubuntu" application
 		if release[9] > latestLTSReleasedDate && release[4] == "Supported" {
 			latestLTSReleasedDate = release[9]
-			latestLTS = wslID
+			ubuntuWSL = wsl
 		}
 	}
-	wslReleases["Ubuntu"] = wslReleases[latestLTS]
+
+	// Select Ubuntu release
+	ubuntuWSL.WslID = "Ubuntu"
+	ubuntuWSL.FullName = "Ubuntu"
+	ubuntuWSL.LauncherName = "ubuntu"
+	ubuntuWSL.IconVersion = ""
+	wslReleases = append(wslReleases, ubuntuWSL)
 
 	return wslReleases
 }
 
-// buildReleasesInfo returns a slice of release info object, ready to be used
-// in templates.
-func buildReleasesInfo(releases map[string]string) (releasesInfo []wslReleaseInfo) {
-	// Ubuntu-Preview              Ubuntu (Preview)            2110.0             ubuntupreview             Preview
-	// Ubuntu-20.04-LTS            Ubuntu 20.04.2 LTS          2004.2             ubuntu2004                20.04.2 LTS
-	for wslID, version := range releases {
-		var fullName, iconVersion string
-		switch wslID {
-		case "Ubuntu":
-			fullName = "Ubuntu"
-		case "Ubuntu-Preview":
-			fullName = "Ubuntu (Preview)"
-			iconVersion = "Preview"
-		default:
-			fullName = fmt.Sprintf("Ubuntu %s LTS", version)
-			iconVersion = fmt.Sprintf("%s LTS", version)
-		}
+/*
+ver.	m.	code	full version	Status				Activ.	Sup.	LTS		Opened			Release			Milestone
+21.10	0	impish	Ubuntu 21.10	Active Development	True	False	False	2021-04-23
+21.04	0	hirsute	Ubuntu 21.04	Current Stable Release	True	True	False	2020-10-23	2021-04-22
+20.10	0	groovy	Ubuntu 20.10	Supported	True	True	False	2020-04-24	2020-10-22
+20.04	2	focal	Ubuntu 20.04.2 LTS	Supported	True	True	True	2019-02-18	2020-04-23	2021-02-11
+18.04	5	bionic	Ubuntu 18.04.5 LTS	Supported	True	True	True	2017-10-04	2018-04-26	2020-08-06
+16.04	6	xenial	Ubuntu 16.04.6 LTS	Supported	True	True	True	2015-10-19	2016-04-21	2019-02-28
+14.04	6	trusty	Ubuntu 14.04.6 LTS	Supported	True	True	True	2012-10-01	2014-04-17	2019-03-07
 
-		releasesInfo = append(releasesInfo, wslReleaseInfo{
-			WslID:    wslID,
-			FullName: fullName,
-			// buildVersion is the version with first . stripped out
-			BuildVersion: strings.Replace(version, ".", "", 1),
-			LauncherName: strings.TrimSuffix(strings.ReplaceAll(strings.ReplaceAll(strings.ToLower(wslID), "-", ""), ".", ""), "lts"),
-			IconVersion:  iconVersion,
-		})
-	}
-
-	return releasesInfo
-}
+WSL_ID                      FULLNAME                    BUILD_VERSION      LAUNCHER_NAME             ICON_VERSION                BUILD_ID (locally stored, incremental)
+Ubuntu                      Ubuntu                      2004.2             ubuntu                    ""
+Ubuntu-Preview              Ubuntu (Preview)            2110.0             ubuntupreview             Preview
+Ubuntu-20.04-LTS            Ubuntu 20.04.2 LTS          2004.2             ubuntu2004                20.04.2 LTS
+Ubuntu-18.04-LTS            Ubuntu 18.04.5 LTS          1804.5             ubuntu1804                18.04.5 LTS
+*/
 
 // readCSV deserialized the CSV filed into a [][]string
 func readCSV(name string) (releases [][]string, err error) {
