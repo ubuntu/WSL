@@ -30,7 +30,7 @@ func updateAssets(csvPath string) error {
 		return err
 	}
 
-	releasesInfo, err := ReleaseInfos(csvPath)
+	releasesInfo, err := ReleasesInfo(csvPath)
 	if err != nil {
 		return err
 	}
