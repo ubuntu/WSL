@@ -3,13 +3,14 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"image"
+	_ "image/png"
 	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"gopkg.in/gographics/imagick.v2/imagick"
 )

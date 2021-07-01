@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	_ "image/png"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -30,9 +29,19 @@ Ubuntu-18.04-LTS            Ubuntu 18.04.5 LTS          1804.5             ubunt
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "update-releases CSV_RELEASE_FILE",
+		Use:   "wsl-builder COMMAND",
 		Short: "Update releases in WSL distribution info and assets from template",
 		Long: `This tool update releases from an incoming CSV file and generate
+		       every icons and xml files needed to build a WSL application`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return nil
+		},
+	}
+
+	updateCmd := &cobra.Command{
+		Use:   "update CSV_FILE",
+		Short: "Update all releases in WSL distribution info and assets from template",
+		Long: `This tool update all releases from an incoming CSV file and generate
 		       every icons and xml files needed to build a WSL application`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
@@ -42,6 +51,8 @@ func main() {
 			return updateReleases(args[0])
 		},
 	}
+
+	rootCmd.AddCommand(updateCmd)
 
 	err := rootCmd.Execute()
 	if err != nil {
