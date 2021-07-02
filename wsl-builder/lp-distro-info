@@ -60,16 +60,19 @@ def releases(lpconn, args):
         milestone_date = ""
         lts = ((int(serie.version.split('.')[0]) % 2 == 0) and serie.version.endswith('.04'))
         description = "%s %s" % (DISTRIBUTION, serie.version)
+        next_milestone = ""
         if lts:
             for milestone in serie.active_milestones:
-                if milestone.date_targeted and milestone.date_targeted > datetime.now():
-                    continue
                 m = milestone.name.split('-')[1]
-                if m != "updates":
-                    milestone_id = m.split('.')[2]
-                    description += ".%s" % milestone_id
-                    milestone_date = milestone.date_targeted.strftime("%Y-%m-%d")
-                    break
+                if m == "updates":
+                    continue
+                if milestone.date_targeted and milestone.date_targeted > datetime.now():
+                    next_milestone = milestone.date_targeted.strftime("%Y-%m-%d")
+                    continue
+                milestone_id = m.split('.')[2]
+                description += ".%s" % milestone_id
+                milestone_date = milestone.date_targeted.strftime("%Y-%m-%d")
+                break
 
             description += " LTS"
 
@@ -95,7 +98,8 @@ def releases(lpconn, args):
             str(lts),
             date_created,
             date_released,
-            milestone_date)
+            milestone_date,
+            next_milestone)
 
 
 def main():
