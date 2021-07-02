@@ -4,9 +4,78 @@ on:
     inputs:
       wslID:
         description: 'Release name to use for the bundle'
-        required: false
-        default: 'local'
-      rootfses:
-        description: 'Ubuntu WSL rootfs urls, separated by a semi colon. Direct set of "tar.gz::arch" if arch is not in the filename'
         required: true
-        default: 'http://cloud-images.ubuntu.com/impish/current/impish-server-cloudimg-amd64-wsl.rootfs.tar.gz'
+        default: 'Ubuntu-Preview'
+      rootfses:
+        description: 'Ubuntu WSL rootfs urls, separated by a colon. Direct set of "tar.gz::arch" if arch is not in the filename'
+        required: true
+        default: ''
+  schedule:
+    - cron: '0 10 * * *'
+
+env:
+  goversion: '1.16'
+
+jobs:
+  build-matrix:
+    name: Build Matrix for WSLIDs to run on with rootfses, which can be manually supplied or automatically.
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.build-matrix-release.outputs.matrix }}
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt update
+          sudo DEBIAN_FRONTEND=noninteractive apt install -y jq
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.goversion }}
+      - name: Build Matrix for WSLIDs to run on with rootfses, which can be manually supplied or automatically
+        id: build-matrix-release
+        run: |
+          set -eu
+          # Manual build
+          if [ ${{ github.event_name }} = 'workflow_dispatch' ]; then
+            wslID="${{ github.event.inputs.wslID }}"
+            if [ -z "${wslID}" ]; then
+              wslID="Ubuntu-Preview"
+            fi
+
+            builds="$(cat <<-EOF|jq -c
+              {"include":
+                [
+                  {
+                    "WslID": "${wslID}",
+                    "Rootfses": "${{ github.event.inputs.rootfses }}",
+                    "Upload": "no"
+                  }
+                ]
+              }
+          EOF
+            )"
+          else
+            wsl-builder/lp-distro-info > /tmp/all-releases.csv
+            cd wsl-builder/
+            go build .
+            builds_config="$(./wsl-builder build-github-matrix /tmp/all-releases.csv)"
+            builds="{\"include\":${builds_config}}"
+          fi
+
+          echo "${builds}"
+          echo "::set-output name=matrix::${builds}"
+
+  build-wsl:
+    name: Build WSL appxbundle for a given release
+    runs-on: windows-latest
+    needs: build-matrix
+    strategy:
+      matrix: ${{fromJson(needs.build-matrix.outputs.matrix)}}
+    steps:
+      - name: Print matrix content
+        run: |
+          wget http://cloud-images.ubuntu.com/impish/current/SHA256SUMS
+          sha256sum -c SHA256SUMS
+          echo ${{ matrix.WslID }}
+          echo ${{ matrix.Rootfses }}
+          echo ${{ matrix.Upload }}
