@@ -1,0 +1,12 @@
+name: Build WSL
+on:
+  workflow_dispatch:
+    inputs:
+      wslID:
+        description: 'Release name to use for the bundle'
+        required: false
+        default: 'local'
+      rootfses:
+        description: 'Ubuntu WSL rootfs urls, separated by a semi colon. Direct set of "tar.gz::arch" if arch is not in the filename'
+        required: true
+        default: 'http://cloud-images.ubuntu.com/impish/current/impish-server-cloudimg-amd64-wsl.rootfs.tar.gz'
