@@ -8,7 +8,7 @@ on:
       - 'DistroLauncher/DistributionInfo.h'
       - 'DistroLauncher-Appx/*'
       - '.github/workflows/detect-update-releases.yaml'
-      - 'wsl-build/*'
+      - 'wsl-builder/*'
   schedule:
     - cron: '42 0 * * 6'
 
