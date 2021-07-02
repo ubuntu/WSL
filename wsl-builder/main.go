@@ -31,8 +31,22 @@ func main() {
 			return updateAssets(args[0])
 		},
 	}
-
 	rootCmd.AddCommand(assetsCmd)
+
+	buildGHMatrixCmd := &cobra.Command{
+		Use:   "build-github-matrix CSV_FILE",
+		Short: "Return a json list of all build combinations we support",
+		Long: `This builds and returnb the list of all desired build combinations
+		       we should trigger on Github Actions, following the release schedule`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				return errors.New("this command accepts exactly one CSV file")
+			}
+
+			return buildGHMatrix(args[0])
+		},
+	}
+	rootCmd.AddCommand(buildGHMatrixCmd)
 
 	err := rootCmd.Execute()
 	if err != nil {
