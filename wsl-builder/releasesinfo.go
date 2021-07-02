@@ -4,7 +4,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type wslReleaseInfo struct {
@@ -25,18 +27,22 @@ func ReleasesInfo(csvPath string) (releasesInfo []wslReleaseInfo, err error) {
 		return nil, err
 	}
 
-	return buildWSLReleaseInfo(releases), nil
+	return buildWSLReleaseInfo(releases)
 }
 
 // buildWSLReleaseInfo extracts WSL supported releases from the releases content
 // and returns a slice of wslReleaseInfo, ready to be used from templates.
-func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo) {
+func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err error) {
 	var latestLTSReleasedDate string
 	var ubuntuWSL wslReleaseInfo
 
 	for _, release := range releases {
 
-		version := fmt.Sprintf("%s.%s", release[0], release[1])
+		minor, err := strconv.Atoi(release[1])
+		if err != nil {
+			return nil, fmt.Errorf("minor version is not an int: %v", err)
+		}
+		version := fmt.Sprintf("%s.%d", release[0], minor)
 		buildVersion := strings.Replace(version, ".", "", 1)
 		launcherName := fmt.Sprintf("ubuntu%s", strings.Replace(release[0], ".", "", 1))
 		codeName := release[2]
@@ -60,6 +66,31 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo) {
 			continue
 		}
 
+		// Follow WSL build release schedule.
+		var shouldBuild bool
+		releaseDate, err := time.Parse("2006-01-02", release[8])
+		if err != nil {
+			return nil, fmt.Errorf("wrong release date for %s: %v", codeName, err)
+		}
+		if withinAWeekOf(releaseDate) {
+			shouldBuild = true
+		} else if release[11] != "" {
+			nextPointReleaseDate, err := time.Parse("2006-01-02", release[11])
+			if err != nil {
+				return nil, fmt.Errorf("wrong next point release date for %s: %v", codeName, err)
+			}
+			if withinAWeekOf(nextPointReleaseDate) {
+				shouldBuild = true
+				// We need to +1 the minor release as we are close to next point release
+				minor++
+				version = fmt.Sprintf("%s.%d", release[0], minor)
+				buildVersion = strings.Replace(version, ".", "", 1)
+			}
+		}
+
+		// we don’t want to display in FullName or IconVersion the .0 suffix. BuildVersion stays as it.
+		version = strings.TrimSuffix(version, ".0")
+
 		// Add per-release application
 		wsl := wslReleaseInfo{
 			WslID:        fmt.Sprintf("Ubuntu-%s-LTS", release[0]),
@@ -68,8 +99,8 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo) {
 			LauncherName: launcherName,
 			IconVersion:  fmt.Sprintf("%s LTS", version),
 
-			codeName: codeName,
-			//TODO: shouldBuild: //it’s complicated,
+			codeName:    codeName,
+			shouldBuild: shouldBuild,
 		}
 		wslReleases = append(wslReleases, wsl)
 
@@ -87,7 +118,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo) {
 	ubuntuWSL.IconVersion = ""
 	wslReleases = append(wslReleases, ubuntuWSL)
 
-	return wslReleases
+	return wslReleases, nil
 }
 
 /*
@@ -123,4 +154,13 @@ func readCSV(name string) (releases [][]string, err error) {
 	r := csv.NewReader(f)
 	r.Comma = '\t'
 	return r.ReadAll()
+}
+
+// withinAWeekOf returns if now is withing a week of date.
+func withinAWeekOf(date time.Time) bool {
+	now := time.Now()
+	if now.After(date.Add(-time.Duration(time.Hour*24*7))) && now.Before(date.Add(time.Duration(time.Hour*24))) {
+		return true
+	}
+	return false
 }
