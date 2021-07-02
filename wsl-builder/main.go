@@ -14,7 +14,7 @@ func main() {
 		Long: `This tool update releases from an incoming CSV file and generate
 		       every icons and xml files needed to build a WSL application`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return nil
+			return errors.New("subcommand is required")
 		},
 	}
 

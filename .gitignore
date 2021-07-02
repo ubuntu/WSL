@@ -298,4 +298,4 @@ DistroLauncher/messages.h
 *.tar.gz
 
 # Our own components
-wsl-builder/
+wsl-builder/wsl-builder
