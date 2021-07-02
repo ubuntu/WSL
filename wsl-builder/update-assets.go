@@ -176,6 +176,9 @@ func generateAssetsForRelease(r wslReleaseInfo, wslPath, metaPath, rootPath stri
 		if err := mw.SetImageCompressionQuality(95); err != nil {
 			return err
 		}
+		if err := mw.StripImage(); err != nil {
+			return err
+		}
 
 		assetsDest := filepath.Join(wslPath, assetsRelDir, f.Name())
 		if err := os.MkdirAll(filepath.Dir(assetsDest), 0755); err != nil {
@@ -216,7 +219,7 @@ func generateAssetsForRelease(r wslReleaseInfo, wslPath, metaPath, rootPath stri
 	}
 
 	_, err = imagick.ConvertImageCommand([]string{
-		"convert", "-background", "none", src, "-resize", "256x256", "-define",
+		"convert", "-strip", "-background", "none", src, "-resize", "256x256", "-define",
 		"icon:auto-resize=16,32,48,256",
 		dest,
 	})
