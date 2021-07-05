@@ -8,7 +8,7 @@ on:
       - 'DistroLauncher/DistributionInfo.h'
       - 'DistroLauncher-Appx/*'
       - '.github/workflows/detect-update-releases.yaml'
-      - 'wsl-builder/*'
+      - 'wsl-builder/**'
   schedule:
     - cron: '42 0 * * 6'
 
@@ -38,9 +38,9 @@ jobs:
           cat  /tmp/all-releases.csv
       - name: Update current metadata and asset for all releases
         run: |
-          cd wsl-builder/
+          cd wsl-builder/prepare-assets
           go build .
-          ./wsl-builder assets /tmp/all-releases.csv
+          ./prepare-assets /tmp/all-releases.csv
       - name: Add any changes to git
         run: |
           git add .
