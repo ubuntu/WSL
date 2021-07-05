@@ -248,16 +248,16 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 			return fmt.Errorf("copy %q to %q failed: %v", path, relPath, err)
 		}
 
-		if filepath.Ext(path) == "appxmanifest" {
-			d, err := os.ReadFile(path)
+		if filepath.Ext(relPath) == "appxmanifest" {
+			d, err := os.ReadFile(relPath)
 			if err != nil {
-				return fmt.Errorf("failed to read %q: %v", path, err)
+				return fmt.Errorf("failed to read %q: %v", relPath, err)
 			}
 			d = bytes.ReplaceAll(d, []byte("[[BUILD_ID]]"), []byte(buildNumber))
 			d = bytes.ReplaceAll(d, []byte("[[WIN_ARCH]]"), []byte(archString))
 
-			if err := os.WriteFile(path, d, de.Type().Perm()); err != nil {
-				return fmt.Errorf("failed to write %q: %v", path, err)
+			if err := os.WriteFile(relPath, d, de.Type().Perm()); err != nil {
+				return fmt.Errorf("failed to write %q: %v", relPath, err)
 			}
 		}
 
