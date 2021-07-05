@@ -170,13 +170,8 @@ func generateAssetsForRelease(r wslReleaseInfo, wslPath, metaPath, rootPath stri
 		mw = mw.Clone()
 		defer mw.Destroy()
 
-		// TODO: read image depth from source to replicate
-		// There is a limitation of 200K to the image size uploaded to the store.
-		var imgDepth uint = 16
-		if f.Name() == "Wide310x150Logo.scale-400.png" {
-			imgDepth = 8
-		}
-		if err := mw.SetImageDepth(imgDepth); err != nil {
+		// There is a limitation of 200K to the image size uploaded to the store. All source images are 8 bits.
+		if err := mw.SetImageDepth(8); err != nil {
 			return err
 		}
 		if err := mw.ResizeImage(uint(src.Width), uint(src.Height), imagick.FILTER_LANCZOS, 1); err != nil {
