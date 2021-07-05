@@ -71,11 +71,84 @@ jobs:
     needs: build-matrix
     strategy:
       matrix: ${{fromJson(needs.build-matrix.outputs.matrix)}}
+    env:
+      artifactsPath: 'build-artefacts/'
     steps:
+      - name: Download build artefacts
+        if: ${{  matrix.Upload == 'yes' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artifacts-${{ matrix.WslID }}
+          path: ${{ env.artifactsPath }}
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.goversion }}
       - name: Print matrix content
+        shell: bash
         run: |
-          wget http://cloud-images.ubuntu.com/impish/current/SHA256SUMS
-          sha256sum -c SHA256SUMS
-          echo ${{ matrix.WslID }}
-          echo ${{ matrix.Rootfses }}
-          echo ${{ matrix.Upload }}
+          set -eu
+          # Download rootfses, checksum and place them at the correct place
+          # TODO: what if we changed only assets?
+          # if not upload:
+          # build-id is 9999
+          cd wsl-builder/
+          go build .
+          cd ../
+          envValues=$(./wsl-builder/wsl-builder prepare-build ${{ env.artifactsPath }}) ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum
+
+          # Prepare env variables for msbuild
+          echo ${envValues} >> ${GITHUB_ENV}
+          buildMode="SideloadOnly"
+          if [ ${{ matrix.Upload }} = "yes" ]; then
+            buildMode="StoreUpload"
+          fi
+          echo "UapAppxPackageBuildMode=${buildMode}" >> $GITHUB_ENV
+      - name: Setup MSBuild (PATH)
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Install certificate
+        shell: powershell
+        run: |
+          New-Item -ItemType directory -Path certificate
+          Set-Content -Path certificate\certificate.txt -Value '${{ secrets.TESTCERTIFICATE }}'
+          certutil -decode certificate\certificate.txt certificate\certificate.pfx
+
+          $pwd = ConvertTo-SecureString  '${{ secrets.TESTCERTIFICATE_PASSWORD }}' -AsPlainText -Force
+          Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
+          Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
+      - name: Build DistroLauncher
+        run:  msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="${{ env.AppxBundlePlatforms }}" /p:UapAppxPackageBuildMode=${{ env.UapAppxPackageBuildMode }} -verbosity:normal
+      - name: Allow downloading new appbundle
+        if: ${{ matrix.Upload != 'yes' }}
+        run: |
+          echo "TODO"
+      - name: Check if we need to upload new build
+        id: upload-build
+        if: ${{ matrix.Upload == 'yes' }}
+        shell:  bash
+        run: |
+          set -eu
+          # Store md5sum of rootfs and launchers
+          md5sum */install.tar.gz */Release/launcher.exe|sort >> ${{ env.artifactsPath }}-new/fingerprint
+
+          echo "::set-output uploaded=false"
+          hasChanges="$(diff -Nu ${{ env.artifactsPath }}/fingerprint ${{ env.artifactsPath }}-new/fingerprint)"
+          if [ -z "${hasChanges}" ]; then
+            exit 0
+          fi
+
+          echo "Uploading new version: some files have changed:"
+          echo "${hasChanges}"
+
+          # TODO: upload to the store
+
+          echo "::set-output uploaded=true"
+
+          rm -r ${{ env.artifactsPath }}
+          mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
+      - name: Upload build artefacts
+        if: ${{ matrix.Upload == 'yes' || steps.upload-build.uploaded == 'true' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts-${{ matrix.WslID }}
+          path: ${{ env.artifactsPath }}-new
