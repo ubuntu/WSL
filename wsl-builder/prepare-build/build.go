@@ -232,10 +232,7 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 		}
 	}()
 
-	archString := strings.Join(arches, "|")
-	// Print for github env variable
-	fmt.Println(archString)
-
+	// Copy content from meta/
 	rootDir := filepath.Join(rootPath, "meta", wslID)
 	if err := filepath.WalkDir(rootDir, func(path string, de fs.DirEntry, err error) error {
 		if de.IsDir() {
@@ -248,23 +245,30 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 			return fmt.Errorf("copy %q to %q failed: %v", path, relPath, err)
 		}
 
-		if filepath.Ext(path) == "appxmanifest" {
-			d, err := os.ReadFile(path)
-			if err != nil {
-				return fmt.Errorf("failed to read %q: %v", path, err)
-			}
-			d = bytes.ReplaceAll(d, []byte("[[BUILD_ID]]"), []byte(buildNumber))
-			d = bytes.ReplaceAll(d, []byte("[[WIN_ARCH]]"), []byte(archString))
-
-			if err := os.WriteFile(path, d, de.Type().Perm()); err != nil {
-				return fmt.Errorf("failed to write %q: %v", path, err)
-			}
-		}
-
 		return nil
 	}); err != nil {
 		return err
 	}
+
+	// Prepare appxmanifest
+	appxManifest := filepath.Join("DistroLauncher-Appx", "MyDistro.appxmanifest")
+	for _, arch := range arches {
+		d, err := os.ReadFile(appxManifest)
+		if err != nil {
+			return fmt.Errorf("failed to read %q: %v", appxManifest, err)
+		}
+		d = bytes.ReplaceAll(d, []byte("[[BUILD_ID]]"), []byte(buildNumber))
+		d = bytes.ReplaceAll(d, []byte("[[WIN_ARCH]]"), []byte(strings.ToLower(arch)))
+
+		destPath := filepath.Join(rootPath, arch, filepath.Base(appxManifest))
+		if err := os.WriteFile(destPath, d, 0644); err != nil {
+			return fmt.Errorf("failed to write %q: %v", destPath, err)
+		}
+	}
+
+	// Print for github env variable
+	archString := strings.Join(arches, "|")
+	fmt.Println(archString)
 
 	return nil
 }
