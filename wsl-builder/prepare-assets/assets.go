@@ -86,7 +86,7 @@ func generateMetaFilesForRelease(r wslReleaseInfo, wslPath, rootPath string) (er
 			return err
 		}
 		templateData := string(data)
-		if !strings.Contains(templateData, "{{.") {
+		if filepath.Ext(path) == ".png" || !strings.Contains(templateData, "{{.") {
 			return nil
 		}
 
@@ -170,10 +170,11 @@ func generateAssetsForRelease(r wslReleaseInfo, wslPath, metaPath, rootPath stri
 		mw = mw.Clone()
 		defer mw.Destroy()
 
-		if err := mw.ResizeImage(uint(src.Width), uint(src.Height), imagick.FILTER_LANCZOS, 1); err != nil {
+		// There is a limitation of 200K to the image size uploaded to the store. All source images are 8 bits.
+		if err := mw.SetImageDepth(8); err != nil {
 			return err
 		}
-		if err := mw.SetImageCompressionQuality(95); err != nil {
+		if err := mw.ResizeImage(uint(src.Width), uint(src.Height), imagick.FILTER_LANCZOS, 1); err != nil {
 			return err
 		}
 		if err := mw.StripImage(); err != nil {
