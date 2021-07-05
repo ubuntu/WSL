@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/termie/go-shutil"
+	shutil "github.com/termie/go-shutil"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -27,17 +27,23 @@ var (
 )
 
 func prepareBuild(artifactsPath, wslID, rootfses string, noChecksum bool) error {
+	rootPath, err := getPathWith("DistroLauncher-Appx")
+	if err != nil {
+		return err
+	}
+	rootPath = filepath.Dir(rootPath)
+
 	buildNumber, err := extractAndStoreNextBuildNumber(artifactsPath)
 	if err != nil {
 		return err
 	}
 
-	archs, err := downloadRootfses(rootfses, noChecksum)
+	archs, err := downloadRootfses(rootPath, rootfses, noChecksum)
 	if err != nil {
 		return err
 	}
 
-	if err := prepareAssets(wslID, buildNumber, archs); err != nil {
+	if err := prepareAssets(rootPath, wslID, buildNumber, archs); err != nil {
 		return err
 	}
 
@@ -72,7 +78,7 @@ func extractAndStoreNextBuildNumber(artifactsPath string) (buildNumber string, e
 }
 
 // downloadRootfses and returns a list of windows archs we will build on
-func downloadRootfses(rootfses string, noChecksum bool) ([]string, error) {
+func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]string, error) {
 	requestedArches := make(map[string]struct{})
 
 	var g errgroup.Group
@@ -85,11 +91,12 @@ func downloadRootfses(rootfses string, noChecksum bool) ([]string, error) {
 		switch len(e) {
 		case 1:
 			// Autodetect arch from url
-			for _, a := range linuxToWindowsArch {
+			for a := range linuxToWindowsArch {
 				if !strings.Contains(url, a) {
 					continue
 				}
 				arch = a
+				break
 			}
 		case 2:
 			arch = e[1]
@@ -98,7 +105,7 @@ func downloadRootfses(rootfses string, noChecksum bool) ([]string, error) {
 		}
 		winArch, ok := linuxToWindowsArch[arch]
 		if !ok {
-			return nil, fmt.Errorf("arch %q not supported in WSL (no Windows equivalent)", winArch)
+			return nil, fmt.Errorf("arch %q not supported in WSL (no Windows equivalent)", arch)
 		}
 		requestedArches[winArch] = struct{}{}
 
@@ -107,7 +114,7 @@ func downloadRootfses(rootfses string, noChecksum bool) ([]string, error) {
 			if err := os.MkdirAll(winArch, 0755); err != nil {
 				return err
 			}
-			if err := downloadFile(url, filepath.Join(winArch, "install.tar.gz")); err != nil {
+			if err := downloadFile(url, filepath.Join(rootPath, winArch, "install.tar.gz")); err != nil {
 				return err
 			}
 
@@ -116,10 +123,10 @@ func downloadRootfses(rootfses string, noChecksum bool) ([]string, error) {
 			}
 
 			checksumURL := filepath.Join(filepath.Dir(winArch), "SHA256SUMS")
-			if err := downloadFile(checksumURL, filepath.Join(winArch, "SHA256SUMS")); err != nil {
+			if err := downloadFile(checksumURL, filepath.Join(rootPath, winArch, "SHA256SUMS")); err != nil {
 				return err
 			}
-			if err := checksumMatches(filepath.Join(winArch, "install.tar.gz"), filepath.Base(url), checksumURL); err != nil {
+			if err := checksumMatches(filepath.Join(rootPath, winArch, "install.tar.gz"), filepath.Base(url), checksumURL); err != nil {
 				return err
 			}
 			return nil
@@ -135,7 +142,13 @@ func downloadRootfses(rootfses string, noChecksum bool) ([]string, error) {
 }
 
 // downloadFile into dest
-func downloadFile(url string, dest string) error {
+func downloadFile(url string, dest string) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("could not download %q: %v", url, err)
+		}
+	}()
+
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
@@ -212,7 +225,7 @@ func checksumMatches(path, origName, checksumPath string) (err error) {
 }
 
 // prepareAssets copies metadata and assets files, appending dynamic elements
-func prepareAssets(wslID, buildNumber string, arches []string) (err error) {
+func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("could not prepare assets and metadata: %v", err)
@@ -220,25 +233,31 @@ func prepareAssets(wslID, buildNumber string, arches []string) (err error) {
 	}()
 
 	archString := strings.Join(arches, "|")
+	// Print for github env variable
+	fmt.Println(archString)
 
-	rootDir := filepath.Join("meta", wslID)
+	rootDir := filepath.Join(rootPath, "meta", wslID)
 	if err := filepath.WalkDir(rootDir, func(path string, de fs.DirEntry, err error) error {
-		relPath := strings.TrimPrefix(path, rootDir)
+		if de.IsDir() {
+			return nil
+		}
+
+		relPath := strings.TrimPrefix(path, fmt.Sprintf("%s%c", rootDir, os.PathSeparator))
 
 		if err := shutil.CopyFile(path, relPath, false); err != nil {
-			return err
+			return fmt.Errorf("copy %q to %q failed: %v", path, relPath, err)
 		}
 
 		if filepath.Ext(path) == "appxmanifest" {
 			d, err := os.ReadFile(path)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to read %q: %v", path, err)
 			}
 			d = bytes.ReplaceAll(d, []byte("[[BUILD_ID]]"), []byte(buildNumber))
 			d = bytes.ReplaceAll(d, []byte("[[WIN_ARCH]]"), []byte(archString))
 
 			if err := os.WriteFile(path, d, de.Type().Perm()); err != nil {
-				return err
+				return fmt.Errorf("failed to write %q: %v", path, err)
 			}
 		}
 
