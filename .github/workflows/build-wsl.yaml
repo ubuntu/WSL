@@ -56,9 +56,9 @@ jobs:
             )"
           else
             wsl-builder/lp-distro-info > /tmp/all-releases.csv
-            cd wsl-builder/
+            cd ./wsl-builder/prepare-build
             go build .
-            builds_config="$(./wsl-builder build-github-matrix /tmp/all-releases.csv)"
+            builds_config="$(./prepare-build build-github-matrix /tmp/all-releases.csv)"
             builds="{\"include\":${builds_config}}"
           fi
 
@@ -84,7 +84,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.goversion }}
-      - name: Print matrix content
+      - name: Prepare project metadata, assets and download rootfses
         shell: bash
         run: |
           set -eu
@@ -92,13 +92,13 @@ jobs:
           # TODO: what if we changed only assets?
           # if not upload:
           # build-id is 9999
-          cd wsl-builder/
+          cd wsl-builder/prepare-build
           go build .
-          cd ../
-          envValues=$(./wsl-builder/wsl-builder prepare-build ${{ env.artifactsPath }}) ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum
+          cd ../../
+          archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum)"
+          echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
 
-          # Prepare env variables for msbuild
-          echo ${envValues} >> ${GITHUB_ENV}
+          # Prepare remaining env variables for msbuild
           buildMode="SideloadOnly"
           if [ ${{ matrix.Upload }} = "yes" ]; then
             buildMode="StoreUpload"
@@ -110,10 +110,10 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType directory -Path certificate
-          Set-Content -Path certificate\certificate.txt -Value '${{ secrets.TESTCERTIFICATE }}'
+          Set-Content -Path certificate\certificate.txt -Value '${{ secrets.CERTIFICATE }}'
           certutil -decode certificate\certificate.txt certificate\certificate.pfx
 
-          $pwd = ConvertTo-SecureString  '${{ secrets.TESTCERTIFICATE_PASSWORD }}' -AsPlainText -Force
+          $pwd = ConvertTo-SecureString  '${{ secrets.CERTIFICATE_PASSWORD }}' -AsPlainText -Force
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
       - name: Build DistroLauncher
@@ -147,7 +147,7 @@ jobs:
           rm -r ${{ env.artifactsPath }}
           mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
       - name: Upload build artefacts
-        if: ${{ matrix.Upload == 'yes' || steps.upload-build.uploaded == 'true' }}
+        if: ${{ steps.upload-build.uploaded == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
