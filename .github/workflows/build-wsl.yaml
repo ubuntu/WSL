@@ -88,6 +88,7 @@ jobs:
         shell: bash
         run: |
           set -eu
+
           # Download rootfses, checksum and place them at the correct place
           # TODO: what if we changed only assets?
           # if not upload:
