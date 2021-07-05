@@ -163,8 +163,8 @@
     <CustomBuild Include="$(targetname)">
       <FileType>Document</FileType>
       <ExcludedFromBuild>false</ExcludedFromBuild>
-      <Message>Copy `$(OutDir)\..\launcher.exe into `$(OutDir)\`$(targetname).exe</Message>
-      <Command>copy `$(OutDir)\..\launcher.exe `$(OutDir)\`$(targetname).exe</Command>
+      <Message>Copy $(OutDir)..\launcher.exe into $(OutDir)$(targetname).exe</Message>
+      <Command>copy $(OutDir)..\launcher.exe $(OutDir)$(targetname).exe</Command>
       <Outputs>$(targetname).exe</Outputs>
     </CustomBuild>
   </ItemGroup>
