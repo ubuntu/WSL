@@ -56,9 +56,9 @@ jobs:
             )"
           else
             wsl-builder/lp-distro-info > /tmp/all-releases.csv
-            cd wsl-builder/
+            cd ./wsl-builder/prepare-build
             go build .
-            builds_config="$(./wsl-builder build-github-matrix /tmp/all-releases.csv)"
+            builds_config="$(./prepare-build build-github-matrix /tmp/all-releases.csv)"
             builds="{\"include\":${builds_config}}"
           fi
 
@@ -84,7 +84,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.goversion }}
-      - name: Print matrix content
+      - name: Prepare project metadata, assets and download rootfses
         shell: bash
         run: |
           set -eu
@@ -92,13 +92,12 @@ jobs:
           # TODO: what if we changed only assets?
           # if not upload:
           # build-id is 9999
-          cd wsl-builder/
+          cd wsl-builder/prepare-build
           go build .
-          cd ../
-          envValues=$(./wsl-builder/wsl-builder prepare-build ${{ env.artifactsPath }}) ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum
+          cd ../../
+          echo "AppxBundlePlatforms=$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum)" >> $GITHUB_ENV
 
-          # Prepare env variables for msbuild
-          echo ${envValues} >> ${GITHUB_ENV}
+          # Prepare remaining env variables for msbuild
           buildMode="SideloadOnly"
           if [ ${{ matrix.Upload }} = "yes" ]; then
             buildMode="StoreUpload"
