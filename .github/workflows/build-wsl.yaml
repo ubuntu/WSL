@@ -116,12 +116,19 @@ jobs:
           $pwd = ConvertTo-SecureString  '${{ secrets.CERTIFICATE_PASSWORD }}' -AsPlainText -Force
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
-      - name: Build DistroLauncher
+      - name: Build Bundle
         run:  msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="${{ env.AppxBundlePlatforms }}" /p:UapAppxPackageBuildMode=${{ env.UapAppxPackageBuildMode }} -verbosity:normal
-      - name: Allow downloading new appbundle
-        if: ${{ matrix.Upload != 'yes' }}
+      - name: Print content
+        shell: bash
         run: |
-          echo "TODO"
+          find .
+      - name: Allow downloading new appxbundle
+        if: ${{ matrix.Upload != 'yes' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: appxbundle
+          path: ./AppPackages/**/*.appxbundle
+          retention-days: 7
       - name: Check if we need to upload new build
         id: upload-build
         if: ${{ matrix.Upload == 'yes' }}
