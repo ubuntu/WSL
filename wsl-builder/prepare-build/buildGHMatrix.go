@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 )
 
 type matrixElem struct {
@@ -12,8 +13,8 @@ type matrixElem struct {
 }
 
 // buildGHMatrix computes the list of distro that needs to start a build request.
-func buildGHMatrix(csvPath string) error {
-	releasesInfo, err := ReleasesInfo(csvPath)
+func buildGHMatrix(csvPath, metaPath string) error {
+	releasesInfo, err := ReleasesInfo(csvPath, filepath.Join(metaPath, "storeApplicationInfo.yaml"))
 	if err != nil {
 		return err
 	}
