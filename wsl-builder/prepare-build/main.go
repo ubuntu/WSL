@@ -28,7 +28,11 @@ func main() {
 				return errors.New("this command accepts exactly one CSV file")
 			}
 
-			return buildGHMatrix(args[0])
+			metaPath, err := getPathWith("meta")
+			if err != nil {
+				return err
+			}
+			return buildGHMatrix(args[0], metaPath)
 		},
 	}
 	rootCmd.AddCommand(buildGHMatrixCmd)
