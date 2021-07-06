@@ -95,7 +95,12 @@ jobs:
           cd wsl-builder/prepare-build
           go build .
           cd ../../
-          echo "AppxBundlePlatforms=$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum)" >> $GITHUB_ENV
+          platforms="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum)"
+          if [ -z "${platforms}" ]; then
+            echo "ERROR: preparing build failed"
+            exit 1
+          fi
+          echo "AppxBundlePlatforms=${platforms}" >> $GITHUB_ENV
 
           # Prepare remaining env variables for msbuild
           buildMode="SideloadOnly"
