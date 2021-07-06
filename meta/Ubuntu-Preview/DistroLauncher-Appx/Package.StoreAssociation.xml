@@ -362,10 +362,14 @@
   </SupportedLocales>
   <ProductReservedInfo>
     <MainPackageIdentityName>CanonicalGroupLimited.Ubuntu-Preview</MainPackageIdentityName>
+    <ReservedNames>
+      <ReservedName>Ubuntu on Windows</ReservedName>
+    </ReservedNames>
   </ProductReservedInfo>
   <AccountPackageIdentityNames>
+    <MainPackageIdentityName>CanonicalGroupLimited.Ubuntu16.04onWindows</MainPackageIdentityName>
   </AccountPackageIdentityNames>
-    <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9PJN388HP8C9">
+  <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9PJN388HP8C9">
     <BundleInfo>
       <PackageInfo>
         <OsMinVersion>0.0.0.0</OsMinVersion>
