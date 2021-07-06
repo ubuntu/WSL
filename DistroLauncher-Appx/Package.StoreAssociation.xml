@@ -366,7 +366,4 @@
       <ReservedName>{{.FullName}}</ReservedName>
     </ReservedNames>
   </ProductReservedInfo>
-  <AccountPackageIdentityNames>
-    <MainPackageIdentityName>CanonicalGroupLimited.Ubuntu16.04onWindows</MainPackageIdentityName>
-  </AccountPackageIdentityNames>
 </StoreAssociation>
