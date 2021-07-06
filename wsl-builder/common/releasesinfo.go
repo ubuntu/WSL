@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	yaml "gopkg.in/yaml.v3"
 )
 
 type wslReleaseInfo struct {
@@ -15,29 +17,43 @@ type wslReleaseInfo struct {
 	BuildVersion string
 	LauncherName string
 	IconVersion  string
+	AppStoreID   string
 
 	codeName    string
 	shouldBuild bool
 }
 
+type storeApplicationInfo struct {
+	AppStoreID string `yaml:"AppStoreID,omitempty"`
+}
+
 // ReleasesInfo returns all releases we care about from a csvPath.
-func ReleasesInfo(csvPath string) (releasesInfo []wslReleaseInfo, err error) {
+func ReleasesInfo(csvPath string, storeAppInfoPath string) (releasesInfo []wslReleaseInfo, err error) {
 	releases, err := readCSV(csvPath)
 	if err != nil {
 		return nil, err
 	}
 
-	return buildWSLReleaseInfo(releases)
+	d, err := os.ReadFile(storeAppInfoPath)
+	if err != nil {
+		return nil, err
+	}
+
+	i := make(map[string]storeApplicationInfo)
+	if err = yaml.Unmarshal(d, &i); err != nil {
+		return nil, err
+	}
+
+	return buildWSLReleaseInfo(releases, i)
 }
 
 // buildWSLReleaseInfo extracts WSL supported releases from the releases content
 // and returns a slice of wslReleaseInfo, ready to be used from templates.
-func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err error) {
+func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]storeApplicationInfo) (wslReleases []wslReleaseInfo, err error) {
 	var latestLTSReleasedDate string
 	var ubuntuWSL wslReleaseInfo
 
 	for _, release := range releases {
-
 		minor, err := strconv.Atoi(release[1])
 		if err != nil {
 			return nil, fmt.Errorf("minor version is not an int: %v", err)
@@ -49,16 +65,23 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err
 
 		// There is always a development release, LTS or not
 		if release[4] == "Active Development" {
+			wslID := "Ubuntu-Preview"
+			storeInfo, exists := storeApplicationsInfo[wslID]
+			if !exists {
+				return nil, fmt.Errorf("no store application info for %q. Please register the application and provide it", wslID)
+			}
 			wslReleases = append(wslReleases, wslReleaseInfo{
-				WslID:        "Ubuntu-Preview",
+				WslID:        wslID,
 				FullName:     "Ubuntu (Preview)",
 				BuildVersion: buildVersion,
 				LauncherName: "ubuntupreview",
 				IconVersion:  "Preview",
+				AppStoreID:   storeInfo.AppStoreID,
 
 				codeName:    codeName,
 				shouldBuild: true,
 			})
+
 		}
 
 		// We have one application per LTSes, starting with 18.04 LTSes and onwards.
@@ -91,13 +114,20 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err
 		// we don’t want to display in FullName or IconVersion the .0 suffix. BuildVersion stays as it.
 		version = strings.TrimSuffix(version, ".0")
 
+		wslID := fmt.Sprintf("Ubuntu-%s-LTS", release[0])
+		storeInfo, exists := storeApplicationsInfo[wslID]
+		if !exists {
+			return nil, fmt.Errorf("no store application info for %q. Please register the application and provide it", wslID)
+		}
+
 		// Add per-release application
 		wsl := wslReleaseInfo{
-			WslID:        fmt.Sprintf("Ubuntu-%s-LTS", release[0]),
+			WslID:        wslID,
 			FullName:     fmt.Sprintf("Ubuntu %s LTS", version),
 			BuildVersion: buildVersion,
 			LauncherName: launcherName,
 			IconVersion:  fmt.Sprintf("%s LTS", version),
+			AppStoreID:   storeInfo.AppStoreID,
 
 			codeName:    codeName,
 			shouldBuild: shouldBuild,
