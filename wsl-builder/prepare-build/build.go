@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -144,6 +145,7 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 
 // downloadFile into dest
 func downloadFile(url string, dest string) (err error) {
+	log.Printf("downloading file %s", url)
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("could not download %q: %v", url, err)
@@ -152,7 +154,7 @@ func downloadFile(url string, dest string) (err error) {
 
 	// Get the data
 	var netClient = &http.Client{
-		Timeout: 2 * time.Minute,
+		Timeout: 10 * time.Minute,
 	}
 	resp, err := netClient.Get(url)
 	if err != nil {
