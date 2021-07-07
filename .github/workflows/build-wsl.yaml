@@ -76,6 +76,7 @@ jobs:
     steps:
       - name: Download build artefacts
         if: ${{  matrix.Upload == 'yes' }}
+        continue-on-error: true # if the artifact doesn't exist
         uses: actions/download-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
