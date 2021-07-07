@@ -127,7 +127,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: appxbundle
-          path: ./AppPackages/**/*.appxbundle
+          path: ./AppPackages/Ubuntu/Ubuntu_*/
           retention-days: 7
       - name: Check if we need to upload new build
         id: upload-build
