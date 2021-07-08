@@ -72,7 +72,7 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.build-matrix.outputs.matrix)}}
     env:
-      artifactsPath: 'build-artefacts/'
+      artifactsPath: 'build-artefacts'
     steps:
       - name: Download build artefacts
         if: ${{  matrix.Upload == 'yes' }}
