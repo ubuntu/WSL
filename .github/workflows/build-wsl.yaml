@@ -10,6 +10,10 @@ on:
         description: 'Ubuntu WSL rootfs urls, separated by a colon. Direct set of "tar.gz::arch" if arch is not in the filename'
         required: true
         default: ''
+      upload:
+        description: 'Should we upload the appxbundle to the store'
+        required: true
+        default: 'no'
   schedule:
     - cron: '0 10 * * *'
 
@@ -48,7 +52,7 @@ jobs:
                   {
                     "WslID": "${wslID}",
                     "Rootfses": "${{ github.event.inputs.rootfses }}",
-                    "Upload": "no"
+                    "Upload": "${{ github.event.inputs.upload }}"
                   }
                 ]
               }
@@ -91,12 +95,14 @@ jobs:
           set -eu
           # Download rootfses, checksum and place them at the correct place
           # TODO: what if we changed only assets?
-          # if not upload:
-          # build-id is 9999
           cd wsl-builder/prepare-build
           go build .
           cd ../../
-          archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum)"
+          extraArgs=""
+          if [ ${{ matrix.Upload }} != "yes" ]; then
+            extraArgs="--build-id 9999 --no-checksum"
+          fi
+          archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
 
           # Prepare remaining env variables for msbuild
@@ -127,7 +133,7 @@ jobs:
         if: ${{ matrix.Upload != 'yes' }}
         uses: actions/upload-artifact@v2
         with:
-          name: appxbundle
+          name: appxbundle-${{ matrix.WslID }}
           path: ./AppPackages/Ubuntu/Ubuntu_*/
           retention-days: 7
       - name: Check if we need to upload new build

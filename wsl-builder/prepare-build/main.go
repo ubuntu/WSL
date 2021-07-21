@@ -38,6 +38,7 @@ func main() {
 	rootCmd.AddCommand(buildGHMatrixCmd)
 
 	var noChecksum *bool
+	var buildID *int
 	prepareBuildCmd := &cobra.Command{
 		Use:   "prepare ARTIFACTS_PATH WSL_ID ROOTFSES",
 		Short: "Prepares the build source before calling msbuild",
@@ -45,11 +46,12 @@ func main() {
 		       building the appx bundle`,
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return prepareBuild(args[0], args[1], args[2], *noChecksum)
+			return prepareBuild(args[0], args[1], args[2], *noChecksum, *buildID)
 		},
 	}
 	rootCmd.AddCommand(prepareBuildCmd)
 	noChecksum = prepareBuildCmd.Flags().Bool("no-checksum", false, "Disable checksum verification on rootfses")
+	buildID = prepareBuildCmd.Flags().Int("build-id", -1, "Force a build ID")
 
 	err := rootCmd.Execute()
 	if err != nil {
