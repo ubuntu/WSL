@@ -28,16 +28,21 @@ var (
 	}
 )
 
-func prepareBuild(artifactsPath, wslID, rootfses string, noChecksum bool) error {
+func prepareBuild(artifactsPath, wslID, rootfses string, noChecksum bool, buildID int) error {
 	rootPath, err := getPathWith("DistroLauncher-Appx")
 	if err != nil {
 		return err
 	}
 	rootPath = filepath.Dir(rootPath)
 
-	buildNumber, err := extractAndStoreNextBuildNumber(artifactsPath)
-	if err != nil {
-		return err
+	var buildNumber string
+	if buildID < 0 {
+		if buildNumber, err = extractAndStoreNextBuildNumber(artifactsPath); err != nil {
+			return err
+		}
+	} else {
+		// force a manual build number
+		buildNumber = fmt.Sprintf("%d", buildID)
 	}
 
 	archs, err := downloadRootfses(rootPath, rootfses, noChecksum)
