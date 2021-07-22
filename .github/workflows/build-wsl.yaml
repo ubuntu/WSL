@@ -153,8 +153,8 @@ jobs:
           # Store md5sum of rootfs and launchers
           md5sum */install.tar.gz */Release/launcher.exe|sort >> ${{ env.artifactsPath }}-new/fingerprint
 
-          echo "::set-output uploaded=false"
-          hasChanges="$(diff -Nu ${{ env.artifactsPath }}/fingerprint ${{ env.artifactsPath }}-new/fingerprint)"
+          echo "::set-output upload-done=false"
+          hasChanges="$(diff -Nu ${{ env.artifactsPath }}/fingerprint ${{ env.artifactsPath }}-new/fingerprint || true)"
           if [ -z "${hasChanges}" ]; then
             exit 0
           fi
@@ -164,12 +164,12 @@ jobs:
 
           # TODO: upload to the store
 
-          echo "::set-output uploaded=true"
+          echo "::set-output upload-done=true"
 
           rm -r ${{ env.artifactsPath }}
           mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
       - name: Upload build artefacts
-        if: ${{ steps.upload-build.uploaded == 'true' }}
+        if: ${{ steps.upload-build.upload-done == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
