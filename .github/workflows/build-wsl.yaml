@@ -10,10 +10,14 @@ on:
         description: 'Ubuntu WSL rootfs urls, separated by a colon. Direct set of "tar.gz::arch" if arch is not in the filename'
         required: true
         default: ''
+      rootfseschecksum:
+        description: 'Should download a SHA256SUMS file to check the rootfs'
+        required: true
+        default: 'yes'
       upload:
         description: 'Should we upload the appxbundle to the store'
         required: true
-        default: 'no'
+        default: 'yes'
   schedule:
     - cron: '0 10 * * *'
 
@@ -52,6 +56,7 @@ jobs:
                   {
                     "WslID": "${wslID}",
                     "Rootfses": "${{ github.event.inputs.rootfses }}",
+                    "RootfsesChecksum": "${{ github.event.inputs.rootfseschecksum }}",
                     "Upload": "${{ github.event.inputs.upload }}"
                   }
                 ]
@@ -100,7 +105,10 @@ jobs:
           cd ../../
           extraArgs=""
           if [ ${{ matrix.Upload }} != "yes" ]; then
-            extraArgs="--build-id 9999 --no-checksum"
+            extraArgs="--build-id 9999"
+          fi
+          if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
+            extraArgs="${extraArgs} --no-checksum"
           fi
           archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
