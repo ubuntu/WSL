@@ -46,8 +46,8 @@ def lpinit():
     return Launchpad.login_anonymously('lpdistroinfo', 'production', version='devel')
 
 
-def releases(lpconn, args):
-    """returns the list of releases matching the filters in args"""
+def releases(lpconn, all, active, supported, devel, lts):
+    """returns the list of releases matching the filters"""
     ubuntu = lpconn.distributions[DISTRIBUTION.lower()]
 
     for serie in ubuntu.series:
@@ -76,15 +76,15 @@ def releases(lpconn, args):
 
             description += " LTS"
 
-        if not args.all:
-            if args.active and not serie.active:
+        if not all:
+            if active and not serie.active:
                 continue
-            if args.supported and not serie.supported:
+            if supported and not serie.supported:
                 continue
-            if args.devel and not (serie.active and not serie.supported):
+            if devel and not (serie.active and not serie.supported):
                 continue
 
-        if args.lts and not lts:
+        if lts and not lts:
             continue
 
         yield (
@@ -109,7 +109,7 @@ def main():
     logging.debug("arguments: %s", args)
 
     lpconn = lpinit()
-    for i in releases(lpconn, args):
+    for i in releases(lpconn, args.all, args.active, args.supported, args.devel, args.lts):
         print("\t".join(i))
     return 0
 
