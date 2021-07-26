@@ -193,7 +193,7 @@ func downloadFile(url string, dest string) (err error) {
 func checksumMatches(path, origName, checksumPath string) (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("error checking checksum for: %q", path)
+			err = fmt.Errorf("error checking checksum for: %q: %v", path, err)
 		}
 	}()
 
