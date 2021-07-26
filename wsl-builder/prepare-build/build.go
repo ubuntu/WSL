@@ -136,7 +136,7 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 				return err
 			}
 			u.Path = filepath.Join(path.Dir(u.Path), "SHA256SUMS")
-			checksumURL := u.String()
+			checksumURL := strings.ReplaceAll(u.String(), "%5C", "/")
 			checksumDest := filepath.Join(rootPath, winArch, "SHA256SUMS")
 			if err := downloadFile(checksumURL, checksumDest); err != nil {
 				return err
