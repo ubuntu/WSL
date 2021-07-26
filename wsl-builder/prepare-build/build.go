@@ -9,7 +9,9 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -91,7 +93,7 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 	var g errgroup.Group
 	for _, rootfs := range strings.Split(rootfses, ",") {
 		e := strings.Split(rootfs, "::")
-		url := e[0]
+		rootfsURL := e[0]
 
 		// Register arch
 		var arch string
@@ -99,7 +101,7 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 		case 1:
 			// Autodetect arch from url
 			for a := range linuxToWindowsArch {
-				if !strings.Contains(url, a) {
+				if !strings.Contains(rootfsURL, a) {
 					continue
 				}
 				arch = a
@@ -121,7 +123,7 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 			if err := os.MkdirAll(winArch, 0755); err != nil {
 				return err
 			}
-			if err := downloadFile(url, filepath.Join(rootPath, winArch, "install.tar.gz")); err != nil {
+			if err := downloadFile(rootfsURL, filepath.Join(rootPath, winArch, "install.tar.gz")); err != nil {
 				return err
 			}
 
@@ -129,11 +131,17 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 				return nil
 			}
 
-			checksumURL := filepath.Join(filepath.Dir(winArch), "SHA256SUMS")
-			if err := downloadFile(checksumURL, filepath.Join(rootPath, winArch, "SHA256SUMS")); err != nil {
+			u, err := url.Parse(rootfsURL)
+			if err != nil {
 				return err
 			}
-			if err := checksumMatches(filepath.Join(rootPath, winArch, "install.tar.gz"), filepath.Base(url), checksumURL); err != nil {
+			u.Path = filepath.Join(path.Dir(u.Path), "SHA256SUMS")
+			checksumURL := u.String()
+			checksumDest := filepath.Join(rootPath, winArch, "SHA256SUMS")
+			if err := downloadFile(checksumURL, checksumDest); err != nil {
+				return err
+			}
+			if err := checksumMatches(filepath.Join(rootPath, winArch, "install.tar.gz"), filepath.Base(rootfsURL), checksumDest); err != nil {
 				return err
 			}
 			return nil
