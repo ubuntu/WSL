@@ -166,7 +166,7 @@ jobs:
 
           echo "::set-output upload-done=true"
 
-          rm -r ${{ env.artifactsPath }}
+          rm -rf ${{ env.artifactsPath }}
           mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
       - name: Upload build artefacts
         if: ${{ steps.upload-build.upload-done == 'true' }}
