@@ -10,6 +10,14 @@ on:
         description: 'Ubuntu WSL rootfs urls, separated by a colon. Direct set of "tar.gz::arch" if arch is not in the filename'
         required: true
         default: ''
+      rootfseschecksum:
+        description: 'Should download a SHA256SUMS file to check the rootfs'
+        required: true
+        default: 'yes'
+      upload:
+        description: 'Should we upload the appxbundle to the store'
+        required: true
+        default: 'yes'
   schedule:
     - cron: '0 10 * * *'
 
@@ -48,7 +56,8 @@ jobs:
                   {
                     "WslID": "${wslID}",
                     "Rootfses": "${{ github.event.inputs.rootfses }}",
-                    "Upload": "no"
+                    "RootfsesChecksum": "${{ github.event.inputs.rootfseschecksum }}",
+                    "Upload": "${{ github.event.inputs.upload }}"
                   }
                 ]
               }
@@ -91,12 +100,17 @@ jobs:
           set -eu
           # Download rootfses, checksum and place them at the correct place
           # TODO: what if we changed only assets?
-          # if not upload:
-          # build-id is 9999
           cd wsl-builder/prepare-build
           go build .
           cd ../../
-          archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} --no-checksum)"
+          extraArgs=""
+          if [ ${{ matrix.Upload }} != "yes" ]; then
+            extraArgs="--build-id 9999"
+          fi
+          if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
+            extraArgs="${extraArgs} --no-checksum"
+          fi
+          archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
 
           # Prepare remaining env variables for msbuild
@@ -127,7 +141,7 @@ jobs:
         if: ${{ matrix.Upload != 'yes' }}
         uses: actions/upload-artifact@v2
         with:
-          name: appxbundle
+          name: appxbundle-${{ matrix.WslID }}
           path: ./AppPackages/Ubuntu/Ubuntu_*/
           retention-days: 7
       - name: Check if we need to upload new build
@@ -139,8 +153,8 @@ jobs:
           # Store md5sum of rootfs and launchers
           md5sum */install.tar.gz */Release/launcher.exe|sort >> ${{ env.artifactsPath }}-new/fingerprint
 
-          echo "::set-output uploaded=false"
-          hasChanges="$(diff -Nu ${{ env.artifactsPath }}/fingerprint ${{ env.artifactsPath }}-new/fingerprint)"
+          echo "::set-output upload-done=false"
+          hasChanges="$(diff -Nu ${{ env.artifactsPath }}/fingerprint ${{ env.artifactsPath }}-new/fingerprint || true)"
           if [ -z "${hasChanges}" ]; then
             exit 0
           fi
@@ -150,12 +164,12 @@ jobs:
 
           # TODO: upload to the store
 
-          echo "::set-output uploaded=true"
+          echo "::set-output upload-done=true"
 
           rm -r ${{ env.artifactsPath }}
           mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
       - name: Upload build artefacts
-        if: ${{ steps.upload-build.uploaded == 'true' }}
+        if: ${{ steps.upload-build.upload-done == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}

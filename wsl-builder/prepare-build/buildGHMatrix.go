@@ -7,9 +7,10 @@ import (
 )
 
 type matrixElem struct {
-	WslID    string
-	Rootfses string
-	Upload   string
+	WslID            string
+	Rootfses         string
+	RootfsesChecksum string
+	Upload           string
 }
 
 // buildGHMatrix computes the list of distro that needs to start a build request.
@@ -37,9 +38,10 @@ func buildGHMatrix(csvPath, metaPath string) error {
 		}
 
 		allBuilds = append(allBuilds, matrixElem{
-			WslID:    r.WslID,
-			Rootfses: rootfses,
-			Upload:   "yes",
+			WslID:            r.WslID,
+			Rootfses:         rootfses,
+			RootfsesChecksum: "yes",
+			Upload:           "yes",
 		})
 	}
 
