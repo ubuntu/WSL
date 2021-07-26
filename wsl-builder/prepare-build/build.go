@@ -231,7 +231,9 @@ func checksumMatches(path, origName, checksumPath string) (err error) {
 			continue
 		}
 
+		fmt.Fprintln(os.Stderr, e[1], origName)
 		e[1] = strings.TrimSuffix(e[1], "*")
+		fmt.Fprintln(os.Stderr, e[1])
 		if e[1] != origName {
 			continue
 		}
