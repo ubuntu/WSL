@@ -16,7 +16,7 @@ namespace DistributionInfo
     const std::wstring Name = L"Ubuntu-18.04-LTS";
 
     // The title bar for the console window while the distribution is installing.
-    const std::wstring WindowTitle = L"Ubuntu 18.04.5 LTS";
+    const std::wstring WindowTitle = L"Ubuntu 18.04 LTS";
 
     // Create and configure a user account.
     bool CreateUser(std::wstring_view userName);
