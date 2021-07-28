@@ -118,6 +118,8 @@ jobs:
           if [ ${{ matrix.Upload }} = "yes" ]; then
             buildMode="StoreUpload"
           fi
+          # Test: try always StoreUpload mode to get appxupload file
+          buildMode="StoreUpload"
           echo "UapAppxPackageBuildMode=${buildMode}" >> $GITHUB_ENV
       - name: Setup MSBuild (PATH)
         uses: microsoft/setup-msbuild@v1.0.2
@@ -138,11 +140,12 @@ jobs:
         run: |
           find .
       - name: Allow downloading new appxbundle
-        if: ${{ matrix.Upload != 'yes' }}
         uses: actions/upload-artifact@v2
         with:
           name: appxbundle-${{ matrix.WslID }}
-          path: ./AppPackages/Ubuntu/Ubuntu_*/
+          path: |
+            ./AppPackages/Ubuntu/Ubuntu_*/
+            ./AppPackages/Ubuntu/Ubuntu_*.appxupload
           retention-days: 7
       - name: Check if we need to upload new build
         id: upload-build
@@ -169,7 +172,7 @@ jobs:
           rm -rf ${{ env.artifactsPath }}
           mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
       - name: Upload build artefacts
-        if: ${{ steps.upload-build.upload-done == 'true' }}
+        if: ${{ steps.upload-build.outputs.upload-done == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
