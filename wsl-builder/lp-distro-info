@@ -62,7 +62,7 @@ def releases(lpconn, all, active, supported, devel, lts):
         description = "%s %s" % (DISTRIBUTION, serie.version)
         next_milestone = ""
         if lts:
-            for milestone in serie.active_milestones:
+            for milestone in serie.all_milestones:
                 m = milestone.name.split('-')[1]
                 if m == "updates":
                     continue
