@@ -111,8 +111,8 @@ def main():
     logging.debug("arguments: %s", args)
 
     github_token = os.environ.get("WSL_GITHUB_TOKEN")
-    if args.github_token:
-        github_token = args.github_token
+    if args.wsl_github_token:
+        github_token = args.wsl_github_token
     if not github_token:
         logging.error("GitHub token not found in environment or passed with -t")
         sys.exit(1)
@@ -288,7 +288,7 @@ def _parse_arguments():
                         help="ppa to use livecd-rootfs from. Syntax is user/ppa")
     parser.add_argument("-u", "--with-upload", dest="upload", default=False,
                         help="upload the appbundle to the Microsoft Store")
-    parser.add_argument("-t", "--github-token", dest="github_token",
+    parser.add_argument("-t", "--github-token", dest="wsl_github_token",
                         help="Pass a github token with the repo:public_repo permission to run github worklows. Override WSL_GITHUB_TOKEN env variable")
 
     return parser.parse_args()
