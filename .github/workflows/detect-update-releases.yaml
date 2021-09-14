@@ -20,7 +20,7 @@ jobs:
     name: Update and create metadata and assets for releases
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:devel
+      image: ubuntu:latest
     steps:
       - name: Install git and dependencies
         run: |
