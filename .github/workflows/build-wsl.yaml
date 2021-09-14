@@ -84,7 +84,6 @@ jobs:
       artifactsPath: 'build-artefacts'
     steps:
       - name: Download build artefacts
-        if: ${{  matrix.Upload == 'yes' }}
         continue-on-error: true # if the artifact doesn't exist
         uses: actions/download-artifact@v2
         with:
@@ -113,12 +112,7 @@ jobs:
           archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
 
-          # Prepare remaining env variables for msbuild
-          buildMode="SideloadOnly"
-          if [ ${{ matrix.Upload }} = "yes" ]; then
-            buildMode="StoreUpload"
-          fi
-          # Test: try always StoreUpload mode to get appxupload file
+          # Always StoreUpload mode to get appxupload file
           buildMode="StoreUpload"
           echo "UapAppxPackageBuildMode=${buildMode}" >> $GITHUB_ENV
       - name: Setup MSBuild (PATH)
@@ -162,7 +156,6 @@ jobs:
           # Store md5sum of rootfs and launchers
           md5sum */install.tar.gz */Release/launcher.exe|sort >> ${{ env.artifactsPath }}-new/fingerprint
 
-          echo "::set-output name=upload-done::false"
           hasChanges="$(diff -Nu ${{ env.artifactsPath }}/fingerprint ${{ env.artifactsPath }}-new/fingerprint || true)"
           if [ -z "${hasChanges}" ]; then
             exit 0
@@ -173,13 +166,10 @@ jobs:
 
           # TODO: upload to the store
 
-          echo "::set-output name=upload-done::true"
-
           rm -rf ${{ env.artifactsPath }}
           mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
       - name: Upload build artefacts
-        if: ${{ steps.upload-build.outputs.upload-done == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
-          path: ${{ env.artifactsPath }}-new
+          path: ${{ env.artifactsPath }}
