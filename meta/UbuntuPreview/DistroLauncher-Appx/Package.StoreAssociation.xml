@@ -361,12 +361,12 @@
     <Language Code="zu-za" InMinimumRequirementSet="true" />
   </SupportedLocales>
   <ProductReservedInfo>
-    <MainPackageIdentityName>CanonicalGroupLimited.Ubuntu-Preview</MainPackageIdentityName>
+    <MainPackageIdentityName>CanonicalGroupLimited.UbuntuPreview</MainPackageIdentityName>
     <ReservedNames>
         <ReservedName>Ubuntu (Preview)</ReservedName>
     </ReservedNames>
   </ProductReservedInfo>
-  <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9P9Q5ZH1HRR0">
+  <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9P7BDVKVNXZ6">
     <BundleInfo>
     </BundleInfo>
   </PackageInfoList>
