@@ -66,7 +66,7 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 
 		// There is always a development release, LTS or not
 		if release[4] == "Active Development" {
-			wslID := "Ubuntu-Preview"
+			wslID := "UbuntuPreview"
 			fullName := "Ubuntu (Preview)"
 			storeInfo, exists := storeApplicationsInfo[wslID]
 			if !exists {
@@ -117,7 +117,7 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 		// we don’t want to display in FullName or IconVersion the .0 suffix. BuildVersion stays as it.
 		version = strings.TrimSuffix(version, ".0")
 
-		wslID := fmt.Sprintf("Ubuntu-%s-LTS", release[0])
+		wslID := fmt.Sprintf("Ubuntu%sLTS", release[0])
 		storeInfo, exists := storeApplicationsInfo[wslID]
 		if !exists {
 			return nil, fmt.Errorf("no store application info for %q. Please register the application and provide it", wslID)
@@ -150,7 +150,7 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 		}
 	}
 
-	// Select Ubuntu release		wslID := fmt.Sprintf("Ubuntu-%s-LTS", release[0])
+	// Select Ubuntu release		wslID := fmt.Sprintf("Ubuntu%sLTS", release[0])
 	ubuntuWSL.WslID = "Ubuntu"
 	storeInfo, exists := storeApplicationsInfo[ubuntuWSL.WslID]
 	if !exists {
@@ -179,9 +179,9 @@ ver.	m.	code	full version	Status				Activ.	Sup.	LTS		Opened			Release			Mileston
 
 WSL_ID                      FULLNAME                    BUILD_VERSION      LAUNCHER_NAME             ICON_VERSION                BUILD_ID (locally stored, incremental)
 Ubuntu                      Ubuntu                      2004.2             ubuntu                    ""
-Ubuntu-Preview              Ubuntu (Preview)            2110.0             ubuntupreview             Preview
-Ubuntu-20.04-LTS            Ubuntu 20.04.2 LTS          2004.2             ubuntu2004                20.04.2 LTS
-Ubuntu-18.04-LTS            Ubuntu 18.04.5 LTS          1804.5             ubuntu1804                18.04.5 LTS
+UbuntuPreview               Ubuntu (Preview)            2110.0             ubuntupreview             Preview
+Ubuntu20.04LTS              Ubuntu 20.04.2 LTS          2004.2             ubuntu2004                20.04.2 LTS
+Ubuntu18.04LTS              Ubuntu 18.04.5 LTS          1804.5             ubuntu1804                18.04.5 LTS
 */
 
 // readCSV deserialized the CSV filed into a [][]string

@@ -62,11 +62,11 @@ def wslID_to_releases(lpconn):
     latest_lts = ""
     for serie in ubuntu.series:
         if serie.status == "Active Development":
-            r["Ubuntu-Preview"] = serie.name
+            r["UbuntuPreview"] = serie.name
 
         is_lts = ((int(serie.version.split('.')[0]) % 2 == 0) and serie.version.endswith('.04'))
         if is_lts:
-            r["Ubuntu-%s-LTS" % serie.version] = serie.name
+            r["Ubuntu%sLTS" % serie.version] = serie.name
             latest_lts = serie.name
 
     r["Ubuntu"] = latest_lts
