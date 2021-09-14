@@ -5,7 +5,7 @@ on:
       wslID:
         description: 'Release name to use for the bundle'
         required: true
-        default: 'Ubuntu-Preview'
+        default: 'UbuntuPreview'
       rootfses:
         description: 'Ubuntu WSL rootfs urls, separated by a colon. Direct set of "tar.gz::arch" if arch is not in the filename'
         required: true
@@ -47,7 +47,7 @@ jobs:
           if [ ${{ github.event_name }} = 'workflow_dispatch' ]; then
             wslID="${{ github.event.inputs.wslID }}"
             if [ -z "${wslID}" ]; then
-              wslID="Ubuntu-Preview"
+              wslID="UbuntuPreview"
             fi
 
             builds="$(cat <<-EOF|jq -c
