@@ -16,7 +16,7 @@ namespace DistributionInfo
     const std::wstring Name = L"UbuntuPreview";
 
     // The title bar for the console window while the distribution is installing.
-    const std::wstring WindowTitle = L"Ubuntu Preview";
+    const std::wstring WindowTitle = L"Ubuntu (Preview)";
 
     // Create and configure a user account.
     bool CreateUser(std::wstring_view userName);
