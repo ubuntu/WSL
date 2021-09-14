@@ -84,7 +84,6 @@ jobs:
       artifactsPath: 'build-artefacts'
     steps:
       - name: Download build artefacts
-        if: ${{  matrix.Upload == 'yes' }}
         continue-on-error: true # if the artifact doesn't exist
         uses: actions/download-artifact@v2
         with:
@@ -104,21 +103,13 @@ jobs:
           go build .
           cd ../../
           extraArgs=""
-          if [ ${{ matrix.Upload }} != "yes" ]; then
-            extraArgs="--build-id 9999"
-          fi
           if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
             extraArgs="${extraArgs} --no-checksum"
           fi
           archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
 
-          # Prepare remaining env variables for msbuild
-          buildMode="SideloadOnly"
-          if [ ${{ matrix.Upload }} = "yes" ]; then
-            buildMode="StoreUpload"
-          fi
-          # Test: try always StoreUpload mode to get appxupload file
+          # Always StoreUpload mode to get appxupload file
           buildMode="StoreUpload"
           echo "UapAppxPackageBuildMode=${buildMode}" >> $GITHUB_ENV
       - name: Setup MSBuild (PATH)
@@ -135,16 +126,12 @@ jobs:
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
       - name: Build Bundle
         run:  msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="${{ env.AppxBundlePlatforms }}" /p:UapAppxPackageBuildMode=${{ env.UapAppxPackageBuildMode }} -verbosity:normal
-      - name: Print content
-        shell: bash
-        run: |
-          find .
       - name: Allow downloading sideload appxbundle
         uses: actions/upload-artifact@v2
         with:
           name: sideload-${{ matrix.WslID }}
           path: |
-            ./AppPackages/Ubuntu/Ubuntu_*/
+            ./AppPackages/Ubuntu/Ubuntu_*/*
           retention-days: 7
       - name: Allow downloading store appxupload
         uses: actions/upload-artifact@v2
@@ -155,14 +142,12 @@ jobs:
           retention-days: 7
       - name: Check if we need to upload new build
         id: upload-build
-        if: ${{ matrix.Upload == 'yes' }}
         shell:  bash
         run: |
           set -eu
           # Store md5sum of rootfs and launchers
           md5sum */install.tar.gz */Release/launcher.exe|sort >> ${{ env.artifactsPath }}-new/fingerprint
 
-          echo "::set-output name=upload-done::false"
           hasChanges="$(diff -Nu ${{ env.artifactsPath }}/fingerprint ${{ env.artifactsPath }}-new/fingerprint || true)"
           if [ -z "${hasChanges}" ]; then
             exit 0
@@ -173,13 +158,10 @@ jobs:
 
           # TODO: upload to the store
 
-          echo "::set-output name=upload-done::true"
-
           rm -rf ${{ env.artifactsPath }}
           mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
       - name: Upload build artefacts
-        if: ${{ steps.upload-build.outputs.upload-done == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
-          path: ${{ env.artifactsPath }}-new
+          path: ${{ env.artifactsPath }}
