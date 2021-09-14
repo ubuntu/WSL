@@ -139,12 +139,18 @@ jobs:
         shell: bash
         run: |
           find .
-      - name: Allow downloading new appxbundle
+      - name: Allow downloading sideload appxbundle
         uses: actions/upload-artifact@v2
         with:
-          name: appxbundle-${{ matrix.WslID }}
+          name: sideload-${{ matrix.WslID }}
           path: |
             ./AppPackages/Ubuntu/Ubuntu_*/
+          retention-days: 7
+      - name: Allow downloading store appxupload
+        uses: actions/upload-artifact@v2
+        with:
+          name: store-${{ matrix.WslID }}
+          path: |
             ./AppPackages/Ubuntu/Ubuntu_*.appxupload
           retention-days: 7
       - name: Check if we need to upload new build
