@@ -363,7 +363,7 @@
   <ProductReservedInfo>
     <MainPackageIdentityName>CanonicalGroupLimited.UbuntuPreview</MainPackageIdentityName>
     <ReservedNames>
-        <ReservedName>Ubuntu (Preview)</ReservedName>
+        <ReservedName>Ubuntu Preview</ReservedName>
     </ReservedNames>
   </ProductReservedInfo>
   <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9P7BDVKVNXZ6">
