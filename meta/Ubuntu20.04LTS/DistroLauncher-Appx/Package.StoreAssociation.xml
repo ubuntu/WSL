@@ -361,7 +361,7 @@
     <Language Code="zu-za" InMinimumRequirementSet="true" />
   </SupportedLocales>
   <ProductReservedInfo>
-    <MainPackageIdentityName>CanonicalGroupLimited.Ubuntu-20.04-LTS</MainPackageIdentityName>
+    <MainPackageIdentityName>CanonicalGroupLimited.Ubuntu20.04LTS</MainPackageIdentityName>
     <ReservedNames>
         <ReservedName>Ubuntu 20.04 LTS</ReservedName>
         <ReservedName>Ubuntu 20.04.0 LTS</ReservedName>
