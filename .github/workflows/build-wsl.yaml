@@ -193,7 +193,7 @@ jobs:
       - name: Copy modified artifacts to base wiki
         if: ${{ github.event.inputs.upload == 'yes' }}
         run: |
-          set -ex
+          set -eu
           ls -lR ${{ env.artifactsPath }}
           mkdir -p build-info/
           cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/
