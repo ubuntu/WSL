@@ -30,7 +30,7 @@ var (
 	}
 )
 
-func prepareBuild(artifactsPath, wslID, rootfses string, noChecksum bool, buildID int) error {
+func prepareBuild(buildIDPath, wslID, rootfses string, noChecksum bool, buildID int) error {
 	rootPath, err := getPathWith("DistroLauncher-Appx")
 	if err != nil {
 		return err
@@ -39,7 +39,7 @@ func prepareBuild(artifactsPath, wslID, rootfses string, noChecksum bool, buildI
 
 	var buildNumber string
 	if buildID < 0 {
-		if buildNumber, err = extractAndStoreNextBuildNumber(artifactsPath); err != nil {
+		if buildNumber, err = extractAndStoreNextBuildNumber(buildIDPath); err != nil {
 			return err
 		}
 	} else {
@@ -60,7 +60,7 @@ func prepareBuild(artifactsPath, wslID, rootfses string, noChecksum bool, buildI
 }
 
 // extractAndStoreNextBuildNumber returns the next minor build number to use
-func extractAndStoreNextBuildNumber(artifactsPath string) (buildNumber string, err error) {
+func extractAndStoreNextBuildNumber(buildIDPath string) (buildNumber string, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("can't update build number: %v", err)
@@ -68,18 +68,18 @@ func extractAndStoreNextBuildNumber(artifactsPath string) (buildNumber string, e
 	}()
 
 	buildNumber = "0"
-	if d, err := os.ReadFile(filepath.Join(artifactsPath, "buildID")); err == nil {
+	if d, err := os.ReadFile(buildIDPath); err == nil {
 		num, err := strconv.Atoi(string(d))
 		if err != nil {
 			return "", fmt.Errorf("invalid previous build number: %v", err)
 		}
 		buildNumber = fmt.Sprintf("%d", num+1)
 	}
-	artifactsPath = fmt.Sprintf("%s-new", filepath.Clean(artifactsPath))
-	if err := os.MkdirAll(artifactsPath, 0755); err != nil {
+
+	if err := os.MkdirAll(filepath.Dir(buildIDPath), 0755); err != nil {
 		return "", err
 	}
-	if err := os.WriteFile(filepath.Join(artifactsPath, "buildID"), []byte(buildNumber), 0644); err != nil {
+	if err := os.WriteFile(buildIDPath, []byte(buildNumber), 0644); err != nil {
 		return "", err
 	}
 
