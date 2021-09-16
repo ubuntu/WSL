@@ -129,39 +129,81 @@ jobs:
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
       - name: Build Bundle
         run:  msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="${{ env.AppxBundlePlatforms }}" /p:UapAppxPackageBuildMode=${{ env.UapAppxPackageBuildMode }} -verbosity:normal
-      - name: Allow downloading sideload appxbundle
-        uses: actions/upload-artifact@v2
-        with:
-          name: sideload-${{ matrix.WslID }}
-          path: |
-            ./AppPackages/Ubuntu/Ubuntu_*/*
-          retention-days: 7
-      - name: Allow downloading store appxupload
-        uses: actions/upload-artifact@v2
-        with:
-          name: store-${{ matrix.WslID }}
-          path: |
-            ./AppPackages/Ubuntu/Ubuntu_*.appxupload
-          retention-days: 7
+      #- name: Allow downloading sideload appxbundle
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: sideload-${{ matrix.WslID }}
+      #    path: |
+      #      ./AppPackages/Ubuntu/Ubuntu_*/*
+      #    retention-days: 7
+      #- name: Allow downloading store appxupload
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: store-${{ matrix.WslID }}
+      #    path: |
+      #      ./AppPackages/Ubuntu/Ubuntu_*.appxupload
+      #    retention-days: 7
       - name: Check if we need to upload new build
+        id: detect-upload-to-store
         if: ${{ matrix.Upload == 'yes' }}
         shell:  bash
         run: |
           set -eu
+
+          echo "::set-output name=needs-upload::false"
+
           # Store md5sum of rootfs and launchers
           fingerprint_file="${{ env.buildInfoPath }}/${{ matrix.WslID }}-fingerprint.md"
           md5sum */install.tar.gz */Release/launcher.exe */Release/DistroLauncher-Appx/*/launcher.exe|sort > ${fingerprint_file}
           git add ${fingerprint_file}
 
+          # If build-id is 0, we don’t want to submit it to the store as first submission is manual.
+          # We let the other steps and jobs happening to save artifacts (build-id, fingerprints) of the first build
+          build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md")
           hasChanges="$(git diff --staged ${fingerprint_file})"
-          if [ -z "${hasChanges}" ]; then
+          if [ -z "${hasChanges}" -o -z "${build_id}" -o "${build_id}" = "0" ]; then
             exit 0
           fi
+
+          echo "::set-output name=needs-upload:::true"
 
           echo "Uploading new version: some files have changed:"
           echo "${hasChanges}"
 
-          # TODO: upload to the store
+      - name: Install Store Broker
+        #if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        shell: powershell
+        run: |
+          Install-Module -Name StoreBroker -AcceptLicense -Force -Scope CurrentUser -Verbose
+      - name: Submit to Microsoft Store
+        #if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        shell: powershell
+        run: |
+          # Authenticate against the store
+          New-Item -ItemType directory -Path store
+          Set-Content -Path store\clientsecret.txt -Value '${{ secrets.MSSTORE_CLIENT_SECRET }}'
+
+          $clientSecret = Get-Content -Path store\clientsecret.txt | ConvertTo-SecureString
+          $cred = New-Object System.Management.Automation.PSCredential '${{ secrets.AZUREAD_APPID }}', $clientSecret
+          Set-StoreBrokerAuthentication -TenantId '${{ secrets.AZUREAD_TENANTID }}' -Credential $cred
+
+          # Get store app ID for WslID
+          $appid = (Get-Applications -GetAll | Where-Object PackageIdentityName -like '*${{ matrix.WslID }}').id
+          If($appid -eq "") {
+            echo "No app found for WslID: ${{ matrix.WslID }}"
+            exit 1
+          }
+
+          # We want to publish UbuntuPreview automatically
+          If(${{ matrix.WslID }} -eq "UbuntuPreview") {
+            ((Get-Content -path meta\SBConfig.json -Raw) -replace 'Private','Public') | Set-Content -Path meta\SBConfig.json
+          }
+
+          # Prepare and submit to the Store
+          cd store\
+          New-SubmissionPackage -ConfigPath ..\meta\SBConfig.json
+          Update-ApplicationSubmission -AppId $appid -SubmissionDataPath "out\appstore-submission.json" -PackagePath "out\appstore-submission.zip" -Force -Autocommit -ReplacePackages -UpdateListings -UpdatePublishModeAndVisibility -UpdatePricingAndAvailability -UpdateAppProperties -UpdateGamingOptions -UpdateTrailers -UpdateNotesForCertification
+
 
 
       - name: Upload build artifacts
