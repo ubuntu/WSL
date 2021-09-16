@@ -80,16 +80,16 @@ jobs:
     needs: build-matrix
     strategy:
       matrix: ${{fromJson(needs.build-matrix.outputs.matrix)}}
+      fail-fast: false
     env:
-      artifactsPath: 'build-artefacts'
+      buildInfoPath: 'wiki/build-info'
     steps:
-      - name: Download build artefacts
-        continue-on-error: true # if the artifact doesn't exist
-        uses: actions/download-artifact@v2
-        with:
-          name: build-artifacts-${{ matrix.WslID }}
-          path: ${{ env.artifactsPath }}
       - uses: actions/checkout@v2
+      - name: Checkout build-info
+        uses: actions/checkout@v2
+        with:
+          path: 'wiki/'
+          repository: ubuntu/wsl.wiki
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.goversion }}
@@ -103,10 +103,13 @@ jobs:
           go build .
           cd ../../
           extraArgs=""
+          if [ ${{ matrix.Upload }} != "yes" ]; then
+              extraArgs="--build-id 9999"
+          fi
           if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
             extraArgs="${extraArgs} --no-checksum"
           fi
-          archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.artifactsPath }} ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
+          archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
 
           # Always StoreUpload mode to get appxupload file
@@ -141,14 +144,16 @@ jobs:
             ./AppPackages/Ubuntu/Ubuntu_*.appxupload
           retention-days: 7
       - name: Check if we need to upload new build
-        id: upload-build
+        if: ${{ matrix.Upload == 'yes' }}
         shell:  bash
         run: |
           set -eu
           # Store md5sum of rootfs and launchers
-          md5sum */install.tar.gz */Release/launcher.exe|sort >> ${{ env.artifactsPath }}-new/fingerprint
+          fingerprint_file="${{ env.buildInfoPath }}/${{ matrix.WslID }}-fingerprint.md"
+          md5sum */install.tar.gz */Release/launcher.exe|sort >> ${fingerprint_file}
+          git add ${fingerprint_file}
 
-          hasChanges="$(diff -Nu ${{ env.artifactsPath }}/fingerprint ${{ env.artifactsPath }}-new/fingerprint || true)"
+          hasChanges="$(git diff --staged ${fingerprint_file})"
           if [ -z "${hasChanges}" ]; then
             exit 0
           fi
@@ -158,10 +163,46 @@ jobs:
 
           # TODO: upload to the store
 
-          rm -rf ${{ env.artifactsPath }}
-          mv ${{ env.artifactsPath }}-new ${{ env.artifactsPath }}
-      - name: Upload build artefacts
+
+      - name: Upload build artifacts
+        if: ${{ matrix.Upload == 'yes' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
+          path: ${{ env.buildInfoPath }}/${{ matrix.WslID }}-*
+
+
+  update-build-artifacts:
+    name: Store updated build artifacts in wiki for reuse in future workflow runs
+    runs-on: ubuntu-latest
+    if: always()
+    needs: build-wsl
+    env:
+      artifactsPath: '/tmp/artifacts'
+    steps:
+      - name: Checkout wiki
+        if: ${{ github.event.inputs.upload == 'yes' }}
+        uses: actions/checkout@v2
+        with:
+          repository: ubuntu/wsl.wiki
+      - name: Download artifacts from all previous matrix runs
+        if: ${{ github.event.inputs.upload == 'yes' }}
+        uses: actions/download-artifact@v2
+        with:
           path: ${{ env.artifactsPath }}
+      - name: Copy modified artifacts to base wiki
+        if: ${{ github.event.inputs.upload == 'yes' }}
+        run: |
+          set -ex
+          ls -lR ${{ env.artifactsPath }}
+          mkdir -p build-info/
+          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/
+      - name: Sync wiki to repository documentation
+        if: ${{ github.event.inputs.upload == 'yes' }}
+        run: |
+          set -eux
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Auto-update build info"
+          git push origin master

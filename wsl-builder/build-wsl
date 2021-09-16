@@ -286,7 +286,7 @@ def _parse_arguments():
                         help="ppas with rootfs contents to fetch from. Syntax is user/ppa")
     parser.add_argument("-l", "--livecd-rootfs-ppa", dest="livecd_rootfs", default="",
                         help="ppa to use livecd-rootfs from. Syntax is user/ppa")
-    parser.add_argument("-u", "--with-upload", dest="upload", default=False,
+    parser.add_argument("-u", "--with-upload", action="store_true", dest="upload", default=False,
                         help="upload the appbundle to the Microsoft Store")
     parser.add_argument("-t", "--github-token", dest="wsl_github_token",
                         help="Pass a github token with the repo:public_repo permission to run github worklows. Override WSL_GITHUB_TOKEN env variable")
