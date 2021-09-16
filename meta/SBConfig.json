@@ -1,0 +1,58 @@
+{
+    "packageParameters": {
+
+      "PDPRootPath": ".",
+
+      "PDPInclude": [
+        "ProductDescription.xml"
+      ],
+
+      "ImagesRootPath": ".",
+
+      "MediaFallbackLanguage": "en-us",
+
+      "AppxPath": "*.appx*",
+
+      "OutPath": "out",
+
+      "OutName": "appstore-submission",
+
+      "DisableAutoPackageNameFormatting": false
+    },
+
+    "appSubmission": {
+        "targetPublishMode": "Manual",
+
+        "visibility": "Private",
+
+        "allowTargetFutureDeviceFamilies": {
+            "Xbox": false,
+            "Team": false,
+            "Holographic": false,
+            "Desktop": true,
+            "Mobile": false
+        },
+
+        "pricing": {
+          "priceId": "Free",
+          "trialPeriod": "NoFreeTrial",
+          "marketSpecificPricings": {
+            "EH":  "NotAvailable"
+          },
+          "sales": [ ]
+        },
+
+        "allowMicrosoftDecideAppAvailabilityToFutureDeviceFamilies": true,
+        "enterpriseLicensing": "OnlineAndOffline",
+        "applicationCategory": "DeveloperTools",
+        "hardwarePreferences": ["Keyboard"],
+        "hasExternalInAppProducts": false,
+        "meetAccessibilityGuidelines": false,
+        "canInstallOnRemovableMedia": true,
+        "automaticBackupEnabled": false,
+        "isGameDvrEnabled": false,
+        "notesForCertification": "Please follow http://iso.qa.ubuntu.com/qatracker/testcases/1739/info from step 6 and onwards.",
+
+        "gamingOptions": [{}]
+    }
+}
