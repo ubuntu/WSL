@@ -180,7 +180,7 @@ jobs:
         shell: powershell
         run: |
           # Authenticate against the store
-          New-Item -ItemType directory -Path store\clientsecret.txt
+          New-Item -ItemType directory -Path store
           Set-Content -Path store\clientsecret.txt -Value '${{ secrets.MSSTORE_CLIENT_SECRET }}'
 
           $clientSecret = Get-Content -Path store\clientsecret.txt | ConvertTo-SecureString
