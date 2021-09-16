@@ -150,7 +150,7 @@ jobs:
           set -eu
           # Store md5sum of rootfs and launchers
           fingerprint_file="${{ env.buildInfoPath }}/${{ matrix.WslID }}-fingerprint.md"
-          md5sum */install.tar.gz */Release/launcher.exe|sort >> ${fingerprint_file}
+          md5sum */install.tar.gz */Release/launcher.exe */Release/DistroLauncher-Appx/*/launcher.exe|sort > ${fingerprint_file}
           git add ${fingerprint_file}
 
           hasChanges="$(git diff --staged ${fingerprint_file})"
