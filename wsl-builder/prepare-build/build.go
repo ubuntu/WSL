@@ -264,6 +264,10 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 
 		relPath := strings.TrimPrefix(path, fmt.Sprintf("%s%c", rootDir, os.PathSeparator))
 
+		if err := os.MkdirAll(filepath.Dir(relPath), 0755); err != nil {
+			return fmt.Errorf("creating parent dir for %q failed: %v", relPath, err)
+		}
+
 		if err := shutil.CopyFile(path, relPath, false); err != nil {
 			return fmt.Errorf("copy %q to %q failed: %v", path, relPath, err)
 		}
