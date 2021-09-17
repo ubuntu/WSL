@@ -11,7 +11,7 @@
 
       "MediaFallbackLanguage": "en-us",
 
-      "AppxPath": "*.appx*",
+      "AppxPath": "../AppPackages/Ubuntu/Ubuntu_*.appxupload",
 
       "OutPath": "out",
 
