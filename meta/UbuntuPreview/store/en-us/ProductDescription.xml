@@ -30,8 +30,8 @@ For more information about Windows Subsystem for Linux please visit: https://wik
   <DevStudio>Canonical Ltd. and the OpenSource community</DevStudio>
   <ScreenshotCaptions>
     <!-- Valid length: 200 character limit, up to 9 elements per platform -->
-    <Caption DesktopImage="screenshots_desktop_1.png">screenshots desktop 1</Caption>
-    <Caption DesktopImage="canonical.png">canonical</Caption>
+    <Caption DesktopImage="Ubuntu_Preview.png">Ubuntu Preview</Caption>
+    <Caption DesktopImage="Ubuntu_WSL.png">Ubuntu WSL</Caption>
   </ScreenshotCaptions>
   <AppFeatures>
     <!-- Valid length: 200 character limit, up to 20 elements -->
