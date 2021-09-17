@@ -37,12 +37,8 @@ func updateAssets(csvPath string) error {
 
 	// Update each release
 	for _, r := range releasesInfo {
-		// Reset directory
 		wslPath := filepath.Join(metaPath, r.WslID)
-		if err := os.RemoveAll(wslPath); err != nil {
-			return err
-		}
-		if err := os.MkdirAll(wslPath, 0755); err != nil {
+		if err := resetMetaDirectoryForRelease(wslPath); err != nil {
 			return err
 		}
 
@@ -53,6 +49,49 @@ func updateAssets(csvPath string) error {
 		if err := generateAssetsForRelease(r, wslPath, metaPath, rootPath); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// resetMetaDirectoryForRelease recreate a vanilla meta directory, but keep any store screenshots
+func resetMetaDirectoryForRelease(wslPath string) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("can't generate reset meta directory %q: %v", wslPath, err)
+		}
+	}()
+
+	oldWslPath := wslPath + ".old"
+	if err := os.Rename(wslPath, oldWslPath); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(wslPath, 0755); err != nil {
+		return err
+	}
+
+	err = filepath.WalkDir(filepath.Join(oldWslPath, "store"), func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !strings.HasSuffix(path, ".png") || d.IsDir() {
+			return nil
+		}
+
+		relPath := strings.TrimPrefix(path, oldWslPath+"/")
+
+		destPath := filepath.Join(wslPath, relPath)
+		if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
+			return err
+		}
+
+		return os.Rename(path, destPath)
+	})
+
+	if err := os.RemoveAll(oldWslPath); err != nil {
+		return err
 	}
 
 	return nil
