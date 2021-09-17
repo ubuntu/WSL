@@ -20,6 +20,7 @@ on:
         default: 'yes'
   schedule:
     - cron: '0 10 * * *'
+concurrency: build-wsl
 
 env:
   goversion: '1.16'
@@ -209,7 +210,6 @@ jobs:
         with:
           name: build-artifacts-${{ matrix.WslID }}
           path: ${{ env.buildInfoPath }}/${{ matrix.WslID }}-*
-
 
   update-build-artifacts:
     name: Store updated build artifacts in wiki for reuse in future workflow runs
