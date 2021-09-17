@@ -182,20 +182,19 @@ jobs:
           New-Item -ItemType directory -Path store -Force
 
           # Authenticate against the store
-          Set-Content -Path store\clientsecret.txt -Value '${{ secrets.MSSTORE_CLIENT_SECRET }}'
-          $clientSecret = Get-Content -Path store\clientsecret.txt | ConvertTo-SecureString
-          $cred = New-Object System.Management.Automation.PSCredential '${{ secrets.AZUREAD_APPID }}', $clientSecret
+          $pass = ConvertTo-SecureString -String '${{ secrets.AZUREAD_APPKEY }}' -AsPlainText -Force
+          $cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ${{ secrets.AZUREAD_APPID }},$pass
           Set-StoreBrokerAuthentication -TenantId '${{ secrets.AZUREAD_TENANTID }}' -Credential $cred
 
           # Get store app ID for WslID
           $appid = (Get-Applications -GetAll | Where-Object PackageIdentityName -like '*${{ matrix.WslID }}').id
-          If($appid -eq "") {
+          If($appid -eq '') {
             echo "No app found for WslID: ${{ matrix.WslID }}"
             exit 1
           }
 
           # We want to publish UbuntuPreview automatically
-          If(${{ matrix.WslID }} -eq "UbuntuPreview") {
+          If('${{ matrix.WslID }}' -eq 'UbuntuPreview') {
             ((Get-Content -path meta\SBConfig.json -Raw) -replace 'Private','Public') | Set-Content -Path meta\SBConfig.json
           }
 
@@ -203,8 +202,6 @@ jobs:
           cd store\
           New-SubmissionPackage -ConfigPath ..\meta\SBConfig.json
           Update-ApplicationSubmission -AppId $appid -SubmissionDataPath "out\appstore-submission.json" -PackagePath "out\appstore-submission.zip" -Force -Autocommit -ReplacePackages -UpdateListings -UpdatePublishModeAndVisibility -UpdatePricingAndAvailability -UpdateAppProperties -UpdateGamingOptions -UpdateTrailers -UpdateNotesForCertification
-
-
 
       - name: Upload build artifacts
         if: ${{ matrix.Upload == 'yes' }}

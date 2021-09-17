@@ -51,7 +51,7 @@
         "canInstallOnRemovableMedia": true,
         "automaticBackupEnabled": false,
         "isGameDvrEnabled": false,
-        "notesForCertification": "Please follow http://iso.qa.ubuntu.com/qatracker/testcases/1739/info from step 6 and onwards.",
+        "notesForCertification": "Please follow http:\/\/iso.qa.ubuntu.com\/qatracker\/testcases\/1739\/info from step 6 and onwards.",
 
         "gamingOptions": [{}]
     }
