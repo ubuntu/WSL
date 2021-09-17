@@ -130,20 +130,20 @@ jobs:
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
       - name: Build Bundle
         run:  msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="${{ env.AppxBundlePlatforms }}" /p:UapAppxPackageBuildMode=${{ env.UapAppxPackageBuildMode }} -verbosity:normal
-      #- name: Allow downloading sideload appxbundle
-      #  uses: actions/upload-artifact@v2
-      #  with:
-      #    name: sideload-${{ matrix.WslID }}
-      #    path: |
-      #      ./AppPackages/Ubuntu/Ubuntu_*/*
-      #    retention-days: 7
-      #- name: Allow downloading store appxupload
-      #  uses: actions/upload-artifact@v2
-      #  with:
-      #    name: store-${{ matrix.WslID }}
-      #    path: |
-      #      ./AppPackages/Ubuntu/Ubuntu_*.appxupload
-      #    retention-days: 7
+      - name: Allow downloading sideload appxbundle
+        uses: actions/upload-artifact@v2
+        with:
+          name: sideload-${{ matrix.WslID }}
+          path: |
+            ./AppPackages/Ubuntu/Ubuntu_*/*
+          retention-days: 7
+      - name: Allow downloading store appxupload
+        uses: actions/upload-artifact@v2
+        with:
+          name: store-${{ matrix.WslID }}
+          path: |
+            ./AppPackages/Ubuntu/Ubuntu_*.appxupload
+          retention-days: 7
       - name: Check if we need to upload new build
         id: detect-upload-to-store
         if: ${{ matrix.Upload == 'yes' }}
