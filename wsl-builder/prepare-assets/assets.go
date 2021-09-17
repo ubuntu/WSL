@@ -9,9 +9,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 
+	shutil "github.com/termie/go-shutil"
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
 
@@ -37,12 +39,8 @@ func updateAssets(csvPath string) error {
 
 	// Update each release
 	for _, r := range releasesInfo {
-		// Reset directory
 		wslPath := filepath.Join(metaPath, r.WslID)
-		if err := os.RemoveAll(wslPath); err != nil {
-			return err
-		}
-		if err := os.MkdirAll(wslPath, 0755); err != nil {
+		if err := resetMetaDirectoryForRelease(wslPath); err != nil {
 			return err
 		}
 
@@ -56,6 +54,59 @@ func updateAssets(csvPath string) error {
 	}
 
 	return nil
+}
+
+// resetMetaDirectoryForRelease recreate a vanilla meta directory, but keep any store screenshots
+func resetMetaDirectoryForRelease(wslPath string) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("can't generate reset meta directory %q: %v", wslPath, err)
+		}
+	}()
+
+	oldWslPath := wslPath + ".old"
+	if err := os.Rename(wslPath, oldWslPath); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(wslPath, 0755); err != nil {
+		return err
+	}
+
+	err = filepath.WalkDir(filepath.Join(oldWslPath, "store"), func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !strings.HasSuffix(path, ".png") || d.IsDir() {
+			return nil
+		}
+
+		relPath := strings.TrimPrefix(path, oldWslPath+"/")
+
+		destPath := filepath.Join(wslPath, relPath)
+		if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
+			return err
+		}
+
+		return os.Rename(path, destPath)
+	})
+
+	if err := os.RemoveAll(oldWslPath); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type captionScreenshot struct {
+	DisplayName string
+	Path        string
+}
+
+type releaseInfoWithStoreScreenshots struct {
+	wslReleaseInfo
+	StoreScreenShots []captionScreenshot
 }
 
 // generateMetaFilesForRelease updates all metadata files from template for a given release.
@@ -73,11 +124,23 @@ func generateMetaFilesForRelease(r wslReleaseInfo, wslPath, rootPath string) (er
 		}
 
 		relPath := strings.TrimPrefix(path, rootPath+"/")
-		if !strings.HasPrefix(relPath, "DistroLauncher/") && !strings.HasPrefix(relPath, "DistroLauncher-Appx/") {
+		if !strings.HasPrefix(relPath, "DistroLauncher/") && !strings.HasPrefix(relPath, "DistroLauncher-Appx/") && !strings.HasPrefix(relPath, "meta/store") {
 			return nil
 		}
 		if d.IsDir() {
 			return nil
+		}
+		// if the destination is the meta directory, take that as root
+		relPath = strings.TrimPrefix(relPath, "meta/")
+
+		destPath := filepath.Join(wslPath, relPath)
+		if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
+			return err
+		}
+
+		// if it’s a store screenshot .png file, just copy it.
+		if filepath.Ext(path) == ".png" && strings.HasPrefix(relPath, "store") {
+			return shutil.CopyFile(path, destPath, false)
 		}
 
 		// ensure we have template file to substitude data in
@@ -90,11 +153,6 @@ func generateMetaFilesForRelease(r wslReleaseInfo, wslPath, rootPath string) (er
 			return nil
 		}
 
-		destPath := filepath.Join(wslPath, relPath)
-		if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
-			return err
-		}
-
 		t := template.Must(template.New("").Parse(templateData))
 
 		f, err := os.Create(destPath)
@@ -103,9 +161,65 @@ func generateMetaFilesForRelease(r wslReleaseInfo, wslPath, rootPath string) (er
 		}
 		defer f.Close()
 
-		return t.Execute(f, r)
+		// Extend our object with screenshots from store for store product description
+		var templateMeta interface{} = r
+		if filepath.Base(path) == "ProductDescription.xml" {
+			rWithScrenshots := releaseInfoWithStoreScreenshots{wslReleaseInfo: r}
+
+			// Collect corresponding original common screenshots for that release that we will put at the end of the description
+			commonScreenshots, err := filterAndSortImagesInDir(filepath.Dir(path), nil)
+			if err != nil {
+				return err
+			}
+
+			// And now collect screenshots already copied in the dest store directory
+			screenshots, err := filterAndSortImagesInDir(filepath.Dir(destPath), commonScreenshots)
+			if err != nil {
+				return err
+			}
+			// Append base sorted screenshots
+			screenshots = append(screenshots, commonScreenshots...)
+
+			for _, s := range screenshots {
+				rWithScrenshots.StoreScreenShots = append(rWithScrenshots.StoreScreenShots, captionScreenshot{
+					Path:        s,
+					DisplayName: strings.TrimSuffix(strings.ReplaceAll(s, "_", " "), ".png"),
+				})
+			}
+
+			templateMeta = rWithScrenshots
+		}
+
+		return t.Execute(f, templateMeta)
 	})
 	return err
+}
+
+// collectAndSortImagesInDir returns a sorted list of all images in a directory
+func filterAndSortImagesInDir(path string, excludes []string) ([]string, error) {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter and sort them
+	var r []string
+nextFile:
+	for _, f := range files {
+		if !strings.HasSuffix(f.Name(), ".png") {
+			continue
+		}
+		// Exclude base list
+		for _, e := range excludes {
+			if f.Name() == e {
+				continue nextFile
+			}
+		}
+
+		r = append(r, f.Name())
+	}
+	sort.Strings(r)
+	return r, nil
 }
 
 // generateAssetsForRelease updates all assets files from template for a given release.

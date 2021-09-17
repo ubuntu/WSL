@@ -16,6 +16,7 @@ type wslReleaseInfo struct {
 	FullName      string
 	BuildVersion  string
 	LauncherName  string
+	ShortVersion  string
 	IconVersion   string
 	AppStoreID    string
 	ReservedNames []string
@@ -77,6 +78,7 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 				FullName:      fullName,
 				BuildVersion:  buildVersion,
 				LauncherName:  "ubuntupreview",
+				ShortVersion:  release[0],
 				IconVersion:   "Preview",
 				AppStoreID:    storeInfo.AppStoreID,
 				ReservedNames: []string{fullName},
@@ -134,6 +136,7 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 			FullName:      fmt.Sprintf("Ubuntu %s LTS", version),
 			BuildVersion:  buildVersion,
 			LauncherName:  launcherName,
+			ShortVersion:  release[0],
 			IconVersion:   fmt.Sprintf("%s LTS", version),
 			AppStoreID:    storeInfo.AppStoreID,
 			ReservedNames: reservedNames,
