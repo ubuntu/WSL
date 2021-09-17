@@ -172,12 +172,12 @@ jobs:
           echo "${hasChanges}"
 
       - name: Install Store Broker
-        #if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
         shell: powershell
         run: |
           Install-Module -Name StoreBroker -AcceptLicense -Force -Scope CurrentUser -Verbose
       - name: Submit to Microsoft Store
-        #if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
         shell: powershell
         run: |
           New-Item -ItemType directory -Path store -Force
