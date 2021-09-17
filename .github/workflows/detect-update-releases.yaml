@@ -5,6 +5,7 @@ on:
       - '**' # Ignore tag push, but take any branch
     paths:
       - 'meta/images/*'
+      - 'meta/store/*'
       - 'DistroLauncher/DistributionInfo.h'
       - 'DistroLauncher-Appx/*'
       - '.github/workflows/detect-update-releases.yaml'
