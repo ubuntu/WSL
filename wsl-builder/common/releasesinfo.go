@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	yaml "gopkg.in/yaml.v3"
 )
 
 type wslReleaseInfo struct {
@@ -18,40 +16,25 @@ type wslReleaseInfo struct {
 	LauncherName  string
 	ShortVersion  string
 	IconVersion   string
-	AppStoreID    string
 	ReservedNames []string
 
 	codeName    string
 	shouldBuild bool
 }
 
-type storeApplicationInfo struct {
-	AppStoreID string `yaml:"AppStoreID,omitempty"`
-}
-
 // ReleasesInfo returns all releases we care about from a csvPath.
-func ReleasesInfo(csvPath string, storeAppInfoPath string) (releasesInfo []wslReleaseInfo, err error) {
+func ReleasesInfo(csvPath string) (releasesInfo []wslReleaseInfo, err error) {
 	releases, err := readCSV(csvPath)
 	if err != nil {
 		return nil, err
 	}
 
-	d, err := os.ReadFile(storeAppInfoPath)
-	if err != nil {
-		return nil, err
-	}
-
-	i := make(map[string]storeApplicationInfo)
-	if err = yaml.Unmarshal(d, &i); err != nil {
-		return nil, err
-	}
-
-	return buildWSLReleaseInfo(releases, i)
+	return buildWSLReleaseInfo(releases)
 }
 
 // buildWSLReleaseInfo extracts WSL supported releases from the releases content
 // and returns a slice of wslReleaseInfo, ready to be used from templates.
-func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]storeApplicationInfo) (wslReleases []wslReleaseInfo, err error) {
+func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err error) {
 	var latestLTSReleasedDate string
 	var ubuntuWSL wslReleaseInfo
 
@@ -69,10 +52,6 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 		if release[4] == "Active Development" {
 			wslID := "UbuntuPreview"
 			fullName := "Ubuntu (Preview)"
-			storeInfo, exists := storeApplicationsInfo[wslID]
-			if !exists {
-				return nil, fmt.Errorf("no store application info for %q. Please register the application and provide it", wslID)
-			}
 			wslReleases = append(wslReleases, wslReleaseInfo{
 				WslID:         wslID,
 				FullName:      fullName,
@@ -80,7 +59,6 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 				LauncherName:  "ubuntupreview",
 				ShortVersion:  release[0],
 				IconVersion:   "Preview",
-				AppStoreID:    storeInfo.AppStoreID,
 				ReservedNames: []string{fullName},
 
 				codeName:    codeName,
@@ -120,10 +98,6 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 		version = strings.TrimSuffix(version, ".0")
 
 		wslID := fmt.Sprintf("Ubuntu%sLTS", release[0])
-		storeInfo, exists := storeApplicationsInfo[wslID]
-		if !exists {
-			return nil, fmt.Errorf("no store application info for %q. Please register the application and provide it", wslID)
-		}
 		// Reserve .pointReleases elements
 		reservedNames := []string{fmt.Sprintf("Ubuntu %s LTS", release[0])}
 		for i := 0; i < 10; i++ {
@@ -138,7 +112,6 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 			LauncherName:  launcherName,
 			ShortVersion:  release[0],
 			IconVersion:   fmt.Sprintf("%s LTS", version),
-			AppStoreID:    storeInfo.AppStoreID,
 			ReservedNames: reservedNames,
 
 			codeName:    codeName,
@@ -155,15 +128,9 @@ func buildWSLReleaseInfo(releases [][]string, storeApplicationsInfo map[string]s
 
 	// Select Ubuntu release		wslID := fmt.Sprintf("Ubuntu%sLTS", release[0])
 	ubuntuWSL.WslID = "Ubuntu"
-	storeInfo, exists := storeApplicationsInfo[ubuntuWSL.WslID]
-	if !exists {
-		return nil, fmt.Errorf("no store application info for %q. Please register the application and provide it", ubuntuWSL.WslID)
-	}
-
 	ubuntuWSL.FullName = "Ubuntu"
 	ubuntuWSL.LauncherName = "ubuntu"
 	ubuntuWSL.IconVersion = ""
-	ubuntuWSL.AppStoreID = storeInfo.AppStoreID
 	ubuntuWSL.ReservedNames = []string{ubuntuWSL.FullName}
 	wslReleases = append(wslReleases, ubuntuWSL)
 

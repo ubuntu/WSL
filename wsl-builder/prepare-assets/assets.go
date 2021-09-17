@@ -32,7 +32,7 @@ func updateAssets(csvPath string) error {
 		return err
 	}
 
-	releasesInfo, err := ReleasesInfo(csvPath, filepath.Join(metaPath, "storeApplicationInfo.yaml"))
+	releasesInfo, err := ReleasesInfo(csvPath)
 	if err != nil {
 		return err
 	}
