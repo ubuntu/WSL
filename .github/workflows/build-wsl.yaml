@@ -179,10 +179,10 @@ jobs:
         #if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
         shell: powershell
         run: |
-          # Authenticate against the store
-          New-Item -ItemType directory -Path store
-          Set-Content -Path store\clientsecret.txt -Value '${{ secrets.MSSTORE_CLIENT_SECRET }}'
+          New-Item -ItemType directory -Path store -Force
 
+          # Authenticate against the store
+          Set-Content -Path store\clientsecret.txt -Value '${{ secrets.MSSTORE_CLIENT_SECRET }}'
           $clientSecret = Get-Content -Path store\clientsecret.txt | ConvertTo-SecureString
           $cred = New-Object System.Management.Automation.PSCredential '${{ secrets.AZUREAD_APPID }}', $clientSecret
           Set-StoreBrokerAuthentication -TenantId '${{ secrets.AZUREAD_TENANTID }}' -Credential $cred
