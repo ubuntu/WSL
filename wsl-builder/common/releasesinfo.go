@@ -49,7 +49,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err
 		codeName := release[2]
 
 		// There is always a development release, LTS or not
-		if release[4] == "Active Development" {
+		if release[4] == "Active Development" || release[4] == "Pre-release Freeze" {
 			wslID := "UbuntuPreview"
 			fullName := "Ubuntu (Preview)"
 			wslReleases = append(wslReleases, wslReleaseInfo{
