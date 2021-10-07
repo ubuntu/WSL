@@ -152,7 +152,7 @@ jobs:
         run: |
           set -eux
 
-          build_id=$(cat "${{ matrix.WslID }}-buildid.md")
+          build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md")
 
           echo "::set-output name=needs-upload::false"
 
@@ -210,7 +210,7 @@ jobs:
 
           # We want to publish UbuntuPreview automatically
           If('${{ matrix.WslID }}' -eq 'UbuntuPreview') {
-            ((Get-Content -path meta\SBConfig.json -Raw) -replace 'Private','Public') | Set-Content -Path meta\SBConfig.json
+            ((Get-Content -path meta\SBConfig.json -Raw) -replace 'Manual','Immediate') | Set-Content -Path meta\SBConfig.json
           }
 
           # Prepare and submit to the Store
