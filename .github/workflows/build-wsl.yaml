@@ -43,7 +43,7 @@ jobs:
       - name: Build Matrix for WSLIDs to run on with rootfses, which can be manually supplied or automatically
         id: build-matrix-release
         run: |
-          set -eu
+          set -eux
           # Manual build
           if [ ${{ github.event_name }} = 'workflow_dispatch' ]; then
             wslID="${{ github.event.inputs.wslID }}"
@@ -74,6 +74,7 @@ jobs:
 
           echo "${builds}"
           echo "::set-output name=matrix::${builds}"
+          echo "::notice::Building for: $(echo "${builds}" | jq '.include[] | "\(.WslID): \(.Rootfses)"') RootfsesChecksum: ${{ github.event.inputs.rootfseschecksum }} Needs upload: ${{ github.event.inputs.upload }}"
 
   build-wsl:
     name: Build WSL appxbundle for a given release
@@ -149,24 +150,28 @@ jobs:
         if: ${{ matrix.Upload == 'yes' }}
         shell:  bash
         run: |
-          set -eu
+          set -eux
 
           echo "::set-output name=needs-upload::false"
 
           # Store md5sum of rootfs and launchers
-          fingerprint_file="${{ env.buildInfoPath }}/${{ matrix.WslID }}-fingerprint.md"
-          md5sum */install.tar.gz */Release/launcher.exe */Release/DistroLauncher-Appx/*/launcher.exe|sort > ${fingerprint_file}
-          git add ${fingerprint_file}
+          fingerprint_file="${{ matrix.WslID }}-fingerprint.md"
+          md5sum */install.tar.gz */Release/launcher.exe */Release/DistroLauncher-Appx/*/launcher.exe|sort -k2 > "${{ env.buildInfoPath }}/${fingerprint_file}"
 
+          cd "${{ env.buildInfoPath }}"
+          git add "${fingerprint_file}"
           # If build-id is 0, we don’t want to submit it to the store as first submission is manual.
           # We let the other steps and jobs happening to save artifacts (build-id, fingerprints) of the first build
-          build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md")
+          build_id=$(cat "${{ matrix.WslID }}-buildid.md")
           hasChanges="$(git diff --staged ${fingerprint_file})"
+          cd -
+
           if [ -z "${hasChanges}" -o -z "${build_id}" -o "${build_id}" = "0" ]; then
             exit 0
           fi
 
-          echo "::set-output name=needs-upload:::true"
+          echo "::notice::Uploading to the store ${{ matrix.WslID }} build ${build_id}"
+          echo "::set-output name=needs-upload::true"
 
           echo "Uploading new version: some files have changed:"
           echo "${hasChanges}"
@@ -205,7 +210,7 @@ jobs:
           Update-ApplicationSubmission -AppId $appid -SubmissionDataPath "out\appstore-submission.json" -PackagePath "out\appstore-submission.zip" -Force -Autocommit -ReplacePackages -UpdateListings -UpdatePublishModeAndVisibility -UpdatePricingAndAvailability -UpdateAppProperties -UpdateGamingOptions -UpdateTrailers -UpdateNotesForCertification
 
       - name: Upload build artifacts
-        if: ${{ matrix.Upload == 'yes' }}
+        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
