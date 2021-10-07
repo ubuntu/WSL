@@ -152,24 +152,33 @@ jobs:
         run: |
           set -eux
 
+          build_id=$(cat "${{ matrix.WslID }}-buildid.md")
+
           echo "::set-output name=needs-upload::false"
 
-          # Store md5sum of rootfs and launchers
+          # Store md5sum of rootfs, launcher and assets related code
           fingerprint_file="${{ matrix.WslID }}-fingerprint.md"
-          md5sum */install.tar.gz */Release/launcher.exe */Release/DistroLauncher-Appx/*/launcher.exe|sort -k2 > "${{ env.buildInfoPath }}/${fingerprint_file}"
+          fingerprint_filepath="${{ env.buildInfoPath }}/${{ matrix.WslID }}-fingerprint.md"
+          # First. the rootfses
+          echo '```' > "${fingerprint_filepath}"
+          md5sum */install.tar.gz | sort -k2 >> "${fingerprint_filepath}"
+          # Launcher code
+          echo "$(find DistroLauncher -type f -not -path "*/ARM64/*" -not -path "*/x64/*" -exec md5sum {} \; | sort -k 2 | md5sum)DistroLauncher" >> "${fingerprint_filepath}"
+          # Build info and assets (without specific build number)
+          sed -i "s/\.${build_id}\./XXX/" DistroLauncher-Appx/MyDistro.appxmanifest
+          echo "$(find DistroLauncher-Appx -type f -not -path "*/ARM64/*" -not -path "*/x64/*" -not -path "*/BundleArtifacts/*" -not -name "Generated Files" -exec md5sum {} \; | sort -k 2 | md5sum)DistroLauncher-Appx" >> "${fingerprint_filepath}"
+          echo '```' >> "${fingerprint_filepath}"
 
           cd "${{ env.buildInfoPath }}"
           git add "${fingerprint_file}"
           # If build-id is 0, we don’t want to submit it to the store as first submission is manual.
           # We let the other steps and jobs happening to save artifacts (build-id, fingerprints) of the first build
-          build_id=$(cat "${{ matrix.WslID }}-buildid.md")
           hasChanges="$(git diff --staged ${fingerprint_file})"
           cd -
 
           if [ -z "${hasChanges}" -o -z "${build_id}" -o "${build_id}" = "0" ]; then
             exit 0
           fi
-
           echo "::notice::Uploading to the store ${{ matrix.WslID }} build ${build_id}"
           echo "::set-output name=needs-upload::true"
 
