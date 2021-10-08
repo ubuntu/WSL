@@ -43,7 +43,7 @@ jobs:
       - name: Build Matrix for WSLIDs to run on with rootfses, which can be manually supplied or automatically
         id: build-matrix-release
         run: |
-          set -eu
+          set -eux
           # Manual build
           if [ ${{ github.event_name }} = 'workflow_dispatch' ]; then
             wslID="${{ github.event.inputs.wslID }}"
@@ -74,6 +74,7 @@ jobs:
 
           echo "${builds}"
           echo "::set-output name=matrix::${builds}"
+          echo "::notice::Building for: $(echo "${builds}" | jq '.include[] | "\(.WslID): \(.Rootfses)"') RootfsesChecksum: ${{ github.event.inputs.rootfseschecksum }} Needs upload: ${{ github.event.inputs.upload }}"
 
   build-wsl:
     name: Build WSL appxbundle for a given release
@@ -149,24 +150,37 @@ jobs:
         if: ${{ matrix.Upload == 'yes' }}
         shell:  bash
         run: |
-          set -eu
+          set -eux
+
+          build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md")
 
           echo "::set-output name=needs-upload::false"
 
-          # Store md5sum of rootfs and launchers
-          fingerprint_file="${{ env.buildInfoPath }}/${{ matrix.WslID }}-fingerprint.md"
-          md5sum */install.tar.gz */Release/launcher.exe */Release/DistroLauncher-Appx/*/launcher.exe|sort > ${fingerprint_file}
-          git add ${fingerprint_file}
+          # Store md5sum of rootfs, launcher and assets related code
+          fingerprint_file="${{ matrix.WslID }}-fingerprint.md"
+          fingerprint_filepath="${{ env.buildInfoPath }}/${{ matrix.WslID }}-fingerprint.md"
+          # First. the rootfses
+          echo '```' > "${fingerprint_filepath}"
+          md5sum */install.tar.gz | sort -k2 >> "${fingerprint_filepath}"
+          # Launcher code
+          echo "$(find DistroLauncher -type f -not -path "*/ARM64/*" -not -path "*/x64/*" -exec md5sum {} \; | sort -k 2 | md5sum)DistroLauncher" >> "${fingerprint_filepath}"
+          # Build info and assets (without specific build number)
+          sed -i "s/\.${build_id}\./XXX/" DistroLauncher-Appx/MyDistro.appxmanifest
+          echo "$(find DistroLauncher-Appx -type f -not -path "*/ARM64/*" -not -path "*/x64/*" -not -path "*/BundleArtifacts/*" -not -name "Generated Files" -exec md5sum {} \; | sort -k 2 | md5sum)DistroLauncher-Appx" >> "${fingerprint_filepath}"
+          echo '```' >> "${fingerprint_filepath}"
 
+          cd "${{ env.buildInfoPath }}"
+          git add "${fingerprint_file}"
           # If build-id is 0, we don’t want to submit it to the store as first submission is manual.
           # We let the other steps and jobs happening to save artifacts (build-id, fingerprints) of the first build
-          build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md")
           hasChanges="$(git diff --staged ${fingerprint_file})"
+          cd -
+
           if [ -z "${hasChanges}" -o -z "${build_id}" -o "${build_id}" = "0" ]; then
             exit 0
           fi
-
-          echo "::set-output name=needs-upload:::true"
+          echo "::notice::Uploading to the store ${{ matrix.WslID }} build ${build_id}"
+          echo "::set-output name=needs-upload::true"
 
           echo "Uploading new version: some files have changed:"
           echo "${hasChanges}"
@@ -196,7 +210,7 @@ jobs:
 
           # We want to publish UbuntuPreview automatically
           If('${{ matrix.WslID }}' -eq 'UbuntuPreview') {
-            ((Get-Content -path meta\SBConfig.json -Raw) -replace 'Private','Public') | Set-Content -Path meta\SBConfig.json
+            ((Get-Content -path meta\SBConfig.json -Raw) -replace 'Manual','Immediate') | Set-Content -Path meta\SBConfig.json
           }
 
           # Prepare and submit to the Store
@@ -205,7 +219,7 @@ jobs:
           Update-ApplicationSubmission -AppId $appid -SubmissionDataPath "out\appstore-submission.json" -PackagePath "out\appstore-submission.zip" -Force -Autocommit -ReplacePackages -UpdateListings -UpdatePublishModeAndVisibility -UpdatePricingAndAvailability -UpdateAppProperties -UpdateGamingOptions -UpdateTrailers -UpdateNotesForCertification
 
       - name: Upload build artifacts
-        if: ${{ matrix.Upload == 'yes' }}
+        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
@@ -230,14 +244,17 @@ jobs:
         with:
           path: ${{ env.artifactsPath }}
       - name: Copy modified artifacts to base wiki
+        id: modified-artifacts
         if: ${{ github.event.inputs.upload == 'yes' }}
         run: |
           set -eu
           ls -lR ${{ env.artifactsPath }}
+
           mkdir -p build-info/
-          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/
+          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || exit 0
+          echo "::set-output name=needs-wiki-update::true"
       - name: Sync wiki to repository documentation
-        if: ${{ github.event.inputs.upload == 'yes' }}
+        if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
         run: |
           set -eux
           git config user.name "github-actions[bot]"
