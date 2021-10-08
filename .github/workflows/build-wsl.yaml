@@ -244,14 +244,17 @@ jobs:
         with:
           path: ${{ env.artifactsPath }}
       - name: Copy modified artifacts to base wiki
+        id: modified-artifacts
         if: ${{ github.event.inputs.upload == 'yes' }}
         run: |
           set -eu
           ls -lR ${{ env.artifactsPath }}
+
           mkdir -p build-info/
-          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/
+          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || exit 0
+          echo "::set-output name=needs-wiki-update::true"
       - name: Sync wiki to repository documentation
-        if: ${{ github.event.inputs.upload == 'yes' }}
+        if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
         run: |
           set -eux
           git config user.name "github-actions[bot]"
