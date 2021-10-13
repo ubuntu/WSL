@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/ubuntu/WSL-DsitroLauncher/wsl-builder/common"
 )
 
 type matrixElem struct {
@@ -14,7 +16,7 @@ type matrixElem struct {
 
 // buildGHMatrix computes the list of distro that needs to start a build request.
 func buildGHMatrix(csvPath, metaPath string) error {
-	releasesInfo, err := ReleasesInfo(csvPath)
+	releasesInfo, err := common.ReleasesInfo(csvPath)
 	if err != nil {
 		return err
 	}
@@ -22,7 +24,7 @@ func buildGHMatrix(csvPath, metaPath string) error {
 	var allBuilds []matrixElem
 	// List which releases we should try building
 	for _, r := range releasesInfo {
-		if !r.shouldBuild {
+		if !r.ShouldBuild {
 			continue
 		}
 
@@ -32,7 +34,7 @@ func buildGHMatrix(csvPath, metaPath string) error {
 			if i == 0 {
 				t = ""
 			}
-			t += fmt.Sprintf("https://cloud-images.ubuntu.com/%s/current/%s-server-cloudimg-%s-wsl.rootfs.tar.gz::%s", r.codeName, r.codeName, arch, arch)
+			t += fmt.Sprintf("https://cloud-images.ubuntu.com/%s/current/%s-server-cloudimg-%s-wsl.rootfs.tar.gz::%s", r.CodeName, r.CodeName, arch, arch)
 			rootfses += t
 		}
 
