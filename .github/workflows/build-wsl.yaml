@@ -234,18 +234,15 @@ jobs:
       artifactsPath: '/tmp/artifacts'
     steps:
       - name: Checkout wiki
-        if: ${{ github.event.inputs.upload == 'yes' }}
         uses: actions/checkout@v2
         with:
           repository: ubuntu/wsl.wiki
       - name: Download artifacts from all previous matrix runs
-        if: ${{ github.event.inputs.upload == 'yes' }}
         uses: actions/download-artifact@v2
         with:
           path: ${{ env.artifactsPath }}
       - name: Copy modified artifacts to base wiki
         id: modified-artifacts
-        if: ${{ github.event.inputs.upload == 'yes' }}
         run: |
           set -eu
           ls -lR ${{ env.artifactsPath }}
