@@ -74,7 +74,7 @@ jobs:
 
           echo "${builds}"
           echo "::set-output name=matrix::${builds}"
-          echo "::notice::Building for: $(echo "${builds}" | jq '.include[] | "\(.WslID): \(.Rootfses)"') RootfsesChecksum: ${{ github.event.inputs.rootfseschecksum }} Needs upload: ${{ github.event.inputs.upload }}"
+          echo "::notice::Building for: $(echo "${builds}" | jq '.include[] | "\(.WslID): \(.Rootfses). RootfsesChecksum: \(.RootfsesChecksum). Upload to store: \(.Upload)"')"
 
   build-wsl:
     name: Build WSL appxbundle for a given release
