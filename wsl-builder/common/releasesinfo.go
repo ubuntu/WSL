@@ -29,7 +29,7 @@ func ReleasesInfo(csvPath string) (releasesInfo []WslReleaseInfo, err error) {
 		return nil, err
 	}
 
-	return buildWslReleaseInfo(releases)
+	return buildWSLReleaseInfo(releases)
 }
 
 // buildWSLReleaseInfo extracts WSL supported releases from the releases content

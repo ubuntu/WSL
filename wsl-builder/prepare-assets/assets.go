@@ -15,6 +15,7 @@ import (
 
 	shutil "github.com/termie/go-shutil"
 	"gopkg.in/gographics/imagick.v2/imagick"
+	"github.com/ubuntu/WSL-DsitroLauncher/wsl-builder/common"
 )
 
 // updateAssets orchestrates the distro launcher metadata and assets generation from a csv file path.
@@ -22,17 +23,17 @@ func updateAssets(csvPath string) error {
 	imagick.Initialize()
 	defer imagick.Terminate()
 
-	rootPath, err := getPathWith("DistroLauncher-Appx")
+	rootPath, err := common.GetPathWith("DistroLauncher-Appx")
 	if err != nil {
 		return err
 	}
 	rootPath = filepath.Dir(rootPath)
-	metaPath, err := getPathWith("meta")
+	metaPath, err := common.GetPathWith("meta")
 	if err != nil {
 		return err
 	}
 
-	releasesInfo, err := ReleasesInfo(csvPath)
+	releasesInfo, err := common.ReleasesInfo(csvPath)
 	if err != nil {
 		return err
 	}
@@ -105,12 +106,12 @@ type captionScreenshot struct {
 }
 
 type releaseInfoWithStoreScreenshots struct {
-	wslReleaseInfo
+	common.WslReleaseInfo
 	StoreScreenShots []captionScreenshot
 }
 
 // generateMetaFilesForRelease updates all metadata files from template for a given release.
-func generateMetaFilesForRelease(r wslReleaseInfo, wslPath, rootPath string) (err error) {
+func generateMetaFilesForRelease(r common.WslReleaseInfo, wslPath, rootPath string) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("can't generate metadata file for %s: %v", r.WslID, err)
@@ -164,7 +165,7 @@ func generateMetaFilesForRelease(r wslReleaseInfo, wslPath, rootPath string) (er
 		// Extend our object with screenshots from store for store product description
 		var templateMeta interface{} = r
 		if filepath.Base(path) == "ProductDescription.xml" {
-			rWithScrenshots := releaseInfoWithStoreScreenshots{wslReleaseInfo: r}
+			rWithScrenshots := releaseInfoWithStoreScreenshots{WslReleaseInfo: r}
 
 			// Collect corresponding original common screenshots for that release that we will put at the end of the description
 			commonScreenshots, err := filterAndSortImagesInDir(filepath.Dir(path), nil)
@@ -223,7 +224,7 @@ nextFile:
 }
 
 // generateAssetsForRelease updates all assets files from template for a given release.
-func generateAssetsForRelease(r wslReleaseInfo, wslPath, metaPath, rootPath string) (err error) {
+func generateAssetsForRelease(r common.WslReleaseInfo, wslPath, metaPath, rootPath string) (err error) {
 	// Iterates and generates over assets
 	assetsRelDir := filepath.Join("DistroLauncher-Appx", "Assets")
 	assetsPath := filepath.Join(rootPath, assetsRelDir)
