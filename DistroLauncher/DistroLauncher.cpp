@@ -99,9 +99,9 @@ int wmain(int argc, wchar_t const *argv[])
     // Update the title bar of the console window.
     SetConsoleTitleW(DistributionInfo::WindowTitle.c_str());
 
-    sleep(5);
+    Sleep(5);
     Helpers::PrintMessage(MSG_STATUS_INSTALLING);
-    sleep(5);
+    Sleep(5);
 
     // Initialize a vector of arguments.
     std::vector<std::wstring_view> arguments;
