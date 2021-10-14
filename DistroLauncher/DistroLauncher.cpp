@@ -4,6 +4,7 @@
 //
 
 #include "stdafx.h"
+#include <Windows.h>
 
 // Commandline arguments: 
 #define ARG_CONFIG              L"config"
@@ -97,6 +98,10 @@ int wmain(int argc, wchar_t const *argv[])
 {
     // Update the title bar of the console window.
     SetConsoleTitleW(DistributionInfo::WindowTitle.c_str());
+
+    sleep(5);
+    Helpers::PrintMessage(MSG_STATUS_INSTALLING);
+    sleep(5);
 
     // Initialize a vector of arguments.
     std::vector<std::wstring_view> arguments;
