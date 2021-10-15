@@ -18,8 +18,8 @@ import (
 	"time"
 
 	shutil "github.com/termie/go-shutil"
+	"github.com/ubuntu/WSL/wsl-builder/common"
 	"golang.org/x/sync/errgroup"
-	"github.com/ubuntu/WSL-DsitroLauncher/wsl-builder/common"
 )
 
 var (

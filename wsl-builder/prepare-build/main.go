@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
-	"github.com/ubuntu/WSL-DsitroLauncher/wsl-builder/common"
+	"github.com/ubuntu/WSL/wsl-builder/common"
 )
 
 func main() {
