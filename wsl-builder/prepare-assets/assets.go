@@ -14,8 +14,8 @@ import (
 	"text/template"
 
 	shutil "github.com/termie/go-shutil"
+	"github.com/ubuntu/WSL/wsl-builder/common"
 	"gopkg.in/gographics/imagick.v2/imagick"
-	"github.com/ubuntu/WSL-DsitroLauncher/wsl-builder/common"
 )
 
 // updateAssets orchestrates the distro launcher metadata and assets generation from a csv file path.
