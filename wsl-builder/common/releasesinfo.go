@@ -1,4 +1,9 @@
-package main
+/*
+Package common groups utility routines and types commonly used in
+'prepare-assets' and 'prepare-build' module main packages as part
+of the WSL image and launcher build process.
+*/
+package common
 
 import (
 	"encoding/csv"
@@ -9,21 +14,23 @@ import (
 	"time"
 )
 
-type wslReleaseInfo struct {
-	WslID         string
-	FullName      string
-	BuildVersion  string
-	LauncherName  string
-	ShortVersion  string
-	IconVersion   string
-	ReservedNames []string
+// WslReleaseInfo models information about the Ubuntu releases to be used
+// in the template files which are part of the WSL image and launcher build process.
+type WslReleaseInfo struct {
+	WslID         string   // uniquely identifies this distro in WSL context.
+	FullName      string   // full name of the distro bing built.
+	BuildVersion  string   // Ubuntu version we are building with the dot removed to be compatible with UWP version schema. 20.04 -> 2004
+	LauncherName  string   // name of the executable WSL launcher.
+	ShortVersion  string   // Ubuntu version without the point release. For instance  20.04 -> 20.04. 20.04.5 -> 20.04
+	IconVersion   string   // Version to show in the icon. 20.04 -> 20.04 LTS
+	ReservedNames []string // list of reserved names in the store ("Ubuntu 20.04 LTS" for instance. One should match the UWP package name)
 
-	codeName    string
-	shouldBuild bool
+	CodeName    string // Ubuntu release code name (e.g. Focal Fossa, Impish Indri etc)
+	ShouldBuild bool   //whether or not an image should be built for this release.
 }
 
 // ReleasesInfo returns all releases we care about from a csvPath.
-func ReleasesInfo(csvPath string) (releasesInfo []wslReleaseInfo, err error) {
+func ReleasesInfo(csvPath string) (releasesInfo []WslReleaseInfo, err error) {
 	releases, err := readCSV(csvPath)
 	if err != nil {
 		return nil, err
@@ -33,10 +40,10 @@ func ReleasesInfo(csvPath string) (releasesInfo []wslReleaseInfo, err error) {
 }
 
 // buildWSLReleaseInfo extracts WSL supported releases from the releases content
-// and returns a slice of wslReleaseInfo, ready to be used from templates.
-func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err error) {
+// and returns a slice of WslReleaseInfo, ready to be used from templates.
+func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err error) {
 	var latestLTSReleasedDate string
-	var ubuntuWSL wslReleaseInfo
+	var ubuntuWSL WslReleaseInfo
 
 	for _, release := range releases {
 		minor, err := strconv.Atoi(release[1])
@@ -52,7 +59,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err
 		if release[4] == "Active Development" || release[4] == "Pre-release Freeze" {
 			wslID := "UbuntuPreview"
 			fullName := "Ubuntu (Preview)"
-			wslReleases = append(wslReleases, wslReleaseInfo{
+			wslReleases = append(wslReleases, WslReleaseInfo{
 				WslID:         wslID,
 				FullName:      fullName,
 				BuildVersion:  buildVersion,
@@ -61,8 +68,8 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err
 				IconVersion:   "Preview",
 				ReservedNames: []string{fullName},
 
-				codeName:    codeName,
-				shouldBuild: true,
+				CodeName:    codeName,
+				ShouldBuild: true,
 			})
 
 		}
@@ -105,7 +112,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err
 		}
 
 		// Add per-release application
-		wsl := wslReleaseInfo{
+		wsl := WslReleaseInfo{
 			WslID:         wslID,
 			FullName:      fmt.Sprintf("Ubuntu %s LTS", version),
 			BuildVersion:  buildVersion,
@@ -114,8 +121,8 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []wslReleaseInfo, err
 			IconVersion:   fmt.Sprintf("%s LTS", version),
 			ReservedNames: reservedNames,
 
-			codeName:    codeName,
-			shouldBuild: shouldBuild,
+			CodeName:    codeName,
+			ShouldBuild: shouldBuild,
 		}
 		wslReleases = append(wslReleases, wsl)
 

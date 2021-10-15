@@ -18,6 +18,7 @@ import (
 	"time"
 
 	shutil "github.com/termie/go-shutil"
+	"github.com/ubuntu/WSL/wsl-builder/common"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -31,7 +32,7 @@ var (
 )
 
 func prepareBuild(buildIDPath, wslID, rootfses string, noChecksum bool, buildID int) error {
-	rootPath, err := getPathWith("DistroLauncher-Appx")
+	rootPath, err := common.GetPathWith("DistroLauncher-Appx")
 	if err != nil {
 		return err
 	}

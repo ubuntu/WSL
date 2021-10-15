@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
+	"github.com/ubuntu/WSL/wsl-builder/common"
 )
 
 func main() {
@@ -28,7 +29,7 @@ func main() {
 				return errors.New("this command accepts exactly one CSV file")
 			}
 
-			metaPath, err := getPathWith("meta")
+			metaPath, err := common.GetPathWith("meta")
 			if err != nil {
 				return err
 			}
