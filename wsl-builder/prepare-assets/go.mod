@@ -9,4 +9,5 @@ require (
 	gopkg.in/gographics/imagick.v2 v2.6.0
 )
 
+// We always want to use the latest local version.
 replace github.com/ubuntu/WSL-DsitroLauncher/wsl-builder/common => ../common

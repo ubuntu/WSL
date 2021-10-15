@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// getPathWith return the parent directory containing subdirectory. It goes up from
+// GetPathWith returns the parent directory containing <subdirectory>. It goes up from
 // current working directory.
 func GetPathWith(subdirectory string) (metaDir string, err error) {
 	defer func() {

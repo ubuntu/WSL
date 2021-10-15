@@ -1,3 +1,8 @@
+/*
+Package common groups utility routines and types commonly used in
+'prepare-assets' and 'prepare-build' module main packages as part
+of the WSL image and launcher build process.
+*/
 package common
 
 import (
@@ -9,17 +14,19 @@ import (
 	"time"
 )
 
+// WslReleaseInfo models information about the Ubuntu releases to be used
+// in the template files which are part of the WSL image and launcher build process.
 type WslReleaseInfo struct {
-	WslID         string
-	FullName      string
-	BuildVersion  string
-	LauncherName  string
-	ShortVersion  string
-	IconVersion   string
-	ReservedNames []string
+	WslID         string   // uniquely identifies this distro in WSL context.
+	FullName      string   // full name of the distro bing built.
+	BuildVersion  string   // Ubuntu version we are building with the dot removed to be compatible with UWP version schema. 20.04 -> 2004
+	LauncherName  string   // name of the executable WSL launcher.
+	ShortVersion  string   // Ubuntu version without the point release. For instance  20.04 -> 20.04. 20.04.5 -> 20.04
+	IconVersion   string   // Version to show in the icon. 20.04 -> 20.04 LTS
+	ReservedNames []string // list of reserved names in the store ("Ubuntu 20.04 LTS" for instance. One should match the UWP package name)
 
-	CodeName    string
-	ShouldBuild bool
+	CodeName    string // Ubuntu release code name (e.g. Focal Fossa, Impish Indri etc)
+	ShouldBuild bool   //whether or not an image should be built for this release.
 }
 
 // ReleasesInfo returns all releases we care about from a csvPath.
