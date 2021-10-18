@@ -9,18 +9,18 @@
     <Keyword>bash</Keyword>
   </Keywords>
   <Description>
-Ubuntu (Preview) on Windows allows you to use Ubuntu Terminal and run Ubuntu command line utilities including bash, ssh, git, apt and many more.
+Ubuntu 22.04 LTS on Windows allows you to use Ubuntu Terminal and run Ubuntu command line utilities including bash, ssh, git, apt and many more.
 
 Please note that Windows 10 S does not support running this app.
 
-To launch, use "ubuntupreview" on the command-line prompt (cmd.exe), or click on the Ubuntu (Preview) tile in the Start Menu.
+To launch, use "ubuntu2204" on the command-line prompt (cmd.exe), or click on the Ubuntu 22.04 LTS tile in the Start Menu.
 
 To use this feature, one first needs to use "Turn Windows features on or off" and select "Windows Subsystem for Linux", click OK, reboot, and use this app.
 
 The above step can also be performed using Administrator PowerShell prompt:
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
 
-This app installs the Ubuntu (Preview) release on Windows.
+This app installs the Ubuntu 22.04 LTS release on Windows.
 
 Please note that app updates don't change the Ubuntu installation. To upgrade to a new release please run do-release-upgrade in the Ubuntu Terminal.
 
@@ -30,7 +30,6 @@ For more information about Windows Subsystem for Linux please visit: https://wik
   <DevStudio>Canonical Ltd. and the OpenSource community</DevStudio>
   <ScreenshotCaptions>
     <!-- Valid length: 200 character limit, up to 9 elements per platform -->
-    <Caption DesktopImage="Ubuntu_Preview.png">Ubuntu Preview</Caption>
     <Caption DesktopImage="Ubuntu_WSL.png">Ubuntu WSL</Caption>
   </ScreenshotCaptions>
   <AppFeatures>
