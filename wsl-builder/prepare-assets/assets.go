@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"image"
 	_ "image/png"
@@ -66,7 +67,7 @@ func resetMetaDirectoryForRelease(wslPath string) (err error) {
 	}()
 
 	oldWslPath := wslPath + ".old"
-	if err := os.Rename(wslPath, oldWslPath); err != nil {
+	if err := os.Rename(wslPath, oldWslPath); !errors.Is(err, fs.ErrNotExist) && err != nil {
 		return err
 	}
 
@@ -75,6 +76,10 @@ func resetMetaDirectoryForRelease(wslPath string) (err error) {
 	}
 
 	err = filepath.WalkDir(filepath.Join(oldWslPath, "store"), func(path string, d fs.DirEntry, err error) error {
+		// "store" directory does not exists in oldWslPath
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil
+		}
 		if err != nil {
 			return err
 		}
