@@ -245,7 +245,6 @@ jobs:
         id: modified-artifacts
         run: |
           set -eu
-          ls -lR ${{ env.artifactsPath }}
 
           mkdir -p build-info/
           cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || exit 0
