@@ -77,7 +77,7 @@ jobs:
           echo "::notice::Building for: $(echo "${builds}" | jq '.include[] | "\(.WslID): \(.Rootfses). RootfsesChecksum: \(.RootfsesChecksum). Upload to store: \(.Upload)"')"
 
   build-wsl:
-    name: Build WSL appxbundle for a given release
+    name: Build ${{ matrix.WslID }}
     runs-on: windows-latest
     needs: build-matrix
     strategy:
