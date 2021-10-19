@@ -157,36 +157,62 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 	return arches, g.Wait()
 }
 
-// downloadFile into dest
+// downloadFile into dest (or copy it if from a local path).
 func downloadFile(url string, dest string) (err error) {
-	log.Printf("downloading file %s", url)
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("could not download %q: %v", url, err)
+	// checking if the url is actually a local file path
+	// by testing if file already exists
+	if sourceFileStat, err := os.Stat(url); err == nil {
+		if !sourceFileStat.Mode().IsRegular() {
+			return fmt.Errorf("%s is not a regular file", url)
 		}
-	}()
 
-	// Get the data
-	var netClient = &http.Client{
-		Timeout: 10 * time.Minute,
-	}
-	resp, err := netClient.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
+		log.Printf("copying file %s", url)
 
-	if resp.StatusCode >= 400 {
-		return fmt.Errorf("http request failed with code %d", resp.StatusCode)
-	}
+		source, err := os.Open(url)
+		if err != nil {
+			return err
+		}
 
+		defer source.Close()
+
+		return copyToDestinationFile(source, dest)
+
+	} else { // otherwise, download it.
+		log.Printf("downloading file %s", url)
+		defer func() {
+			if err != nil {
+				err = fmt.Errorf("could not download %q: %v", url, err)
+			}
+		}()
+
+		// Get the data
+		var netClient = &http.Client{
+			Timeout: 10 * time.Minute,
+		}
+		resp, err := netClient.Get(url)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode >= 400 {
+			return fmt.Errorf("http request failed with code %d", resp.StatusCode)
+		}
+
+		return copyToDestinationFile(resp.Body, dest)
+	}
+}
+
+// private function created to avoid creating the destination file too early
+func copyToDestinationFile(source io.Reader, dest string) (err error) {
 	out, err := os.Create(dest)
 	if err != nil {
 		return err
 	}
+
 	defer out.Close()
 
-	_, err = io.Copy(out, resp.Body)
+	_, err = io.Copy(out, source)
 	return err
 }
 
