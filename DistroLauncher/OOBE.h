@@ -29,5 +29,5 @@ namespace DistributionInfo {
     HRESULT OOBESetup();
 
     // OOBE executable name.
-    static TCHAR* OOBE_NAME = L"ubuntu_wsl_setup";
+    static TCHAR* OOBE_NAME = L"/usr/lib/libexec/wsl-setup";
 }
