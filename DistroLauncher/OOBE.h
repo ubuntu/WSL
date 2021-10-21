@@ -21,4 +21,7 @@
 namespace DistributionInfo {
     // OOBE Experience.
     ULONG OOBE();
+
+    // OOBE executable name.
+    static TCHAR* OOBE_NAME = L"ubuntu_wsl_setup";
 }
