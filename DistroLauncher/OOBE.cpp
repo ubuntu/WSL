@@ -18,6 +18,15 @@
 
 #include "stdafx.h"
 
+bool DistributionInfo::isOOBEAvailable(){
+	DWORD exitCode=-1;
+	std::wstring whichCdm{ L"which " };
+	whichCdm.append(DistributionInfo::OOBE_NAME);
+	HRESULT hr = g_wslApi.WslLaunchInteractive(whichCdm.c_str(), true, &exitCode);
+	// true if launching the process succeeds and `which` command returns 0.
+	return ((SUCCEEDED(hr)) && (exitCode == 0));
+}
+
 ULONG DistributionInfo::OOBE()
 {
 	ULONG uid = UID_INVALID;
@@ -80,4 +89,15 @@ ULONG DistributionInfo::OOBE()
 	}
 
 	return uid;
+}
+
+HRESULT DistributionInfo::OOBESetup(){
+	// Query the UID of the given user name and configure the distribution
+	// to use this UID as the default.
+	ULONG uid = DistributionInfo::OOBE();
+	if (uid == UID_INVALID) {
+		return E_INVALIDARG;
+	}
+
+	return g_wslApi.WslConfigureDistribution(uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
 }

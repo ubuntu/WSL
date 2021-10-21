@@ -36,44 +36,24 @@ HRESULT InstallDistribution(bool createUser)
         return hr;
     }
 
-	// checking for the existance of the OOBE executable.
-	std::wstring whichCdm{ L"which " };
-	whichCdm.append(DistributionInfo::OOBE_NAME);
-	hr = g_wslApi.WslLaunchInteractive(whichCdm.c_str(), true, &exitCode);
-	//if the OOBE experience do not exist, skip and fallback
-	if ((FAILED(hr)) || (exitCode != 0)) {
-		if (createUser) {
-			Helpers::PrintMessage(MSG_CREATE_USER_PROMPT);
-			std::wstring userName;
-			do {
-				userName = Helpers::GetUserInput(MSG_ENTER_USERNAME, 32);
+    // Create a user account.
+    if (createUser) {
+        if(DistributionInfo::isOOBEAvailable()){
+            return DistributionInfo::OOBESetup();
+        }
+        Helpers::PrintMessage(MSG_CREATE_USER_PROMPT);
+        std::wstring userName;
+        do {
+            userName = Helpers::GetUserInput(MSG_ENTER_USERNAME, 32);
 
-			} while (!DistributionInfo::CreateUser(userName));
+        } while (!DistributionInfo::CreateUser(userName));
 
-			// Set this user account as the default.
-			hr = SetDefaultUser(userName);
-			if (FAILED(hr)) {
-				return hr;
-			}
-		}
-	}
-	else {
-		if (createUser) {
-			// Query the UID of the given user name and configure the distribution
-			// to use this UID as the default.
-			ULONG uid = DistributionInfo::OOBE();
-			if (uid == UID_INVALID) {
-				return E_INVALIDARG;
-			}
-
-			HRESULT hr = g_wslApi.WslConfigureDistribution(uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
-			if (FAILED(hr)) {
-				return hr;
-			}
-
-			return hr;
-		}
-	}
+        // Set this user account as the default.
+        hr = SetDefaultUser(userName);
+        if (FAILED(hr)) {
+            return hr;
+        }
+    }
 
     return hr;
 }

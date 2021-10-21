@@ -22,6 +22,12 @@ namespace DistributionInfo {
     // OOBE Experience.
     ULONG OOBE();
 
+    // isOOBEAvailable returns true if OOBE executable is found inside rootfs. 
+    bool isOOBEAvailable();
+
+    // OOBESetup executes the OOBE, creates the user and calls WslConfigureDistribution.
+    HRESULT OOBESetup();
+
     // OOBE executable name.
     static TCHAR* OOBE_NAME = L"ubuntu_wsl_setup";
 }
