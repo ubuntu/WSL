@@ -21,9 +21,6 @@ namespace DistributionInfo
     // Create and configure a user account.
     bool CreateUser(std::wstring_view userName);
 
-    // OOBE Experience.
-    ULONG OOBE();
-
     // Query the UID of the user account.
     ULONG QueryUid(std::wstring_view userName);
 }
