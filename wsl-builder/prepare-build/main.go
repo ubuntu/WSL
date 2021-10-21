@@ -43,8 +43,9 @@ func main() {
 	prepareBuildCmd := &cobra.Command{
 		Use:   "prepare BUILDID_PATH WSL_ID ROOTFSES",
 		Short: "Prepares the build source before calling msbuild",
-		Long: `This downloads the root file systems and prepares the build before
-		       building the appx bundle`,
+		Long: `This gets the root file systems and prepares the build before building 
+			the appx bundle. ROOTFSES must be a comma separated list of
+			local file paths or urls each followed by ::<arch>`,
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return prepareBuild(args[0], args[1], args[2], *noChecksum, *buildID)
