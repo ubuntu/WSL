@@ -31,6 +31,7 @@ var (
 	}
 )
 
+// prepareBuild finds the correct paths of the VS projects, prepare build assets and get rootfs images.
 func prepareBuild(buildIDPath, wslID, rootfses string, noChecksum bool, buildID int) error {
 	rootPath, err := common.GetPathWith("DistroLauncher-Appx")
 	if err != nil {
@@ -48,7 +49,7 @@ func prepareBuild(buildIDPath, wslID, rootfses string, noChecksum bool, buildID 
 		buildNumber = fmt.Sprintf("%d", buildID)
 	}
 
-	archs, err := downloadRootfses(rootPath, rootfses, noChecksum)
+	archs, err := getRootfses(rootPath, rootfses, noChecksum)
 	if err != nil {
 		return err
 	}
@@ -60,7 +61,7 @@ func prepareBuild(buildIDPath, wslID, rootfses string, noChecksum bool, buildID 
 	return nil
 }
 
-// extractAndStoreNextBuildNumber returns the next minor build number to use
+// extractAndStoreNextBuildNumber returns the next minor build number to use.
 func extractAndStoreNextBuildNumber(buildIDPath string) (buildNumber string, err error) {
 	defer func() {
 		if err != nil {
@@ -87,8 +88,48 @@ func extractAndStoreNextBuildNumber(buildIDPath string) (buildNumber string, err
 	return buildNumber, nil
 }
 
-// downloadRootfses and returns a list of windows archs we will build on
-func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]string, error) {
+// getRootfs downloads one rootfs file in tar.gz format and place
+// it where the distro launcher build system expects. If `uri` points to
+// a local regular file, it is copied from disk instead of downloaded.
+func getRootfs(uri, rootPath, winArch string, noChecksum bool) error {
+	if err := os.MkdirAll(winArch, 0755); err != nil {
+		return err
+	}
+
+	if isLocalFile(uri) {
+		if !noChecksum {
+			log.Printf("Checksum not supported for local URI")
+		}
+		return copyLocalFile(uri, filepath.Join(rootPath, winArch, "install.tar.gz"))
+	}
+
+	if err := downloadFile(uri, filepath.Join(rootPath, winArch, "install.tar.gz")); err != nil {
+		return err
+	}
+
+	if noChecksum {
+		return nil
+	}
+
+	u, err := url.Parse(uri)
+	if err != nil {
+		return err
+	}
+	u.Path = filepath.Join(path.Dir(u.Path), "SHA256SUMS")
+	checksumURL := strings.ReplaceAll(u.String(), "%5C", "/")
+	checksumDest := filepath.Join(rootPath, winArch, "SHA256SUMS")
+	if err := downloadFile(checksumURL, checksumDest); err != nil {
+		return err
+	}
+	if err := checksumMatches(filepath.Join(rootPath, winArch, "install.tar.gz"), filepath.Base(uri), checksumDest); err != nil {
+		return err
+	}
+	return nil
+}
+
+// getRootfses returns a list of windows archs we will build on
+// and place rootfses into the path expected by the WSL build process for each arch.
+func getRootfses(rootPath, rootfses string, noChecksum bool) ([]string, error) {
 	requestedArches := make(map[string]struct{})
 
 	var g errgroup.Group
@@ -119,33 +160,9 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 		}
 		requestedArches[winArch] = struct{}{}
 
-		// Download rootfs and checksum it
+		// Obtains rootfs and checksum it if `noChecksum==false`
 		g.Go(func() error {
-			if err := os.MkdirAll(winArch, 0755); err != nil {
-				return err
-			}
-			if err := downloadFile(rootfsURL, filepath.Join(rootPath, winArch, "install.tar.gz")); err != nil {
-				return err
-			}
-
-			if noChecksum {
-				return nil
-			}
-
-			u, err := url.Parse(rootfsURL)
-			if err != nil {
-				return err
-			}
-			u.Path = filepath.Join(path.Dir(u.Path), "SHA256SUMS")
-			checksumURL := strings.ReplaceAll(u.String(), "%5C", "/")
-			checksumDest := filepath.Join(rootPath, winArch, "SHA256SUMS")
-			if err := downloadFile(checksumURL, checksumDest); err != nil {
-				return err
-			}
-			if err := checksumMatches(filepath.Join(rootPath, winArch, "install.tar.gz"), filepath.Base(rootfsURL), checksumDest); err != nil {
-				return err
-			}
-			return nil
+			return getRootfs(rootfsURL, rootPath, winArch, noChecksum)
 		})
 	}
 
@@ -157,66 +174,74 @@ func downloadRootfses(rootPath string, rootfses string, noChecksum bool) ([]stri
 	return arches, g.Wait()
 }
 
-// downloadFile into dest (or copy it if from a local path).
-func downloadFile(url string, dest string) (err error) {
-	// checking if the url is actually a local file path
-	// by testing if file already exists
-	if sourceFileStat, err := os.Stat(url); err == nil {
-		if !sourceFileStat.Mode().IsRegular() {
-			return fmt.Errorf("%s is not a regular file", url)
-		}
-
-		log.Printf("copying file %s", url)
-
-		source, err := os.Open(url)
-		if err != nil {
-			return err
-		}
-
-		defer source.Close()
-
-		return copyToDestinationFile(source, dest)
-
-	} else { // otherwise, download it.
-		log.Printf("downloading file %s", url)
-		defer func() {
-			if err != nil {
-				err = fmt.Errorf("could not download %q: %v", url, err)
-			}
-		}()
-
-		// Get the data
-		var netClient = &http.Client{
-			Timeout: 10 * time.Minute,
-		}
-		resp, err := netClient.Get(url)
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode >= 400 {
-			return fmt.Errorf("http request failed with code %d", resp.StatusCode)
-		}
-
-		return copyToDestinationFile(resp.Body, dest)
+// isLocalFile returns true if `url` points to a regular local file.
+func isLocalFile(url string) bool {
+	sourceFileStat, err := os.Stat(url)
+	if err != nil {
+		return false
 	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		log.Printf("%s is not a regular file", url)
+		return false
+	}
+	return true
 }
 
-// private function created to avoid creating the destination file too early
-func copyToDestinationFile(source io.Reader, dest string) (err error) {
+// copyLocalFile copies a regular local file pointed by `url`
+// into a new file created at `dest`.
+func copyLocalFile(url, dest string) (err error) {
+	log.Printf("copying file %s", url)
+	source, err := os.Open(url)
+	if err != nil {
+		return err
+	}
+	defer source.Close()
+
+	return writeContentInto(source, dest)
+}
+
+// downloadFile downloads a file from the address pointed by `url` into `dest`.
+func downloadFile(url, dest string) (err error) {
+	log.Printf("downloading file %s", url)
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("could not download %q: %v", url, err)
+		}
+	}()
+
+	// Get the data
+	var netClient = &http.Client{
+		Timeout: 10 * time.Minute,
+	}
+	resp, err := netClient.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("http request failed with code %d", resp.StatusCode)
+	}
+
+	return writeContentInto(resp.Body, dest)
+}
+
+// writeContentInto writes the content of the `source io.Reader`
+// into a new file created at `dest`.
+func writeContentInto(source io.Reader, dest string) (err error) {
 	out, err := os.Create(dest)
 	if err != nil {
 		return err
 	}
-
 	defer out.Close()
 
 	_, err = io.Copy(out, source)
 	return err
 }
 
-// checksumMatches checks that file to match
+// checksumMatches checks the file pointed by `path` against values
+// provided in the `checksumPath` file.
 func checksumMatches(path, origName, checksumPath string) (err error) {
 	defer func() {
 		if err != nil {
@@ -274,7 +299,7 @@ func checksumMatches(path, origName, checksumPath string) (err error) {
 	return nil
 }
 
-// prepareAssets copies metadata and assets files, appending dynamic elements
+// prepareAssets copies metadata and assets files, appending dynamic elements.
 func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err error) {
 	defer func() {
 		if err != nil {
