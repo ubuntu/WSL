@@ -31,13 +31,13 @@ HRESULT InstallDistribution(bool createUser)
 
     // Delete /etc/resolv.conf to allow WSL to generate a version based on Windows networking information.
     DWORD exitCode;
-    hr = g_wslApi.WslLaunchInteractive(L"/bin/rm /etc/resolv.conf", true, &exitCode);
+    hr = g_wslApi.WslLaunchInteractive(L"rm /etc/resolv.conf", true, &exitCode);
     if (FAILED(hr)) {
         return hr;
     }
 
     // doing stuff here
-	hr = g_wslApi.WslLaunchInteractive(L"/usr/bin/which /usr/bin/ubuntu-wsl-oobe", true, &exitCode);
+	hr = g_wslApi.WslLaunchInteractive(L"which ubuntu-wsl-oobe", true, &exitCode);
 	//if the OOBE experience do not exist, skip and fallback
 	if ((FAILED(hr)) || (exitCode != 0)) {
 		if (createUser) {
