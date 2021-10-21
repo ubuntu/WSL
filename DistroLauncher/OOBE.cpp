@@ -24,13 +24,13 @@ ULONG DistributionInfo::OOBE()
 
 	// calling the oobe experience
 	DWORD exitCode;
-	std::wstring commandLine = L"/usr/bin/ubuntu-wsl-oobe";
+	std::wstring commandLine = L"ubuntu-wsl-oobe";
 	HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
 	if ((FAILED(hr)) || (exitCode != 0)) {
 		return uid;
 	}
 
-	hr = g_wslApi.WslLaunchInteractive(L"/usr/bin/clear", true, &exitCode);
+	hr = g_wslApi.WslLaunchInteractive(L"clear", true, &exitCode);
 	if (FAILED(hr)) {
 		return uid;
 	}
