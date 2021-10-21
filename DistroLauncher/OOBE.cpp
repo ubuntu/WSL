@@ -24,7 +24,7 @@ ULONG DistributionInfo::OOBE()
 
 	// calling the oobe experience
 	DWORD exitCode;
-	std::wstring commandLine = L"ubuntu-wsl-oobe";
+	std::wstring commandLine = DistributionInfo::OOBE_NAME;
 	HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
 	if ((FAILED(hr)) || (exitCode != 0)) {
 		return uid;

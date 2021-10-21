@@ -36,8 +36,10 @@ HRESULT InstallDistribution(bool createUser)
         return hr;
     }
 
-    // doing stuff here
-	hr = g_wslApi.WslLaunchInteractive(L"which ubuntu-wsl-oobe", true, &exitCode);
+    // checking for the existance of the OOBE executable.
+    std::wstring whichCdm{ L"which " };
+    whichCdm.append(DistributionInfo::OOBE_NAME);
+	hr = g_wslApi.WslLaunchInteractive(whichCdm.c_str(), true, &exitCode);
 	//if the OOBE experience do not exist, skip and fallback
 	if ((FAILED(hr)) || (exitCode != 0)) {
 		if (createUser) {
