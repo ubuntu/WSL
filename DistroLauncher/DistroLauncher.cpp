@@ -31,47 +31,29 @@ HRESULT InstallDistribution(bool createUser)
 
     // Delete /etc/resolv.conf to allow WSL to generate a version based on Windows networking information.
     DWORD exitCode;
-    hr = g_wslApi.WslLaunchInteractive(L"/bin/rm /etc/resolv.conf", true, &exitCode);
+    hr = g_wslApi.WslLaunchInteractive(L"rm /etc/resolv.conf", true, &exitCode);
     if (FAILED(hr)) {
         return hr;
     }
 
-    // doing stuff here
-	hr = g_wslApi.WslLaunchInteractive(L"/usr/bin/which /usr/bin/ubuntu-wsl-oobe", true, &exitCode);
-	//if the OOBE experience do not exist, skip and fallback
-	if ((FAILED(hr)) || (exitCode != 0)) {
-		if (createUser) {
-			Helpers::PrintMessage(MSG_CREATE_USER_PROMPT);
-			std::wstring userName;
-			do {
-				userName = Helpers::GetUserInput(MSG_ENTER_USERNAME, 32);
+    // Create a user account.
+    if (createUser) {
+        if(DistributionInfo::isOOBEAvailable()){
+            return DistributionInfo::OOBESetup();
+        }
+        Helpers::PrintMessage(MSG_CREATE_USER_PROMPT);
+        std::wstring userName;
+        do {
+            userName = Helpers::GetUserInput(MSG_ENTER_USERNAME, 32);
 
-			} while (!DistributionInfo::CreateUser(userName));
+        } while (!DistributionInfo::CreateUser(userName));
 
-			// Set this user account as the default.
-			hr = SetDefaultUser(userName);
-			if (FAILED(hr)) {
-				return hr;
-			}
-		}
-	}
-	else {
-		if (createUser) {
-			// Query the UID of the given user name and configure the distribution
-			// to use this UID as the default.
-			ULONG uid = DistributionInfo::OOBE();
-			if (uid == UID_INVALID) {
-				return E_INVALIDARG;
-			}
-
-			HRESULT hr = g_wslApi.WslConfigureDistribution(uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
-			if (FAILED(hr)) {
-				return hr;
-			}
-
-			return hr;
-		}
-	}
+        // Set this user account as the default.
+        hr = SetDefaultUser(userName);
+        if (FAILED(hr)) {
+            return hr;
+        }
+    }
 
     return hr;
 }
