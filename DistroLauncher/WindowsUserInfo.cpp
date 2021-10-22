@@ -80,7 +80,9 @@ namespace DistributionInfo {
 			} else {
 				std::wstring_view view{ loc,result };
 				std::size_t dashPos = view.find_first_of('-');
-				if (dashPos > 0 && dashPos < result) loc[dashPos] = '_';
+				if (dashPos > 0 && dashPos < result) {
+					loc[dashPos] = '_';
+				}
 				// (result-1) because GetUserDefaultLocaleName includes the Windows null-terminating char, not needed here.
 				userInfo.localeName = std::wstring{ loc, result - 1 };
 			}
