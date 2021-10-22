@@ -25,6 +25,7 @@
 #include <string_view>
 #include <vector>
 #include <wslapi.h>
+#include <fstream>
 #define SECURITY_WIN32
 #include <sspi.h>
 #include <secext.h>

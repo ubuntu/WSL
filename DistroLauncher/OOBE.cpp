@@ -18,86 +18,133 @@
 
 #include "stdafx.h"
 
-bool DistributionInfo::isOOBEAvailable(){
-	DWORD exitCode=-1;
-	std::wstring whichCdm{ L"which " };
-	whichCdm.append(DistributionInfo::OOBE_NAME);
-	HRESULT hr = g_wslApi.WslLaunchInteractive(whichCdm.c_str(), true, &exitCode);
-	// true if launching the process succeeds and `which` command returns 0.
-	return ((SUCCEEDED(hr)) && (exitCode == 0));
-}
+namespace DistributionInfo {
 
-ULONG DistributionInfo::OOBE()
-{
-	ULONG uid = UID_INVALID;
-
-	// calling the oobe experience
-	DWORD exitCode;
-	std::wstring commandLine = DistributionInfo::OOBE_NAME;
-	HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
-	if ((FAILED(hr)) || (exitCode != 0)) {
-		return uid;
+	namespace {
+		std::wstring PreparePrefillInfo();
 	}
 
-	hr = g_wslApi.WslLaunchInteractive(L"clear", true, &exitCode);
-	if (FAILED(hr)) {
-		return uid;
+	bool DistributionInfo::isOOBEAvailable(){
+		DWORD exitCode=-1;
+		std::wstring whichCdm{ L"which " };
+		whichCdm.append(DistributionInfo::OOBE_NAME);
+		HRESULT hr = g_wslApi.WslLaunchInteractive(whichCdm.c_str(), true, &exitCode);
+		// true if launching the process succeeds and `which` command returns 0.
+		return ((SUCCEEDED(hr)) && (exitCode == 0));
 	}
 
-	// getting username from ouput
-	// Create a pipe to read the output of the launched process.
-	HANDLE readPipe;
-	HANDLE writePipe;
-	SECURITY_ATTRIBUTES sa{ sizeof(sa), nullptr, true };
-	if (CreatePipe(&readPipe, &writePipe, &sa, 0)) {
-		// Query the UID of the supplied username.
-		std::wstring command = L"cat /var/lib/ubuntu-wsl/assigned_account";
-		int returnValue = 0;
-		HANDLE child;
-		HRESULT hr = g_wslApi.WslLaunch(command.c_str(), true, GetStdHandle(STD_INPUT_HANDLE), writePipe, GetStdHandle(STD_ERROR_HANDLE), &child);
-		if (SUCCEEDED(hr)) {
-			// Wait for the child to exit and ensure process exited successfully.
-			WaitForSingleObject(child, INFINITE);
-			DWORD exitCode;
-			if ((GetExitCodeProcess(child, &exitCode) == false) || (exitCode != 0)) {
-				hr = E_INVALIDARG;
-			}
+	ULONG DistributionInfo::OOBE()
+	{
+		ULONG uid = UID_INVALID;
 
-			CloseHandle(child);
-			if (SUCCEEDED(hr)) {
-				char buffer[64];
-				DWORD bytesRead;
-
-				// Read the output of the command from the pipe and query UID
-				if (ReadFile(readPipe, buffer, (sizeof(buffer) - 1), &bytesRead, nullptr)) {
-					buffer[bytesRead] = ANSI_NULL;
-					try {
-						const size_t bfrSize = strlen(buffer) + 1;
-						wchar_t* wbuffer = new wchar_t[bfrSize];
-						size_t outSize;
-						mbstowcs_s(&outSize, wbuffer, bfrSize, buffer, bfrSize - 1);
-						std::wstring_view uname_bfr{ wbuffer, bfrSize };
-						uid = QueryUid(uname_bfr);
-					}
-					catch (...) {}
-				}
-			}
+		// calling the oobe experience
+		DWORD exitCode;
+		// Prepare prefill information to send to the OOBE.
+		std::wstring prefillCLIPostFix = DistributionInfo::PreparePrefillInfo();
+		std::wstring commandLine = DistributionInfo::OOBE_NAME + prefillCLIPostFix;
+		HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
+		if ((FAILED(hr)) || (exitCode != 0)) {
+			return uid;
 		}
 
-		CloseHandle(readPipe);
-		CloseHandle(writePipe);
+		hr = g_wslApi.WslLaunchInteractive(L"clear", true, &exitCode);
+		if (FAILED(hr)) {
+			return uid;
+		}
+
+		// getting username from ouput
+		// Create a pipe to read the output of the launched process.
+		HANDLE readPipe;
+		HANDLE writePipe;
+		SECURITY_ATTRIBUTES sa{ sizeof(sa), nullptr, true };
+		if (CreatePipe(&readPipe, &writePipe, &sa, 0)) {
+			// Query the UID of the supplied username.
+			std::wstring command = L"cat /var/lib/ubuntu-wsl/assigned_account";
+			int returnValue = 0;
+			HANDLE child;
+			HRESULT hr = g_wslApi.WslLaunch(command.c_str(), true, GetStdHandle(STD_INPUT_HANDLE), writePipe, GetStdHandle(STD_ERROR_HANDLE), &child);
+			if (SUCCEEDED(hr)) {
+				// Wait for the child to exit and ensure process exited successfully.
+				WaitForSingleObject(child, INFINITE);
+				DWORD exitCode;
+				if ((GetExitCodeProcess(child, &exitCode) == false) || (exitCode != 0)) {
+					hr = E_INVALIDARG;
+				}
+
+				CloseHandle(child);
+				if (SUCCEEDED(hr)) {
+					char buffer[64];
+					DWORD bytesRead;
+
+					// Read the output of the command from the pipe and query UID
+					if (ReadFile(readPipe, buffer, (sizeof(buffer) - 1), &bytesRead, nullptr)) {
+						buffer[bytesRead] = ANSI_NULL;
+						try {
+							const size_t bfrSize = strlen(buffer) + 1;
+							wchar_t* wbuffer = new wchar_t[bfrSize];
+							size_t outSize;
+							mbstowcs_s(&outSize, wbuffer, bfrSize, buffer, bfrSize - 1);
+							std::wstring_view uname_bfr{ wbuffer, bfrSize };
+							uid = QueryUid(uname_bfr);
+						}
+						catch (...) {}
+					}
+				}
+			}
+
+			CloseHandle(readPipe);
+			CloseHandle(writePipe);
+		}
+
+		return uid;
 	}
 
-	return uid;
-}
+	HRESULT DistributionInfo::OOBESetup(){
+		// Query the UID of the given user name and configure the distribution
+		// to use this UID as the default.
+		ULONG uid = DistributionInfo::OOBE();
+		if (uid == UID_INVALID) {
+			return E_INVALIDARG;
+		}
 
-HRESULT DistributionInfo::OOBESetup(){
-	// Query the UID of the given user name and configure the distribution
-	// to use this UID as the default.
-	ULONG uid = DistributionInfo::OOBE();
-	if (uid == UID_INVALID) {
-		return E_INVALIDARG;
+		return g_wslApi.WslConfigureDistribution(uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
 	}
 
-	return g_wslApi.WslConfigureDistribution(uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
-}
+	// Anonimous namespace to avoid exposing internal details of the implementation.
+	namespace {
+
+		// Saves Windows information inside Linux filesystem to supply to the OOBE.
+		// Returns empty string if we fail to generate the prefill file
+		// or the postfix to be added to the OOBE command line.
+		std::wstring PreparePrefillInfo() {
+			std::wstring commandLine;
+			std::wstring prefillInfo = DistributionInfo::GetPrefillInfoInYaml();
+			if (prefillInfo.empty()) {
+				return commandLine;
+			}
+
+			// Write it to a file inside \\wsl$ distro filesystem.        
+			const std::wstring prefillFileNameDest = L"/var/tmp/prefill-system-setup.yaml";
+			const std::wstring wslPrefix = L"\\\\wsl$\\" + DistributionInfo::Name;
+			std::wofstream prefillFile;
+			// Mixing slashes and backslashes that way is not a problem for Windows.
+			prefillFile.open(wslPrefix + prefillFileNameDest, std::ios::ate);
+			if (prefillFile.fail()) {
+				Helpers::PrintErrorMessage(CO_E_FAILEDTOCREATEFILE);
+				return commandLine;
+			}
+
+			prefillFile << prefillInfo;
+			prefillFile.close();
+			if (prefillFile.fail()) {
+				Helpers::PrintErrorMessage(CO_E_FAILEDTOCREATEFILE);
+				return commandLine;
+			}
+			
+			commandLine += L" --prefill=" + prefillFileNameDest;
+			return commandLine;
+		} // std::wstring PreparePrefillInfo().
+
+	} // namespace.
+
+} // namespace DistributionInfo.
