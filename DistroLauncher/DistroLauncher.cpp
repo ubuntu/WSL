@@ -38,7 +38,7 @@ HRESULT InstallDistribution(bool createUser)
 
     // Create a user account.
     if (createUser) {
-        if(DistributionInfo::isOOBEAvailable()){
+        if (DistributionInfo::isOOBEAvailable()){
             return DistributionInfo::OOBESetup();
         }
         Helpers::PrintMessage(MSG_CREATE_USER_PROMPT);

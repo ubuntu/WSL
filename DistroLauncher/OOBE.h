@@ -28,6 +28,9 @@ namespace DistributionInfo {
     // OOBESetup executes the OOBE, creates the user and calls WslConfigureDistribution.
     HRESULT OOBESetup();
 
+    // GetPrefillInfoInYaml generates a YAML string from Windows user and locale information.
+    std::wstring GetPrefillInfoInYaml();
+
     // OOBE executable name.
     static TCHAR* OOBE_NAME = L"/usr/lib/libexec/wsl-setup";
 }
