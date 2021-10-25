@@ -176,7 +176,14 @@ jobs:
           hasChanges="$(git diff --staged ${fingerprint_file})"
           cd -
 
-          if [ -z "${hasChanges}" -o -z "${build_id}" -o "${build_id}" = "0" ]; then
+          if [ -z "${hasChanges}" ]; then
+            exit 0
+          fi
+
+          echo "::set-output name=save-artifacts::true"
+
+          if [ "${build_id}" = "0" ]; then
+            echo "::notice::This is the first build for ${{ matrix.WslID }}. It needs to be submitted manually to the Microsoft Store"
             exit 0
           fi
           echo "::notice::Uploading to the store ${{ matrix.WslID }} build ${build_id}"
@@ -219,7 +226,7 @@ jobs:
           Update-ApplicationSubmission -AppId $appid -SubmissionDataPath "out\appstore-submission.json" -PackagePath "out\appstore-submission.zip" -Force -Autocommit -ReplacePackages -UpdateListings -UpdatePublishModeAndVisibility -UpdatePricingAndAvailability -UpdateAppProperties -UpdateGamingOptions -UpdateTrailers -UpdateNotesForCertification
 
       - name: Upload build artifacts
-        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        if: ${{ steps.detect-upload-to-store.outputs.save-artifacts == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
