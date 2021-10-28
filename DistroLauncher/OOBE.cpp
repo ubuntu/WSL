@@ -33,9 +33,13 @@ namespace DistributionInfo {
 		return ((SUCCEEDED(hr)) && (exitCode == 0));
 	}
 
-	ULONG DistributionInfo::OOBE()
+	HRESULT DistributionInfo::OOBE()
 	{
-		ULONG uid = UID_INVALID;
+		// comfigre the distribution before calling OOBE
+		hr = g_wslApi.WslConfigureDistribution(0, WSL_DISTRIBUTION_FLAGS_DEFAULT);
+		if (FAILED(hr)) {
+			return hr;
+		}
 
 		// calling the oobe experience
 		DWORD exitCode;
@@ -44,22 +48,21 @@ namespace DistributionInfo {
 		std::wstring commandLine = DistributionInfo::OOBE_NAME + prefillCLIPostFix;
 		HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
 		if ((FAILED(hr)) || (exitCode != 0)) {
-			return uid;
+			return hr;
 		}
 
 		hr = g_wslApi.WslLaunchInteractive(L"clear", true, &exitCode);
 		if (FAILED(hr)) {
-			return uid;
+			return hr;
 		}
 
-		// getting username from ouput
-		// Create a pipe to read the output of the launched process.
+		// read the final statis
 		HANDLE readPipe;
 		HANDLE writePipe;
 		SECURITY_ATTRIBUTES sa{ sizeof(sa), nullptr, true };
 		if (CreatePipe(&readPipe, &writePipe, &sa, 0)) {
-			// Query the UID of the supplied username.
-			std::wstring command = L"cat /var/lib/ubuntu-wsl/assigned_account";
+			// check the content of the launcher status.
+			std::wstring command = L"cat /run/subiquity/launcher-status";
 			int returnValue = 0;
 			HANDLE child;
 			HRESULT hr = g_wslApi.WslLaunch(command.c_str(), true, GetStdHandle(STD_INPUT_HANDLE), writePipe, GetStdHandle(STD_ERROR_HANDLE), &child);
@@ -76,7 +79,7 @@ namespace DistributionInfo {
 					char buffer[64];
 					DWORD bytesRead;
 
-					// Read the output of the command from the pipe and query UID
+					// Read the output of the command from the pipe and read the status
 					if (ReadFile(readPipe, buffer, (sizeof(buffer) - 1), &bytesRead, nullptr)) {
 						buffer[bytesRead] = ANSI_NULL;
 						try {
@@ -84,8 +87,8 @@ namespace DistributionInfo {
 							wchar_t* wbuffer = new wchar_t[bfrSize];
 							size_t outSize;
 							mbstowcs_s(&outSize, wbuffer, bfrSize, buffer, bfrSize - 1);
-							std::wstring_view uname_bfr{ wbuffer, bfrSize };
-							uid = QueryUid(uname_bfr);
+							std::wstring_view status_bfr{ wbuffer, bfrSize };
+							hr = OOBEStatusHandling(status_bfr);
 						}
 						catch (...) {}
 					}
@@ -96,18 +99,67 @@ namespace DistributionInfo {
 			CloseHandle(writePipe);
 		}
 
-		return uid;
+		return hr;
 	}
 
-	HRESULT DistributionInfo::OOBESetup(){
-		// Query the UID of the given user name and configure the distribution
-		// to use this UID as the default.
-		ULONG uid = DistributionInfo::OOBE();
-		if (uid == UID_INVALID) {
-			return E_INVALIDARG;
+	HRESULT DistributionInfo::OOBEStatusHandling(std::wstring_view status) {
+		// Check the status passed from Linux side and perform the corresponding actions
+		std::wstring statusl = status;
+		bool is_reboot = false;
+
+		if (statusl.compare(L"complete") == 0) {
+			// do nothing; just return
+			return S_OK;
+		}
+		else if (statusl.compare(L"reboot") == 0) {
+			is_reboot = true;
+		}
+		else if (statusl.compare(L"shutdown") != 0) {
+			// unaccepted status
+			return E_NOT_VALID_STATE;
 		}
 
-		return g_wslApi.WslConfigureDistribution(uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
+		std::wstring ARG_SET = L"-t " + DistributionInfo::Name;
+
+		SHELLEXECUTEINFO ShExecInfo;
+		ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+		ShExecInfo.fMask = NULL;
+		ShExecInfo.hwnd = 0;
+		ShExecInfo.lpVerb = L"open";
+		ShExecInfo.lpFile = L"C:\\Windows\\Sysnative\\wsl.exe";
+		ShExecInfo.lpParameters = ARG_SET.c_str();
+		ShExecInfo.lpDirectory = NULL;
+		ShExecInfo.nShow = SW_HIDE;
+		ShExecInfo.hInstApp = NULL;
+
+		bool Result = ShellExecuteEx(&ShExecInfo);
+
+		if (!Result) {
+			return ERROR_FAIL_SHUTDOWN;
+		}
+
+
+		if (is_reboot) {
+			//constructing the current windows executable location
+			TCHAR szPath[MAX_PATH];
+			if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath)))
+			{
+				PathAppend(szPath, _T("\\Microsoft\\WindowsApps\\"));
+				PathAppend(szPath, DistributionInfo::WINEXEC_NAME.c_str());
+			}
+
+			ShExecInfo.lpFile = szPath;
+			ShExecInfo.lpParameters = NULL;
+			ShExecInfo.nShow = SW_SHOWNORMAL;
+
+			Result = ShellExecuteEx(&ShExecInfo);
+			if (!Result) {
+				return ERROR_FAIL_RESTART;
+			}
+		}
+
+		return S_OK;
+
 	}
 
 	// Anonimous namespace to avoid exposing internal details of the implementation.
