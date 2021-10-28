@@ -32,5 +32,5 @@ namespace DistributionInfo {
     std::wstring GetPrefillInfoInYaml();
 
     // OOBE executable name.
-    static TCHAR* OOBE_NAME = L"/usr/lib/libexec/wsl-setup";
+    static TCHAR* OOBE_NAME = L"/usr/libexec/wsl-setup";
 }
