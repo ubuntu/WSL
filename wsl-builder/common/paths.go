@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 )
 
-// GetPathWith returns the parent directory containing <subdirectory>. It goes up from
+// GetPath returns the first directory to <subdirectory>. It goes up from
 // current working directory.
-func GetPathWith(subdirectory string) (metaDir string, err error) {
+func GetPath(subdirectory string) (metaDir string, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("couldn't find a %s directory: %v", subdirectory, err)
