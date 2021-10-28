@@ -29,7 +29,7 @@ func main() {
 				return errors.New("this command accepts exactly one CSV file")
 			}
 
-			metaPath, err := common.GetPathWith("meta")
+			metaPath, err := common.GetPath("meta")
 			if err != nil {
 				return err
 			}

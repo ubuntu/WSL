@@ -24,17 +24,17 @@ func updateAssets(csvPath string) error {
 	imagick.Initialize()
 	defer imagick.Terminate()
 
-	rootPath, err := common.GetPathWith("DistroLauncher-Appx")
+	metaPath, err := common.GetPath("meta")
 	if err != nil {
 		return err
 	}
-	rootPath = filepath.Dir(rootPath)
-	metaPath, err := common.GetPathWith("meta")
+	rootPath := filepath.Dir(metaPath)
+
+	releasesInfo, err := common.ReleasesInfo(csvPath)
 	if err != nil {
 		return err
 	}
 
-	releasesInfo, err := common.ReleasesInfo(csvPath)
 	if err != nil {
 		return err
 	}
