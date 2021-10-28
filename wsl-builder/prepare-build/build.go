@@ -308,8 +308,11 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 	}()
 
 	// Copy content from meta/
-	rootDir := filepath.Join(rootPath, "meta", wslID)
+	rootDir := filepath.Join(rootPath, "meta", wslID, common.GeneratedDir)
 	if err := filepath.WalkDir(rootDir, func(path string, de fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if de.IsDir() {
 			return nil
 		}

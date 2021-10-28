@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 )
 
+// GeneratedDir is the generated output directory for a given released
+const GeneratedDir = "generated"
+
 // GetPath returns <subdirectory> prepended by its first parent.
 func GetPath(subdirectory string) (metaDir string, err error) {
 	defer func() {
