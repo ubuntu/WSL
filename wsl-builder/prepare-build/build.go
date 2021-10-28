@@ -33,11 +33,11 @@ var (
 
 // prepareBuild finds the correct paths of the VS projects, prepare build assets and get rootfs images.
 func prepareBuild(buildIDPath, wslID, rootfses string, noChecksum bool, buildID int) error {
-	rootPath, err := common.GetPathWith("DistroLauncher-Appx")
+	metaPath, err := common.GetPath("meta")
 	if err != nil {
 		return err
 	}
-	rootPath = filepath.Dir(rootPath)
+	rootPath := filepath.Dir(metaPath)
 
 	var buildNumber string
 	if buildID < 0 {
@@ -308,8 +308,11 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 	}()
 
 	// Copy content from meta/
-	rootDir := filepath.Join(rootPath, "meta", wslID)
+	rootDir := filepath.Join(rootPath, "meta", wslID, common.GeneratedDir)
 	if err := filepath.WalkDir(rootDir, func(path string, de fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if de.IsDir() {
 			return nil
 		}

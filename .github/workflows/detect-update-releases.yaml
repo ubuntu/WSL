@@ -4,8 +4,8 @@ on:
     branches:
       - '**' # Ignore tag push, but take any branch
     paths:
-      - 'meta/images/*'
-      - 'meta/store/*'
+      - 'meta/src/**'
+      - 'meta/*/src/**'
       - 'DistroLauncher/DistributionInfo.h'
       - 'DistroLauncher-Appx/*'
       - '.github/workflows/detect-update-releases.yaml'
