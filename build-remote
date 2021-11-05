@@ -140,11 +140,10 @@ def main():
         sys.exit(1)
 
     # Sanitize input by accepting "ppa:" prefix
-    ppas, livecd_rootfs = [], []
+    ppas = []
     for ppa in args.ppas:
         ppas.append(ppa.removeprefix("ppa:"))
-    for lr in args.livecd_rootfs:
-        livecd_rootfs.append(lr.removeprefix("ppa:"))
+    livecd_rootfs = args.livecd_rootfs.removeprefix("ppa:")
 
     rootfses = []
 
