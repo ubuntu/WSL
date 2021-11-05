@@ -139,13 +139,20 @@ def main():
         logging.error("one of --ppa (to build a rootfs first) or --with-rootfs (to download existing rootfs) is needed")
         sys.exit(1)
 
+    # Sanitize input by accepting "ppa:" prefix
+    ppas, livecd_rootfs = [], []
+    for ppa in args.ppas:
+        ppas.append(ppa.removeprefix("ppa:"))
+    for lr in args.livecd_rootfs:
+        livecd_rootfs.append(lr.removeprefix("ppa:"))
+
     rootfses = []
 
     if args.ppas:
         # ppas don’t have signature files
         args.rootfs_no_signature_check = True
         # Start building
-        builds = rootfs_build(lpconn, selected_release, args.ppas, args.livecd_rootfs)
+        builds = rootfs_build(lpconn, selected_release, ppas, livecd_rootfs)
         #builds = [
         #    lpconn.load("/~ubuntu-wsl-dev/+livefs/ubuntu/impish/wsl/+build/287484"),
         #    lpconn.load("/~ubuntu-wsl-dev/+livefs/ubuntu/impish/wsl/+build/287485")
