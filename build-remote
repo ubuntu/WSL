@@ -268,7 +268,7 @@ def main():
     return 0
 
 
-# build-wsl
+# build-remote
 #           <WSL_ID>
 #                  -> with default current rootfses for WSL_ID, print appbundle url
 #             --with-upload -> force upload to the store
