@@ -33,10 +33,10 @@ namespace DistributionInfo {
 		return ((SUCCEEDED(hr)) && (exitCode == 0));
 	}
 
-	HRESULT DistributionInfo::OOBE()
+	HRESULT DistributionInfo::OOBESetup()
 	{
 		// comfigre the distribution before calling OOBE
-		hr = g_wslApi.WslConfigureDistribution(0, WSL_DISTRIBUTION_FLAGS_DEFAULT);
+		HRESULT hr = g_wslApi.WslConfigureDistribution(0, WSL_DISTRIBUTION_FLAGS_DEFAULT);
 		if (FAILED(hr)) {
 			return hr;
 		}
@@ -46,7 +46,7 @@ namespace DistributionInfo {
 		// Prepare prefill information to send to the OOBE.
 		std::wstring prefillCLIPostFix = DistributionInfo::PreparePrefillInfo();
 		std::wstring commandLine = DistributionInfo::OOBE_NAME + prefillCLIPostFix;
-		HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
+		hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
 		if ((FAILED(hr)) || (exitCode != 0)) {
 			return hr;
 		}
@@ -104,7 +104,7 @@ namespace DistributionInfo {
 
 	HRESULT DistributionInfo::OOBEStatusHandling(std::wstring_view status) {
 		// Check the status passed from Linux side and perform the corresponding actions
-		std::wstring statusl = status;
+		std::wstring statusl{ status };
 		bool is_reboot = false;
 
 		if (statusl.compare(L"complete") == 0) {
@@ -145,7 +145,7 @@ namespace DistributionInfo {
 			if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath)))
 			{
 				PathAppend(szPath, _T("\\Microsoft\\WindowsApps\\"));
-				PathAppend(szPath, DistributionInfo::WINEXEC_NAME.c_str());
+				PathAppend(szPath, DistributionInfo::WINEXEC_NAME);
 			}
 
 			ShExecInfo.lpFile = szPath;
