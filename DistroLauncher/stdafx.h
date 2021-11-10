@@ -29,8 +29,6 @@
 #define SECURITY_WIN32
 #include <sspi.h>
 #include <secext.h>
-#include <ShlObj.h>
-#include <Shlwapi.h>
 #include "WslApiLoader.h"
 #include "Helpers.h"
 #include "DistributionInfo.h"

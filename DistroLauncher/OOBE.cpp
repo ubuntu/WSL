@@ -22,6 +22,8 @@ namespace DistributionInfo {
 
 	namespace {
 		std::wstring PreparePrefillInfo();
+		HRESULT OOBEStatusHandling(std::wstring_view status);
+		static TCHAR* OOBE_NAME = L"/usr/libexec/wsl-setup";
 	}
 
 	bool DistributionInfo::isOOBEAvailable(){
@@ -35,18 +37,12 @@ namespace DistributionInfo {
 
 	HRESULT DistributionInfo::OOBESetup()
 	{
-		// comfigre the distribution before calling OOBE
-		HRESULT hr = g_wslApi.WslConfigureDistribution(0, WSL_DISTRIBUTION_FLAGS_DEFAULT);
-		if (FAILED(hr)) {
-			return hr;
-		}
-
-		// calling the oobe experience
-		DWORD exitCode;
 		// Prepare prefill information to send to the OOBE.
 		std::wstring prefillCLIPostFix = DistributionInfo::PreparePrefillInfo();
 		std::wstring commandLine = DistributionInfo::OOBE_NAME + prefillCLIPostFix;
-		hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
+		// calling the OOBE.
+		DWORD exitCode=-1;
+		HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
 		if ((FAILED(hr)) || (exitCode != 0)) {
 			return hr;
 		}
@@ -56,110 +52,26 @@ namespace DistributionInfo {
 			return hr;
 		}
 
-		// read the final statis
-		HANDLE readPipe;
-		HANDLE writePipe;
-		SECURITY_ATTRIBUTES sa{ sizeof(sa), nullptr, true };
-		if (CreatePipe(&readPipe, &writePipe, &sa, 0)) {
-			// check the content of the launcher status.
-			std::wstring command = L"cat /run/subiquity/launcher-status";
-			int returnValue = 0;
-			HANDLE child;
-			HRESULT hr = g_wslApi.WslLaunch(command.c_str(), true, GetStdHandle(STD_INPUT_HANDLE), writePipe, GetStdHandle(STD_ERROR_HANDLE), &child);
-			if (SUCCEEDED(hr)) {
-				// Wait for the child to exit and ensure process exited successfully.
-				WaitForSingleObject(child, INFINITE);
-				DWORD exitCode;
-				if ((GetExitCodeProcess(child, &exitCode) == false) || (exitCode != 0)) {
-					hr = E_INVALIDARG;
-				}
-
-				CloseHandle(child);
-				if (SUCCEEDED(hr)) {
-					char buffer[64];
-					DWORD bytesRead;
-
-					// Read the output of the command from the pipe and read the status
-					if (ReadFile(readPipe, buffer, (sizeof(buffer) - 1), &bytesRead, nullptr)) {
-						buffer[bytesRead] = ANSI_NULL;
-						try {
-							const size_t bfrSize = strlen(buffer) + 1;
-							wchar_t* wbuffer = new wchar_t[bfrSize];
-							size_t outSize;
-							mbstowcs_s(&outSize, wbuffer, bfrSize, buffer, bfrSize - 1);
-							std::wstring_view status_bfr{ wbuffer, bfrSize };
-							hr = OOBEStatusHandling(status_bfr);
-						}
-						catch (...) {}
-					}
-				}
-			}
-
-			CloseHandle(readPipe);
-			CloseHandle(writePipe);
+		// read the OOBE exit status file.
+		// Even without interop activated Windows can still access Linux files under WSL.
+		const TCHAR* launcherStatusPath = L"/run/subiquity/launcher-status";
+		const std::wstring wslPrefix = L"\\\\wsl$\\" + DistributionInfo::Name;
+		std::wifstream statusFile;
+		statusFile.open(wslPrefix + launcherStatusPath, std::ios::in);
+		if (statusFile.fail()) {
+			Helpers::PrintErrorMessage(E_FAIL);
+			return E_FAIL;
 		}
 
-		return hr;
-	}
-
-	HRESULT DistributionInfo::OOBEStatusHandling(std::wstring_view status) {
-		// Check the status passed from Linux side and perform the corresponding actions
-		std::wstring statusl{ status };
-		bool is_reboot = false;
-
-		if (statusl.compare(L"complete") == 0) {
-			// do nothing; just return
-			return S_OK;
-		}
-		else if (statusl.compare(L"reboot") == 0) {
-			is_reboot = true;
-		}
-		else if (statusl.compare(L"shutdown") != 0) {
-			// unaccepted status
-			return E_NOT_VALID_STATE;
+		std::wstring launcherStatus;
+		// Launcher status file should have just one word.
+		statusFile >> launcherStatus;
+		if (statusFile.fail() || launcherStatus.empty()) {
+			Helpers::PrintErrorMessage(E_FAIL);
+			return E_FAIL;
 		}
 
-		std::wstring ARG_SET = L"-t " + DistributionInfo::Name;
-
-		SHELLEXECUTEINFO ShExecInfo;
-		ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		ShExecInfo.fMask = NULL;
-		ShExecInfo.hwnd = 0;
-		ShExecInfo.lpVerb = L"open";
-		ShExecInfo.lpFile = L"C:\\Windows\\Sysnative\\wsl.exe";
-		ShExecInfo.lpParameters = ARG_SET.c_str();
-		ShExecInfo.lpDirectory = NULL;
-		ShExecInfo.nShow = SW_HIDE;
-		ShExecInfo.hInstApp = NULL;
-
-		bool Result = ShellExecuteEx(&ShExecInfo);
-
-		if (!Result) {
-			return ERROR_FAIL_SHUTDOWN;
-		}
-
-
-		if (is_reboot) {
-			//constructing the current windows executable location
-			TCHAR szPath[MAX_PATH];
-			if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath)))
-			{
-				PathAppend(szPath, _T("\\Microsoft\\WindowsApps\\"));
-				PathAppend(szPath, DistributionInfo::WINEXEC_NAME);
-			}
-
-			ShExecInfo.lpFile = szPath;
-			ShExecInfo.lpParameters = NULL;
-			ShExecInfo.nShow = SW_SHOWNORMAL;
-
-			Result = ShellExecuteEx(&ShExecInfo);
-			if (!Result) {
-				return ERROR_FAIL_RESTART;
-			}
-		}
-
-		return S_OK;
-
+		return OOBEStatusHandling(launcherStatus);
 	}
 
 	// Anonimous namespace to avoid exposing internal details of the implementation.
@@ -196,6 +108,48 @@ namespace DistributionInfo {
 			commandLine += L" --prefill=" + prefillFileNameDest;
 			return commandLine;
 		} // std::wstring PreparePrefillInfo().
+
+		// OOBEStatusHandling checks the exit status of wsl-setup script
+		// and takes the required actions.
+		HRESULT OOBEStatusHandling(std::wstring_view status) {
+			if (status.compare(L"complete") == 0) {
+				// Do nothing, just return.
+				return S_OK;
+			}
+
+			bool needsReboot = (status.compare(L"reboot") == 0);
+
+			// Neither reboot nor shutdown
+			if (!needsReboot && (status.compare(L"shutdown") != 0)) {
+				return E_INVALIDARG;
+			}
+
+			const std::wstring shutdownCmd = L"wsl -t " + DistributionInfo::Name;
+			int cmdResult = _wsystem(shutdownCmd.c_str());
+			if (cmdResult != 0) {
+				return ERROR_FAIL_SHUTDOWN;
+			}
+
+			if (!needsReboot) {
+				return S_OK;
+			}
+
+			// We could, but may not want to just `wsl -d Distro`.
+			// We can explore running our launcher in the future.
+			TCHAR launcherName[MAX_PATH];
+			DWORD fnLength = GetModuleFileName(NULL, launcherName, MAX_PATH);
+			if (fnLength == 0) {
+				return HRESULT_FROM_WIN32(GetLastError());
+			}
+			// Just to ensure we respect the returned buffer size:
+			const std::wstring_view launcher{ launcherName, fnLength };
+			cmdResult = _wsystem(launcher.data());
+			if (cmdResult != 0) {
+				return ERROR_FAIL_RESTART;
+			}
+
+			return S_OK;
+		} // HRESULT OOBEStatusHandling(std::wstring_view status).
 
 	} // namespace.
 
