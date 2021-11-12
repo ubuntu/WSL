@@ -17,13 +17,13 @@ import (
 // WslReleaseInfo models information about the Ubuntu releases to be used
 // in the template files which are part of the WSL image and launcher build process.
 type WslReleaseInfo struct {
-	WslID         string   // uniquely identifies this distro in WSL context.
-	FullName      string   // full name of the distro bing built.
-	BuildVersion  string   // Ubuntu version we are building with the dot removed to be compatible with UWP version schema. 20.04 -> 2004
-	LauncherName  string   // name of the executable WSL launcher.
-	ShortVersion  string   // Ubuntu version without the point release. For instance  20.04 -> 20.04. 20.04.5 -> 20.04
-	IconVersion   string   // Version to show in the icon. 20.04 -> 20.04 LTS
-	ReservedNames []string // list of reserved names in the store ("Ubuntu 20.04 LTS" for instance. One should match the UWP package name)
+	WslID          string   // uniquely identifies this distro in WSL context.
+	FullName       string   // full name of the distro bing built.
+	BuildVersion   string   // Ubuntu version we are building with the dot removed to be compatible with UWP version schema. 20.04 -> 2004
+	LauncherName   string   // name of the executable WSL launcher.
+	ShortVersion   string   // Ubuntu version without point release and LTS. For instance  20.04 -> 20.04. 20.04.5 -> 20.04
+	ReleaseVersion string   // Version to show in some icon without point release. 20.04 -> 20.04 LTS. 20.04.5 -> 20.04 LTS
+	ReservedNames  []string // list of reserved names in the store ("Ubuntu 20.04 LTS" for instance. One should match the UWP package name)
 
 	CodeName    string // Ubuntu release code name (e.g. Focal Fossa, Impish Indri etc)
 	ShouldBuild bool   //whether or not an image should be built for this release.
@@ -60,13 +60,13 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 			wslID := "UbuntuPreview"
 			fullName := "Ubuntu (Preview)"
 			wslReleases = append(wslReleases, WslReleaseInfo{
-				WslID:         wslID,
-				FullName:      fullName,
-				BuildVersion:  buildVersion,
-				LauncherName:  "ubuntupreview",
-				ShortVersion:  release[0],
-				IconVersion:   "Preview",
-				ReservedNames: []string{fullName},
+				WslID:          wslID,
+				FullName:       fullName,
+				BuildVersion:   buildVersion,
+				LauncherName:   "ubuntupreview",
+				ShortVersion:   release[0],
+				ReleaseVersion: "Preview",
+				ReservedNames:  []string{fullName},
 
 				CodeName:    codeName,
 				ShouldBuild: true,
@@ -101,7 +101,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 			}
 		}
 
-		// we don’t want to display in FullName or IconVersion the .0 suffix. BuildVersion stays as it.
+		// we don’t want to display in FullName or ReleaseVersion the .0 suffix. BuildVersion stays as it.
 		version = strings.TrimSuffix(version, ".0")
 
 		wslID := fmt.Sprintf("Ubuntu%sLTS", release[0])
@@ -113,13 +113,13 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 
 		// Add per-release application
 		wsl := WslReleaseInfo{
-			WslID:         wslID,
-			FullName:      fmt.Sprintf("Ubuntu %s LTS", version),
-			BuildVersion:  buildVersion,
-			LauncherName:  launcherName,
-			ShortVersion:  release[0],
-			IconVersion:   fmt.Sprintf("%s LTS", version),
-			ReservedNames: reservedNames,
+			WslID:          wslID,
+			FullName:       fmt.Sprintf("Ubuntu %s LTS", version),
+			BuildVersion:   buildVersion,
+			LauncherName:   launcherName,
+			ShortVersion:   release[0],
+			ReleaseVersion: fmt.Sprintf("%s LTS", release[0]),
+			ReservedNames:  reservedNames,
 
 			CodeName:    codeName,
 			ShouldBuild: shouldBuild,
@@ -137,7 +137,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 	ubuntuWSL.WslID = "Ubuntu"
 	ubuntuWSL.FullName = "Ubuntu"
 	ubuntuWSL.LauncherName = "ubuntu"
-	ubuntuWSL.IconVersion = ""
+	ubuntuWSL.ReleaseVersion = ""
 	ubuntuWSL.ReservedNames = []string{ubuntuWSL.FullName}
 	wslReleases = append(wslReleases, ubuntuWSL)
 
