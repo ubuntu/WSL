@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -21,6 +22,11 @@ import (
 
 // updateAssets orchestrates the distro launcher metadata and assets generation from a csv file path.
 func updateAssets(csvPath string) error {
+	// pngquant is a required dependency
+	if _, err := exec.LookPath("pngquant"); err != nil {
+		return err
+	}
+
 	imagick.Initialize()
 	defer imagick.Terminate()
 
@@ -336,6 +342,9 @@ func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPa
 		if err := mw.SetImageDepth(8); err != nil {
 			return err
 		}
+		if err := mw.SetImageFormat(strings.TrimPrefix(filepath.Ext(f.Name()), ".")); err != nil {
+			return err
+		}
 		if err := mw.ResizeImage(uint(ref.Width), uint(ref.Height), imagick.FILTER_LANCZOS, 1); err != nil {
 			return err
 		}
@@ -343,13 +352,33 @@ func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPa
 			return err
 		}
 
+		// Crush the image size for png files
+		var img = mw.GetImageBlob()
+		if filepath.Ext(f.Name()) == ".png" {
+			cmd := exec.Command("pngquant", "-")
+			var out bytes.Buffer
+			cmd.Stdin = bytes.NewBuffer(img)
+			cmd.Stdout = &out
+			err := cmd.Run()
+			if err != nil {
+				return err
+			}
+			img = out.Bytes()
+		}
+
 		assetsDest := filepath.Join(generatedPath, relDir, f.Name())
 		if err := os.MkdirAll(filepath.Dir(assetsDest), 0755); err != nil {
 			return err
 		}
-		if err := mw.WriteImage(assetsDest); err != nil {
+		f, err := os.Create(assetsDest)
+		if err != nil {
 			return err
 		}
+		defer f.Close()
+		if _, err := f.Write(img); err != nil {
+			return err
+		}
+		f.Close()
 	}
 
 	// B. Icon files
