@@ -52,12 +52,38 @@ namespace DistributionInfo {
 			return hr;
 		}
 
+		// Before shutting down the distro, make sure we set the default user.
+		// We should not rely on WSL VM being completely shutdown since we don't know
+		// wether the user will be running other distros in parallel.
+		std::wifstream statusFile;
+		const std::wstring wslPrefix = L"\\\\wsl$\\" + DistributionInfo::Name;
+
+		const TCHAR* subiquityRunPath = L"/run/subiquity/";
+		const TCHAR* defaultUIDPath = L"default-uid";
+		statusFile.open(wslPrefix + subiquityRunPath + defaultUIDPath, std::ios::in);
+		if (statusFile.fail()) {
+			Helpers::PrintErrorMessage(E_FAIL);
+			return E_FAIL;
+		}
+
+		ULONG defaultUID = UID_INVALID;
+		statusFile >> defaultUID;
+		if (statusFile.fail() || defaultUID == UID_INVALID) {
+			Helpers::PrintErrorMessage(E_FAIL);
+			return E_FAIL;
+		}
+		statusFile.close();
+
+		hr = g_wslApi.WslConfigureDistribution(defaultUID, WSL_DISTRIBUTION_FLAGS_DEFAULT);
+		if (FAILED(hr)) {
+			return hr;
+		}
+
 		// read the OOBE exit status file.
 		// Even without interop activated Windows can still access Linux files under WSL.
-		const TCHAR* launcherStatusPath = L"/run/subiquity/launcher-status";
-		const std::wstring wslPrefix = L"\\\\wsl$\\" + DistributionInfo::Name;
-		std::wifstream statusFile;
-		statusFile.open(wslPrefix + launcherStatusPath, std::ios::in);
+		const TCHAR* launcherStatusPath = L"launcher-status";		
+		
+		statusFile.open(wslPrefix + subiquityRunPath + launcherStatusPath, std::ios::in);
 		if (statusFile.fail()) {
 			Helpers::PrintErrorMessage(E_FAIL);
 			return E_FAIL;
@@ -70,6 +96,7 @@ namespace DistributionInfo {
 			Helpers::PrintErrorMessage(E_FAIL);
 			return E_FAIL;
 		}
+		statusFile.close();
 
 		return OOBEStatusHandling(launcherStatus);
 	}
