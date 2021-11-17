@@ -23,6 +23,7 @@ namespace DistributionInfo {
 	namespace {
 		std::wstring PreparePrefillInfo();
 		HRESULT OOBEStatusHandling(std::wstring_view status);
+		bool EnsureStopped(unsigned int timeoutSeconds);
 		static TCHAR* OOBE_NAME = L"/usr/libexec/wsl-setup";
 	}
 
@@ -52,9 +53,8 @@ namespace DistributionInfo {
 			return hr;
 		}
 
-		// Before shutting down the distro, make sure we set the default user.
-		// We should not rely on WSL VM being completely shutdown since we don't know
-		// wether the user will be running other distros in parallel.
+		// Before shutting down the distro, make sure we set the default
+		// user through the WSL API.
 		std::wifstream statusFile;
 		const std::wstring wslPrefix = L"\\\\wsl$\\" + DistributionInfo::Name;
 
@@ -67,6 +67,9 @@ namespace DistributionInfo {
 		}
 
 		ULONG defaultUID = UID_INVALID;
+		// The file should contain the UID and nothing else.
+		// TODO: migrate this to a more robust solution, like one single
+		// YAML file.
 		statusFile >> defaultUID;
 		if (statusFile.fail() || defaultUID == UID_INVALID) {
 			Helpers::PrintErrorMessage(E_FAIL);
@@ -161,6 +164,15 @@ namespace DistributionInfo {
 				return S_OK;
 			}
 
+			// Before relaunching, give WSL some time to make sure 
+			// distro is stopped.
+			bool stopSuccess = EnsureStopped(30u);
+			if (!stopSuccess) {
+				// We could try again, but who knows why
+				// we failed to stop the distro in the first time.
+				return ERROR_FAIL_SHUTDOWN;
+			}
+
 			// We could, but may not want to just `wsl -d Distro`.
 			// We can explore running our launcher in the future.
 			TCHAR launcherName[MAX_PATH];
@@ -168,15 +180,51 @@ namespace DistributionInfo {
 			if (fnLength == 0) {
 				return HRESULT_FROM_WIN32(GetLastError());
 			}
-			// Just to ensure we respect the returned buffer size:
-			const std::wstring_view launcher{ launcherName, fnLength };
-			cmdResult = _wsystem(launcher.data());
+
+			cmdResult = _wsystem(launcherName);
 			if (cmdResult != 0) {
 				return ERROR_FAIL_RESTART;
 			}
 
 			return S_OK;
 		} // HRESULT OOBEStatusHandling(std::wstring_view status).
+
+		// Polls WSL to ensure the distro is actually stopped.
+		bool EnsureStopped(unsigned int timeoutSeconds) {
+			const unsigned int magicNoOfConfirmations = 7;
+			unsigned int confirmStopped = 0;
+			bool distroIsRunning = true;
+			for (unsigned int i=0; i<timeoutSeconds; ++i) {
+				auto runner = Helpers::ProcessRunner(L"wsl -l --quiet --running");
+				auto exitCode = runner.run();
+				if (exitCode != 0L) {
+					// I'm sure we will want to customize those messages in the short future.
+					Helpers::PrintErrorMessage(ERROR_FAIL_SHUTDOWN);
+					return false;
+				}
+
+				// Every time we don't find the DistributionInfo::Name in process's stdout
+				// we increment the confirmStopped counter. When it hits the 
+				// magicNoOfConfirmations we are sure the distro is really stopped.
+				auto output = runner.getStdOut();
+				distroIsRunning = (output.find(DistributionInfo::Name) < output.length());
+				// User launched another instance of this distro while
+				// we wait for the shutdown? If so, zero out the counter.
+				if (distroIsRunning) {
+					confirmStopped = 0;
+				} else {
+					++confirmStopped;
+				}
+
+				if (confirmStopped > magicNoOfConfirmations) {
+					return true;
+				}
+
+				// We don't need to be hard real time precise.
+				Sleep(993u);
+			}
+			return false;
+		}
 
 	} // namespace.
 
