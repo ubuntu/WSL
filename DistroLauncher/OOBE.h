@@ -20,17 +20,11 @@
 
 namespace DistributionInfo {
     // OOBE Experience.
-    ULONG OOBE();
+    HRESULT OOBESetup();
 
     // isOOBEAvailable returns true if OOBE executable is found inside rootfs. 
     bool isOOBEAvailable();
 
-    // OOBESetup executes the OOBE, creates the user and calls WslConfigureDistribution.
-    HRESULT OOBESetup();
-
     // GetPrefillInfoInYaml generates a YAML string from Windows user and locale information.
     std::wstring GetPrefillInfoInYaml();
-
-    // OOBE executable name.
-    static TCHAR* OOBE_NAME = L"/usr/libexec/wsl-setup";
 }

@@ -33,6 +33,7 @@
 #include "Helpers.h"
 #include "DistributionInfo.h"
 #include "OOBE.h"
+#include "ProcessRunner.h"
 
 // Message strings compiled from .MC file.
 #include "messages.h"
