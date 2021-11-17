@@ -23,7 +23,7 @@ namespace DistributionInfo {
 	namespace {
 		std::wstring PreparePrefillInfo();
 		HRESULT OOBEStatusHandling(std::wstring_view status);
-		bool EnsureStopped(unsigned int timeoutSeconds);
+		bool EnsureStopped(unsigned int maxNoOfRetries);
 		static TCHAR* OOBE_NAME = L"/usr/libexec/wsl-setup";
 	}
 
@@ -190,11 +190,8 @@ namespace DistributionInfo {
 		} // HRESULT OOBEStatusHandling(std::wstring_view status).
 
 		// Polls WSL to ensure the distro is actually stopped.
-		bool EnsureStopped(unsigned int timeoutSeconds) {
-			const unsigned int magicNoOfConfirmations = 7;
-			unsigned int confirmStopped = 0;
-			bool distroIsRunning = true;
-			for (unsigned int i=0; i<timeoutSeconds; ++i) {
+		bool EnsureStopped(unsigned int maxNoOfRetries) {
+			for (unsigned int i=0; i<maxNoOfRetries; ++i) {
 				auto runner = Helpers::ProcessRunner(L"wsl -l --quiet --running");
 				auto exitCode = runner.run();
 				if (exitCode != 0L) {
@@ -203,25 +200,14 @@ namespace DistributionInfo {
 					return false;
 				}
 
-				// Every time we don't find the DistributionInfo::Name in process's stdout
-				// we increment the confirmStopped counter. When it hits the 
-				// magicNoOfConfirmations we are sure the distro is really stopped.
+				// Returns true once we don't find the DistributionInfo::Name in process's stdout
 				auto output = runner.getStdOut();
-				distroIsRunning = (output.find(DistributionInfo::Name) < output.length());
-				// User launched another instance of this distro while
-				// we wait for the shutdown? If so, zero out the counter.
-				if (distroIsRunning) {
-					confirmStopped = 0;
-				} else {
-					++confirmStopped;
-				}
-
-				if (confirmStopped > magicNoOfConfirmations) {
+				if (output.find(DistributionInfo::Name)==std::wstring::npos) {
 					return true;
 				}
 
 				// We don't need to be hard real time precise.
-				Sleep(993u);
+				Sleep(997u);
 			}
 			return false;
 		}
