@@ -41,6 +41,10 @@ namespace DistributionInfo {
 		// Prepare prefill information to send to the OOBE.
 		std::wstring prefillCLIPostFix = DistributionInfo::PreparePrefillInfo();
 		std::wstring commandLine = DistributionInfo::OOBE_NAME + prefillCLIPostFix;
+		// Fallback OOBE to text mode if graphics are not supported.
+		if (!Helpers::WslGraphicsSupported()) {
+			commandLine.append(L" --text");
+		}
 		// calling the OOBE.
 		DWORD exitCode=-1;
 		HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
