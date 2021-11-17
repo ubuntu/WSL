@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   data-name="Layer 1"
+   viewBox="0 0 1280 1280"
+   version="1.1"
+   sodipodi:docname="LargeTile.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   width="1280"
+   height="1280"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview13"
+     pagecolor="#818181"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="true"
+     showgrid="false"
+     inkscape:zoom="0.3"
+     inkscape:cx="630"
+     inkscape:cy="81.666667"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:#fff;}.cls-2{fill:#e95420;}
+.cls-3 { 
+    fill:#fff;
+    font-family:Ubuntu-Light, Ubuntu;
+    font-size:160px;
+    font-weight:300;
+}.cls-4{letter-spacing:-0.1em;}</style>
+  </defs>
+  <rect
+     style="font-variation-settings:normal;vector-effect:none;fill:#e95420;fill-opacity:1;fill-rule:evenodd;stroke-width:7.99999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+     id="rect37"
+     width="1280"
+     height="1280"
+     x="3.8671874e-06"
+     y="0" />
+  <circle
+     class="cls-1"
+     cx="640"
+     cy="527.03998"
+     r="400"
+     id="circle6"
+     style="stroke-width:8" />
+  <path
+     class="cls-2"
+     d="m 432.4,527.04 a 51.44,51.44 0 1 1 -51.44,-51.36 51.44,51.44 0 0 1 51.44,51.36 z M 725.04,777.12 A 51.44,51.44 0 1 0 744,706.88 51.36,51.36 0 0 0 725.04,777.12 Z m 89.04,-448.64 a 51.44,51.44 0 1 0 -70.08,18.8 51.44,51.44 0 0 0 70.08,-18.8 z M 640,380.4 a 146.64,146.64 0 0 1 146.08,133.68 l 74.48,-1.2 A 220.72,220.72 0 0 0 795.6,370.24 72,72 0 0 1 698,313.84 221.84,221.84 0 0 0 542,329.04 L 578.24,394 A 146,146 0 0 1 640,380.4 Z M 493.36,527.04 a 146.56,146.56 0 0 1 62.32,-120 l -38.16,-64 a 221.04,221.04 0 0 0 -91.2,127.52 72,72 0 0 1 0,112.72 221.04,221.04 0 0 0 91.2,127.52 l 38.16,-64 A 146.56,146.56 0 0 1 493.36,527.04 Z M 640,673.76 a 146,146 0 0 1 -61.76,-13.6 L 542,725.12 a 221.84,221.84 0 0 0 156,15.2 72,72 0 0 1 97.6,-56.4 220.48,220.48 0 0 0 64.88,-142.72 l -74.4,-1.12 A 146.64,146.64 0 0 1 640,673.76 Z"
+     id="path8"
+     style="stroke-width:8" />
+  <text
+     class="cls-3"
+     id="text10"
+     x="304.39999"
+     y="1172.1599"
+     style="stroke-width:8">{{.ReleaseVersion}}</text>
+</svg>

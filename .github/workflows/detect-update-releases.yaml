@@ -4,8 +4,8 @@ on:
     branches:
       - '**' # Ignore tag push, but take any branch
     paths:
-      - 'meta/images/*'
-      - 'meta/store/*'
+      - 'meta/src/**'
+      - 'meta/*/src/**'
       - 'DistroLauncher/DistributionInfo.h'
       - 'DistroLauncher-Appx/*'
       - '.github/workflows/detect-update-releases.yaml'
@@ -27,7 +27,7 @@ jobs:
         run: |
           export DEBIAN_FRONTEND=noninteractive
           apt update
-          apt install -y python3-launchpadlib libmagickwand-dev git
+          apt install -y python3-launchpadlib libmagickwand-dev git pngquant
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
