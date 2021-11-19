@@ -23,6 +23,7 @@ namespace DistributionInfo {
 		std::wstring PreparePrefillInfo();
 		HRESULT OOBEStatusHandling(std::wstring_view status);
 		bool EnsureStopped(unsigned int maxNoOfRetries);
+		bool mustRunOOBEinTextMode();
 		const TCHAR* OOBE_NAME = L"/usr/libexec/wsl-setup";
 	}
 
@@ -40,8 +41,8 @@ namespace DistributionInfo {
 		// Prepare prefill information to send to the OOBE.
 		std::wstring prefillCLIPostFix = DistributionInfo::PreparePrefillInfo();
 		std::wstring commandLine = DistributionInfo::OOBE_NAME + prefillCLIPostFix;
-		// Fallback OOBE to text mode if graphics are not supported.
-		if (!Helpers::WslGraphicsSupported()) {
+		// OOBE runs GUI by default, unless arg --text is set.
+		if (mustRunOOBEinTextMode()) {
 			commandLine.append(L" --text");
 		}
 		// calling the OOBE.
@@ -169,7 +170,7 @@ namespace DistributionInfo {
 
 			// Before relaunching, give WSL some time to make sure 
 			// distro is stopped.
-			bool stopSuccess = EnsureStopped(30);
+			bool stopSuccess = EnsureStopped(30); // NOLINT(readability-magic-numbers): only used here.
 			if (!stopSuccess) {
 				// We could try again, but who knows why
 				// we failed to stop the distro in the first time.
@@ -210,11 +211,45 @@ namespace DistributionInfo {
 				}
 
 				// We don't need to be hard real time precise.
-				Sleep(997);
+				Sleep(997); // NOLINT(readability-magic-numbers): only used here.
 			}
 			return false;
 		}
 
+		// Returns true if OOBE has to be launched in text mode.
+		// That might be the case due lack of graphics support in WSL
+		// or user requirement, by setting the environment variable
+		// LAUNCHER_FORCE_MODE, which can only be:
+		//	0 or unset or invalid = autodetection
+		//	1 = text mode
+		//	2 = GUI mode.
+		bool mustRunOOBEinTextMode() {
+			// has to consider the NULL-terminating.
+			const DWORD expectedSize = 2;
+			wchar_t value[expectedSize];
+			auto readResult = GetEnvironmentVariable(L"LAUNCHER_FORCE_MODE", value, expectedSize);
+			// var unset is not an error.
+			const bool unset = (readResult == 0 && GetLastError() == ERROR_ENVVAR_NOT_FOUND);
+			// more than one char + NULL, that's invalid. Like a string or a more than one digit number.
+			const bool notASingleChar = (readResult >= expectedSize || value[1] != NULL);
+			// Handle both in the same way: autodetect.
+			if (unset || notASingleChar) {
+				return !Helpers::WslGraphicsSupported();
+			}
+
+			// Expected result if the env var is correctly set:
+			// readResult == 1 && value[1] == NULL && value[0] in (0,1,2).
+			switch (value[0]) {
+			case L'1': // forced text mode.
+				return true;
+				break;
+			case L'2': // forced GUI mode, no autodetection.
+				return false;
+			case L'0':
+			default:
+				return !Helpers::WslGraphicsSupported();
+			}
+		}
 	} // namespace.
 
 } // namespace DistributionInfo.

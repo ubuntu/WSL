@@ -31,5 +31,6 @@ namespace Helpers {
 	// Returns true if all the commands `exit 0`.
 	// Launched command will not be interactive nor show any output,
 	// but it blocks current thread for up to dwMilisseconds.
-	bool WslLaunchSuccess(const TCHAR* command, DWORD dwMilisseconds);
+	bool WslLaunchSuccess(const TCHAR* command, DWORD dwMilisseconds=500); // NOLINT(readability-magic-numbers):
+	// Magic numbers in default arguments should not be an issue.
 }

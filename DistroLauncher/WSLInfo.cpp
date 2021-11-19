@@ -20,7 +20,6 @@
 namespace Helpers {
     namespace {
         bool isX11UnixSocketMounted();
-        bool isWSLVDCPluginRegistered();
     }
 
     // Altough currently only used in this translation unit,
@@ -58,8 +57,8 @@ namespace Helpers {
         }
 
         // discards the env variable string array otherwise they will leak.
-        for (int i = defaultEnvironmentVariableCount-1; i >= 0; --i) {
-            CoTaskMemFree((LPVOID)(defaultEnvironmentVariables[i]));
+        for (int64_t i = defaultEnvironmentVariableCount-1; i >= 0; --i) {
+            CoTaskMemFree(static_cast<LPVOID>(defaultEnvironmentVariables[i]));
         }
 
         return distributionVersion;
@@ -71,12 +70,8 @@ namespace Helpers {
 
     bool WslGraphicsSupported() {
         // Could WSL 3 or greater exist in the future?
-        if(Helpers::isWslgEnabled() &&
-            Helpers::WslGetDistroSubsystemVersion() > 1) {
-            return true;
-        }
-
-        return false;
+        return (Helpers::isWslgEnabled() &&
+                Helpers::WslGetDistroSubsystemVersion() > 1);
     }
      
 /* =========================== INTERNALS ================================== */
@@ -89,12 +84,15 @@ namespace Helpers {
                 L"ls -l /tmp/.X11-unix",
                 L"ss -lx | grep \"/tmp/.X11-unix/X0\"",
             };
-            for (auto cmd : cmds) {
-                if (!WslLaunchSuccess(cmd, 500)) {
+            // I'm sure is better to read this way than with the algorithm.
+            // NOLINTNEXTLINE(readability-use-anyofallof)
+            for (const auto *const cmd : cmds) {
+                if (!WslLaunchSuccess(cmd)) {
                     wprintf(L"Command %s failed.\n", cmd);
                     return false;
                 }
             }
+
             return true;
         } 
     } // namespace.
