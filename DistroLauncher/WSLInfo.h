@@ -19,7 +19,7 @@
 
 namespace Helpers {
 	// Returns true if user system has WSLg enabled.
-	bool isWslgEnabled();
+	inline bool isWslgEnabled();
 
 	// Returns the subsystem version for this specific distro or 0 if failed.
 	DWORD WslGetDistroSubsystemVersion();

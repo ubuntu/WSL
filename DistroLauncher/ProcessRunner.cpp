@@ -92,8 +92,8 @@ namespace Helpers {
         }
 
         read_pipes();
-        WaitForSingleObject(_piProcInfo.hProcess, 1000u);
-        auto iDontKnow = GetExitCodeProcess(_piProcInfo.hProcess, &exit_code);
+        WaitForSingleObject(_piProcInfo.hProcess, 1000);
+        GetExitCodeProcess(_piProcInfo.hProcess, &exit_code);
         alreadyRun = true;
         return exit_code;
     }
@@ -109,7 +109,7 @@ namespace Helpers {
 
     void ProcessRunner::read_pipes() {
         DWORD dwRead;
-        const size_t BUFSIZE = 80u;
+        const size_t BUFSIZE = 80;
         TCHAR chBuf[BUFSIZE];
         bool bSuccess = FALSE;
         for (;;) {

@@ -169,7 +169,7 @@ namespace DistributionInfo {
 
 			// Before relaunching, give WSL some time to make sure 
 			// distro is stopped.
-			bool stopSuccess = EnsureStopped(30u);
+			bool stopSuccess = EnsureStopped(30);
 			if (!stopSuccess) {
 				// We could try again, but who knows why
 				// we failed to stop the distro in the first time.
@@ -210,7 +210,7 @@ namespace DistributionInfo {
 				}
 
 				// We don't need to be hard real time precise.
-				Sleep(997u);
+				Sleep(997);
 			}
 			return false;
 		}

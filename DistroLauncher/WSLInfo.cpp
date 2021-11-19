@@ -69,14 +69,14 @@ namespace Helpers {
         return distributionVersion;
     }
 
-    bool isWslgEnabled() {
-        return isX11UnixSocketMounted() && isWSLVDCPluginRegistered();
+    inline bool isWslgEnabled() {
+        return isX11UnixSocketMounted();
     }
 
     bool WslGraphicsSupported() {
         // Could WSL 3 or greater exist in the future?
         if(Helpers::isWslgEnabled() &&
-            Helpers::WslGetDistroSubsystemVersion() > 1u) {
+            Helpers::WslGetDistroSubsystemVersion() > 1) {
             return true;
         }
 
@@ -85,32 +85,6 @@ namespace Helpers {
      
 /* =========================== INTERNALS ================================== */
     namespace {
-        // Returns true if the WSLDVCPlugin.dll is found.
-        // That is an indication that WSLg is installed.
-        // Search paths are empirical and subject to change.
-        bool isWSLVDCPluginRegistered() {
-            //TODO: if this hack survives, find more possible locations
-            // from other versions of Windows and different locales,
-            // since default search paths couldn't find that plugin.
-            std::array searchPaths = {
-                L"C:\\ProgramData\\Microsoft\\WSL\\WSLDVCPlugin.dll",
-                L"C:\\Windows\\System32\\WSLDVCPlugin.dll",
-            };
-            for (auto sp : searchPaths) {
-                auto wsldvc = LoadLibraryEx(sp, nullptr, 
-                                            LOAD_WITH_ALTERED_SEARCH_PATH |
-                                              LOAD_LIBRARY_AS_IMAGE_RESOURCE);
-                if (wsldvc != nullptr) {
-                    FreeLibrary(wsldvc);
-                    return true;
-                }
-            }
-            
-            PrintMessage(MSG_ERROR_CODE, HRESULT_FROM_WIN32(GetLastError()),
-                        L"Failed to stat WSLDVCPlugin.dll");
-            return false;
-        }
-
         // Returns true if the WSL successfully launches a list
         // of commands to ensure X11 socket is properly mounted.
         // One indication that the distro has graphical support enabled.
@@ -120,7 +94,7 @@ namespace Helpers {
                 L"ss -lx | grep \"/tmp/.X11-unix/X0\"",
             };
             for (auto cmd : cmds) {
-                if (!WslLaunchSuccess(cmd, 500u)) {
+                if (!WslLaunchSuccess(cmd, 500)) {
                     wprintf(L"Command %s failed.\n", cmd);
                     return false;
                 }
