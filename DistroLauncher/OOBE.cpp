@@ -23,19 +23,19 @@ namespace DistributionInfo {
 		std::wstring PreparePrefillInfo();
 		HRESULT OOBEStatusHandling(std::wstring_view status);
 		bool EnsureStopped(unsigned int maxNoOfRetries);
-		static TCHAR* OOBE_NAME = L"/usr/libexec/wsl-setup";
+		const TCHAR* OOBE_NAME = L"/usr/libexec/wsl-setup";
 	}
 
-	bool DistributionInfo::isOOBEAvailable(){
+	bool isOOBEAvailable(){
 		DWORD exitCode=-1;
 		std::wstring whichCdm{ L"which " };
 		whichCdm.append(DistributionInfo::OOBE_NAME);
-		HRESULT hr = g_wslApi.WslLaunchInteractive(whichCdm.c_str(), true, &exitCode);
+		HRESULT hr = g_wslApi.WslLaunchInteractive(whichCdm.c_str(), TRUE, &exitCode);
 		// true if launching the process succeeds and `which` command returns 0.
 		return ((SUCCEEDED(hr)) && (exitCode == 0));
 	}
 
-	HRESULT DistributionInfo::OOBESetup()
+	HRESULT OOBESetup()
 	{
 		// Prepare prefill information to send to the OOBE.
 		std::wstring prefillCLIPostFix = DistributionInfo::PreparePrefillInfo();
@@ -46,12 +46,12 @@ namespace DistributionInfo {
 		}
 		// calling the OOBE.
 		DWORD exitCode=-1;
-		HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
+		HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), TRUE, &exitCode);
 		if ((FAILED(hr)) || (exitCode != 0)) {
 			return hr;
 		}
 
-		hr = g_wslApi.WslLaunchInteractive(L"clear", true, &exitCode);
+		hr = g_wslApi.WslLaunchInteractive(L"clear", TRUE, &exitCode);
 		if (FAILED(hr)) {
 			return hr;
 		}

@@ -26,7 +26,7 @@ namespace DistributionInfo {
 			std::wstring realName;
 			std::wstring localeName;
 
-			std::wstring toYaml();
+			std::wstring toYaml() const;
 		};
 
 		// PrintLastError converts the last error code from Win32 API's into
@@ -40,7 +40,7 @@ namespace DistributionInfo {
 		// because of such small feature, which would be an overkill. Shall the need
 		// for more YAML manipulation in the DistroLauncher arise, thus function should
 		// be changed to use a proper YAML manipulation library, such as yaml-cpp.
-		std::wstring WindowsUserInfo::toYaml() {
+		std::wstring WindowsUserInfo::toYaml() const {
 			std::wstring fullYaml;
 
 			if (!localeName.empty()) {

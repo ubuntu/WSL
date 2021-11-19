@@ -1,0 +1,2 @@
+Checks: 'bugprone-*,readability-*,google-readability-casting'
+HeaderFilterRegex: '.*'

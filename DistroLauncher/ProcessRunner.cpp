@@ -45,7 +45,7 @@ namespace Helpers {
 
     }
 
-    bool ProcessRunner::isDefunct() {
+    bool ProcessRunner::isDefunct() const {
         return defunct;
     }
 
@@ -55,15 +55,15 @@ namespace Helpers {
         exit_code = ERROR_PROCESS_ABORTED;
     }
 
-    std::wstring_view ProcessRunner::getStdErr() {
+    std::wstring_view ProcessRunner::getStdErr() const {
         return stdErr;
     }
 
-    std::wstring_view ProcessRunner::getStdOut() {
+    std::wstring_view ProcessRunner::getStdOut() const {
         return stdOut;
     }
 
-    DWORD ProcessRunner::getExitCode() {
+    DWORD ProcessRunner::getExitCode() const {
         return exit_code;
     }
 
@@ -111,7 +111,7 @@ namespace Helpers {
         DWORD dwRead;
         const size_t BUFSIZE = 80;
         TCHAR chBuf[BUFSIZE];
-        bool bSuccess = FALSE;
+        BOOL bSuccess = FALSE;
         for (;;) {
             bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
             if (!bSuccess || dwRead == 0) {

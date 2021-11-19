@@ -28,7 +28,7 @@ namespace Helpers {
     bool WslLaunchSuccess(const TCHAR* command, DWORD dwMilisseconds) {
         DWORD exitCode;
         HANDLE child;
-        HRESULT hr = g_wslApi.WslLaunch(command, false, NULL, NULL, NULL, &child);
+        HRESULT hr = g_wslApi.WslLaunch(command, FALSE, NULL, NULL, NULL, &child);
         if (child == NULL || FAILED(hr)) {
             return false;
         }
@@ -36,11 +36,7 @@ namespace Helpers {
         WaitForSingleObject(child, dwMilisseconds);
         auto success = GetExitCodeProcess(child, &exitCode);
         CloseHandle(child);
-        if (success == FALSE || exitCode != 0) {
-            return false;
-        }
-
-        return true;
+        return (success == TRUE && exitCode == 0);
     }
 
     // Retrieves subsystem version from the WSL API.

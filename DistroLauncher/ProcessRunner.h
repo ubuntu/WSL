@@ -60,7 +60,7 @@ namespace Helpers {
         // The runner is considered defunct if it fails to construct the pipe
         // which will conduct the standard streams.
         // This is a way to avoid the need for exceptions.
-        bool isDefunct();
+        bool isDefunct() const;
 
         // Runs the CLI given to constructor and returns it's exit code.
         // If called more than once, returns the cached exit code.
@@ -68,13 +68,13 @@ namespace Helpers {
         DWORD run();
 
         // Returns the cached exit code.
-        DWORD getExitCode();
+        DWORD getExitCode() const;
 
         // Returns a view of the process standard output stream.
-        std::wstring_view getStdOut();
+        std::wstring_view getStdOut() const;
 
         // Returns a view of the process standard error stream.
-        std::wstring_view getStdErr();
+        std::wstring_view getStdErr() const;
 
         ~ProcessRunner();
     };
