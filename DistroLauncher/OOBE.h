@@ -24,6 +24,7 @@ namespace DistributionInfo {
     // isOOBEAvailable returns true if OOBE executable is found inside rootfs. 
     bool isOOBEAvailable();
 
-    // GetPrefillInfoInYaml generates a YAML string from Windows user and locale information.
-    std::wstring GetPrefillInfoInYaml();
+    // GetPrefillInfoInYaml generates a YAML string from Windows user and
+    // locale information, UTF-8 encoded, thus std::string.
+    std::string GetPrefillInfoInYamlUtf8();
 }

@@ -116,15 +116,15 @@ namespace DistributionInfo {
 		// or the postfix to be added to the OOBE command line.
 		std::wstring PreparePrefillInfo() {
 			std::wstring commandLine;
-			std::wstring prefillInfo = DistributionInfo::GetPrefillInfoInYaml();
+			std::string prefillInfo = DistributionInfo::GetPrefillInfoInYamlUtf8();
 			if (prefillInfo.empty()) {
 				return commandLine;
 			}
 
 			// Write it to a file inside \\wsl$ distro filesystem.        
-			const std::wstring prefillFileNameDest = L"/var/tmp/prefill-system-setup.yaml";
-			const std::wstring wslPrefix = L"\\\\wsl$\\" + DistributionInfo::Name;
-			std::wofstream prefillFile;
+			const std::wstring prefillFileNameDest{ L"/var/tmp/prefill-system-setup.yaml" };
+			const std::wstring wslPrefix{ L"\\\\wsl$\\" + DistributionInfo::Name };
+			std::ofstream prefillFile;
 			// Mixing slashes and backslashes that way is not a problem for Windows.
 			prefillFile.open(wslPrefix + prefillFileNameDest, std::ios::ate);
 			if (prefillFile.fail()) {
@@ -138,7 +138,7 @@ namespace DistributionInfo {
 				Helpers::PrintErrorMessage(CO_E_FAILEDTOCREATEFILE);
 				return commandLine;
 			}
-			
+
 			commandLine += L" --prefill=" + prefillFileNameDest;
 			return commandLine;
 		} // std::wstring PreparePrefillInfo().

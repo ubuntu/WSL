@@ -16,6 +16,24 @@
  */
 
 #include "stdafx.h"
+namespace Helpers {
+	std::string wide_string_to_string(const std::wstring& wide_string);
+	std::wstring string_to_wide_string(const std::string& string);
+}
+
+// YAML-Cpp knows how to serialize std::map, but we don't need the sorting
+// mechanism that container provides, so let's extend that library to support 
+// std::unordered_map and other kinds of maps as well.
+namespace YAML {
+	template <template <typename...> class MapType, typename K, typename V>
+	inline Emitter& operator<<(Emitter& emitter, const MapType<K, V>& m) {
+		emitter << BeginMap;
+		for (const auto& v : m)
+			emitter << Key << v.first << Value << v.second;
+		emitter << EndMap;
+		return emitter;
+	}
+}
 
 namespace DistributionInfo {
 	// Implementation details.
@@ -26,7 +44,7 @@ namespace DistributionInfo {
 			std::wstring realName;
 			std::wstring localeName;
 
-			std::wstring toYaml() const;
+			std::string toYamlUtf8() const;
 		};
 
 		// PrintLastError converts the last error code from Win32 API's into
@@ -36,32 +54,33 @@ namespace DistributionInfo {
 			Helpers::PrintErrorMessage(error);
 		}
 
-		// toYaml hand-codes the YAML generation to avoid adding a lib just
-		// because of such small feature, which would be an overkill. Shall the need
-		// for more YAML manipulation in the DistroLauncher arise, thus function should
-		// be changed to use a proper YAML manipulation library, such as yaml-cpp.
-		std::wstring WindowsUserInfo::toYaml() const {
-			std::wstring fullYaml;
-
+		std::string WindowsUserInfo::toYamlUtf8() const {
+			// yaml-cpp doesn't support wide chars.
+			std::unordered_map<std::string,
+				std::unordered_map<std::string, std::string>> sections;
 			if (!localeName.empty()) {
-				fullYaml += L"Welcome:\n  lang: " + localeName + L'\n';
+				sections["Welcome"]["lang"] = Helpers::wide_string_to_string(localeName);
 			}
 
-			if (!(realName.empty() && userName.empty())) {
-				fullYaml += L"WSLIdentity:\n";
-
-				if (!realName.empty()) {
-					fullYaml += L"  realname: " + realName + L'\n';
-				}
-
-				if (!userName.empty()) {
-					fullYaml += L"  username: " + userName + L'\n';
-				}
+			if (!realName.empty()) {
+				sections["WSLIdentity"]["realname"] = Helpers::wide_string_to_string(realName);
 			}
 
-			return fullYaml;
-		} // std::wstring WindowsUserInfo::toYaml()
+			if (!userName.empty()) {
+				sections["WSLIdentity"]["username"] = Helpers::wide_string_to_string(userName);
+			}
 
+			YAML::Emitter out;
+			out << sections << YAML::Newline;
+			if (!out.good()) {
+				return "";
+			}
+
+			// Ensure UTF-8 BOM is present just as a precaution.
+			std::string retVal{ "\xEF\xBB\xBF" };
+			retVal.append(out.c_str());
+			return retVal;
+		} // std::string WindowsUserInfo::toYamlUtf8()
 
 		// QueryWindowsUserInfo queries Win32 API's to provide launcher with locale, user real and login names.
 		// Those pieces of information will be used in the Ubuntu OOBE to enhance the UX.
@@ -111,9 +130,58 @@ namespace DistributionInfo {
 
 	// GetPrefillInfoInYaml exports Windows User Information as an YAML string.
 	// This is the only symbol visible outside of this translation unit.
-	std::wstring GetPrefillInfoInYaml() {
+	std::string GetPrefillInfoInYamlUtf8() {
 		WindowsUserInfo userInfo = DistributionInfo::QueryWindowsUserInfo();
-		return userInfo.toYaml();
+		return userInfo.toYamlUtf8();
 	} // std::wstring GetPrefillInfoInYaml().
 
 } // namespace DistributionInfo.
+
+
+namespace Helpers {
+// Helper functions to deal with wide-multibyte string conversion,
+// needed due the fact that YAML-Cpp doesn't support wide strings,
+// which are default on Windows.
+	std::wstring string_to_wide_string(const std::string& string)
+	{
+		if (string.empty())
+		{
+			return L"";
+		}
+
+		const auto size_needed = MultiByteToWideChar(CP_UTF8, 0, &string.at(0),
+													  static_cast<int>(string.size()), nullptr, 0);
+		if (size_needed <= 0)
+		{
+			throw std::runtime_error("MultiByteToWideChar() failed: " + std::to_string(size_needed)
+									 + ". Error code: " + std::to_string(GetLastError()));
+		}
+
+		std::wstring result(size_needed, 0);
+		MultiByteToWideChar(CP_UTF8, 0, &string.at(0), static_cast<int>(string.size()),
+							&result.at(0), size_needed);
+		return result;
+	}
+
+	std::string wide_string_to_string(const std::wstring& wide_string)
+	{
+		if (wide_string.empty())
+		{
+			return "";
+		}
+
+		const auto size_needed = WideCharToMultiByte(CP_UTF8, 0, &wide_string.at(0),
+													static_cast<int>(wide_string.size()),
+													nullptr, 0, nullptr, nullptr);
+		if (size_needed <= 0)
+		{
+			throw std::runtime_error("WideCharToMultiByte() failed: " + std::to_string(size_needed)
+									 + ". Error code: " + std::to_string(GetLastError()));
+		}
+
+		std::string result(size_needed, 0);
+		WideCharToMultiByte(CP_UTF8, 0, &wide_string.at(0), static_cast<int>(wide_string.size()),
+							&result.at(0), size_needed, nullptr, nullptr);
+		return result;
+	}
+} // namespace Helpers.

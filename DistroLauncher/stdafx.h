@@ -30,6 +30,8 @@
 #define SECURITY_WIN32
 #include <sspi.h>
 #include <secext.h>
+#include <unordered_map>
+#include <yaml-cpp/yaml.h>
 #include "WslApiLoader.h"
 #include "Helpers.h"
 #include "DistributionInfo.h"
