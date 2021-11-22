@@ -242,7 +242,6 @@ namespace DistributionInfo {
 			switch (value[0]) {
 			case L'1': // forced text mode.
 				return true;
-				break;
 			case L'2': // forced GUI mode, no autodetection.
 				return false;
 			case L'0':
