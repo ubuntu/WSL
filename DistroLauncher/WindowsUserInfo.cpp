@@ -1,21 +1,19 @@
-//
-//    Copyright: 2021, Canonical Ltd.
-//  License: GPL-3
-//  This program is free software : you can redistribute itand /or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License.
-//  .
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
-//  GNU General Public License for more details.
-//  .
-//  You should have received a copy of the GNU General Public License
-//  along with this program.If not, see < https://www.gnu.org/licenses/>.
-//  .
-//  On Debian systems, the complete text of the GNU General
-//  Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
-//
+/*
+ * Copyright (C) 2021 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "stdafx.h"
 
@@ -28,7 +26,7 @@ namespace DistributionInfo {
 			std::wstring realName;
 			std::wstring localeName;
 
-			std::wstring toYaml();
+			std::wstring toYaml() const;
 		};
 
 		// PrintLastError converts the last error code from Win32 API's into
@@ -42,7 +40,7 @@ namespace DistributionInfo {
 		// because of such small feature, which would be an overkill. Shall the need
 		// for more YAML manipulation in the DistroLauncher arise, thus function should
 		// be changed to use a proper YAML manipulation library, such as yaml-cpp.
-		std::wstring WindowsUserInfo::toYaml() {
+		std::wstring WindowsUserInfo::toYaml() const {
 			std::wstring fullYaml;
 
 			if (!localeName.empty()) {

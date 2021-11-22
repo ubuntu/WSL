@@ -26,6 +26,7 @@
 #include <vector>
 #include <wslapi.h>
 #include <fstream>
+#include <array>
 #define SECURITY_WIN32
 #include <sspi.h>
 #include <secext.h>
@@ -34,6 +35,7 @@
 #include "DistributionInfo.h"
 #include "OOBE.h"
 #include "ProcessRunner.h"
+#include "WSLInfo.h"
 
 // Message strings compiled from .MC file.
 #include "messages.h"

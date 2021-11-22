@@ -1,4 +1,22 @@
+/*
+ * Copyright (C) 2021 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #pragma once
+
 // Wraps up Win32 API's into an run-once-and-discard object
 // to launch an external process and capture its outputs.
 // Once created it cannot be reassigned, nor reused,
@@ -42,7 +60,7 @@ namespace Helpers {
         // The runner is considered defunct if it fails to construct the pipe
         // which will conduct the standard streams.
         // This is a way to avoid the need for exceptions.
-        bool isDefunct();
+        bool isDefunct() const;
 
         // Runs the CLI given to constructor and returns it's exit code.
         // If called more than once, returns the cached exit code.
@@ -50,13 +68,13 @@ namespace Helpers {
         DWORD run();
 
         // Returns the cached exit code.
-        DWORD getExitCode();
+        DWORD getExitCode() const;
 
         // Returns a view of the process standard output stream.
-        std::wstring_view getStdOut();
+        std::wstring_view getStdOut() const;
 
         // Returns a view of the process standard error stream.
-        std::wstring_view getStdErr();
+        std::wstring_view getStdErr() const;
 
         ~ProcessRunner();
     };

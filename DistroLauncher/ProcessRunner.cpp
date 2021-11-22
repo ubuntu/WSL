@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2021 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "stdafx.h"
 
 namespace Helpers {
@@ -28,7 +45,7 @@ namespace Helpers {
 
     }
 
-    bool ProcessRunner::isDefunct() {
+    bool ProcessRunner::isDefunct() const {
         return defunct;
     }
 
@@ -38,15 +55,15 @@ namespace Helpers {
         exit_code = ERROR_PROCESS_ABORTED;
     }
 
-    std::wstring_view ProcessRunner::getStdErr() {
+    std::wstring_view ProcessRunner::getStdErr() const {
         return stdErr;
     }
 
-    std::wstring_view ProcessRunner::getStdOut() {
+    std::wstring_view ProcessRunner::getStdOut() const {
         return stdOut;
     }
 
-    DWORD ProcessRunner::getExitCode() {
+    DWORD ProcessRunner::getExitCode() const {
         return exit_code;
     }
 
@@ -75,8 +92,8 @@ namespace Helpers {
         }
 
         read_pipes();
-        WaitForSingleObject(_piProcInfo.hProcess, 1000u);
-        auto iDontKnow = GetExitCodeProcess(_piProcInfo.hProcess, &exit_code);
+        WaitForSingleObject(_piProcInfo.hProcess, 1000);
+        GetExitCodeProcess(_piProcInfo.hProcess, &exit_code);
         alreadyRun = true;
         return exit_code;
     }
@@ -92,9 +109,9 @@ namespace Helpers {
 
     void ProcessRunner::read_pipes() {
         DWORD dwRead;
-        const size_t BUFSIZE = 80u;
+        const size_t BUFSIZE = 80;
         TCHAR chBuf[BUFSIZE];
-        bool bSuccess = FALSE;
+        BOOL bSuccess = FALSE;
         for (;;) {
             bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
             if (!bSuccess || dwRead == 0) {
