@@ -15,16 +15,11 @@
  *
  */
 
-#pragma once
-
-namespace DistributionInfo {
-    // OOBE Experience.
-    HRESULT OOBESetup();
-
-    // isOOBEAvailable returns true if OOBE executable is found inside rootfs. 
-    bool isOOBEAvailable();
-
-    // GetPrefillInfoInYaml generates a YAML string from Windows user 
-    // and locale information, UTF-8 encoded, thus std::string.
-    std::string GetPrefillInfoInYaml();
+// This namespace holds a set of functions and utility classes to deal
+// with Win32 specificities in a modern way.
+// It aims to be lighweigth enough to justify not using more robust
+// solutions like those found in Boost libraries.
+namespace Win32Utils {
+    nonstd::expected<std::string, std::wstring> wide_string_to_utf8(const std::wstring& wide_string);
+	nonstd::expected<std::wstring, std::wstring> utf8_to_wide_string(const std::string& utf8str);
 }
