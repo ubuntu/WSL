@@ -26,7 +26,7 @@ namespace DistributionInfo {
 			std::wstring realName;
 			std::wstring localeName;
 
-			std::wstring toYaml() const;
+			std::string toYamlUtf8() const;
 		};
 
 		// PrintLastError converts the last error code from Win32 API's into
@@ -40,26 +40,47 @@ namespace DistributionInfo {
 		// because of such small feature, which would be an overkill. Shall the need
 		// for more YAML manipulation in the DistroLauncher arise, thus function should
 		// be changed to use a proper YAML manipulation library, such as yaml-cpp.
-		std::wstring WindowsUserInfo::toYaml() const {
-			std::wstring fullYaml;
-
+		std::string WindowsUserInfo::toYamlUtf8() const {
+			// yaml-cpp doesn't support wide chars.
+			std::unordered_map<std::string,
+				std::unordered_map<std::string, std::string>> sections;
 			if (!localeName.empty()) {
-				fullYaml += L"Welcome:\n  lang: " + localeName + L'\n';
-			}
-
-			if (!(realName.empty() && userName.empty())) {
-				fullYaml += L"WSLIdentity:\n";
-
-				if (!realName.empty()) {
-					fullYaml += L"  realname: " + realName + L'\n';
-				}
-
-				if (!userName.empty()) {
-					fullYaml += L"  username: " + userName + L'\n';
+				auto conv = Win32Utils::wide_string_to_utf8(localeName);
+				if(conv){
+					sections["Welcome"]["lang"]=conv.value();
+				} else {
+					Helpers::PrintMessage(MSG_ERROR_CODE, HRESULT_FROM_WIN32(GetLastError()),conv.error().c_str());
 				}
 			}
 
-			return fullYaml;
+			if (!realName.empty()) {
+				auto conv = Win32Utils::wide_string_to_utf8(realName);
+				if(conv){
+					sections["WSLIdentity"]["realname"]= conv.value();
+				} else {
+					Helpers::PrintMessage(MSG_ERROR_CODE, HRESULT_FROM_WIN32(GetLastError()), conv.error().c_str());
+				}
+			}
+
+			if (!userName.empty()) {
+				auto conv = Win32Utils::wide_string_to_utf8(userName);
+				if(conv){
+					sections["WSLIdentity"]["username"]= conv.value();
+				} else {
+					Helpers::PrintMessage(MSG_ERROR_CODE, HRESULT_FROM_WIN32(GetLastError()), conv.error().c_str());
+				}
+			}
+
+			YAML::Emitter out;
+			out << sections << YAML::Newline;
+			if (!out.good()) {
+				return "";
+			}
+
+			// Ensure UTF-8 BOM is present just as a precaution.
+			std::string retVal{ "\xEF\xBB\xBF" };
+			retVal.append(out.c_str());
+			return retVal;
 		} // std::wstring WindowsUserInfo::toYaml()
 
 
@@ -81,7 +102,7 @@ namespace DistributionInfo {
 				if (dashPos > 0 && dashPos < result) {
 					loc[dashPos] = '_';
 				}
-				// (result-1) because GetUserDefaultLocaleName includes the Windows null-terminating char, not needed here.
+				// (result-1) because GetUserDefaultLocaleName includes the null-terminating char, not needed here.
 				userInfo.localeName = std::wstring{ loc, result - 1 };
 			}
 
@@ -109,11 +130,12 @@ namespace DistributionInfo {
 
 	} // namespace.
 
-	// GetPrefillInfoInYaml exports Windows User Information as an YAML string.
+	// GetPrefillInfoInYaml exports Windows User Information as an YAML UTF-8
+	// encoded string.
 	// This is the only symbol visible outside of this translation unit.
-	std::wstring GetPrefillInfoInYaml() {
+	std::string GetPrefillInfoInYaml() {
 		WindowsUserInfo userInfo = DistributionInfo::QueryWindowsUserInfo();
-		return userInfo.toYaml();
+		return userInfo.toYamlUtf8();
 	} // std::wstring GetPrefillInfoInYaml().
 
 } // namespace DistributionInfo.
