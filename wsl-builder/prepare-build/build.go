@@ -332,6 +332,44 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 		return err
 	}
 
+	// Modify DistroLauncher.vcxproj to enable vcpkg.
+	const vcpkgPropGrp = `  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
+</Project>`
+	launcherVcxproj := filepath.Join(rootPath, "DistroLauncher", "DistroLauncher.vcxproj")
+	launcherVcxprojBytes, err := os.ReadFile(launcherVcxproj)
+	if err != nil {
+		return fmt.Errorf("failed to read %q: %v", launcherVcxproj, err)
+	}
+
+	launcherVcxprojBytes = bytes.ReplaceAll(launcherVcxprojBytes, []byte("</Project>"),
+		[]byte(vcpkgPropGrp))
+
+	if err := os.WriteFile(launcherVcxproj, launcherVcxprojBytes, 0644); err != nil {
+		return fmt.Errorf("failed to write %q: %v", launcherVcxproj, err)
+	}
+
+	// Modify Appx Vcxproj to add Custom Build Step to copy the dlls the launcher depends on.
+	const copyDllCBS = `  <ItemGroup>
+    <Content Include="$(OutDir)..\*.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>`
+	appxVcxproj := filepath.Join(rootPath, "DistroLauncher-Appx", "DistroLauncher-Appx.vcxproj")
+	vcxprojBytes, err := os.ReadFile(appxVcxproj)
+	if err != nil {
+		return fmt.Errorf("failed to read %q: %v", appxVcxproj, err)
+	}
+
+	vcxprojBytes = bytes.ReplaceAll(vcxprojBytes, []byte("</Project>"),
+		[]byte(copyDllCBS))
+
+	if err := os.WriteFile(appxVcxproj, vcxprojBytes, 0644); err != nil {
+		return fmt.Errorf("failed to write %q: %v", appxVcxproj, err)
+	}
+
 	// Prepare appxmanifest
 	appxManifest := filepath.Join("DistroLauncher-Appx", "MyDistro.appxmanifest")
 	for _, arch := range arches {
