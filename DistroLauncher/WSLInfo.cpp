@@ -85,7 +85,8 @@ namespace Helpers {
         // One indication that the distro has graphical support enabled.
         bool isX11UnixSocketMounted() {
             const std::array cmds = {
-                L"ls -l /tmp/.X11-unix",
+                L"ls -l /mnt/wslg",
+                L"ls -l /tmp/.X11-unix | grep wslg",
                 L"ss -lx | grep \"/tmp/.X11-unix/X0\"",
             };
             // I'm sure is better to read this way than with the algorithm.
