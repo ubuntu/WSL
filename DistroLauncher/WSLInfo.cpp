@@ -60,8 +60,12 @@ namespace Helpers {
         for (int64_t i = defaultEnvironmentVariableCount-1; i >= 0; --i) {
             CoTaskMemFree(static_cast<LPVOID>(defaultEnvironmentVariables[i]));
         }
-
-        return distributionVersion;
+        
+        // Per conversation at https://github.com/microsoft/WSL-DistroLauncher/issues/96
+        // distributionVersion is not what I thought.
+        // The actual information is on the 4th bit of the distro flags, which is not 
+        // currently referrenced by the API nor docs. The `1+` is just to ensure we return 1 or two.
+        return (1+((wslDistributionFlags & 0x08)>>3));
     }
 
     inline bool isWslgEnabled() {
