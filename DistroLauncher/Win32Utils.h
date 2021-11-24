@@ -15,11 +15,11 @@
  *
  */
 
-// This namespace holds a set of functions and utility classes to deal
-// with Win32 specificities in a modern way.
-// It aims to be lighweigth enough to justify not using more robust
-// solutions like those found in Boost libraries.
+ // This namespace holds a set of functions and utility classes to deal
+ // with Win32 specificities in a modern way.
+ // It aims to be lighweigth enough to justify not using more robust
+ // solutions like those found in Boost libraries.
 namespace Win32Utils {
     nonstd::expected<std::string, std::wstring> wide_string_to_utf8(const std::wstring& wide_string);
-	nonstd::expected<std::wstring, std::wstring> utf8_to_wide_string(const std::string& utf8str);
+    nonstd::expected<std::wstring, std::wstring> utf8_to_wide_string(const std::string& utf8str);
 }

@@ -16,17 +16,17 @@
  */
 
 namespace YAML {
-	// YAML-Cpp knows how to serialize std::map, but not unordered_map.
-	// This extension enables other uses of maps as well, as long as the
-	// MapType provides API similar to std::map
-	template <template <typename...> class MapType, typename K, typename V>
-	inline Emitter& operator<<(Emitter& emitter, const MapType<K, V>& m) {
-		emitter << BeginMap;
-		for (const auto& v : m) {
-			emitter << Key << v.first << Value << v.second;
-		}
+    // YAML-Cpp knows how to serialize std::map, but not unordered_map.
+    // This extension enables other uses of maps as well, as long as the
+    // MapType provides API similar to std::map
+    template <template <typename...> class MapType, typename K, typename V>
+    inline Emitter& operator<<(Emitter& emitter, const MapType<K, V>& m) {
+        emitter << BeginMap;
+        for (const auto& v : m) {
+            emitter << Key << v.first << Value << v.second;
+        }
 
-		emitter << EndMap;
-		return emitter;
-	}
+        emitter << EndMap;
+        return emitter;
+    }
 }
