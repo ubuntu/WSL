@@ -85,10 +85,11 @@ namespace Helpers {
         // One indication that the distro has graphical support enabled.
         bool isX11UnixSocketMounted() {
             const std::array cmds = {
-                L"ls -l /mnt/wslg",
-                L"ls -l /tmp/.X11-unix | grep wslg",
-                L"ss -lx | grep \"/tmp/.X11-unix/X0\"",
+                L"ls -l /tmp/.X11-unix | grep wslg", // symlink points to wslg.
+                L"ls -l /tmp/.X11-unix/", // symlink resolves correctly.
+                L"ss -lx | grep \"/tmp/.X11-unix/X0\"", // socket is listening.
             };
+
             // I'm sure is better to read this way than with the algorithm.
             // NOLINTNEXTLINE(readability-use-anyofallof)
             for (const auto *const cmd : cmds) {
