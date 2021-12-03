@@ -68,6 +68,9 @@ def releases(lpconn, all, active, supported, devel, lts):
                 if milestone.date_targeted and milestone.date_targeted > datetime.now():
                     next_milestone = milestone.date_targeted.strftime("%Y-%m-%d")
                     continue
+                milestone_ids = m.split('.')
+                if len(milestone_ids) < 3: # Ignore non point releases eg 21.11, 22.01, ...
+                    continue
                 milestone_id = m.split('.')[2]
                 description += ".%s" % milestone_id
                 milestone_date = milestone.date_targeted.strftime("%Y-%m-%d")

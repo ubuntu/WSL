@@ -85,17 +85,24 @@ jobs:
       fail-fast: false
     env:
       buildInfoPath: 'wiki/build-info'
+      workDir: 'C:/Temp/builddir'
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout WSL
+        shell: bash
+        run: |
+          mkdir -p ${{ env.workDir }}
+          git clone https://github.com/ubuntu/wsl.git ${{ env.workDir }} --depth 1
+          git checkout "${GITHUB_SHA}"
       - name: Checkout build-info
-        uses: actions/checkout@v2
-        with:
-          path: 'wiki/'
-          repository: ubuntu/wsl.wiki
+        shell: bash
+        run: |
+          mkdir -p ${{ env.workDir }}/wiki/
+          git clone https://github.com/ubuntu/wsl.wiki ${{ env.workDir }}/wiki --depth 1
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.goversion }}
       - name: Prepare project metadata, assets and download rootfses
+        working-directory: ${{ env.workDir }}
         shell: bash
         run: |
           set -eu
@@ -121,6 +128,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Install certificate
         shell: powershell
+        working-directory: ${{ env.workDir }}
         run: |
           New-Item -ItemType directory -Path certificate
           Set-Content -Path certificate\certificate.txt -Value '${{ secrets.CERTIFICATE }}'
@@ -130,30 +138,33 @@ jobs:
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
       - name: Install vcpkg
+        working-directory: ${{ env.workDir }}
         run: |
           git clone https://github.com/microsoft/vcpkg ..\vcpkg
           ..\vcpkg\bootstrap-vcpkg.bat
           ..\vcpkg\vcpkg integrate install
           # MSBuild should be able to invoke vcpkg to retrieve dependencies now.
       - name: Build Bundle
+        working-directory: ${{ env.workDir }}
         run:  msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="${{ env.AppxBundlePlatforms }}" /p:UapAppxPackageBuildMode=${{ env.UapAppxPackageBuildMode }} -verbosity:normal
       - name: Allow downloading sideload appxbundle
         uses: actions/upload-artifact@v2
         with:
           name: sideload-${{ matrix.WslID }}
           path: |
-            ./AppPackages/Ubuntu/Ubuntu_*/*
+            ${{ env.workDir }}/AppPackages/Ubuntu/Ubuntu_*/*
           retention-days: 7
       - name: Allow downloading store appxupload
         uses: actions/upload-artifact@v2
         with:
           name: store-${{ matrix.WslID }}
           path: |
-            ./AppPackages/Ubuntu/Ubuntu_*.appxupload
+            ${{ env.workDir }}/AppPackages/Ubuntu/Ubuntu_*.appxupload
           retention-days: 7
       - name: Check if we need to upload new build
         id: detect-upload-to-store
         if: ${{ matrix.Upload == 'yes' }}
+        working-directory: ${{ env.workDir }}
         shell:  bash
         run: |
           set -eux
@@ -200,11 +211,13 @@ jobs:
 
       - name: Install Store Broker
         if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        working-directory: ${{ env.workDir }}
         shell: powershell
         run: |
           Install-Module -Name StoreBroker -AcceptLicense -Force -Scope CurrentUser -Verbose
       - name: Submit to Microsoft Store
         if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        working-directory: ${{ env.workDir }}
         shell: powershell
         run: |
           New-Item -ItemType directory -Path store -Force
@@ -236,9 +249,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.WslID }}
-          path: ${{ env.buildInfoPath }}/${{ matrix.WslID }}-*
+          path: ${{ env.workDir }}/${{ env.buildInfoPath }}/${{ matrix.WslID }}-*
 
   update-build-artifacts:
+    # TODO: download only artefacts for wiki (pattern not supported yet: https://github.com/actions/download-artifact/issues/103)
     name: Store updated build artifacts in wiki for reuse in future workflow runs
     runs-on: ubuntu-latest
     if: always()
