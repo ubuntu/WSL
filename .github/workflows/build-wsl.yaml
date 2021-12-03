@@ -91,7 +91,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p ${{ env.workDir }}
-          git clone https://github.com/ubuntu/wsl.git ${{ env.workDir }} --depth 1
+          git clone https://github.com/ubuntu/wsl.git ${{ env.workDir }}
+          cd ${{ env.workDir }}
           git checkout "${GITHUB_SHA}"
       - name: Checkout build-info
         shell: bash
