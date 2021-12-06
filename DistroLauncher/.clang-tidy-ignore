@@ -1,0 +1,10 @@
+# Excluding upstream files relative to current directory.
+
+messages.h
+resource.h
+targetver.h
+stdafx.cpp
+Helpers.*
+WslApiLoader.*
+DistributionInfo.*
+DistroLauncher.cpp
