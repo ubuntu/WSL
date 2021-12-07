@@ -40,7 +40,8 @@ namespace DistributionInfo {
 	{
 		// Prepare prefill information to send to the OOBE.
 		std::wstring prefillCLIPostFix = DistributionInfo::PreparePrefillInfo();
-		std::wstring commandLine = DistributionInfo::OOBE_NAME + prefillCLIPostFix;
+		std::wstring commandLine{ L"sudo " };
+		commandLine.append(DistributionInfo::OOBE_NAME + prefillCLIPostFix);
 		// OOBE runs GUI by default, unless arg --text is set.
 		if (mustRunOOBEinTextMode()) {
 			commandLine.append(L" --text");
