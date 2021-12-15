@@ -147,8 +147,8 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Win32Utils.h" />
     <ClInclude Include="WslApiLoader.h" />
+    <ClInclude Include="expected.hpp" />
     <ClInclude Include="WSLInfo.h" />
-    <ClInclude Include="YamlExtensions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DistributionInfo.cpp" />
@@ -182,7 +182,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
-  </PropertyGroup>
 </Project>
