@@ -30,11 +30,15 @@
 #define SECURITY_WIN32
 #include <sspi.h>
 #include <secext.h>
+#include <any>
+#include <map>
 #include <unordered_map>
 #include "expected.hpp"
 #include "WslApiLoader.h"
 #include "Helpers.h"
 #include "DistributionInfo.h"
+#include "OobeDefs.h"
+#include "ExitStatus.h"
 #include "OOBE.h"
 #include "ProcessRunner.h"
 #include "WSLInfo.h"

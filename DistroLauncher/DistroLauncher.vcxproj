@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ExitStatus.h" />
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
@@ -152,6 +153,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DistributionInfo.cpp" />
+    <ClCompile Include="ExitStatus.cpp" />
+    <ClCompile Include="exit_status_parser.cpp" />
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="DistroLauncher.cpp" />
     <ClCompile Include="OOBE.cpp" />
