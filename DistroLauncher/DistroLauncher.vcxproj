@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ExitStatus.h" />
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
@@ -147,11 +148,13 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Win32Utils.h" />
     <ClInclude Include="WslApiLoader.h" />
+    <ClInclude Include="expected.hpp" />
     <ClInclude Include="WSLInfo.h" />
-    <ClInclude Include="YamlExtensions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DistributionInfo.cpp" />
+    <ClCompile Include="ExitStatus.cpp" />
+    <ClCompile Include="exit_status_parser.cpp" />
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="DistroLauncher.cpp" />
     <ClCompile Include="OOBE.cpp" />
@@ -182,7 +185,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
-  </PropertyGroup>
 </Project>

@@ -41,48 +41,34 @@ namespace DistributionInfo {
         // for more YAML manipulation in the DistroLauncher arise, thus function should
         // be changed to use a proper YAML manipulation library, such as yaml-cpp.
         std::string WindowsUserInfo::toYamlUtf8() const {
-            // yaml-cpp doesn't support wide chars.
-            std::unordered_map<std::string,
-                std::unordered_map<std::string, std::string>> sections;
+            std::wstring fullYaml;
+
             if (!localeName.empty()) {
-                auto conv = Win32Utils::wide_string_to_utf8(localeName);
-                if (conv) {
-                    sections["Welcome"]["lang"] = conv.value();
-                } else {
-                    Helpers::PrintMessage(MSG_ERROR_CODE, HRESULT_FROM_WIN32(GetLastError()), conv.error().c_str());
+                fullYaml += L"Welcome:\n  lang: " + localeName + L'\n';
                 }
-            }
+
+            if (!realName.empty() || !userName.empty()) {
+                fullYaml += L"WSLIdentity:\n";
 
             if (!realName.empty()) {
-                auto conv = Win32Utils::wide_string_to_utf8(realName);
-                if (conv) {
-                    sections["WSLIdentity"]["realname"] = conv.value();
-                } else {
-                    Helpers::PrintMessage(MSG_ERROR_CODE, HRESULT_FROM_WIN32(GetLastError()), conv.error().c_str());
-                }
+                    fullYaml += L"  realname: " + realName + L'\n';
             }
 
             if (!userName.empty()) {
-                auto conv = Win32Utils::wide_string_to_utf8(userName);
-                if (conv) {
-                    sections["WSLIdentity"]["username"] = conv.value();
-                } else {
-                    Helpers::PrintMessage(MSG_ERROR_CODE, HRESULT_FROM_WIN32(GetLastError()), conv.error().c_str());
+                    fullYaml += L"  username: " + userName + L'\n';
                 }
             }
 
-            YAML::Emitter out;
-            out << sections << YAML::Newline;
-            if (!out.good()) {
-                return "";
+            auto yamlStr = Win32Utils::wide_string_to_utf8(fullYaml);
+            if (!yamlStr.has_value()) {
+                // Failure in this case affects UX just a little bit, yet it would be useful to know why.
+                wprintf(yamlStr.error().c_str());
+                PrintLastError();
+                return std::string{};
             }
 
-            // Ensure UTF-8 BOM is present just as a precaution.
-            std::string retVal{"\xEF\xBB\xBF"};
-            retVal.append(out.c_str());
-            return retVal;
-        } // std::wstring WindowsUserInfo::toYaml()
-
+            return yamlStr.value();
+        } // std::wstring WindowsUserInfo::toYamlUtf8()
 
         // QueryWindowsUserInfo queries Win32 API's to provide launcher with locale, user real and login names.
         // Those pieces of information will be used in the Ubuntu OOBE to enhance the UX.

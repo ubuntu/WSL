@@ -30,17 +30,18 @@
 #define SECURITY_WIN32
 #include <sspi.h>
 #include <secext.h>
+#include <any>
+#include <map>
 #include <unordered_map>
-#include <yaml-cpp/yaml.h>
-#include <nonstd/expected.hpp>
+#include "expected.hpp"
 #include "WslApiLoader.h"
 #include "Helpers.h"
 #include "DistributionInfo.h"
+#include "OobeDefs.h"
+#include "ExitStatus.h"
 #include "OOBE.h"
 #include "ProcessRunner.h"
 #include "WSLInfo.h"
 #include "Win32Utils.h"
-#include "YamlExtensions.h"
-
 // Message strings compiled from .MC file.
 #include "messages.h"
