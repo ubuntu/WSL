@@ -47,7 +47,7 @@ namespace DistributionInfo {
                 fullYaml += L"Welcome:\n  lang: " + localeName + L'\n';
                 }
 
-            if (!(realName.empty() && userName.empty())) {
+            if (!realName.empty() || !userName.empty()) {
                 fullYaml += L"WSLIdentity:\n";
 
             if (!realName.empty()) {

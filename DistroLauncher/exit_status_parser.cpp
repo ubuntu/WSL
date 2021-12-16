@@ -21,9 +21,9 @@ namespace Oobe
 
         nonstd::expected<KeyValuePairs, const wchar_t*> parseExitStatusFile(std::istream& file)
         {
-            std::regex keyValueRe(R"(^\s*(\w+)\s*[=:]\s*(\w+).*$)",
+            const std::regex keyValueRe(R"(^\s*(\w+)\s*[=:]\s*(\w+).*$)",
                                   std::regex_constants::icase | std::regex_constants::ECMAScript);
-            std::regex commentRe(R"(^\s*#+.*)", std::regex_constants::icase | std::regex_constants::ECMAScript);
+            const std::regex commentRe(R"(^\s*#+.*)", std::regex_constants::icase | std::regex_constants::ECMAScript);
             std::string line;
             std::smatch match;
             KeyValuePairs parsed;

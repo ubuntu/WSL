@@ -16,8 +16,29 @@
  */
 
 #include "stdafx.h"
-#include <errno.h>
 #include <filesystem>
+
+namespace Helpers {
+    // TODO: find a better place for this function. Inside Win32Utils, probably. Useful for dealing with std:exception.
+    void PrintFromUtf8(const char* msg)
+    {
+        const size_t MAX_MSG_LENGTH = 256;
+        const int size = static_cast<int>(strnlen_s(msg, MAX_MSG_LENGTH));
+        const auto size_needed = MultiByteToWideChar(CP_UTF8, 0, msg, size, nullptr, 0);
+        if (size_needed <= 0) {
+            Helpers::PrintMessage(MSG_ERROR_CODE, L"Failed with unknown error message");
+            return;
+        }
+
+        std::wstring result(size_needed, 0);
+        auto convResult = MultiByteToWideChar(CP_UTF8, 0, msg, size, &result.at(0), size_needed);
+        if (convResult == 0) {
+            Helpers::PrintMessage(MSG_ERROR_CODE, L"Failed with unknown error message");
+            return;
+        }
+        Helpers::PrintMessage(MSG_ERROR_CODE, result);
+    }
+}
 
 namespace Oobe
 {
@@ -41,12 +62,13 @@ namespace Oobe
         prefixedFilePath.append(distroName.value());
         prefixedFilePath.append(launcherCommandFilePath);
         std::ifstream launcherCmdFile;
+        if (!std::filesystem::exists(prefixedFilePath)) {
+            // OOBE left nothing to do.
+            return;
+        }
         launcherCmdFile.open(prefixedFilePath);
         if (launcherCmdFile.fail()) {
-            if (errno != ENOENT) {
-                Helpers::PrintErrorMessage(HRESULT_FROM_WIN32(GetLastError()));
-            }
-            // File not found will be interpreted as there is nothing to do.
+            Helpers::PrintErrorMessage(HRESULT_FROM_WIN32(GetLastError()));
             return;
         }
 
@@ -55,7 +77,13 @@ namespace Oobe
             // Finally take the actions and delete the file.
             const KeyValuePairs& launcherCmds{parserResult.value()};
             auto actionResult = act(launcherCmds);
+            if (!actionResult.has_value()) {
+                Helpers::PrintFromUtf8(actionResult.error().what());
+            }
             auto configResult = config(launcherCmds);
+            if (!configResult.has_value()) {
+                Helpers::PrintFromUtf8(configResult.error().what());
+            }
         } else {
             wprintf(parserResult.error());
         }
@@ -68,9 +96,8 @@ namespace Oobe
 
     namespace
     {
-        bool ensureDistroStopped(unsigned int maxNoOfRetries);
-
         KeyValuePairs launcherCmds;
+        const unsigned int MAX_NUMBER_OF_ATTEMPTS = 30;
 
         // Shall we need to extend the capabilities triggered by the launcher-command file, here is what we need to do:
         // 1. Add more functions inside the Actions namespace with the same signature of the existing ones.
@@ -82,7 +109,7 @@ namespace Oobe
             VoidResult rebootDistro();
             VoidResult shutdownDistro();
         };
-        using Action = VoidResult (*)();
+        using Action = VoidResult(*)();
         const std::unordered_map<std::string_view, Action> capabilities{{"reboot", &Actions::rebootDistro},
                                                                         {"shutdown", &Actions::shutdownDistro}};
 
@@ -142,12 +169,12 @@ namespace Oobe
                 return VoidResult();
             }
             auto default_uid = std::any_cast<unsigned long>(configIt->second);
-            // TODO: Replace the default flags on this call by the current ones reading before writting.
+            // TODO: Replace the default flags on this call by the current ones reading before writing.
             // The planned wrapper class should resolve this.
             auto hr = g_wslApi.WslConfigureDistribution(default_uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
             if (FAILED(hr)) {
                 return nonstd::make_unexpected(std::runtime_error(
-                  "Could not configure distro to the new default UID: " + std::to_string(default_uid)));
+                    "Could not configure distro to the new default UID: " + std::to_string(default_uid)));
             }
 
             return VoidResult();
@@ -164,7 +191,7 @@ namespace Oobe
                 }
 
                 // Before relaunching, give WSL some time to make sure distro is stopped.
-                bool stopSuccess = ensureDistroStopped(30); // NOLINT(readability-magic-numbers): only used here.
+                bool stopSuccess = ensureDistroStopped(MAX_NUMBER_OF_ATTEMPTS);
                 if (!stopSuccess) {
                     // We could try again, but why would we have failed to stop the distro in the first time?
                     return nonstd::make_unexpected(std::runtime_error("Distro is still running after wsl -t timeout."));
@@ -186,7 +213,7 @@ namespace Oobe
                 DWORD fnLength = GetModuleFileName(nullptr, launcherName, MAX_PATH);
                 if (fnLength == 0) {
                     return nonstd::make_unexpected(std::runtime_error(
-                      "Failed to determine the launcher path. Error Code: " + std::to_string(GetLastError())));
+                        "Failed to determine the launcher path. Error Code: " + std::to_string(GetLastError())));
                 }
 
                 auto cmdResult = _wsystem(launcherName);
