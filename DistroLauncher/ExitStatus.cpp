@@ -36,7 +36,7 @@ namespace Helpers {
             Helpers::PrintMessage(MSG_ERROR_CODE, L"Failed with unknown error message");
             return;
         }
-        Helpers::PrintMessage(MSG_ERROR_CODE, result);
+        Helpers::PrintMessage(MSG_ERROR_CODE, result.c_str());
     }
 }
 
