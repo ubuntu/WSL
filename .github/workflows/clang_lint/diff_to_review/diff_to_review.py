@@ -43,8 +43,10 @@ def diff_to_review(repo_root: str, diff: str, review_msg_body: str,
             target_lines = [
                 tl.value for tl in hunk.target_lines()
             ]
-            review_comment_body = inline_msg + "\n\n```suggestion\n" + \
-                "".join(target_lines) + "```"
+
+            review_comment_body = "{}\n\n```suggestion\n{}```".format(
+                inline_msg, "".join(target_lines)
+            )
             review_comments.append(
                 {
                     "path": file_path,

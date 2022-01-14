@@ -44,7 +44,7 @@ def markdown(s):
     s = re.sub(
         "'([^']*)'",
         lambda match:
-            "`` " + unescape_chars(match.group(1)) + " ``",
+            "`` {} ``".format(unescape_chars(match.group(1))),
         s
     )
 

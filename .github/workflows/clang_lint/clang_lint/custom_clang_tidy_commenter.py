@@ -153,8 +153,9 @@ def parse_clang_tidy_fixes(fixes_path: str, repository_root: str):
                         # Make sure the code suggestion ends with a \n
                         if source_file_line[-1] != "\n":
                             source_file_line += "\n"
-                        suggestion = "\n```suggestion\n" + \
-                            source_file_line + "```"
+                        suggestion = "\n```suggestion\n{}```".format(
+                            source_file_line
+                            )
                     break
 
         review_comment_body = (
@@ -179,7 +180,7 @@ def parse_clang_tidy_fixes(fixes_path: str, repository_root: str):
 
 def review_comments(repository_root: str, pull_request_id: int,
                     export_fixes_file: str):
-    """Generates the PR review object, consisting of a body and a list 
+    """Generates the PR review object, consisting of a body and a list
     of comments."""
     review_comments = parse_clang_tidy_fixes(export_fixes_file,
                                              repository_root)
