@@ -46,13 +46,13 @@ def review_comments(repository_root: str, pull_request_id: int,
         return 0
 
     body = ":warning: `clang-format` found formatting issues in the code" \
-           "  submitted.:warning:\nMake sure to run clang-format and update" \
+           " submitted.:warning:\nMake sure to run clang-format and update" \
            " this pull request.\n"
     inline_msg = "Clang-format suggestion below:"
     pr_review = diff_to_review.diff_to_review(repository_root, git_diff,
                                               body, inline_msg, sources)
     # Reset repo, otherwise the next one in the pipeline will work on a
-    #  modified tree different from what GitHub displays on browser.
+    # modified tree different from what GitHub displays on browser.
     repo.git.reset('--hard')
 
     if pr_review is None:
