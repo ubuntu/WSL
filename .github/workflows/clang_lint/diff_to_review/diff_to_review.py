@@ -27,7 +27,8 @@ from unidiff import PatchSet
 
 def diff_to_review(repo_root: str, diff: str, review_msg_body: str,
                    inline_msg: str, source_files: List[str]):
-
+    """ Generates pull request review comments from a unified diff.
+    The hunks are presented as inline suggestions."""
     review_comments = []
     patch_set = PatchSet(diff)
     for patch in patch_set:

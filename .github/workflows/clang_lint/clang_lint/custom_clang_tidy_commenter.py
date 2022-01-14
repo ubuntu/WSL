@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-""" Runs clang-tidy, parses the generated fixes.yaml file and create
-pull request review comments from the linter diagnostics. """
+""" Creates pull request review comments from the exported diagnostics
+results of a previous clang-tidy run. """
 #
 # Copyright (C) 2021 Canonical Ltd
 #
@@ -25,6 +25,8 @@ from clang_lint.inline_comments.markdown import markdown
 
 
 def parse_clang_tidy_fixes(fixes_path: str, repository_root: str):
+    """Produces a list of comment json objects by parsing the fixes file
+    located at `fixes_path` exported by a previous clang-tidy run. """
     clang_tidy_fixes = dict()
     with open(fixes_path) as file:
         clang_tidy_fixes = yaml.full_load(file)
@@ -177,6 +179,8 @@ def parse_clang_tidy_fixes(fixes_path: str, repository_root: str):
 
 def review_comments(repository_root: str, pull_request_id: int,
                     export_fixes_file: str):
+    """Generates the PR review object, consisting of a body and a list 
+    of comments."""
     review_comments = parse_clang_tidy_fixes(export_fixes_file,
                                              repository_root)
     if len(review_comments) == 0:

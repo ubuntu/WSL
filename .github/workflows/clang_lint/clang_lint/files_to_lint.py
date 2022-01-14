@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """ Parses the .clang-ignore file at the root of the repository
-and also the excluded_paths environment variable to determine which
+and/or the excluded_paths environment variable to determine which
 source files should be excluded from linting process. """
 #
 # Copyright (C) 2021 Canonical Ltd
@@ -26,6 +26,9 @@ from typing import List
 
 
 def files_to_lint(repo_root: str, project_dir: str) -> List[str]:
+    """ Lists all source files in repo_root/project_dir that should be
+    linted based on an existing repo_root/.clang-ignore file and/or
+    `exclude_paths` environment variable """
     extensions = ["h", "hpp", "c", "cpp", "cc", "hh", "cxx", "hx"]
     base_dir = project_dir
     sources = []

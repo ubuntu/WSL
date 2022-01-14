@@ -22,6 +22,8 @@ import re
 
 
 def markdown(s):
+    """ Escapes markdown special characters or unescape the ones
+    improperly escaped in block quotes. """
     md_chars = "\\`*_{}[]<>()#+-.!|"
 
     def escape_chars(s):

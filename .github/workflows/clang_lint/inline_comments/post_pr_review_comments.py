@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-""" Evaluates the review_comments dict against the files from the PR matching
-pull_request_id and post only the new comments affecting those files. """
+""" Posts pull request review comments, excluding the existing ones and
+the ones not affecting files modified in the current pull_request_id."""
 #
 # Copyright (C) 2021 Canonical Ltd
 #
@@ -35,6 +35,8 @@ def chunks(lst, n):
 
 
 def _files_from_this_pr(github_api_url, repo, pull_request_id, github_token):
+    """Lists which files and lines are allowed to receive comments, i.e.
+    those modified by the current pull_request_id Pull Request."""
     pull_request_files = list()
     # Request a maximum of 100 pages (3000 files)
     for page_num in range(1, 101):
@@ -105,6 +107,8 @@ def _files_from_this_pr(github_api_url, repo, pull_request_id, github_token):
 
 def post_pr_review_comments(repository: str, pull_request_id: int,
                             review_comments: dict):
+    """ Posts a PR Review event from each 15 review_comments which
+    matching the output of `files_and_lines_available_for_comments`"""
     github_api_url = os.environ.get("GITHUB_API_URL")
     github_token = os.environ.get("INPUT_GITHUB_TOKEN")
     files_and_lines_available_for_comments = \

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ Invoked by msbuild to run in behalf of the actual clang-tidy.exe
-to accept the command lines --export-fixes and --line-filter. """
+to accept the command lines --export-fixes and --line-filter, currently
+unsupported by the built-in msbuild ClangTidy target. """
 #
 # Copyright (C) 2021 Canonical Ltd
 #
