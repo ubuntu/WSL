@@ -21,6 +21,7 @@ sources and turn the generated diff into review comments, if any. """
 
 import subprocess
 import git
+from git.exc import GitError
 
 from clang_lint.diff_to_review import diff_to_review
 from clang_lint.clang_lint import files_to_lint
@@ -40,12 +41,18 @@ def review_comments(repository_root: str, pull_request_id: int,
         print("Failed to run clang-format.")
         return None
 
-    repo = git.Repo(repository_root)
-    kwargs = {"unified": 0}
-    git_diff = repo.git.diff(**kwargs)
-    if not git_diff:
-        print("Formatting is fine. No issues found.")
-        return 0
+    try:
+        repo = git.Repo(repository_root)
+        kwargs = {"unified": 0}
+        git_diff = repo.git.diff(**kwargs)
+        if not git_diff:
+            print("Formatting is fine. No issues found.")
+            return 0
+
+    except GitError as error:
+        print("Failed to run Git commands: %s", error)
+        print("Cannot work if Git fails.")
+        return None
 
     body = ":warning: `clang-format` found formatting issues in the code" \
            " submitted.:warning:\nMake sure to run clang-format and update" \
