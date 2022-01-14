@@ -1,4 +1,4 @@
-# /usr/bin/python
+#!/usr/bin/python3
 """ Parses unified diff string and generate pull request review comments.
 This is meant to run after formatters of any language in CI. The returned
 dict is almost ready to be posted. Just need to add a new entry called

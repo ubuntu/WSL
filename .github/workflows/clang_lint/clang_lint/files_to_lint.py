@@ -1,4 +1,4 @@
-# /usr/bin/python
+#!/usr/bin/python3
 """ Parses the .clang-ignore file at the root of the repository
 and also the excluded_paths environment variable to determine which
 source files should be excluded from linting process. """

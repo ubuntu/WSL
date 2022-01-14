@@ -1,4 +1,4 @@
-# /usr/bin/python
+#!/usr/bin/python3
 """ Evaluates the review_comments dict against the files from the PR matching
 pull_request_id and post only the new comments affecting those files. """
 #

@@ -1,4 +1,4 @@
-# /usr/bin/python
+#!/usr/bin/python3
 """ Invoked by msbuild to run in behalf of the actual clang-tidy.exe
 to accept the command lines --export-fixes and --line-filter. """
 #

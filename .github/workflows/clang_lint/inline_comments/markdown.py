@@ -1,4 +1,4 @@
-# /usr/bin/python
+#!/usr/bin/python3
 """ Very simple markdown escaping function to avoid text to be interpreted
 as markdown syntax. """
 #

@@ -1,4 +1,4 @@
-# /usr/bin/python
+#!/usr/bin/python3
 """ Exports a function to run clang-format against the non-ignored
 sources and turn the generated diff into review comments, if any. """
 #

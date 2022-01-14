@@ -1,4 +1,4 @@
-# /usr/bin/python
+#!/usr/bin/python3
 """ Runs clang-tidy, parses the generated fixes.yaml file and create
 pull request review comments from the linter diagnostics. """
 #
