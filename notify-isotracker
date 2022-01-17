@@ -1,0 +1,120 @@
+#!/usr/bin/python3
+
+"""
+#
+# This script sends out a notification to the Ubuntu ISO Tracker about the
+# selected WSL image, so that it can appear as a new build for the Ubuntu WSL
+# product.
+#
+"""
+
+# Copyright: 2022, Canonical Ltd.
+
+# License: GPL-3
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License.
+#  .
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY;without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#  .
+#  You should have received a copy of the GNU General Public License
+#  along with this program. If not, see <https://www.gnu.org/licenses/>.
+#  .
+#  On Debian systems, the complete text of the GNU General
+#  Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
+
+import argparse
+import logging
+import os
+import re
+import sys
+from isotracker import ISOTracker
+
+
+PRODUCT_NAME = "Ubuntu WSL"
+
+
+def set_logging(debugmode=False):
+    """Initialize logging"""
+    logging.basicConfig(
+        level=logging.DEBUG if debugmode else logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s")
+    logging.debug("Debug mode enabled")
+
+
+def load_releases(path):
+    """Load the releases database and return it as a list"""
+    if not os.path.exists(path):
+        return None
+
+    with open(path) as f:
+        releases = [line.split() for line in f]
+    return releases
+
+
+def main():
+    """Main routine"""
+    args = _parse_arguments()
+    set_logging(args.debug)
+    logging.debug("arguments: %s", args)
+
+    # Get the series name we want to notify about
+    series_name = None
+    releases = load_releases(args.releases_file)
+    if not releases:
+        logging.error("Could not fetch Ubuntu releases mapping (%s)",
+            args.releases_file)
+        return 1
+
+    if "LTS" in args.wslID:
+        # Identify which LTS
+        version = re.match(r"Ubuntu([0-9\.]+)LTS", args.wslID)
+        if version:
+            version_string = version.group(1)
+            for release in releases:
+                if release[0] == version_string:
+                    series_name = release[2]
+                    break
+    elif args.wslID == "UbuntuPreview":
+        # First release should be the devel one
+        series_name = releases[0][2]
+    
+    if not series_name:
+        logging.error("Unknown wslID.")
+        return 1
+
+    target = "iso-%s" % series_name
+    logging.debug("Pushing notification to the %s tracker", target)
+    try:
+        tracker = ISOTracker(target=target)
+        logging.debug("Logged in, now posting build to the tracker (%s)",
+            args.buildID)
+        tracker.post_build(PRODUCT_NAME, args.buildID)
+    except Exception:
+        logging.error("Failed to post image notification to the ISO Tracker")
+        return 1
+
+    return 0
+
+
+def _parse_arguments():
+    """Parse command-line args, returning an argparse dict."""
+
+    parser = argparse.ArgumentParser(
+        description="Notify the Ubuntu ISO Tracker about an image.")
+    parser.add_argument("wslID", help="wslID of the WSL image built")
+    parser.add_argument("buildID",
+                        help="the build ID of the image to notify about")
+    parser.add_argument("-d", "--debug", action="store_true", default=False,
+                        help="enable debug mode")
+    parser.add_argument("-r", "--releases-file",
+                        default="/tmp/all-releases.csv",
+                        help="path to csv file with ubuntu releases mapping")
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    sys.exit(main())

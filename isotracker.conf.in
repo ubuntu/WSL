@@ -1,0 +1,17 @@
+[general]
+url=https://iso.qa.ubuntu.com/xmlrpc.php
+username=@ISOTRACKER_USERNAME@
+password=@ISOTRACKER_PASSWORD@
+default_milestone=Jammy Daily
+
+[iso-jammy]
+default_milestone=Jammy Daily
+
+[iso-focal]
+default_milestone=Focal Daily
+
+[iso-bionic]
+default_milestone=Bionic Daily
+
+[iso-xenial]
+default_milestone=Xenial Daily
