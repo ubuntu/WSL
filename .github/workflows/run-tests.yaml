@@ -1,0 +1,21 @@
+name: Run tests
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    
+jobs:
+  tests:
+    name: Run tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: microsoft/setup-msbuild@v1.0.2
+      # Ensures compilation of message resources before clang-tidy. Also fails fast.
+      - name: Run tests
+        shell: powershell
+        run: |
+          msbuild -p:Platform=x64 -p:Configuration=Debug -p:RestorePackagesConfig=true -t:restore .\DistroLauncher-Tests\DistroLauncher-Tests.sln
+          msbuild -p:Platform=x64 -p:Configuration=Debug .\DistroLauncher-Tests\DistroLauncher-Tests.sln
+          .\DistroLauncher-Tests\x64\Debug\DistroLauncher-Tests.exe

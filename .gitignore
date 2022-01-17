@@ -302,3 +302,4 @@ wsl-builder/prepare-build/prepare-build
 
 # And dependencies
 **/vcpkg_installed/
+**/*fixes.yaml
