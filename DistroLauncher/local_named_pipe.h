@@ -45,7 +45,7 @@ namespace Win32Utils
 
             SetHandleInformation(hRead, HANDLE_FLAG_INHERIT, static_cast<BOOL>(inheritRead));
         }
-        const HANDLE readHandle() const
+        HANDLE readHandle() const
         {
             return hRead;
         }
@@ -60,9 +60,9 @@ namespace Win32Utils
         void closeWriteHandles();
 
         // Getter to the OS Handle of the write end of the pipe.
-        const HANDLE writeHandle();
+        HANDLE writeHandle();
         // Getter to the OS Handle of the write end of the pipe.
-        const int writeFileDescriptor();
+        int writeFileDescriptor();
 
         ~LocalNamedPipe();
 
@@ -70,14 +70,14 @@ namespace Win32Utils
         // Those are delicate to be exposed. Leaving the write end of this pipe fly all over the places could result
         // in application crashes. Thats why the methods writeHandle() and closeWriteHandles() exist.
         void openWriteEnd();
-        HANDLE hWrite = INVALID_HANDLE_VALUE;
+        HANDLE hWrite = nullptr;
         int writeFd = -1;
         bool inheritWrite;
 
         // Nobody will need to access those outside of this class.
         SECURITY_ATTRIBUTES readSA, writeSA;
         // Those could be public, but to keep the API consistent, they are private.
-        HANDLE hRead = INVALID_HANDLE_VALUE;
+        HANDLE hRead = nullptr;
         // This naming convention (\\\\.\\pipe\\) is a business rule of Win32 named pipes.
         std::wstring szPipeName{L"\\\\.\\pipe\\"};
     };
