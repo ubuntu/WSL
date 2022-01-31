@@ -4,7 +4,7 @@ namespace Win32Utils
     /**
      * Encapsulates the Win32 named pipe which can be inherited by child processes into an RAII object to simplify
      * its usage. This pipe is said local in the sense that both client and server stays in the same application.
-     * This is useful for situations like logging or console redirection. Server end is inbound access, i.e. it's ment
+     * This is useful for situations like logging or console redirection. Server end is inbound access, i.e. it's meant
      * to be read-only while client is a write-only file. The client handle could be inherited by a child process as
      * it's stdout and the process creating the pipe could read it to display in a text component, for example.
      * The opposite is also viable, the process creating the pipe could redirect it's stdout and stderr to the write

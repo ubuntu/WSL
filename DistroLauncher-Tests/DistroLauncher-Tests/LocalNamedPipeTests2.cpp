@@ -4,7 +4,7 @@
 
 // This overrides the Win32 CreateFile macro by placing a function with the same signature inside the same namespace as
 // the class will be, thus being favorited by ADT.
-// That's why we don't specify the global namespace when calling the Win32 functions int he application code.
+// That's why we don't specify the global namespace when calling the Win32 functions in the application code.
 #undef CreateFile
 namespace Test::Win32Utils
 {
