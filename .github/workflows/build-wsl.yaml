@@ -99,19 +99,6 @@ jobs:
         run: |
           mkdir -p ${{ env.workDir }}/wiki/
           git clone https://github.com/ubuntu/wsl.wiki ${{ env.workDir }}/wiki --depth 1
-      - name: Checkout ubuntu-archive-tools
-        shell: bash
-        run: |
-          mkdir -p ${{ env.workDir }}/uat
-          git clone https://git.launchpad.net/ubuntu-archive-tools ${{ env.workDir }}/uat --depth 1
-      - name: Prepare ISO Tracker credentials
-        working-directory: ${{ env.workDir }}
-        shell: bash
-        env:
-          ISOTRACKER_USERNAME: ${{ secrets.ISOTrackerUsername }}
-          ISOTRACKER_PASSWORD: ${{ secrets.ISOTrackerPassword }}
-        run: |
-          perl -pe 's/@([A-Z_]+)@/$ENV{$1}/eg' isotracker.conf.in >~/isotracker.conf
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.goversion }}
@@ -266,14 +253,23 @@ jobs:
           name: build-artifacts-${{ matrix.WslID }}
           path: ${{ env.workDir }}/${{ env.buildInfoPath }}/${{ matrix.WslID }}-*
 
+      - name: Checkout ubuntu-archive-tools
+        if: ${{ steps.detect-upload-to-store.outputs.notify-isotracker == 'true' }}
+        run: |
+          mkdir -p ${{ env.workDir }}/uat
+          git clone https://git.launchpad.net/ubuntu-archive-tools ${{ env.workDir }}/uat --depth 1
+
       - name: Notify ISO Tracker
         if: ${{ steps.detect-upload-to-store.outputs.notify-isotracker == 'true' }}
+        env:
+          ISOTRACKER_USERNAME: ${{ secrets.ISOTrackerUsername }}
+          ISOTRACKER_PASSWORD: ${{ secrets.ISOTrackerPassword }}
         working-directory: ${{ env.workDir }}
-        shell: bash
         run: |
           build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md")
           [ -f /tmp/all-releases.csv ] || wsl-builder/lp-distro-info > /tmp/all-releases.csv
           PYTHONPATH=./uat ./notify-isotracker ${{ matrix.WslID }} $build_id
+
 
   update-build-artifacts:
     # TODO: download only artefacts for wiki (pattern not supported yet: https://github.com/actions/download-artifact/issues/103)

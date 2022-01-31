@@ -31,6 +31,7 @@ import logging
 import os
 import re
 import sys
+import configparser
 from isotracker import ISOTracker
 
 
@@ -53,6 +54,38 @@ def load_releases(path):
     with open(path) as f:
         releases = [line.split() for line in f]
     return releases
+
+
+def create_tracker_config(releases):
+    """Create a ConfigParser object with required tracker configuration"""
+    config = configparser.ConfigParser()
+
+    username = os.environ.get("ISOTRACKER_USERNAME", "")
+    password = os.environ.get("ISOTRACKER_PASSWORD", "")
+
+    # Active milestone settings
+
+    # First release = devel release
+    devel_milestone = "%s Daily" % releases[0][2].capitalize()
+    config["iso-%s" % releases[0][2]] = {
+        "default_milestone": devel_milestone
+    }
+    for release in releases[1:]:
+        # We only care about LTSes + devel
+        if release[7] == "True":
+            config["iso-%s" % release[2]] = {
+                "default_milestone": "%s Daily" % release[2].capitalize()
+            }
+
+    # General settings
+    config["general"] = {
+        "url": "https://iso.qa.ubuntu.com/xmlrpc.php",
+        "username": username,
+        "password": password,
+        "default_milestone": devel_milestone
+    }
+
+    return config
 
 
 def main():
@@ -86,10 +119,13 @@ def main():
         logging.error("Unknown wslID.")
         return 1
 
+    # Generate ISOTracker configuration dynamically
+    tracker_config = create_tracker_config(releases)
+
     target = "iso-%s" % series_name
     logging.debug("Pushing notification to the %s tracker", target)
     try:
-        tracker = ISOTracker(target=target)
+        tracker = ISOTracker(target=target, config=tracker_config)
         logging.debug("Logged in, now posting build to the tracker (%s)",
             args.buildID)
         tracker.post_build(PRODUCT_NAME, args.buildID)
