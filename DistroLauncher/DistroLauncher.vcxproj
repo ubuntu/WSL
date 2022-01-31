@@ -150,6 +150,7 @@
     <ClInclude Include="WslApiLoader.h" />
     <ClInclude Include="expected.hpp" />
     <ClInclude Include="WSLInfo.h" />
+    <ClInclude Include="local_named_pipe.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DistributionInfo.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="exit_status_parser.cpp" />
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="DistroLauncher.cpp" />
+    <ClCompile Include="local_named_pipe.cpp" />
     <ClCompile Include="OOBE.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="stdafx.cpp">
