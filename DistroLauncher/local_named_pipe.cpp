@@ -18,9 +18,9 @@ namespace Win32Utils
     void LocalNamedPipe::openWriteEnd()
     {
         if (hWrite == nullptr && writeFd == -1) {
-            auto handle =
+            HANDLE handle =
               CreateFile(szPipeName.c_str(), GENERIC_WRITE, 0, &writeSA, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, nullptr);
-            
+
             // That's the exact value returned by the function call above if it fails.
             // NOLINTNEXTLINE(performance-no-int-to-ptr)
             if (handle == INVALID_HANDLE_VALUE) {
