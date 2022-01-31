@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
 #include "local_named_pipe.h"
-#include "ConsoleService.h"
+#include "console_service.h"
 #include <fcntl.h>
 
 namespace Win32Utils
