@@ -18,8 +18,15 @@ namespace Win32Utils
     void LocalNamedPipe::openWriteEnd()
     {
         if (hWrite == nullptr && writeFd == -1) {
-            hWrite =
+            auto handle =
               CreateFile(szPipeName.c_str(), GENERIC_WRITE, 0, &writeSA, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, nullptr);
+            
+            // That's the exact value returned by the function call above if it fails.
+            // NOLINTNEXTLINE(performance-no-int-to-ptr)
+            if (handle == INVALID_HANDLE_VALUE) {
+                return; // leave the object unmodified.
+            }
+            hWrite = handle;
             writeFd = _open_osfhandle(reinterpret_cast<intptr_t>(hWrite), _O_WRONLY | _O_TEXT);
             SetHandleInformation(hWrite, HANDLE_FLAG_INHERIT, static_cast<BOOL>(inheritWrite));
             ConnectNamedPipe(hRead, nullptr); // can only be called when there is a client to connect.

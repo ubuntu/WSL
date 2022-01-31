@@ -26,20 +26,27 @@ namespace Win32Utils
         auto pipe = LocalNamedPipe(false, false, L"test-pipe");
         ASSERT_PRED1([](const std::wstring& name) { return name._Starts_with(L"\\\\.\\pipe\\"); }, pipe.pipeName());
     }
-    TEST(LocalNamedPipeTests, FromAnyStringLikeArg)
+    TEST(LocalNamedPipeTests, FromAnyStringLikeArg1)
     {
         std::wstring suffix{L"test-pipe"};
         auto view = std::wstring_view{suffix};
         auto pipe = LocalNamedPipe(false, false, view);
-        ASSERT_PRED1([](const HANDLE& read) { return read != INVALID_HANDLE_VALUE; }, pipe.readHandle());
+        ASSERT_PRED1([](const HANDLE& read) { return read != nullptr; }, pipe.readHandle());
         ASSERT_PRED1([](const std::wstring& name) { return name._Starts_with(L"\\\\.\\pipe\\"); }, pipe.pipeName());
+    }
+    TEST(LocalNamedPipeTests, FromAnyStringLikeArg2)
+    {
+        // Args [static_cast<size_t>(5), L'u'] in string constructor means the char 'u' repeated 5 times.
+        auto pipe = LocalNamedPipe(false, false, static_cast<size_t>(5), L'u');
+        ASSERT_PRED1([](const HANDLE& read) { return read != nullptr; }, pipe.readHandle());
+        ASSERT_EQ(L"\\\\.\\pipe\\uuuuu", pipe.pipeName());
     }
     TEST(LocalNamedPipeTests, NeverReturnClosedHandles)
     {
         auto pipe = LocalNamedPipe(false, false, L"test-pipe");
         auto fd = pipe.writeFileDescriptor();
         auto handle = pipe.writeHandle();
-        ASSERT_NE(handle, INVALID_HANDLE_VALUE);
+        ASSERT_NE(handle, nullptr);
         // After this, both fd and handle are closed.
         pipe.closeWriteHandles();
         DWORD dFlags;
@@ -51,11 +58,12 @@ namespace Win32Utils
         auto pipe = LocalNamedPipe(false, false, L"test-pipe");
         auto fd = pipe.writeFileDescriptor();
         auto handle = pipe.writeHandle();
-        ASSERT_NE(handle, INVALID_HANDLE_VALUE);
+        ASSERT_NE(handle, nullptr);
         pipe.closeWriteHandles();
         ASSERT_NE(handle, pipe.writeHandle());
         ASSERT_NE(fd, pipe.writeFileDescriptor());
     }
+
     TEST(MakeNamedPipeTests, TestFailedPipeCreation)
     {
         using namespace std::string_literals;
