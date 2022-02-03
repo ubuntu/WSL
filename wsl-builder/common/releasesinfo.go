@@ -85,14 +85,14 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 		if err != nil {
 			return nil, fmt.Errorf("wrong release date for %s: %v", codeName, err)
 		}
-		if withinAWeekOf(releaseDate) {
+		if withinThreeWeeksOf(releaseDate) {
 			shouldBuild = true
 		} else if release[11] != "" {
 			nextPointReleaseDate, err := time.Parse("2006-01-02", release[11])
 			if err != nil {
 				return nil, fmt.Errorf("wrong next point release date for %s: %v", codeName, err)
 			}
-			if withinAWeekOf(nextPointReleaseDate) {
+			if withinThreeWeeksOf(nextPointReleaseDate) {
 				shouldBuild = true
 				// We need to +1 the minor release as we are close to next point release
 				minor++
@@ -179,10 +179,10 @@ func readCSV(name string) (releases [][]string, err error) {
 	return r.ReadAll()
 }
 
-// withinAWeekOf returns if now is withing a week of date.
-func withinAWeekOf(date time.Time) bool {
+// withinThreeWeeksOf returns if now is withing 3 weeks before date.
+func withinThreeWeeksOf(date time.Time) bool {
 	now := time.Now()
-	if now.After(date.Add(-time.Duration(time.Hour*24*7))) && now.Before(date.Add(time.Duration(time.Hour*24))) {
+	if now.After(date.Add(-time.Duration(time.Hour*24*7*3))) && now.Before(date.Add(time.Duration(time.Hour*24))) {
 		return true
 	}
 	return false
