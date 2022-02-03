@@ -55,8 +55,13 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 		launcherName := fmt.Sprintf("ubuntu%s", strings.Replace(release[0], ".", "", 1))
 		codeName := release[2]
 
-		// There is always a development release, LTS or not
+		var isDevelopmentRelease bool
 		if release[4] == "Active Development" || release[4] == "Pre-release Freeze" {
+			isDevelopmentRelease = true
+		}
+
+		// There is always a development release, LTS or not
+		if isDevelopmentRelease {
 			wslID := "UbuntuPreview"
 			fullName := "Ubuntu (Preview)"
 			wslReleases = append(wslReleases, WslReleaseInfo{
@@ -85,9 +90,10 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 		if err != nil {
 			return nil, fmt.Errorf("wrong release date for %s: %v", codeName, err)
 		}
-		if withinThreeWeeksOf(releaseDate) {
+		if withinThreeWeeksOf(releaseDate) && isDevelopmentRelease {
 			shouldBuild = true
-		} else if release[11] != "" {
+		} else if release[11] != "" && !isDevelopmentRelease {
+			// next point release of already released version
 			nextPointReleaseDate, err := time.Parse("2006-01-02", release[11])
 			if err != nil {
 				return nil, fmt.Errorf("wrong next point release date for %s: %v", codeName, err)
