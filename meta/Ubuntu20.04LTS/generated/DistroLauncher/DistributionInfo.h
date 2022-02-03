@@ -16,7 +16,7 @@ namespace DistributionInfo
     const std::wstring Name = L"Ubuntu20.04LTS";
 
     // The title bar for the console window while the distribution is installing.
-    const std::wstring WindowTitle = L"Ubuntu 20.04.3 LTS";
+    const std::wstring WindowTitle = L"Ubuntu 20.04.4 LTS";
 
     // Create and configure a user account.
     bool CreateUser(std::wstring_view userName);
