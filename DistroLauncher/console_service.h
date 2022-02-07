@@ -28,6 +28,8 @@ namespace Win32Utils
      * ```cpp
      * assert(pipe.readHandle() != nullptr); // ofc only matters in debug.
      *```
+     * Notice that STDIN was never touched. It could be, but it is outside of the scope of what's planned for this
+     * application for now.
      *
      * == CLASS INVARIANTS ==
      * - An instance of this class only makes sense if a valid pipe object is passed thru constructor.
@@ -144,6 +146,4 @@ namespace Win32Utils
         }
     };
 
-    // Notice that STDIN was never touched. It could be, but it is outside of the scope of what's planned for this
-    // application for now.
 }

@@ -49,8 +49,9 @@ namespace Win32Utils
         // 3. As a File Stream.
         // 1 and 2 are part of the Pipe API, but 3 is a way to fake the stdout and stderr when calling the console
         // service redirectConsole method.
-        // By doing so, line 111 effectively redirects this file into itself. This intentionally tricks the console
-        // service into thinking the redirection worked. This breach was intentionally left to allow testing.
+        // By doing so, the console redirection performed in this test case effectively redirects this file into itself.
+        // See the marker comment: [redirecting_the_file_into_itself]. This intentionally tricks the console service into
+        // thinking the redirection worked. This breach was intentionally left to allow testing.
         struct FakePipe
         {
             HANDLE hFile = nullptr;
@@ -114,8 +115,8 @@ namespace Win32Utils
             ConsoleService<FakePipe> console(std::move(fakePipe.value()));
             DWORD handleNo = 1;
 
-            // When
-            console.redirectConsole(stream, 1, stream, 1); // redirecting the file into itself
+            // [redirecting_the_file_into_itself]
+            console.redirectConsole(stream, 1, stream, 1);
 
             // Then
             ASSERT_EQ(console.isRedirected(), true);
