@@ -3,6 +3,8 @@
 #include "local_named_pipe.h"
 #include "console_service.h"
 #include <fcntl.h>
+#include <filesystem>
+#include <chrono>
 
 namespace Win32Utils
 {
@@ -50,17 +52,18 @@ namespace Win32Utils
         // 1 and 2 are part of the Pipe API, but 3 is a way to fake the stdout and stderr when calling the console
         // service redirectConsole method.
         // By doing so, the console redirection performed in this test case effectively redirects this file into itself.
-        // See the marker comment: [redirecting_the_file_into_itself]. This intentionally tricks the console service into
-        // thinking the redirection worked. This breach was intentionally left to allow testing.
+        // See the marker comment: [redirecting_the_file_into_itself]. This intentionally tricks the console service
+        // into thinking the redirection worked. This breach was intentionally left to allow testing.
         struct FakePipe
         {
             HANDLE hFile = nullptr;
             int fd = -1;
             FILE* stream = nullptr;
+            std::wstring filename{L"test-file-"};
 
             FakePipe(FakePipe&& other) noexcept :
                 hFile{std::exchange(other.hFile, nullptr)}, fd{std::exchange(other.fd, -1)}, // avoid leaks.
-                stream{std::exchange(other.stream, nullptr)}
+                stream{std::exchange(other.stream, nullptr)}, filename{std::exchange(other.filename, std::wstring{})}
             { }
             HANDLE writeHandle()
             {
@@ -82,13 +85,17 @@ namespace Win32Utils
             }
             explicit FakePipe(bool inheritRead, bool inheritWrite, const wchar_t* name)
             {
-                HANDLE handle = CreateFile(L"test-file.txt",      // file name
+                auto now = std::chrono::system_clock::now().time_since_epoch();
+                filename.append(std::to_wstring(now.count()));
+
+                HANDLE handle = CreateFile(filename.c_str(),      // file name
                                            GENERIC_WRITE,         // open for writing
                                            0,                     // do not share
                                            NULL,                  // default security
                                            CREATE_ALWAYS,         // overwrite if exists
                                            FILE_ATTRIBUTE_NORMAL, // normal file
                                            NULL);                 // no attr. template
+
                 if (handle != INVALID_HANDLE_VALUE) {
                     hFile = handle;
                     fd = _open_osfhandle(reinterpret_cast<intptr_t>(hFile), _O_WRONLY | _O_TEXT);
@@ -103,6 +110,10 @@ namespace Win32Utils
                     fd = -1;
                     hFile = nullptr;
                     stream = nullptr;
+
+                    if (std::filesystem::exists(filename)) {
+                        std::filesystem::remove(filename);
+                    }
                 }
             }
         };
