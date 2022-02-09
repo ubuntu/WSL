@@ -116,7 +116,7 @@ namespace Win32Utils
         // To make piping stdout and stderr work, one will need to close the write end of this pipe after assing the
         // standard file descriptors.
         void closeWriteHandles();
-        
+
         // Allows disconnecting the named pipe programmatically.
         void disconnect();
         // Getter to the OS Handle of the write end of the pipe.
