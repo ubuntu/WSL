@@ -25,6 +25,8 @@ namespace Win32Utils
             }
             void closeWriteHandles()
             { }
+            void disconnect()
+            { }
             std::wstring pipeName()
             {
                 return L"FakePipe";
@@ -83,6 +85,8 @@ namespace Win32Utils
             {
                 return hFile;
             }
+            void disconnect()
+            { }
             explicit FakePipe(bool inheritRead, bool inheritWrite, const wchar_t* name)
             {
                 auto now = std::chrono::system_clock::now().time_since_epoch();

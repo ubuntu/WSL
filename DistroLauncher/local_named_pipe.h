@@ -117,6 +117,8 @@ namespace Win32Utils
         // standard file descriptors.
         void closeWriteHandles();
 
+        // Allows disconnecting the named pipe programmatically.
+        void disconnect();
         // Getter to the OS Handle of the write end of the pipe.
         HANDLE writeHandle();
         // Getter to the OS Handle of the write end of the pipe.

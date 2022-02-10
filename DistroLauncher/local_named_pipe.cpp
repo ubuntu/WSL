@@ -27,9 +27,9 @@ namespace Win32Utils
                 return; // leave the object unmodified.
             }
             hWrite = handle;
-            writeFd = _open_osfhandle(reinterpret_cast<intptr_t>(hWrite), _O_WRONLY | _O_TEXT);
             SetHandleInformation(hWrite, HANDLE_FLAG_INHERIT, static_cast<BOOL>(inheritWrite));
             ConnectNamedPipe(hRead, nullptr); // can only be called when there is a client to connect.
+            writeFd = _open_osfhandle(reinterpret_cast<intptr_t>(hWrite), _O_WRONLY | _O_TEXT);
         }
     }
     HANDLE LocalNamedPipe::writeHandle()
@@ -44,10 +44,16 @@ namespace Win32Utils
         return writeFd;
     }
 
+    void LocalNamedPipe::disconnect()
+    {
+        FlushFileBuffers(hRead);
+        DisconnectNamedPipe(hRead);
+    }
+
     LocalNamedPipe::~LocalNamedPipe()
     {
         if (hRead != nullptr) {
-            DisconnectNamedPipe(hRead);
+            disconnect();
             CloseHandle(hRead);
             hRead = nullptr;
         }

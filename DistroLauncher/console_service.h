@@ -16,6 +16,7 @@ namespace Win32Utils
             return lhs.stdErrHandle == rhs.stdErrHandle && lhs.stdOutHandle == rhs.stdOutHandle;
         }
     };
+
     /**
      * Offers the application the capability to redirect the console output and toggle visibitily of the console window.
      * The console redirection is dependent on a class conforming to the same API as the LocalNamedPipe (see
@@ -44,6 +45,7 @@ namespace Win32Utils
         Pipe redirectTo;
         ConsoleState previousConsoleState;
         bool bIsRedirected = false;
+        HWND window_;
 
         ConsoleState consoleState() const
         {
@@ -63,10 +65,12 @@ namespace Win32Utils
             // the consumer side, both stdout and stderr goes to the same file.
             if (state == consoleState())
                 return;
-            auto res2 = _dup2(state.stdErrFileDescriptor, _fileno(stderrStream));
+            fflush(stderrStream);
+            fflush(stdoutStream);
             SetStdHandle(nStderrHandle, state.stdErrHandle);
-            auto res = _dup2(state.stdOutFileDescriptor, _fileno(stdoutStream));
             SetStdHandle(nStdoutHandle, state.stdOutHandle);
+            auto res2 = _dup2(state.stdErrFileDescriptor, _fileno(stderrStream));
+            auto res = _dup2(state.stdOutFileDescriptor, _fileno(stdoutStream));
         }
 
       public:
@@ -74,12 +78,23 @@ namespace Win32Utils
         ConsoleService(Pipe&& pipe) noexcept : redirectTo{std::forward<Pipe>(pipe)}
         {
             assert(redirectTo.readHandle() != nullptr);
+            // Attempting to find the console window is best-effort if it is not the old style console.
+            // This has been tested for the new Windows Terminal. Other terminals out there may not fit.
+            window_ = FindWindow(L"CASCADIA_HOSTING_WINDOW_CLASS", DistributionInfo::WindowTitle.c_str());
+            if (window_ == NULL) {
+                window_ = GetConsoleWindow();
+            }
         }
         ~ConsoleService() = default;
 
         bool isRedirected() const
         {
             return bIsRedirected;
+        }
+
+        HWND window() const
+        {
+            return window_;
         }
 
         // Redirects the application console to the [redirectTo] pipe.
@@ -130,6 +145,7 @@ namespace Win32Utils
             _close(previousConsoleState.stdErrFileDescriptor);
             _close(previousConsoleState.stdOutFileDescriptor);
             std::ios::sync_with_stdio();
+            redirectTo.disconnect();
             bIsRedirected = false;
             // invalidating previous console state, so there is no where to restore to.
             previousConsoleState = ConsoleState{};
@@ -137,12 +153,13 @@ namespace Win32Utils
 
         bool hideConsoleWindow() const
         {
-            return ShowWindow(GetConsoleWindow(), SW_HIDE) == TRUE;
+            return ShowWindow(window_, SW_HIDE) != FALSE;
         }
 
         bool showConsoleWindow() const
         {
-            return ShowWindow(GetConsoleWindow(), SW_SHOW) == TRUE;
+            ShowWindow(window_, SW_RESTORE);
+            return BringWindowToTop(window_) == 0;
         }
     };
 
