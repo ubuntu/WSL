@@ -11,12 +11,12 @@ namespace Win32Utils
         HANDLE stdErrHandle = nullptr;
         // The identity of this state is embedded into the values of the handles.
         // File descriptor values will most likely be always new since they are created by calling _dup().
-        friend constexpr bool operator==(const ConsoleState& lhs, const ConsoleState& rhs);
+        friend bool operator==(const ConsoleState& lhs, const ConsoleState& rhs)
+        {
+            return lhs.stdErrHandle == rhs.stdErrHandle && lhs.stdOutHandle == rhs.stdOutHandle;
+        }
     };
-    constexpr bool operator==(const ConsoleState& lhs, const ConsoleState& rhs)
-    {
-        return lhs.stdErrHandle == rhs.stdErrHandle && lhs.stdOutHandle == rhs.stdOutHandle;
-    }
+
     /**
      * Offers the application the capability to redirect the console output and toggle visibitily of the console window.
      * The console redirection is dependent on a class conforming to the same API as the LocalNamedPipe (see
