@@ -21,6 +21,8 @@
 
 namespace Oobe
 {
+    const auto* fakeFileName = L"./do_not_exists";
+    HWND globalFakeWindow = reinterpret_cast<HWND>(const_cast<wchar_t*>(fakeFileName)); // I just need to compare to nullptr, I'll not do anything.
     // Fake strategies to exercise the Splash controller state machine.
     struct NothingWorksStrategy
     {
@@ -51,7 +53,7 @@ namespace Oobe
         static HWND do_find_window_by_thread_id(DWORD threadId)
         {
             // no risk because this handle will not be used for anything besides passing around.
-            return GetConsoleWindow();
+            return globalFakeWindow;
         }
         static bool do_show_window(HWND window)
         {
@@ -78,7 +80,7 @@ namespace Oobe
     TEST(SplashControllerTests, LaunchFailedShouldStayIdle)
     {
         using Controller = SplashController<NothingWorksStrategy>;
-        Controller controller{"./do_not_exists", GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
         controller.sm.addEvent(Controller::Events::Run{&controller}); // This fails but it is a valid transition.
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Idle>());
     }
@@ -106,7 +108,7 @@ namespace Oobe
             { }
         }; // struct SplashStrategy
         using Controller = SplashController<CantFindWindowStrategy>;
-        Controller controller{"cmd.exe", GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
         controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Idle>());
         controller.sm.addEvent(Controller::Events::Close{});
@@ -116,7 +118,7 @@ namespace Oobe
     TEST(SplashControllerTests, AHappySequenceOfEvents)
     {
         using Controller = SplashController<EverythingWorksStrategy>;
-        Controller controller{"./do_not_exists", GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since everything works in this realm, all transitions below should be valid...
         ASSERT_TRUE(transition.has_value());
@@ -141,7 +143,7 @@ namespace Oobe
     TEST(SplashControllerTests, OnlyIdleStateAcceptsRunEvent)
     {
         using Controller = SplashController<EverythingWorksStrategy>;
-        Controller controller{"./do_not_exists", GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since everything works in this realm, all transitions below should be valid...
         ASSERT_TRUE(transition.has_value());
@@ -179,7 +181,7 @@ namespace Oobe
     {
         // Remember that in this realm everything just works...
         using Controller = SplashController<EverythingWorksStrategy>;
-        Controller controller{"./do_not_exists", GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Visible>());
