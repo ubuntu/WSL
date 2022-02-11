@@ -77,69 +77,11 @@ namespace Oobe
             return FALSE;
         }
 
-        HWND find_main_thread_window(DWORD thread_id)
+        HWND find_main_thread_window(DWORD thread_id, const wchar_t* windowClass)
         {
-            window_data data{L"FLUTTER_RUNNER_WIN32_WINDOW", nullptr};
+            window_data data{windowClass, nullptr};
             EnumThreadWindows(thread_id, enum_windows_callback, reinterpret_cast<LPARAM>(&data));
             return data.window_handle;
         }
     }
-
-    // Most likely the exePath will be built on the fly from a string, so there is no sense in creating a temporary and
-    // copy it when we can move.
-    SplashController::SplashController(std::filesystem::path exePath, not_null<HANDLE> stdIn) :
-        exePath{std::move(exePath)}
-    {
-        ZeroMemory(&_piProcInfo, sizeof(PROCESS_INFORMATION));
-        ZeroMemory(&startInfo, sizeof(STARTUPINFO));
-        startInfo.cb = sizeof(STARTUPINFO);
-        startInfo.hStdInput = stdIn;
-        startInfo.dwFlags |= STARTF_USESTDHANDLES;
-        SetHandleInformation(stdIn, HANDLE_FLAG_INHERIT, 1);
-    }
-
-    SplashController::State SplashController::States::Idle::on_event(Events::Run event)
-    {
-        TCHAR szCmdline[MAX_PATH];
-        wcsncpy_s(
-          szCmdline, event.controller_->exePath.wstring().c_str(), event.controller_->exePath.wstring().length());
-        BOOL res = CreateProcess(nullptr,                          // command line
-                                 szCmdline,                        // non-const CLI
-                                 nullptr,                          // process security attributes
-                                 nullptr,                          // primary thread security attributes
-                                 TRUE,                             // handles are inherited
-                                 0,                                // creation flags
-                                 nullptr,                          // use parent's environment
-                                 nullptr,                          // use parent's current directory
-                                 &event.controller_->startInfo,    // STARTUPINFO pointer
-                                 &event.controller_->_piProcInfo); // output: PROCESS_INFORMATION
-        if (res == 0 || event.controller_->_piProcInfo.hProcess == nullptr) {
-            return *this; // return the the same (Idle) state.
-        }
-        // Without implementing more sofisticated IPC, it can be tricky to monitor the Flutter process to determine the
-        // moment in which the window is ready. Yet, Flutter apps are fast to start up on Windows, so sleeping for some
-        // fraction of a second should be enough. The exact amount of time to sleep might be subject to changes after
-        // further testing on situations of heavier workloads or slower machines or VM's. Yet, it's expected to stay
-        // under less than a second.
-        constexpr DWORD flutterWindowToOpenTimeout = 500; // ms.
-        Sleep(flutterWindowToOpenTimeout);
-        HWND window = internal::find_main_thread_window(event.controller_->_piProcInfo.dwThreadId);
-        if (window == nullptr) {
-            return *this;
-        }
-
-        return Visible{window};
-    }
-
-    // The Close event should be used to gracefully destroys the flutter app.
-    // This will just kill the process unconditionally.
-    SplashController::~SplashController()
-    {
-        if (_piProcInfo.hProcess != nullptr) {
-            TerminateProcess(_piProcInfo.hProcess, 0);
-            CloseHandle(_piProcInfo.hThread);
-            CloseHandle(_piProcInfo.hProcess);
-        }
-    }
-
 }

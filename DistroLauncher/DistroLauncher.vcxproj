@@ -165,7 +165,7 @@
     <ClCompile Include="local_named_pipe.cpp" />
     <ClCompile Include="OOBE.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
-    <ClCompile Include="splash_controller.cpp" />
+    <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
