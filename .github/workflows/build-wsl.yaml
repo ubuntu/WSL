@@ -289,14 +289,11 @@ jobs:
           git commit -m "Auto-update build info"
           git push origin master
 
-      - name: Checkout WSL repo
+      - name: Checkout repositories required by ISO Tracker notification
         if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
         run: |
           mkdir -p ${{ env.codeDir }}
           git clone https://github.com/ubuntu/wsl.git ${{ env.codeDir }} --depth 1
-      - name: Checkout ubuntu-archive-tools
-        if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
-        run: |
           mkdir -p ${{ env.codeDir }}/uat
           git clone https://git.launchpad.net/ubuntu-archive-tools ${{ env.codeDir }}/uat --depth 1
 
@@ -312,5 +309,5 @@ jobs:
             WSLId=$(basename $build);
             WSLId=${WSLId%-buildid.md};
             buildid=$(cat $build)
-            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/notify-isotracker $WslID $buildid
+            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-buidler/notify-isotracker $WslID $buildid
           done
