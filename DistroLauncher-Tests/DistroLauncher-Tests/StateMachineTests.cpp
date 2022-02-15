@@ -22,7 +22,7 @@
 namespace Oobe
 {
     /// This WindowController admits three states:
-    /// Idle - not running,
+    /// Closed - not running,
     /// Visible - running and displaying the window and
     /// Hidden - running but not displaying the window.
     ///
@@ -32,14 +32,14 @@ namespace Oobe
     /// By inspecting the `on_event()` methods of each state class we can draft a state transition table (PlantUML
     /// syntax):
     ///
-    /// [*] --> Idle
-    /// Idle --> Visible : Events::Run
+    /// [*] --> Closed
+    /// Closed --> Visible : Events::Run
     /// Visible --> Hidden : Events::ToggleVisibility
     /// Hidden --> Visible : Events::ToggleVisibility
     ///
     /// There are no guards to the transitions themselves, but there are some invalid possibilities (left unhandled by the
     /// state classes):
-    /// * Idle cannot receive Events::ToggleVisibility
+    /// * Closed cannot receive Events::ToggleVisibility
     /// * Neither Hidden or Visible can receive Events::Run
     ///
     /// While exercising the API, the subsequent test cases also exercise:
@@ -60,12 +60,12 @@ namespace Oobe
         {
             struct Visible;
 
-            struct Idle
+            struct Closed
             {
               private:
                 Visible run()
                 {
-                    std::wcerr << L"[IdleState] Running... visible: yes\n";
+                    std::wcerr << L"[ClosedState] Running... visible: yes\n";
                     return Visible{42};
                 }
 
@@ -101,7 +101,7 @@ namespace Oobe
                 }
             };
         };
-        using State = std::variant<States::Idle, States::Visible, States::Hidden>;
+        using State = std::variant<States::Closed, States::Visible, States::Hidden>;
         using Event = std::variant<Events::Run, Events::ToggleVisibility>;
 
         internal::state_machine<WindowController> sm;
@@ -111,7 +111,7 @@ namespace Oobe
     {
         WindowController controller{};
         // Here we pass the events directly yo the addEvent method.
-        ASSERT_TRUE(controller.sm.isCurrentStateA<WindowController::States::Idle>());
+        ASSERT_TRUE(controller.sm.isCurrentStateA<WindowController::States::Closed>());
         WindowController::Event event = WindowController::Events::Run{};
         controller.sm.addEvent(event);
         ASSERT_TRUE(controller.sm.isCurrentStateA<WindowController::States::Visible>());
@@ -127,7 +127,7 @@ namespace Oobe
         // In this example we reuse a Event variant variable and keep reassigning it.
         WindowController::Event event = WindowController::Events::ToggleVisibility{};
 
-        ASSERT_TRUE(controller.sm.isCurrentStateA<WindowController::States::Idle>());
+        ASSERT_TRUE(controller.sm.isCurrentStateA<WindowController::States::Closed>());
         ASSERT_FALSE(controller.sm.addEvent(event));
 
         event = WindowController::Events::Run{};

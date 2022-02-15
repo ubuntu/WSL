@@ -83,7 +83,7 @@ namespace Oobe
         using Controller = SplashController<NothingWorksStrategy>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
         controller.sm.addEvent(Controller::Events::Run{&controller}); // This fails but it is a valid transition.
-        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Idle>());
+        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
     }
 
     TEST(SplashControllerTests, FailedToFindWindowShouldStayIdle)
@@ -111,9 +111,9 @@ namespace Oobe
         using Controller = SplashController<CantFindWindowStrategy>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
         controller.sm.addEvent(Controller::Events::Run{&controller});
-        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Idle>());
+        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
         controller.sm.addEvent(Controller::Events::Close{});
-        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Idle>());
+        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
     }
 
     TEST(SplashControllerTests, AHappySequenceOfEvents)

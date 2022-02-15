@@ -24,14 +24,15 @@ namespace Oobe
 
     namespace internal
     {
-        HWND find_main_thread_window(DWORD thread_id, const wchar_t* windowClass);
+        /// Returns the top level window of class [windowClass] of the thread [threadId]
+        HWND find_main_thread_window(DWORD threadId, const wchar_t* windowClass);
     }
 
     // Groups a set of functions of stateless functions that interact with the OS to create a process and manipulate
     // windows according to the needs of the SplashController.
     // Although those functions could be inside the body of the SplashController state transition methods, abstracting
     // out the strategy benefits separation of the OS interaction with the logic of the states, thus benefits
-    // testability. Without that separation, the splash controller would never leave the Idle state during tests.
+    // testability. Without that separation, the splash controller would never leave the Closed state during tests.
     // Since most of the functions herein implemented are quite small, the class definition is placed in the header
     // aiming to allow compiler see completely through it and ensure optimizing out function calls.
     struct SplashStrategy
@@ -131,9 +132,9 @@ namespace Oobe
         {
             // Run event transports a non-owning mutating (i.e. borrowing) pointer to the outer controller. Using the
             // pointer instead of a reference allows copy assignment, which in turn simplifies passing the event object
-            // around by value. With this pointer the Run event will allow the Idle state to access the internals of the
-            // controller to find the pieces required to launch the splash application, thus avoiding transferring much
-            // heavier pieces of data. Coupling in this case should not be a concern. They are tightly coupled by
+            // around by value. With this pointer the Run event will allow the Closed state to access the internals of
+            // the controller to find the pieces required to launch the splash application, thus avoiding transferring
+            // much heavier pieces of data. Coupling in this case should not be a concern. They are tightly coupled by
             // definition, since all states and events are members of the outer class, thus all can access even the
             // controller's private members.
             struct Run
@@ -156,26 +157,26 @@ namespace Oobe
         // controller states;
         struct States
         {
-            // Forward-declaring the states enables declaring the variant upfront because Idle::run() needs the variant
-            // already declared.
+            // Forward-declaring the states enables declaring the variant upfront because Closed::run() needs the
+            // variant already declared.
+            struct Closed;
             struct Visible;
             struct Hidden;
-            struct Idle;
             struct ShouldBeClosed;
-            using StateVariant = std::variant<Idle, Visible, Hidden, ShouldBeClosed>;
+            using StateVariant = std::variant<Closed, Visible, Hidden, ShouldBeClosed>;
 
-            struct Idle
+            struct Closed
             {
                 /// Returns a Visible state if it succeeds in:
                 /// - launching the splash application and
                 /// - finding it's window handle.
-                /// Returns itself (i.e. an instance of the Idle state) otherwise.
+                /// Returns itself (i.e. an instance of the Closed state) otherwise.
                 StateVariant on_event(typename Events::Run event)
                 {
                     auto controller = event.controller;
                     if (!Strategy::do_create_process(
                           controller->exePath, controller->startInfo, controller->procInfo)) {
-                        return *this; // return the same (Idle) state.
+                        return *this; // return the same (Closed) state.
                     }
 
                     HWND window = Strategy::do_find_window_by_thread_id(controller->procInfo.dwThreadId);

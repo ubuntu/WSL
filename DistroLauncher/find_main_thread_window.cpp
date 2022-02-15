@@ -32,8 +32,8 @@ namespace Oobe
         //    matches the window we are looking for.
         //    We use this lParam "channel" as a two way: we pass to the callback the window class name as
         //    input and receive the Window Handle as an output. That's why the struct window_data was created, to group
-        //    both pieces of information together and allow accessing both thru a single pointer. The return channel of
-        //    that callback is already occupied with the information the OS expects to know whether it must stop the
+        //    both pieces of information together and allow accessing both through a single pointer. The return channel
+        //    of that callback is already occupied with the information the OS expects to know whether it must stop the
         //    iteration or not. Returning FALSE means we found it.
         // 3. is_main_window - is just an extra sanity check to make sure the window we are looking into is a top one (
         //    not a child MDI or window control).
@@ -52,7 +52,7 @@ namespace Oobe
             HWND window_handle = nullptr;
         };
 
-        // Sanity check because everything is a Window on Windows. By everything, I mean controls, buttons etc etc.
+        // Sanity check because everything is a Window on Windows. By everything, I mean controls, buttons etc.
         BOOL is_main_window(HWND handle)
         {
             return static_cast<BOOL>(GetWindow(handle, GW_OWNER) == nullptr && (IsWindowVisible(handle) != 0));
@@ -68,7 +68,7 @@ namespace Oobe
             std::wstring_view klass{windowClass};
             // Sanity check to make sure we found the correct window. It seems very unlikely not to be the correct one,
             // but this small check decreases quite dramatically chance of mistakes.
-            // If not the window i'm looking for, keep iterating...
+            // If not the window I'm looking for, keep iterating...
             if ((is_main_window(handle) == 0) || klass.compare(data->szClassName) != 0) {
                 return TRUE;
             }
@@ -77,10 +77,10 @@ namespace Oobe
             return FALSE;
         }
 
-        HWND find_main_thread_window(DWORD thread_id, const wchar_t* windowClass)
+        HWND find_main_thread_window(DWORD threadId, const wchar_t* windowClass)
         {
             window_data data{windowClass, nullptr};
-            EnumThreadWindows(thread_id, enum_windows_callback, reinterpret_cast<LPARAM>(&data));
+            EnumThreadWindows(threadId, enum_windows_callback, reinterpret_cast<LPARAM>(&data));
             return data.window_handle;
         }
     }
