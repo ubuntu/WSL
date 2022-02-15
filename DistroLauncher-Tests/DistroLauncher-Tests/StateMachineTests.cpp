@@ -37,7 +37,7 @@ namespace Oobe
     /// Visible --> Hidden : Events::ToggleVisibility
     /// Hidden --> Visible : Events::ToggleVisibility
     ///
-    /// There are no guards to the transitions themselves, but there are some invalid possibilies (left unhandled by the
+    /// There are no guards to the transitions themselves, but there are some invalid possibilities (left unhandled by the
     /// state classes):
     /// * Idle cannot receive Events::ToggleVisibility
     /// * Neither Hidden or Visible can receive Events::Run

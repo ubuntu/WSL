@@ -22,7 +22,8 @@
 namespace Oobe
 {
     const auto* fakeFileName = L"./do_not_exists";
-    HWND globalFakeWindow = reinterpret_cast<HWND>(const_cast<wchar_t*>(fakeFileName)); // I just need to compare to nullptr, I'll not do anything.
+    // I just need to compare to nullptr, I'll not do anything else with that pointer.
+    HWND globalFakeWindow = reinterpret_cast<HWND>(const_cast<wchar_t*>(fakeFileName));
     // Fake strategies to exercise the Splash controller state machine.
     struct NothingWorksStrategy
     {
@@ -151,7 +152,7 @@ namespace Oobe
 
         // now comes the interesting part: all other states should refuse the Run event
 
-        // Exercising the Visble State.
+        // Exercising the Visible State.
         transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_FALSE(transition.has_value());
         // state should remain the previous one.
@@ -170,7 +171,7 @@ namespace Oobe
         transition = controller.sm.addEvent(Controller::Events::Close{});
         ASSERT_TRUE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::ShouldBeClosed>());
-        // Exercising the ShouldBeClosed State. Not even this once accepts re-running the splash. Should we?
+        // Exercising the ShouldBeClosed State. Not even this once accepts re-running the splash.
         transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_FALSE(transition.has_value());
         // state should remain the previous one.

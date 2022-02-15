@@ -33,7 +33,7 @@ namespace Oobe
     // out the strategy benefits separation of the OS interaction with the logic of the states, thus benefits
     // testability. Without that separation, the splash controller would never leave the Idle state during tests.
     // Since most of the functions herein implemented are quite small, the class definition is placed in the header
-    // aiming to allow compiler see completely thru it and ensure optimising out funciton calls.
+    // aiming to allow compiler see completely through it and ensure optimizing out function calls.
     struct SplashStrategy
     {
         static bool do_create_process(const std::filesystem::path& exePath,
@@ -57,7 +57,7 @@ namespace Oobe
 
         static HWND do_find_window_by_thread_id(DWORD threadId)
         {
-            // Without implementing more sofisticated IPC, it can be tricky to monitor the Flutter process to
+            // Without implementing more sophisticated IPC, it can be tricky to monitor the Flutter process to
             // determine the moment in which the window is ready. Yet, Flutter apps are fast to start up on
             // Windows, so sleeping for some fraction of a second should be enough. The exact amount of time to
             // sleep might be subject to changes after further testing on situations of heavier workloads or
@@ -88,7 +88,7 @@ namespace Oobe
         // the window unconditionally). Interestingly, a GUI application that implements that semantics (think
         // of document editor showing a dialog asking if the user wants to save their changes) will hang forever
         // if the window receives WM_CLOSE while hidden, because the OS will not bring it back to the light,
-        // thus there is no way the user can hit any of the dialog buttons to let the window rest in piece.
+        // thus there is no way the user can hit any of the dialog buttons to let the window rest in peace.
         static void do_forcebly_close(HWND window)
         {
             PostMessage(window, WM_QUIT, 0, 0);
@@ -114,8 +114,7 @@ namespace Oobe
 
       public:
         /// Initializes the control structures to later run the splash application. Accepts the splash executable
-        /// filesystem
-        /// path and the HANDLE to the device that will act as the splash standard input.
+        /// file system path and the HANDLE to the device that will act as the splash standard input.
         SplashController(std::filesystem::path exePath, not_null<HANDLE> stdIn) : exePath{std::move(exePath)}
         {
             // Most likely the exePath will be built on the fly from a string, so there is no sense in creating a
@@ -133,7 +132,7 @@ namespace Oobe
             // Run event transports a non-owning mutating (i.e. borrowing) pointer to the outer controller. Using the
             // pointer instead of a reference allows copy assignment, which in turn simplifies passing the event object
             // around by value. With this pointer the Run event will allow the Idle state to access the internals of the
-            // controller to find the pieces required to launch the splash applicaiton, thus avoiding transferring much
+            // controller to find the pieces required to launch the splash application, thus avoiding transferring much
             // heavier pieces of data. Coupling in this case should not be a concern. They are tightly coupled by
             // definition, since all states and events are members of the outer class, thus all can access even the
             // controller's private members.
@@ -176,7 +175,7 @@ namespace Oobe
                     auto controller = event.controller;
                     if (!Strategy::do_create_process(
                           controller->exePath, controller->startInfo, controller->procInfo)) {
-                        return *this; // return the the same (Idle) state.
+                        return *this; // return the same (Idle) state.
                     }
 
                     HWND window = Strategy::do_find_window_by_thread_id(controller->procInfo.dwThreadId);
@@ -235,7 +234,7 @@ namespace Oobe
 
         // The state machine expects the symbol `State` to be visible.
         // The repetition of `typename` is an unfortunate side effect of having this controller as a template. All event
-        // and state types are now dependant and cannot be explicitly referred to without the templated type argument.
+        // and state types are now dependent and cannot be explicitly referred to without the templated type argument.
         using State = typename States::StateVariant;
         using Event = typename Events::EventVariant;
         internal::state_machine<SplashController<Strategy>> sm;

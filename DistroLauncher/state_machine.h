@@ -69,7 +69,7 @@ namespace Oobe::internal
 
     /**
      * This state machine implementation builds on the value semantics of std::variant sum type instead of inheritance
-     * hierachies as commonly practiced in object oriented languages.
+     * hierarchies as commonly practiced in object oriented languages.
      * The template mechanisms above just make a bit easier implementing pattern matching visitation of a variant based
      * on the underlying types and compile-time checking of types in the context of std::variant instantiation.
      *
@@ -87,7 +87,7 @@ namespace Oobe::internal
      * 2. Define state classes grouped in a States class (or struct) for easy discoverability (making dev life a bit
      *    easier).
      * 3. Define State as a type alias for std::variant of the state classes. The first type declared in the variant
-     *    argument will be the initial state when the machine is default constructed (if that type is deafult
+     *    argument will be the initial state when the machine is default constructed (if that type is default
      *   constructible).
      * 4. Apply the exact same steps 2 and 3 for the events, i.e. create the struct Events{}, define the possible events
      *    inside it and define the alias `using Event = std::variant<list of all the event classes>...`.
@@ -95,7 +95,7 @@ namespace Oobe::internal
      *    template type argument.
      *
      * Following those principles turn possible building the API shown in StateMachineTests.cpp. Refer to that file for
-     * examples of usage of this state_machine. It's easier than trying to understand everthying from this header file
+     * examples of usage of this state_machine. It's easier than trying to understand everything from this header file
      * only.
      */
 
@@ -110,15 +110,15 @@ namespace Oobe::internal
       public:
         /// The Event variant - i.e. an alias to std::variant<list of events...>
         using Event = Event_;
-        /// The enclosing class of all the event classes - makes easier to discover than from autocompletion.
+        /// The enclosing class of all the event classes - makes easier to discover than from auto-completion.
         using Events = Events_;
         /// The State variant - i.e. an alias to std::variant<list of states...>
         /// The current state of this state_machine is of type `State`.
         using State = State_;
-        /// The enclosing class of all the state classes - makes easier to discover than from autocompletion.
+        /// The enclosing class of all the state classes - makes easier to discover than from auto-completion.
         using States = States_;
 
-        /// If an invalid state transition attemp occurs, this caches the current state and the surprising event
+        /// If an invalid state transition attempt occurs, this caches the current state and the surprising event
         /// received.
         struct InvalidTransition
         {
@@ -157,7 +157,7 @@ namespace Oobe::internal
         /// processing. The state classes implement the logic to know whether a transition should occur (i.e. return a
         /// new state), or not (return unexpected(InvalidTransition)).
         ///
-        /// This template is almost identical to the full specialisation `ExpectedState addEvent(Event event)` with the
+        /// This template is almost identical to the full specialization `ExpectedState addEvent(Event event)` with the
         /// benefit of not requiring building a Event variant object, which wold represent a minor overhead.
         /// Usage: `machine.addEvent(Events::EstablishConnection{"10.0.2.2", 8080})`.
         template <typename Ev> auto addEvent(Ev&& event) -> std::enable_if_t<is_variant_of_v<Ev, Event>, ExpectedState>
@@ -179,7 +179,7 @@ namespace Oobe::internal
 
         ///  This overload of the addEvent() member function handles the case when the argument is not an alternative
         ///  type of the Event variant, but the variant itself. It's useful when the variant has to be created anyway,
-        ///  such as when events are created programatically in a way that is not possible to predict exactly which
+        ///  such as when events are created programmatically in a way that is not possible to predict exactly which
         ///  alternative type is to be created at the call site. Although quite similar, the visitation pattern applied
         ///  here visits simultaneously both state and event variants.
         ExpectedState addEvent(Event event)
