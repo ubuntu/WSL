@@ -104,6 +104,31 @@ namespace Oobe
     /// Implements the states, events and control of the splash application. Most of the actual work that requires
     /// interacting with the operating system has been moved out to a strategy class, which by default is SplashStrategy
     /// defined above.
+    ///
+    /// SplashController admits the following states:
+    ///
+    /// Closed - not running, initial state upon startup.
+    /// Visible - running and displaying the window.
+    /// Hidden - running but not displaying the window.
+    /// ShouldBeClosed - posted a command to close the splash window. In this state the controller becomes useless.
+    ///
+    /// For sake of simplicity it's assumed that once the splash window receives the closing command it will perform
+    /// certain actions that may take a few seconds and will gently exit, thus no IPC or any other check is implemented
+    /// to make sure the window has closed and the application exited.
+    ///
+    /// The expected state transitions are as follows (using PlantUML notation syntax):
+    ///
+    /// [*] --> Closed
+    /// Closed --> Visible          : Events::Run
+    ///
+    /// Visible --> Hidden          : Events::ToggleVisibility
+    /// Visible --> ShouldBeClosed  : Events::Close
+    ///
+    /// Hidden --> Visible          : Events::ToggleVisibility
+    /// Hidden --> ShouldBeClosed   : Events::Close
+    ///
+    /// Since ShouldBeClosed state cannot handle any event, it's expected that the Close event will happen only once.
+    /// Also, since the Run event can only be handled by the initial state, that event is expected to succeed only once.
     template <typename Strategy = SplashStrategy> class SplashController
     {
       private:
