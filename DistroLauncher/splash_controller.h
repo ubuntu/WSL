@@ -61,7 +61,7 @@ namespace Oobe
             return res != 0 && process.hProcess != nullptr; // success
         }
 
-        static HWND SplashStrategy::do_read_window_from_ipc()
+        static HWND do_read_window_from_ipc()
         {
             // The following trick is borrowed from Go. unique_ptr must invoke its `deleter` function when it goes out
             // of scope. Instantiating a unique_ptr as automatic variable means it lives in the stack frame of the
@@ -74,7 +74,7 @@ namespace Oobe
             constexpr int connectionTimeout = 5000; // ms.
             const wchar_t* pipeName{L"\\\\.\\pipe\\Flutter_HWND_Pipe"};
             // CreateThePipe
-            SECURITY_ATTRIBUTES pipeSecurity{sizeof(pipeSecurity), nullptr, true};
+            SECURITY_ATTRIBUTES pipeSecurity{sizeof(pipeSecurity), nullptr, TRUE};
             HANDLE pipe = CreateNamedPipe(pipeName,
                                           PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
                                           PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
@@ -83,6 +83,7 @@ namespace Oobe
                                           0,
                                           0,
                                           &pipeSecurity);
+            // NOLINTNEXTLINE(performance-no-int-to-ptr) - that's the Win32 way.
             if (pipe == INVALID_HANDLE_VALUE) {
                 std::wcerr << L"Failed to create pipe <" << pipeName << L">.\n";
                 return nullptr;
@@ -94,8 +95,9 @@ namespace Oobe
             // Setup the wait for connection until timeout.
             OVERLAPPED sync;
             ZeroMemory(&sync, sizeof(sync));
-            sync.hEvent = CreateEvent(NULL, TRUE, FALSE, nullptr);
-            if (sync.hEvent == INVALID_HANDLE_VALUE || sync.hEvent == 0) {
+            sync.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+            // NOLINTNEXTLINE(performance-no-int-to-ptr)
+            if (sync.hEvent == INVALID_HANDLE_VALUE || sync.hEvent == nullptr) {
                 std::wcerr << L"Failed to create internal event to notify splash connection\n";
                 return nullptr;
             }
@@ -118,6 +120,8 @@ namespace Oobe
             void* lpBuffer{&window};
             DWORD bytesRead = -1;
             BOOL readSuccess = FALSE;
+
+            // NOLINTNEXTLINE(bugprone-sizeof-expression) - I'm sure I want the pointer size, but in a portable way.
             constexpr DWORD bytesExpected = sizeof(window);
             do {
                 readSuccess = ReadFile(pipe, lpBuffer, bytesExpected, &bytesRead, nullptr);
@@ -288,8 +292,8 @@ namespace Oobe
                         window != nullptr) {
                         return Visible{window};
                     }
-                    std::wcerr << L"Could not find the splash window for Process ID " << event.controller->procInfo.dwProcessId
-                               << '\n';
+                    std::wcerr << L"Could not find the splash window for Process ID "
+                               << event.controller->procInfo.dwProcessId << L'\n';
                     return *this;
                 }
             };
