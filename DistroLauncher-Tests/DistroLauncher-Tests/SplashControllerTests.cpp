@@ -34,6 +34,11 @@ namespace Oobe
             return false;
         }
 
+        static HWND do_read_window_from_ipc()
+        {
+            return nullptr;
+        }
+
         static HWND do_find_window_by_thread_id(DWORD threadId)
         {
             return nullptr;
@@ -49,6 +54,12 @@ namespace Oobe
                                       PROCESS_INFORMATION& process)
         {
             return true;
+        }
+
+        static HWND do_read_window_from_ipc()
+        {
+            // no risk because this handle will not be used for anything besides passing around.
+            return globalFakeWindow;
         }
 
         static HWND do_find_window_by_thread_id(DWORD threadId)
@@ -97,6 +108,11 @@ namespace Oobe
                 return true;
             }
 
+            static HWND do_read_window_from_ipc()
+            {
+                return nullptr;
+            }
+
             static HWND do_find_window_by_thread_id(DWORD threadId)
             {
                 return nullptr;
@@ -107,13 +123,63 @@ namespace Oobe
 
             static void do_gracefully_close(HWND window)
             { }
-        }; // struct SplashStrategy
+        }; // struct CantFindWindowStrategy
+
         using Controller = SplashController<CantFindWindowStrategy>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
         controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
         controller.sm.addEvent(Controller::Events::Close{});
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
+    }
+
+    TEST(SplashControllerTests, IPCMustBePreferred)
+    {
+        struct AlmostEverythingWorksStrategy
+        {
+            static bool do_create_process(const std::filesystem::path& exePath,
+                                          STARTUPINFO& startup,
+                                          PROCESS_INFORMATION& process)
+            {
+                return true;
+            }
+
+            static HWND do_read_window_from_ipc()
+            {
+                // no risk because this handle will not be used for anything besides passing around.
+                return globalFakeWindow;
+            }
+
+            static HWND do_find_window_by_thread_id(DWORD threadId)
+            {
+                EXPECT_TRUE(false) << "This should not be called in this test\n";
+                return nullptr;
+            }
+            static bool do_show_window(HWND window)
+            {
+                return true;
+            }
+            static bool do_hide_window(HWND window)
+            {
+                return true;
+            }
+            static bool do_place_behind(HWND toBeFront, HWND toBeBehind)
+            {
+                return true;
+            }
+            static void do_forcebly_close(HWND window)
+            { }
+
+            static void do_gracefully_close(HWND window)
+            { }
+        }; // struct AlmostEverythingWorksStrategy
+
+        using Controller = SplashController<AlmostEverythingWorksStrategy>;
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
+        auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
+        // Since almost everything works in this realm, all transitions below should be valid...
+        ASSERT_TRUE(transition.has_value());
+        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Visible>());
     }
 
     TEST(SplashControllerTests, AHappySequenceOfEvents)

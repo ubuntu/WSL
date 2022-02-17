@@ -56,6 +56,70 @@ namespace Oobe
             return res != 0 && process.hProcess != nullptr; // success
         }
 
+        static HWND SplashStrategy::do_read_window_from_ipc()
+        {
+            // The following trick is borrowed from Go. unique_ptr must invoke its `deleter` function when it goes out
+            // of scope. Instantiating a unique_ptr as automatic variable means it lives in the stack frame of the
+            // current function. So, the line `defer pipeCleaner(pipe, &CloseHandle);` means that, for whatever means
+            // this function ends, being whatever return path or exception thrown, the function `CloseHandle` will be
+            // invoked effectively closing the `HANDLE pipe` variable. That is only possible because Win32 HANDLE is a
+            // pointer type (typically void*). This using statement is just a syntactic sugar.
+            using defer = std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::CloseHandle)>;
+
+            constexpr int connectionTimeout = 5000; // ms.
+            const wchar_t* pipeName{L"\\\\.\\pipe\\Flutter_HWND_Pipe"};
+            // CreateThePipe
+            SECURITY_ATTRIBUTES pipeSecurity{sizeof(pipeSecurity), nullptr, true};
+            HANDLE pipe = CreateNamedPipe(pipeName,
+                                          PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+                                          PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+                                          PIPE_UNLIMITED_INSTANCES,
+                                          0,
+                                          0,
+                                          0,
+                                          &pipeSecurity);
+            if (pipe == INVALID_HANDLE_VALUE) {
+                return nullptr;
+            }
+            // One can read this as `defer(CloseHandle(pipe));`
+            defer pipeCleaner(pipe, &CloseHandle);
+            SetHandleInformation(pipe, HANDLE_FLAG_INHERIT, 1);
+
+            // Setup the wait for connection until timeout.
+            OVERLAPPED sync;
+            ZeroMemory(&sync, sizeof(sync));
+            sync.hEvent = CreateEvent(NULL, TRUE, FALSE, nullptr);
+            if (sync.hEvent == INVALID_HANDLE_VALUE || sync.hEvent == 0) {
+                return nullptr;
+            }
+            // `defer(CloseHandle(sync.hEvent));`
+            defer eventCleaner(sync.hEvent, &CloseHandle);
+            if (ConnectNamedPipe(pipe, &sync) == FALSE && GetLastError() != ERROR_PIPE_CONNECTED &&
+                GetLastError() != ERROR_IO_PENDING) {
+                return nullptr;
+            }
+            // Block this thread until [connectionTimeout] or the OS notifies the named pipe had a client connected
+            // through the event [sync.hEvent].
+            if (WaitForSingleObject(sync.hEvent, connectionTimeout) != 0) {
+                return nullptr;
+            }
+
+            // Client connected. Time to read.
+            HWND window = nullptr;
+            void* lpBuffer{&window};
+            DWORD bytesRead = -1;
+            BOOL readSuccess = FALSE;
+            constexpr DWORD bytesExpected = sizeof(window);
+            do {
+                readSuccess = ReadFile(pipe, lpBuffer, bytesExpected, &bytesRead, nullptr);
+            } while (readSuccess != FALSE && bytesExpected > bytesRead);
+
+            if (bytesExpected != bytesRead) {
+                return nullptr;
+            }
+            return window;
+        }
+
         static HWND do_find_window_by_thread_id(DWORD threadId)
         {
             // Without implementing more sophisticated IPC, it can be tricky to monitor the Flutter process to
@@ -203,13 +267,18 @@ namespace Oobe
                           controller->exePath, controller->startInfo, controller->procInfo)) {
                         return *this; // return the same (Closed) state.
                     }
-
-                    HWND window = Strategy::do_find_window_by_thread_id(controller->procInfo.dwThreadId);
-                    if (window == nullptr) {
-                        return *this;
+                    if (HWND window = Strategy::do_read_window_from_ipc(); window != nullptr) {
+                        return Visible{window};
                     }
 
-                    return Visible{window};
+                    // Fall back in case IPC fails. The Flutter app will be allowed to keep running if its wait for the
+                    // pipe times out, assuming some fall back method will be in place.
+                    if (HWND window = Strategy::do_find_window_by_thread_id(controller->procInfo.dwThreadId);
+                        window != nullptr) {
+                        return Visible{window};
+                    }
+
+                    return *this;
                 }
             };
 
