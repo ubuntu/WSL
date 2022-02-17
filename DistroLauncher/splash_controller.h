@@ -175,7 +175,9 @@ namespace Oobe
 
         static void do_gracefully_close(HWND window)
         {
-            PostMessage(window, WM_CLOSE, 0, 0);
+            // This enables Flutter code to react differently from the user clicking the close button.
+            constexpr auto WM_CUSTOM_AUTO_CLOSE = WM_USER + 7;
+            PostMessage(window, WM_CUSTOM_AUTO_CLOSE, 0, 0);
         }
     }; // struct SplashStrategy
 
