@@ -18,6 +18,7 @@
 #pragma once
 #include "state_machine.h"
 #include <filesystem>
+#include <iostream>
 
 namespace Oobe
 {
@@ -41,6 +42,10 @@ namespace Oobe
                                       STARTUPINFO& startup,
                                       PROCESS_INFORMATION& process)
         {
+            if (!std::filesystem::exists(exePath)) {
+                std::wcerr << L"Executable <" << exePath << L"> doesn't exist.\n";
+                return false;
+            }
             TCHAR szCmdline[MAX_PATH];
             wcsncpy_s(szCmdline, exePath.wstring().c_str(), exePath.wstring().length());
             BOOL res = CreateProcess(nullptr,               // command line
@@ -79,6 +84,7 @@ namespace Oobe
                                           0,
                                           &pipeSecurity);
             if (pipe == INVALID_HANDLE_VALUE) {
+                std::wcerr << L"Failed to create pipe <" << pipeName << L">.\n";
                 return nullptr;
             }
             // One can read this as `defer(CloseHandle(pipe));`
@@ -90,17 +96,20 @@ namespace Oobe
             ZeroMemory(&sync, sizeof(sync));
             sync.hEvent = CreateEvent(NULL, TRUE, FALSE, nullptr);
             if (sync.hEvent == INVALID_HANDLE_VALUE || sync.hEvent == 0) {
+                std::wcerr << L"Failed to create internal event to notify splash connection\n";
                 return nullptr;
             }
             // `defer(CloseHandle(sync.hEvent));`
             defer eventCleaner(sync.hEvent, &CloseHandle);
             if (ConnectNamedPipe(pipe, &sync) == FALSE && GetLastError() != ERROR_PIPE_CONNECTED &&
                 GetLastError() != ERROR_IO_PENDING) {
+                std::wcerr << L"Failed to connect to splash process\n";
                 return nullptr;
             }
             // Block this thread until [connectionTimeout] or the OS notifies the named pipe had a client connected
             // through the event [sync.hEvent].
             if (WaitForSingleObject(sync.hEvent, connectionTimeout) != 0) {
+                std::wcerr << L"Timeout: no response from the splash process\n";
                 return nullptr;
             }
 
@@ -115,6 +124,7 @@ namespace Oobe
             } while (readSuccess != FALSE && bytesExpected > bytesRead);
 
             if (bytesExpected != bytesRead) {
+                std::wcerr << L"Unexpected value read from the splash process:" << window << L'\n';
                 return nullptr;
             }
             return window;
@@ -265,6 +275,7 @@ namespace Oobe
                     auto controller = event.controller;
                     if (!Strategy::do_create_process(
                           controller->exePath, controller->startInfo, controller->procInfo)) {
+                        std::wcerr << L"Failed to create the splash process\n";
                         return *this; // return the same (Closed) state.
                     }
                     if (HWND window = Strategy::do_read_window_from_ipc(); window != nullptr) {
@@ -277,7 +288,8 @@ namespace Oobe
                         window != nullptr) {
                         return Visible{window};
                     }
-
+                    std::wcerr << L"Could not find the splash window for Process ID " << event.controller->procInfo.dwProcessId
+                               << '\n';
                     return *this;
                 }
             };
