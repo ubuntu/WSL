@@ -34,6 +34,7 @@
 #include <map>
 #include <unordered_map>
 #include "expected.hpp"
+#include "not_null.h"
 #include "WslApiLoader.h"
 #include "Helpers.h"
 #include "DistributionInfo.h"

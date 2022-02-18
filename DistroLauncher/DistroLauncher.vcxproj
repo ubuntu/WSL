@@ -140,11 +140,14 @@
   <ItemGroup>
     <ClInclude Include="console_service.h" />
     <ClInclude Include="ExitStatus.h" />
+    <ClInclude Include="not_null.h" />
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="splash_controller.h" />
+    <ClInclude Include="state_machine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Win32Utils.h" />
@@ -162,6 +165,7 @@
     <ClCompile Include="local_named_pipe.cpp" />
     <ClCompile Include="OOBE.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
+    <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
