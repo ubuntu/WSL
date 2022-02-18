@@ -29,6 +29,13 @@
             <desktop:ExecutionAlias Alias="ubuntu2204.exe" />
           </uap3:AppExecutionAlias>
         </uap3:Extension>
+        <uap3:Extension Category="windows.appExtension">
+          <uap3:AppExtension Name="com.microsoft.windows.terminal.settings"
+                             Id="Ubuntu22.04LTS"
+                             DisplayName="Ubuntu 22.04 LTS"
+                             PublicFolder="Terminal">
+          </uap3:AppExtension>
+        </uap3:Extension>
       </Extensions>
     </Application>
   </Applications>
