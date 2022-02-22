@@ -153,7 +153,7 @@ namespace Oobe
 
                     std::wstring commandLine{Policy::OobeCommand};
                     commandLine += Policy::prepare_prefill_info();
-                    
+
                     // OOBE runs GUI by default, unless command line option --text is set.
                     if (Policy::must_run_in_text_mode()) {
                         commandLine.append(L" --text");
