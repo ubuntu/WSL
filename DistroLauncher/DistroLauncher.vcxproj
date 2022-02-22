@@ -140,6 +140,8 @@
   <ItemGroup>
     <ClInclude Include="console_service.h" />
     <ClInclude Include="ExitStatus.h" />
+    <ClInclude Include="installer_controller.h" />
+    <ClInclude Include="installer_policy.h" />
     <ClInclude Include="not_null.h" />
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
