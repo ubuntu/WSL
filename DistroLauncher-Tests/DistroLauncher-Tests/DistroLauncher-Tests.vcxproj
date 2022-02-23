@@ -66,6 +66,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleServiceTests.cpp" />
+    <ClCompile Include="InstallerControllerTests.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ExitStatusParserTests.cpp" />
     <ClCompile Include="LocalNamedPipeTests.cpp" />
@@ -80,6 +81,9 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ProjectReference Include="..\GTest\GTest.vcxproj">
       <Project>{fe0d50ff-24b4-44fc-ba7c-12a846c0c477}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InstallerControllerTestPolicies.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
