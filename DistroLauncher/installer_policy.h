@@ -149,7 +149,7 @@ namespace Oobe
         }
     };
 
-    // This imposes deprecation of the symbol DistributionInfo::OBE_NAME exposed in OOBE.h.
+    // This imposes deprecation of the symbol DistributionInfo::OOBE_NAME exposed in OOBE.h.
     // This is useful because the controller can launch the OOBE in a couple of different ways, but in all of them we
     // need `sudo`. At some point those files OOBE.cpp and OOBE.h will be dropped in favor of this one.
     const wchar_t* InstallerPolicy::OobeCommand = L"sudo /usr/libexec/wsl-setup";
