@@ -7,7 +7,7 @@ on:
       - 'meta/src/**'
       - 'meta/*/src/**'
       - 'DistroLauncher/DistributionInfo.h'
-      - 'DistroLauncher-Appx/*'
+      - 'DistroLauncher-Appx/**'
       - '.github/workflows/detect-update-releases.yaml'
       - 'wsl-builder/**'
   schedule:

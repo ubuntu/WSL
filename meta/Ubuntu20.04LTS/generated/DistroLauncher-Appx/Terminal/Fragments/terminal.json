@@ -21,7 +21,7 @@
           // Also, referencing it if it does not exist will show an error message when opening
           // the profile.
           //"face": "Ubuntu Mono",
-          "face": "Cascadia",
+          "face": "Cascadia Mono",
           "size": 13
         },
         "useAcrylic": true
