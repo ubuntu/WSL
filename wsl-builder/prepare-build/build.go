@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -211,8 +212,15 @@ func downloadFile(url, dest string) (err error) {
 	}()
 
 	// Get the data
+	var netTransport = &http.Transport{
+		Dial: (&net.Dialer{
+			Timeout: 5 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 5 * time.Second,
+	}
 	var netClient = &http.Client{
-		Timeout: 10 * time.Minute,
+		Timeout:   10 * time.Minute,
+		Transport: netTransport,
 	}
 	resp, err := netClient.Get(url)
 	if err != nil {
