@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
@@ -199,7 +200,15 @@ func copyLocalFile(url, dest string) (err error) {
 	}
 	defer source.Close()
 
-	return writeContentInto(source, dest)
+	var size uint64
+	fi, err := source.Stat()
+	if err != nil {
+		log.Printf("Warning: unknown size for %s: %v", url, err)
+	} else {
+		size = uint64(fi.Size())
+	}
+
+	return writeContentInto(source, size, dest)
 }
 
 // downloadFile downloads a file from the address pointed by `url` into `dest`.
@@ -232,19 +241,54 @@ func downloadFile(url, dest string) (err error) {
 		return fmt.Errorf("http request failed with code %d", resp.StatusCode)
 	}
 
-	return writeContentInto(resp.Body, dest)
+	var size int
+	if size, err = strconv.Atoi(resp.Header.Get("Content-Length")); err != nil {
+		log.Printf("Warning: unknown size for %s: %v", url, err)
+	}
+	return writeContentInto(resp.Body, uint64(size), dest)
+}
+
+type writeCounter struct {
+	f               *os.File
+	name            string
+	current         uint64
+	previousPrinted uint64
+	total           uint64
+}
+
+func (wc *writeCounter) Write(p []byte) (int, error) {
+	n := len(p)
+	wc.current += uint64(n)
+	if wc.current < wc.previousPrinted+10*(1<<20) {
+		return wc.f.Write(p)
+	}
+	log.Printf("%s: %.0f MB / %.0f MB\n", wc.name,
+		math.Floor(float64(wc.current)/(1<<20)),
+		math.Floor(float64(wc.total)/(1<<20)))
+	wc.previousPrinted = wc.current
+	return wc.f.Write(p)
+}
+
+func (wc *writeCounter) Close() error {
+	return wc.f.Close()
 }
 
 // writeContentInto writes the content of the `source io.Reader`
 // into a new file created at `dest`.
-func writeContentInto(source io.Reader, dest string) (err error) {
+// total is the total size of the content to be downloaded.
+func writeContentInto(source io.Reader, total uint64, dest string) (err error) {
 	out, err := os.Create(dest)
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	wc := &writeCounter{
+		f:     out,
+		name:  filepath.Join(filepath.Base(filepath.Dir(dest)), filepath.Base(dest)),
+		total: total,
+	}
+	defer wc.Close()
 
-	_, err = io.Copy(out, source)
+	_, err = io.Copy(wc, source)
 	return err
 }
 
