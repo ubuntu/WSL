@@ -155,28 +155,21 @@ namespace Oobe
 
         static bool do_hide_window(HWND window)
         {
-            return ShowWindow(window, SW_HIDE) != 0;
+            // This enables Flutter code to react on our hide request.
+            constexpr auto WM_CUSTOM_AUTO_HIDE = WM_USER + 7;
+            PostMessage(window, WM_CUSTOM_AUTO_HIDE, 0, 0);
+            return true;
         }
 
         static bool do_place_behind(HWND toBeFront, HWND toBeBehind)
         {
             return SetWindowPos(toBeBehind, toBeFront, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE) != 0;
         }
-        // In the visible state, closing the window should allow the user to confirm closing or doing some clean
-        // up. That is the semantic difference between WM_CLOSE (enables that behavior) versus WM_QUIT (closes
-        // the window unconditionally). Interestingly, a GUI application that implements that semantics (think
-        // of document editor showing a dialog asking if the user wants to save their changes) will hang forever
-        // if the window receives WM_CLOSE while hidden, because the OS will not bring it back to the light,
-        // thus there is no way the user can hit any of the dialog buttons to let the window rest in peace.
-        static void do_forcebly_close(HWND window)
-        {
-            PostMessage(window, WM_QUIT, 0, 0);
-        }
 
         static void do_gracefully_close(HWND window)
         {
             // This enables Flutter code to react differently from the user clicking the close button.
-            constexpr auto WM_CUSTOM_AUTO_CLOSE = WM_USER + 7;
+            constexpr auto WM_CUSTOM_AUTO_CLOSE = WM_USER + 8;
             PostMessage(window, WM_CUSTOM_AUTO_CLOSE, 0, 0);
         }
 
@@ -381,7 +374,7 @@ namespace Oobe
                 {
                     Strategy::do_unsubscribe(event.controller->splashCloseNotifier);
                     event.controller->splashCloseNotifier = nullptr;
-                    Strategy::do_forcebly_close(window);
+                    Strategy::do_gracefully_close(window);
                     return ShouldBeClosed{};
                 }
             };
