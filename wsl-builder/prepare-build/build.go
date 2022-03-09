@@ -228,7 +228,7 @@ func downloadFile(url, dest string) (err error) {
 		TLSHandshakeTimeout: 5 * time.Second,
 	}
 	var netClient = &http.Client{
-		Timeout:   10 * time.Minute,
+		Timeout:   30 * time.Minute,
 		Transport: netTransport,
 	}
 	resp, err := netClient.Get(url)
