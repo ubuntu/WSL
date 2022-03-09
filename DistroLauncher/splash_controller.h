@@ -155,29 +155,47 @@ namespace Oobe
 
         static bool do_hide_window(HWND window)
         {
-            return ShowWindow(window, SW_HIDE) != 0;
+            // This enables Flutter code to react on our hide request.
+            constexpr auto WM_CUSTOM_AUTO_HIDE = WM_USER + 7;
+            PostMessage(window, WM_CUSTOM_AUTO_HIDE, 0, 0);
+            return true;
         }
 
         static bool do_place_behind(HWND toBeFront, HWND toBeBehind)
         {
             return SetWindowPos(toBeBehind, toBeFront, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE) != 0;
         }
-        // In the visible state, closing the window should allow the user to confirm closing or doing some clean
-        // up. That is the semantic difference between WM_CLOSE (enables that behavior) versus WM_QUIT (closes
-        // the window unconditionally). Interestingly, a GUI application that implements that semantics (think
-        // of document editor showing a dialog asking if the user wants to save their changes) will hang forever
-        // if the window receives WM_CLOSE while hidden, because the OS will not bring it back to the light,
-        // thus there is no way the user can hit any of the dialog buttons to let the window rest in peace.
-        static void do_forcebly_close(HWND window)
-        {
-            PostMessage(window, WM_QUIT, 0, 0);
-        }
 
         static void do_gracefully_close(HWND window)
         {
             // This enables Flutter code to react differently from the user clicking the close button.
-            constexpr auto WM_CUSTOM_AUTO_CLOSE = WM_USER + 7;
+            constexpr auto WM_CUSTOM_AUTO_CLOSE = WM_USER + 8;
             PostMessage(window, WM_CUSTOM_AUTO_CLOSE, 0, 0);
+        }
+
+        static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
+        {
+            HANDLE handle{nullptr};
+            if (RegisterWaitForSingleObject(&handle, process, callback, data, INFINITE,
+                                            WT_EXECUTEDEFAULT | WT_EXECUTEONLYONCE) == FALSE) {
+                wprintf(L"Failed to register splash window monitoring callback\n");
+                return nullptr;
+            }
+            return handle;
+        }
+
+        static void do_unsubscribe(HANDLE& waiter)
+        {
+            if (UnregisterWait(waiter) != FALSE) {
+                waiter = nullptr;
+            }
+        }
+
+        static void do_cleanup_process(PROCESS_INFORMATION& procInfo)
+        {
+            TerminateProcess(procInfo.hProcess, 0);
+            CloseHandle(procInfo.hThread);
+            CloseHandle(procInfo.hProcess);
         }
     }; // struct SplashStrategy
 
@@ -211,18 +229,44 @@ namespace Oobe
     /// Also, since the Run event can only be handled by the initial state, that event is expected to succeed only once.
     template <typename Strategy = SplashStrategy> class SplashController
     {
+      public:
+        // Instead of facilitating the typing, the intention of this using clause is to let it explicit that this
+        // callable must not be called in this thread.
+        using CallInOtherThread = std::function<void()>;
+
       private:
         const std::filesystem::path exePath;
         STARTUPINFO startInfo;
         // this is the only member that requires ownership/resource management since it contains handles to the process
         // that will be created and its threads and that must be closed at some point.
         PROCESS_INFORMATION procInfo;
+        HANDLE splashCloseNotifier = nullptr;
+        // This listener will be invoked if and only if the user closes the splash window before the launcher.
+        CallInOtherThread notifyListener;
+
+        // Call-once method which must be called only by the OS in reaction to the user closing the window.
+        // Since the notifyListener member is initialized before the splash runs and (must) never be touched since then,
+        // it's safe to assume no need for synchronization whatsoever in accessing it.
+        // Any need for synchronization must be taken care of by the callable itself.
+        static void onWindowClosedByUser(void* data, BOOLEAN /*unused*/)
+        {
+            auto* self = static_cast<typename SplashController<Strategy>*>(data);
+            self->notifyListener();
+        }
 
       public:
         /// Initializes the control structures to later run the splash application. Accepts the splash executable
-        /// file system path and the HANDLE to the device that will act as the splash standard input.
-        SplashController(std::filesystem::path exePath, not_null<HANDLE> stdIn) : exePath{std::move(exePath)}
+        /// file system path and the HANDLE to the device that will act as the splash standard input and a callable
+        /// object [onClose] to be invoked when the user closes the splash window, if that ever happens.
+        /// IMPORTANT NOTE ON MULTITHREADING: [onClose] will be invoked by another thread, thus any precaution required
+        /// to ensure safe concurrent call must be taken by the [onClose] callable implementation itself and any
+        /// functions it calls inside its body. That's the reason for the horrible type names.
+        template <typename CallableInOtherThread>
+        SplashController(std::filesystem::path exePath, not_null<HANDLE> stdIn, CallableInOtherThread&& onClose) :
+            exePath{std::move(exePath)}, notifyListener{std::forward<CallableInOtherThread>(onClose)}
         {
+            static_assert(std::is_convertible_v<CallableInOtherThread, CallInOtherThread>,
+                          "CallableInOtherThread callback must be void with no arguments.");
             // Most likely the exePath will be built on the fly from a string, so there is no sense in creating a
             // temporary and copy it when we can move.
             ZeroMemory(&procInfo, sizeof(PROCESS_INFORMATION));
@@ -255,7 +299,9 @@ namespace Oobe
             };
 
             struct Close
-            { };
+            {
+                not_null<SplashController<Strategy>*> controller;
+            };
             using EventVariant = std::variant<ToggleVisibility, Run, PlaceBehind, Close>;
         };
 
@@ -279,11 +325,13 @@ namespace Oobe
                 StateVariant on_event(typename Events::Run event)
                 {
                     auto controller = event.controller;
-                    if (!Strategy::do_create_process(
-                          controller->exePath, controller->startInfo, controller->procInfo)) {
+                    if (!Strategy::do_create_process(controller->exePath, controller->startInfo,
+                                                     controller->procInfo)) {
                         std::wcerr << L"Failed to create the splash process\n";
                         return *this; // return the same (Closed) state.
                     }
+                    controller->splashCloseNotifier =
+                      Strategy::do_on_close(controller->procInfo.hProcess, onWindowClosedByUser, controller);
                     if (HWND window = Strategy::do_read_window_from_ipc(); window != nullptr) {
                         return Visible{window};
                     }
@@ -321,9 +369,12 @@ namespace Oobe
                     return Visible{window};
                 }
 
-                ShouldBeClosed on_event(typename Events::Close /*unused*/) const
+                // If the window gets closed programmatically we need to unsubscribe the closing notification.
+                ShouldBeClosed on_event(typename Events::Close event) const
                 {
-                    Strategy::do_forcebly_close(window);
+                    Strategy::do_unsubscribe(event.controller->splashCloseNotifier);
+                    event.controller->splashCloseNotifier = nullptr;
+                    Strategy::do_gracefully_close(window);
                     return ShouldBeClosed{};
                 }
             };
@@ -337,8 +388,10 @@ namespace Oobe
                     return Hidden{window};
                 }
 
-                ShouldBeClosed on_event(typename Events::Close /*unused*/) const
+                ShouldBeClosed on_event(typename Events::Close event) const
                 {
+                    Strategy::do_unsubscribe(event.controller->splashCloseNotifier);
+                    event.controller->splashCloseNotifier = nullptr;
                     Strategy::do_gracefully_close(window);
                     return ShouldBeClosed{};
                 }
@@ -354,10 +407,12 @@ namespace Oobe
 
         ~SplashController()
         {
+            if (splashCloseNotifier != nullptr) {
+                // This ensures that the OS will not call us back when there is no controller alive anymore.
+                Strategy::do_unsubscribe(splashCloseNotifier);
+            }
             if (procInfo.hProcess != nullptr) {
-                TerminateProcess(procInfo.hProcess, 0);
-                CloseHandle(procInfo.hThread);
-                CloseHandle(procInfo.hProcess);
+                Strategy::do_cleanup_process(procInfo);
             }
         }
     };

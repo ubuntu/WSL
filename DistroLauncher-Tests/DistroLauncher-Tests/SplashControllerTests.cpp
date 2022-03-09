@@ -43,6 +43,14 @@ namespace Oobe
         {
             return nullptr;
         }
+        static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
+        {
+            return nullptr;
+        }
+        static void do_cleanup_process(PROCESS_INFORMATION& h)
+        { }
+        static void do_unsubscribe(HANDLE h)
+        { }
         // The other methods will never be called, so there is no need to define them. Otherwise it would not even
         // compile.
     }; // struct NothingWorksStrategy
@@ -79,20 +87,31 @@ namespace Oobe
         {
             return true;
         }
-        static void do_forcebly_close(HWND window)
-        { }
 
         static void do_gracefully_close(HWND window)
+        { }
+
+        static void do_cleanup_process(PROCESS_INFORMATION& h)
+        { }
+
+        static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
+        {
+            return static_cast<HANDLE>(globalFakeWindow);
+        }
+
+        static void do_unsubscribe(HANDLE h)
         { }
         // The other methods will never be called, so there is no need to define them. Otherwise it would not even
         // compile.
     }; // struct EverythingWorksStrategy
 
+    auto callback = []() {};
+
     // The whole purpose of adding this state machine technique was to improve overall testability.
     TEST(SplashControllerTests, LaunchFailedShouldStayIdle)
     {
         using Controller = SplashController<NothingWorksStrategy>;
-        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         controller.sm.addEvent(Controller::Events::Run{&controller}); // This fails but it is a valid transition.
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
     }
@@ -117,19 +136,24 @@ namespace Oobe
             {
                 return nullptr;
             }
-            // When we attempt to push the Close event, compiler detects the need for the two methods below.
-            static void do_forcebly_close(HWND window)
-            { }
+            static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
+            {
+                return static_cast<HANDLE>(globalFakeWindow);
+            }
 
             static void do_gracefully_close(HWND window)
+            { }
+            static void do_cleanup_process(PROCESS_INFORMATION& h)
+            { }
+            static void do_unsubscribe(HANDLE h)
             { }
         }; // struct CantFindWindowStrategy
 
         using Controller = SplashController<CantFindWindowStrategy>;
-        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
-        controller.sm.addEvent(Controller::Events::Close{});
+        controller.sm.addEvent(Controller::Events::Close{&controller});
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
     }
 
@@ -167,15 +191,21 @@ namespace Oobe
             {
                 return true;
             }
-            static void do_forcebly_close(HWND window)
-            { }
+            static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
+            {
+                return static_cast<HANDLE>(globalFakeWindow);
+            }
 
             static void do_gracefully_close(HWND window)
+            { }
+            static void do_cleanup_process(PROCESS_INFORMATION& h)
+            { }
+            static void do_unsubscribe(HANDLE h)
             { }
         }; // struct AlmostEverythingWorksStrategy
 
         using Controller = SplashController<AlmostEverythingWorksStrategy>;
-        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since almost everything works in this realm, all transitions below should be valid...
         ASSERT_TRUE(transition.has_value());
@@ -185,7 +215,7 @@ namespace Oobe
     TEST(SplashControllerTests, AHappySequenceOfEvents)
     {
         using Controller = SplashController<EverythingWorksStrategy>;
-        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since everything works in this realm, all transitions below should be valid...
         ASSERT_TRUE(transition.has_value());
@@ -202,7 +232,7 @@ namespace Oobe
         transition = controller.sm.addEvent(Controller::Events::PlaceBehind{GetConsoleWindow()});
         ASSERT_TRUE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Visible>());
-        transition = controller.sm.addEvent(Controller::Events::Close{});
+        transition = controller.sm.addEvent(Controller::Events::Close{&controller});
         ASSERT_TRUE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::ShouldBeClosed>());
     }
@@ -210,7 +240,7 @@ namespace Oobe
     TEST(SplashControllerTests, OnlyIdleStateAcceptsRunEvent)
     {
         using Controller = SplashController<EverythingWorksStrategy>;
-        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since everything works in this realm, all transitions below should be valid...
         ASSERT_TRUE(transition.has_value());
@@ -234,7 +264,7 @@ namespace Oobe
         // state should remain the previous one.
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Hidden>());
 
-        transition = controller.sm.addEvent(Controller::Events::Close{});
+        transition = controller.sm.addEvent(Controller::Events::Close{&controller});
         ASSERT_TRUE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::ShouldBeClosed>());
         // Exercising the ShouldBeClosed State. Not even this once accepts re-running the splash.
@@ -248,18 +278,18 @@ namespace Oobe
     {
         // Remember that in this realm everything just works...
         using Controller = SplashController<EverythingWorksStrategy>;
-        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE)};
+        Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Visible>());
-        transition = controller.sm.addEvent(Controller::Events::Close{});
+        transition = controller.sm.addEvent(Controller::Events::Close{&controller});
         ASSERT_TRUE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::ShouldBeClosed>());
         // silly attempts start here.
         transition = controller.sm.addEvent(Controller::Events::ToggleVisibility{});
         ASSERT_FALSE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::ShouldBeClosed>());
-        transition = controller.sm.addEvent(Controller::Events::Close{});
+        transition = controller.sm.addEvent(Controller::Events::Close{&controller});
         ASSERT_FALSE(transition.has_value()); // if closing twice worked, this assertion would fail.
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::ShouldBeClosed>());
 
@@ -269,7 +299,7 @@ namespace Oobe
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::ShouldBeClosed>());
 
         // and here we make sure the state machine was not fooled by the attempt to run.
-        transition = controller.sm.addEvent(Controller::Events::Close{});
+        transition = controller.sm.addEvent(Controller::Events::Close{&controller});
         ASSERT_FALSE(transition.has_value());
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::ShouldBeClosed>());
     }
