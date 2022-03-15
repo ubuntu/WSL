@@ -17,20 +17,23 @@
 
 #pragma once
 
-namespace Helpers {
-	// Returns true if user system has WSLg enabled.
-	inline bool isWslgEnabled();
+namespace Helpers
+{
+    // Returns true if WSLg is enabled and distro subsystem version is > 1.
+    bool WslGraphicsSupported();
+}
 
-	// Returns the subsystem version for this specific distro or 0 if failed.
-	DWORD WslGetDistroSubsystemVersion();
+namespace Oobe::internal
+{
+    // Returns true if user system has WSLg enabled.
+    inline bool isWslgEnabled();
 
-	// Returns true if WSLg is enabled and distro subsystem versin is > 1.
-	bool WslGraphicsSupported();
-
-	// Runs a Linux command and checks for successfull exit.
-	// Returns true if all the commands `exit 0`.
-	// Launched command will not be interactive nor show any output,
-	// but it blocks current thread for up to dwMilisseconds.
-	bool WslLaunchSuccess(const TCHAR* command, DWORD dwMilisseconds=500); // NOLINT(readability-magic-numbers):
-	// Magic numbers in default arguments should not be an issue.
+    // Returns the subsystem version for this specific distro or 0 if failed.
+    DWORD WslGetDistroSubsystemVersion();
+    // Runs a Linux command and checks for successful exit.
+    // Returns true if all the commands `exit 0`.
+    // Launched command will not be interactive nor show any output,
+    // but it blocks current thread for up to dwMilisseconds.
+    bool WslLaunchSuccess(const TCHAR* command, DWORD dwMilisseconds = 500); // NOLINT(readability-magic-numbers):
+    // Magic numbers in default arguments should not be an issue.
 }
