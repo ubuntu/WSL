@@ -6,7 +6,7 @@ namespace Oobe::internal
     /// Trims both ends of a string in place.
     inline void trim(std::wstring& str)
     {
-        constexpr wchar_t* whitespaces = L" \t\n\r\f\v";
+        const wchar_t* whitespaces = L" \t\n\r\f\v";
 
         auto lastpos = str.find_last_not_of(whitespaces);
         if (lastpos == std::wstring::npos) {
@@ -43,7 +43,9 @@ namespace Oobe::internal
     {
         std::wstring line;
         std::wistringstream splitter;
-        std::wstring currentSection, currentKey, value;
+        std::wstring currentSection;
+        std::wstring currentKey;
+        std::wstring value;
         ini.seekg(0);
         while (std::getline(ini, line)) {
             // skip empty lines.
@@ -82,8 +84,7 @@ namespace Oobe::internal
 
                 // The only possible way to return true from this function is finding the key=*valueContains* definition
                 // we are looking for inside the proper section.
-                if (currentSection.compare(section) == 0 && currentKey.compare(key) == 0 &&
-                    value.find(valueContains) != std::wstring::npos) {
+                if (currentSection == section && currentKey == key && value.find(valueContains) != std::wstring::npos) {
                     return true;
                 }
             }
