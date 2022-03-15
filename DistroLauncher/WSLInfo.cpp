@@ -107,6 +107,20 @@ namespace Oobe::internal
 
     } // namespace.
 
+    // Returns true if /etc/wsl.conf file contains the boot command to activate systemd.
+    bool is_systemd_enabled()
+    {
+        std::wstring wslConfPath{L"\\\\wsl.localhost\\"};
+        wslConfPath.append(DistributionInfo::Name);
+        wslConfPath.append(L"/etc/wsl.conf");
+        std::wifstream wslConf;
+        wslConf.open(wslConfPath, std::ios::in);
+        if (wslConf.fail()) {
+            return false;
+        }
+        return ini_find_value(wslConf, L"boot", L"command", L"/usr/libexec/wsl-systemd");
+    }
+
 } // namespace Oobe::internal
 
 // This was kept under Helpers namespace to avoid touching OOBE.cpp/h files.
@@ -120,3 +134,18 @@ namespace Helpers
     }
 
 } // namespace Helpers.
+
+namespace Oobe
+{
+    /// Returns a possibly wrapped command line to invoke [intendedCommand] if systemd is enabled.
+    std::wstring WrapCommand(std::wstring_view intendedCommand)
+    {
+        if (!internal::is_systemd_enabled()) {
+            return std::wstring{intendedCommand};
+        }
+
+        std::wstring command{L"/usr/libexec/nslogin "};
+        command.append(intendedCommand);
+        return command;
+    }
+}
