@@ -36,4 +36,15 @@ namespace Oobe::internal
     // but it blocks current thread for up to dwMilisseconds.
     bool WslLaunchSuccess(const TCHAR* command, DWORD dwMilisseconds = 500); // NOLINT(readability-magic-numbers):
     // Magic numbers in default arguments should not be an issue.
+
+    /// Parses an [ini]/conf input stream from the beginning checking for the existence of the entry [section.key].
+    /// Returns true if that sections is present and its value contains the string [valueContains].
+    /// This is intended to be called once, thus no caching.
+    bool ini_find_value(std::wistream& ini, std::wstring_view section, std::wstring_view key,
+                        std::wstring_view valueContains);
+}
+
+namespace Oobe
+{
+    std::wstring WrapCommand(std::wstring_view intendedCommand);
 }

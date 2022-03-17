@@ -120,7 +120,7 @@ int wmain(int argc, wchar_t const *argv[])
     // Parse the command line arguments.
     if ((SUCCEEDED(hr)) && (!installOnly)) {
         if (arguments.empty()) {
-            hr = g_wslApi.WslLaunchInteractive(L"", false, &exitCode);
+            hr = g_wslApi.WslLaunchInteractive(Oobe::WrapCommand(L"").c_str(), false, &exitCode);
 
             // Check exitCode to see if wsl.exe returned that it could not start the Linux process
             // then prompt users for input so they can view the error message.
@@ -137,7 +137,7 @@ int wmain(int argc, wchar_t const *argv[])
                 command += arguments[index];
             }
 
-            hr = g_wslApi.WslLaunchInteractive(command.c_str(), true, &exitCode);
+            hr = g_wslApi.WslLaunchInteractive(Oobe::WrapCommand(command.c_str()).c_str(), true, &exitCode);
 
         } else if (arguments[0] == ARG_CONFIG) {
             hr = E_INVALIDARG;
