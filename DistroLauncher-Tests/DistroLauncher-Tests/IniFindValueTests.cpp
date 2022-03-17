@@ -23,6 +23,45 @@ command = /usr/libexec/wsl-systemd
             ASSERT_FALSE(ini_find_value(fakeFile, L"automount", L"enabled", L"true"));
         }
 
+        TEST(IniFindValueTests, ExtraSpacesAreFine)
+        {
+            std::wstring buffer{LR"(# This mimics the syntax of /etc/wsl.conf file with comments.
+  [user]
+          default     =    root
+  [boot]
+          command  =  /usr/libexec/wsl-systemd
+)"};
+            std::wstringstream fakeFile{buffer};
+            ASSERT_TRUE(ini_find_value(fakeFile, L"boot", L"command", L"/usr/libexec/wsl-systemd"));
+            ASSERT_TRUE(ini_find_value(fakeFile, L"user", L"default", L"root"));
+        }
+
+        TEST(IniFindValueTests, LessSpacesAreFine)
+        {
+            std::wstring buffer{LR"(# This mimics the syntax of /etc/wsl.conf file with comments.
+[user]
+default=root
+[boot]
+command=/usr/libexec/wsl-systemd
+)"};
+            std::wstringstream fakeFile{buffer};
+            ASSERT_TRUE(ini_find_value(fakeFile, L"boot", L"command", L"/usr/libexec/wsl-systemd"));
+            ASSERT_TRUE(ini_find_value(fakeFile, L"user", L"default", L"root"));
+        }
+
+        TEST(IniFindValueTests, SurroundingSpacesInsideSectionBreaks)
+        {
+            std::wstring buffer{LR"(# This mimics the syntax of /etc/wsl.conf file with comments.
+  [user ]
+ default  =  root 
+  [ boot]
+ command  =  /usr/libexec/wsl-systemd
+)"};
+            std::wstringstream fakeFile{buffer};
+            ASSERT_FALSE(ini_find_value(fakeFile, L"boot", L"command", L"/usr/libexec/wsl-systemd"));
+            ASSERT_FALSE(ini_find_value(fakeFile, L"user", L"default", L"root"));
+        }
+
         TEST(IniFindValueTests, SemicolonCommentsBreaksWSL)
         {
             std::wstring buffer{LR"(# This mimics the syntax of /etc/wsl.conf file with comments.
@@ -51,18 +90,6 @@ enable = true
             ASSERT_FALSE(ini_find_value(fakeFile, L"boot", L"command", L"/usr/libexec/wsl-systemd"));
             ASSERT_FALSE(ini_find_value(fakeFile, L"user", L"default", L"root"));
             ASSERT_FALSE(ini_find_value(fakeFile, L"automount", L"enabled", L"true"));
-        }
-        TEST(IniFindValueTests, WhiteSpacesAreIrrelevant)
-        {
-            std::wstring buffer{LR"(# This mimics the syntax of /etc/wsl.conf file with comments.
-[user]
-    default = root   
-[boot]
-    command = /usr/libexec/wsl-systemd
-)"};
-            std::wstringstream fakeFile{buffer};
-            ASSERT_TRUE(ini_find_value(fakeFile, L"boot", L"command", L"/usr/libexec/wsl-systemd"));
-            ASSERT_TRUE(ini_find_value(fakeFile, L"user", L"default", L"root"));
         }
         TEST(IniFindValueTests, IllFormedLinesStopParsing)
         {
@@ -111,6 +138,16 @@ mountFsTab = true
             std::wstringstream fakeFile{buffer};
             ASSERT_TRUE(ini_find_value(fakeFile, L"automount", L"enabled", L"true"));
             ASSERT_TRUE(ini_find_value(fakeFile, L"automount", L"mountFsTab", L"true"));
+        }
+        TEST(IniFindValueTests, EmptySectionsWontAffectOthers)
+        {
+            std::wstring buffer{LR"([user]
+[boot]
+command = /usr/libexec/wsl-systemd
+
+)"};
+            std::wstringstream fakeFile{buffer};
+            ASSERT_TRUE((fakeFile, L"boot", L"command", L"/usr/libexec/wsl-systemd"));
         }
     }
 }

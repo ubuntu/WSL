@@ -3,10 +3,13 @@
 
 namespace Oobe::internal
 {
+    namespace
+    {
+        const wchar_t* const whitespaces = L" \t\n\r\f\v";
+    }
     /// Trims both ends of a string in place.
     inline void trim(std::wstring& str)
     {
-        const wchar_t* whitespaces = L" \t\n\r\f\v";
 
         auto lastpos = str.find_last_not_of(whitespaces);
         if (lastpos == std::wstring::npos) {
@@ -18,6 +21,11 @@ namespace Oobe::internal
         str.erase(0, str.find_first_not_of(whitespaces));
     }
 
+    /// Returns true if the argument contains white spaces in the beginning or in the end.
+    inline bool has_surrounding_whitespaces(std::wstring& str)
+    {
+        return str.find_first_not_of(whitespaces) != 0 || str.find_last_not_of(whitespaces) + 1 != str.length();
+    }
     /// Removes wrapping square brackets in place.
     /// Returns false if the string didn't contain the wrapping bracket pair.
     inline bool remove_surrounding_brackets(std::wstring& str)
@@ -32,7 +40,6 @@ namespace Oobe::internal
 
         str.erase(closingBracketPos);
         str.erase(0, 1); // removes the first character only.
-        trim(str);
         return true;
     }
 
@@ -60,6 +67,10 @@ namespace Oobe::internal
             case L'[':
                 // ill-formed section header breaks parsing.
                 if (!remove_surrounding_brackets(line)) {
+                    return false;
+                }
+                if (has_surrounding_whitespaces(line)) {
+                    // WSL treats spaces in the beginning or in the end of the section name as syntax error.
                     return false;
                 }
                 currentSection = line;
