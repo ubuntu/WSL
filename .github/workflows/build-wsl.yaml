@@ -245,6 +245,7 @@ jobs:
           name: build-artifacts-${{ matrix.WslID }}
           path: ${{ env.workDir }}/${{ env.buildInfoPath }}/${{ matrix.WslID }}-*
 
+
   update-build-artifacts:
     # TODO: download only artefacts for wiki (pattern not supported yet: https://github.com/actions/download-artifact/issues/103)
     name: Store updated build artifacts in wiki for reuse in future workflow runs
@@ -253,6 +254,7 @@ jobs:
     needs: build-wsl
     env:
       artifactsPath: '/tmp/artifacts'
+      codeDir: '/tmp/update-codedir'
     steps:
       - name: Checkout wiki
         uses: actions/checkout@v2
@@ -279,3 +281,25 @@ jobs:
           git add .
           git commit -m "Auto-update build info"
           git push origin master
+
+      - name: Checkout repositories required by ISO Tracker notification
+        if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
+        run: |
+          mkdir -p ${{ env.codeDir }}
+          git clone https://github.com/ubuntu/wsl.git ${{ env.codeDir }} --depth 1
+          mkdir -p ${{ env.codeDir }}/uat
+          git clone https://git.launchpad.net/ubuntu-archive-tools ${{ env.codeDir }}/uat --depth 1
+
+      - name: Notify ISO Tracker
+        if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
+        env:
+          ISOTRACKER_USERNAME: ${{ secrets.ISOTrackerUsername }}
+          ISOTRACKER_PASSWORD: ${{ secrets.ISOTrackerPassword }}
+        run: |
+          [ -f /tmp/all-releases.csv ] || ${{ env.codeDir }}/wsl-builder/lp-distro-info > /tmp/all-releases.csv
+          # There might have been more than one build in the latest commit 
+          for build in $(git diff-tree --no-commit-id --name-only -r HEAD | grep buildid); do
+            WSLId=$(basename $build);
+            WSLId=${WSLId%-buildid.md};
+            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-buidler/notify-isotracker $WslID $GITHUB_RUN_ID
+          done
