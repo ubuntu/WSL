@@ -1,59 +1,86 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   id="Layer_1"
-   data-name="Layer 1"
+   id="Layer_2"
+   data-name="Layer 2"
    viewBox="0 0 1280 1280"
    version="1.1"
-   sodipodi:docname="Ubuntu_WSL_Standard_128px.svg"
+   sodipodi:docname="Ubuntu_WSL_Standard_19px.svg"
    width="1280"
    height="1280"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
-     id="namedview11"
-     pagecolor="#898989"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageshadow="2"
+     id="namedview21"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:pageshadow="0"
      inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="true"
+     inkscape:pagecheckerboard="1"
      showgrid="false"
-     inkscape:zoom="0.63046875"
-     inkscape:cx="639.20694"
-     inkscape:cy="640"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.5"
+     inkscape:cx="640"
+     inkscape:cy="641"
      inkscape:window-width="1920"
      inkscape:window-height="1016"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="Layer_1" />
+     inkscape:current-layer="Layer_2" />
   <defs
      id="defs4">
     <style
        id="style2">.cls-1{fill:#e95420;}.cls-2{fill:#fff;}</style>
   </defs>
   <rect
-     class="cls-2"
-     id="rect47"
+     class="cls-1"
      width="1280"
      height="1280"
+     id="rect6"
      x="0"
-     y="0" />
-  <g
-     id="g23"
-     transform="scale(10)">
-    <circle
-       class="cls-1"
-       cx="64"
-       cy="64"
-       r="64"
-       id="circle6" />
-    <path
-       class="cls-2"
-       d="M 30.79,64 A 8.23,8.23 0 1 1 22.55,55.77 8.23,8.23 0 0 1 30.79,64 Z m 46.81,40 a 8.23,8.23 0 1 0 3,-11.24 8.23,8.23 0 0 0 -3,11.24 z M 91.85,32.22 a 8.23,8.23 0 1 0 -11.24,3 8.22,8.22 0 0 0 11.24,-3 z M 64,40.53 A 23.46,23.46 0 0 1 87.37,61.92 L 99.28,61.74 A 35.22,35.22 0 0 0 88.9,38.91 a 11.58,11.58 0 0 1 -15.62,-9 35.49,35.49 0 0 0 -25,2.43 l 5.8,10.4 A 23.46,23.46 0 0 1 64,40.53 Z M 40.54,64 a 23.43,23.43 0 0 1 10,-19.2 L 44.4,34.58 A 35.44,35.44 0 0 0 29.81,55 a 11.56,11.56 0 0 1 0,18 35.49,35.49 0 0 0 14.59,20.43 L 50.51,83.2 A 23.43,23.43 0 0 1 40.54,64 Z M 64,87.47 a 23.39,23.39 0 0 1 -9.89,-2.18 l -5.79,10.4 A 35.12,35.12 0 0 0 64,99.35 35.52,35.52 0 0 0 73.28,98.12 11.58,11.58 0 0 1 88.9,89.12 35.27,35.27 0 0 0 99.28,66.27 L 87.37,66.08 A 23.46,23.46 0 0 1 64,87.47 Z"
-       id="path8" />
-  </g>
+     y="0"
+     style="stroke-width:67.3684" />
+  <circle
+     class="cls-2"
+     cx="286.9895"
+     cy="633.26312"
+     r="134.06316"
+     id="circle8"
+     style="stroke-width:67.3684" />
+  <circle
+     class="cls-2"
+     cx="844.12628"
+     cy="338.86316"
+     r="134.06316"
+     id="circle10"
+     style="stroke-width:67.3684" />
+  <path
+     class="cls-2"
+     d="M 588.8,976.84211 A 324.04211,324.04211 0 0 1 367.15789,808.42105 196.04211,196.04211 0 0 1 253.30526,822.56842 434.52632,434.52632 0 0 0 567.24211,1085.3053 445.97895,445.97895 0 0 0 662.23158,1095.4105 185.93684,185.93684 0 0 1 623.15789,983.57895 117.89474,117.89474 0 0 1 588.8,976.84211 Z"
+     id="path12"
+     style="stroke-width:67.3684" />
+  <circle
+     class="cls-2"
+     cx="813.81055"
+     cy="978.18951"
+     r="134.06316"
+     id="circle14"
+     style="stroke-width:67.3684" />
+  <path
+     class="cls-2"
+     d="m 999.74737,929.01053 a 434.52632,434.52632 0 0 0 22.23153,-512.67369 192.67368,192.67368 0 0 1 -74.7789,87.57895 336.84211,336.84211 0 0 1 30.98947,222.31579 317.97895,317.97895 0 0 1 -42.4421,103.74737 177.17895,177.17895 0 0 1 64,99.03158 z"
+     id="path16"
+     style="stroke-width:67.3684" />
+  <path
+     class="cls-2"
+     d="m 276.21053,441.26316 h 10.10526 a 156.29474,156.29474 0 0 1 39.74737,4.0421 177.85263,177.85263 0 0 1 60.63158,24.92632 328.75789,328.75789 0 0 1 263.41052,-141.47369 239.83158,239.83158 0 0 1 4.04211,-29.6421 A 182.56842,182.56842 0 0 1 691.2,220.96842 437.22105,437.22105 0 0 0 276.21053,441.26316 Z"
+     id="path18"
+     style="stroke-width:67.3684" />
 </svg>
