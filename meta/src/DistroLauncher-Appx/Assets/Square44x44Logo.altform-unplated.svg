@@ -2,71 +2,98 @@
 <svg
    id="Layer_1"
    data-name="Layer 1"
-   viewBox="0 0 256 256"
+   viewBox="0 0 1280 1280"
    version="1.1"
    sodipodi:docname="Square44x44Logo.svg"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
-   width="256"
-   height="256"
+   width="1280"
+   height="1280"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
-     id="namedview13"
-     pagecolor="#848484"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageshadow="2"
+     id="namedview23"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:pageshadow="0"
      inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="true"
+     inkscape:pagecheckerboard="1"
      showgrid="false"
-     inkscape:zoom="1.6866678"
-     inkscape:cx="128.06315"
-     inkscape:cy="69.663983"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.44"
+     inkscape:cx="618.18182"
+     inkscape:cy="1289.7727"
      inkscape:window-width="1920"
      inkscape:window-height="1016"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="Layer_1"
-     inkscape:lockguides="false" />
+     inkscape:current-layer="Layer_1" />
   <defs
      id="defs4">
     <style
-       id="style2">.cls-1 { fill:#fff; }
-.cls-2 { fill:#e95420; }
-.cls-3 { fill:#fff;font-size:20px;font-family:Ubuntu-Light, Ubuntu;font-weight:300; }
-.cls-4 { letter-spacing:-0.1em; }
-</style>
+       id="style2">.cls-1{isolation:isolate;font-size:7.5px;font-family:Ubuntu;}.cls-1,.cls-2{fill:#fff;}.cls-3{fill:#e95420;}</style>
   </defs>
-  <g
-     id="g118"
-     transform="scale(1.6)">
-    <rect
-       class="cls-2"
-       id="rect32"
-       width="160"
-       height="160"
-       x="0"
-       y="0" />
-    <g
-       id="g1049">
-      <circle
-         class="cls-1"
-         cx="80"
-         cy="65.879997"
-         r="50"
-         id="circle6" />
-      <path
-         class="cls-2"
-         d="m 54.05,65.88 a 6.43,6.43 0 1 1 -6.43,-6.42 6.43,6.43 0 0 1 6.43,6.42 z M 90.63,97.14 A 6.43,6.43 0 1 0 93,88.36 6.42,6.42 0 0 0 90.63,97.14 Z M 101.76,41.06 A 6.43,6.43 0 1 0 93,43.41 6.43,6.43 0 0 0 101.76,41.06 Z M 80,47.55 a 18.33,18.33 0 0 1 18.26,16.71 l 9.31,-0.15 a 27.59,27.59 0 0 0 -8.12,-17.83 9,9 0 0 1 -12.2,-7.05 27.73,27.73 0 0 0 -19.5,1.9 l 4.53,8.12 A 18.25,18.25 0 0 1 80,47.55 Z M 61.67,65.88 a 18.32,18.32 0 0 1 7.79,-15 l -4.77,-8 a 27.63,27.63 0 0 0 -11.4,15.94 9,9 0 0 1 0,14.09 27.63,27.63 0 0 0 11.4,15.94 l 4.77,-8 A 18.32,18.32 0 0 1 61.67,65.88 Z M 80,84.22 a 18.25,18.25 0 0 1 -7.72,-1.7 l -4.53,8.12 a 27.73,27.73 0 0 0 19.5,1.9 9,9 0 0 1 12.2,-7.05 27.56,27.56 0 0 0 8.11,-17.84 l -9.3,-0.14 A 18.33,18.33 0 0 1 80,84.22 Z"
-         id="path8" />
-    </g>
-    <text
-       class="cls-3"
-       id="text10"
-       x="54.790039"
-       y="146.52">{{.ShortVersion}}</text>
-  </g>
+  <rect
+     class="cls-3"
+     id="rect862"
+     width="1280"
+     height="1280"
+     x="0"
+     y="0" />
+  <text
+     class="cls-1"
+     id="text6"
+     x="139.20001"
+     y="1253.8667"
+     style="fill:#fff;stroke-width:53.3333;font-size:400px;">{{.ShortVersion}}</text>
+  <rect
+     class="cls-2"
+     x="240"
+     width="816"
+     height="853.33331"
+     id="rect8"
+     y="0"
+     style="fill:#fff;stroke-width:53.3333;" />
+  <circle
+     class="cls-3"
+     cx="424"
+     cy="415.46667"
+     r="85.866669"
+     id="circle10"
+     style="stroke-width:53.3333" />
+  <circle
+     class="cls-3"
+     cx="781.86664"
+     cy="227.20001"
+     r="85.866669"
+     id="circle12"
+     style="stroke-width:53.3333" />
+  <path
+     class="cls-3"
+     d="M 617.6,636.8 A 209.6,209.6 0 0 1 475.2,530.13333 128.53333,128.53333 0 0 1 401.6,539.2 a 281.06667,281.06667 0 0 0 201.6,168.53333 290.66667,290.66667 0 0 0 60.8,6.4 A 125.33333,125.33333 0 0 1 640,640 Z"
+     id="path14"
+     style="stroke-width:53.3333" />
+  <circle
+     class="cls-3"
+     cx="762.66669"
+     cy="636.79999"
+     r="85.866669"
+     id="circle16"
+     style="stroke-width:53.3333" />
+  <path
+     class="cls-3"
+     d="M 882.13333,605.33333 A 280.53333,280.53333 0 0 0 896,276.26667 127.46667,127.46667 0 0 1 847.46667,332.8 a 209.06667,209.06667 0 0 1 20.26666,142.4 223.46667,223.46667 0 0 1 -26.66666,66.13333 130.66667,130.66667 0 0 1 41.06666,64 z"
+     id="path18"
+     style="stroke-width:53.3333" />
+  <path
+     class="cls-3"
+     d="m 417.6,292.8 h 9.06667 a 145.06667,145.06667 0 0 1 26.13333,0 124.8,124.8 0 0 1 38.93333,16 210.13333,210.13333 0 0 1 168.53334,-90.13333 c 0,-6.4 0,-12.8 2.66666,-19.2 A 133.86667,133.86667 0 0 1 686.4,148.8 282.13333,282.13333 0 0 0 417.6,292.8 Z"
+     id="path20"
+     style="stroke-width:53.3333" />
 </svg>
