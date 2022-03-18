@@ -1,58 +1,100 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 25.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
 <svg
-   id="Layer_1"
-   data-name="Layer 1"
-   viewBox="0 0 2480 1200"
    version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 2480 1200"
+   xml:space="preserve"
    sodipodi:docname="Ubuntu_WSL_Preview_128px.svg"
    width="2480"
    height="1200"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview19"
-     pagecolor="#979797"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="true"
-     showgrid="false"
-     inkscape:zoom="0.42903226"
-     inkscape:cx="1240"
-     inkscape:cy="600.18797"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="Layer_1" />
-  <defs
-     id="defs12">
-    <style
-       id="style10">.cls-1{fill:#e95420;}.cls-2{fill:none;stroke:#e95420;stroke-miterlimit:10;stroke-width:1.5px;}.cls-3{fill:#fff;}</style>
-  </defs>
-  <rect
-     class="cls-3"
-     id="rect47"
-     width="2480"
-     height="1200"
-     x="0"
-     y="0"
-     style="stroke-width:1.34774" />
-  <g
-     id="g23"
-     transform="matrix(9.375,0,0,9.375,640,0)">
-    <path
-       class="cls-1"
-       d="M 64,1.5 A 62.5,62.5 0 1 1 1.5,64 62.57,62.57 0 0 1 64,1.5 M 64,0 A 64,64 0 1 0 128,64 64,64 0 0 0 64,0 Z"
-       id="path14" />
-    <path
-       class="cls-2"
-       d="M 30.79,64 A 8.23,8.23 0 1 1 22.55,55.77 8.23,8.23 0 0 1 30.79,64 Z m 46.81,40 a 8.23,8.23 0 1 0 3,-11.24 8.23,8.23 0 0 0 -3,11.24 z M 91.85,32.22 a 8.23,8.23 0 1 0 -11.24,3 8.22,8.22 0 0 0 11.24,-3 z M 64,40.53 A 23.46,23.46 0 0 1 87.37,61.92 L 99.28,61.74 A 35.22,35.22 0 0 0 88.9,38.91 a 11.58,11.58 0 0 1 -15.62,-9 35.49,35.49 0 0 0 -25,2.43 l 5.8,10.4 A 23.46,23.46 0 0 1 64,40.53 Z M 40.54,64 a 23.43,23.43 0 0 1 10,-19.2 L 44.4,34.58 A 35.44,35.44 0 0 0 29.81,55 a 11.56,11.56 0 0 1 0,18 35.49,35.49 0 0 0 14.59,20.43 L 50.51,83.2 A 23.43,23.43 0 0 1 40.54,64 Z M 64,87.47 a 23.39,23.39 0 0 1 -9.89,-2.18 l -5.79,10.4 A 35.12,35.12 0 0 0 64,99.35 35.52,35.52 0 0 0 73.28,98.12 11.58,11.58 0 0 1 88.9,89.12 35.27,35.27 0 0 0 99.28,66.27 L 87.37,66.08 A 23.46,23.46 0 0 1 64,87.47 Z"
-       id="path16" />
-  </g>
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs27" /><sodipodi:namedview
+   id="namedview25"
+   pagecolor="#ffffff"
+   bordercolor="#111111"
+   borderopacity="1"
+   inkscape:pageshadow="0"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="1"
+   showgrid="false"
+   fit-margin-top="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-bottom="0"
+   inkscape:zoom="0.38047958"
+   inkscape:cx="1264.194"
+   inkscape:cy="600.55786"
+   inkscape:window-width="1920"
+   inkscape:window-height="1016"
+   inkscape:window-x="0"
+   inkscape:window-y="27"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="g22" />
+<style
+   type="text/css"
+   id="style2">
+	.st0 { 
+    fill:#fff;
+}
+	.st1{fill:#E65821;}
+	.st2{fill:none;stroke:#E65821;stroke-width:1.5;stroke-miterlimit:10;}
+</style>
+<g
+   id="g22"
+   transform="matrix(10,0,0,10,600,-40)">
+	<rect
+   class="st0"
+   width="248"
+   height="120"
+   id="rect4"
+   x="-60"
+   y="4"
+   style="stroke-width:1.34774" />
+	<g
+   id="g8"
+   transform="matrix(0.9375,0,0,0.9375,4,4)">
+		<path
+   class="st1"
+   d="m 107.5,1.5 v 125 h -87 V 1.5 h 87 M 109,0 H 19 v 128 h 90 z"
+   id="path6" />
+	</g>
+	<circle
+   class="st2"
+   cx="40.1875"
+   cy="79.84375"
+   r="8.8125"
+   id="circle10" />
+	<circle
+   class="st2"
+   cx="77.125"
+   cy="60.4375"
+   r="8.8125"
+   id="circle12" />
+	<path
+   class="st2"
+   d="m 60.15625,102.625 c -6.375,-1.3125 -11.71875,-5.4375 -14.71875,-11.25 -2.34375,1.125 -5.0625,1.40625 -7.59375,0.9375 3.5625,8.90625 11.34375,15.375 20.71875,17.4375 2.0625,0.46875 4.21875,0.65625 6.28125,0.65625 C 63.25,108.25 62.3125,105.71875 62.21875,103 c -0.5625,-0.0937 -1.3125,-0.28125 -2.0625,-0.375 z"
+   id="path14" />
+	<circle
+   class="st2"
+   cx="75.0625"
+   cy="102.625"
+   r="8.8125"
+   id="circle16" />
+	<path
+   class="st2"
+   d="m 87.4375,99.4375 c 7.78125,-9.84375 8.34375,-23.53125 1.5,-34.03125 -1.03125,2.4375 -2.71875,4.40625 -4.96875,5.8125 3.5625,6.75 3.28125,15 -0.75,21.5625 2.0625,1.6875 3.5625,4.03125 4.21875,6.65625 z"
+   id="path18" />
+	<path
+   class="st2"
+   d="m 39.53125,67.09375 h 0.65625 c 0.9375,0 1.78125,0.09375 2.71875,0.28125 1.40625,0.28125 2.8125,0.84375 4.03125,1.59375 3.9375,-5.71875 10.40625,-9.1875 17.34375,-9.28125 0,-0.65625 0.09375,-1.3125 0.28125,-1.96875 C 64.9375,55.84375 65.78125,54.0625 67,52.5625 55.84375,51.71875 45.15625,57.34375 39.53125,67.09375 Z"
+   id="path20" />
+</g>
 </svg>
