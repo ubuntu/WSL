@@ -9,22 +9,24 @@
     <Keyword>bash</Keyword>
   </Keywords>
   <Description>
-Ubuntu 22.04 LTS on Windows allows you to use Ubuntu Terminal and run Ubuntu command line utilities including bash, ssh, git, apt and many more.
+Install a complete Ubuntu terminal environment in minutes with Windows Subsystem for Linux (WSL). Develop cross-platform applications, improve your data science or web development workflows and manage IT infrastructure without leaving Windows.
 
-Please note that Windows 10 S does not support running this app.
+Key features:
+  - Efficient command line utilities including bash, ssh, git, apt, npm, pip and many more
+  - Manage Docker containers with improved performance and startup times
+  - Leverage GPU acceleration for AI/ML workloads with NVIDIA CUDA
+  - A consistent development to deployment workflow when using Ubuntu in the cloud
+  - 5 years of security patching with Ubuntu Long Term Support (LTS) releases
 
-To launch, use "ubuntu2204" on the command-line prompt (cmd.exe), or click on the Ubuntu 22.04 LTS tile in the Start Menu.
+Ubuntu 22.04 LTS is the LTS version of Ubuntu and receives updates for five years. Upgrades to future LTS releases will not be proposed.
 
-To use this feature, one first needs to use "Turn Windows features on or off" and select "Windows Subsystem for Linux", click OK, reboot, and use this app.
+Installation tips:
+  - Search for "Turn Windows features on or off" in the Windows search bar and ensure that "Windows Subsystem for Linux" is turned on before restarting your machine.
+  - To launch, use "ubuntu2204" on the command-line prompt or Windows Terminal, or click on the Ubuntu 22.04 LTS tile in the Start Menu.
 
-The above step can also be performed using Administrator PowerShell prompt:
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+For more information about Ubuntu WSL and how Canonical supports developers please visit:
 
-This app installs the Ubuntu 22.04 LTS release on Windows.
-
-Please note that app updates don't change the Ubuntu installation. To upgrade to a new release please run do-release-upgrade in the Ubuntu Terminal.
-
-For more information about Windows Subsystem for Linux please visit: https://wiki.ubuntu.com/WSL
+https://wiki.ubuntu.com/WSL
 </Description>
   <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver=22.04</ReleaseNotes>
   <DevStudio>Canonical Ltd. and the OpenSource community</DevStudio>
