@@ -52,7 +52,7 @@ namespace Oobe
 
     void ExitStatusHandling()
     {
-        std::string prefixedFilePath{"\\\\wsl$\\"};
+        std::string prefixedFilePath{"\\\\wsl.localhost\\"};
         auto distroName = Win32Utils::wide_string_to_utf8(DistributionInfo::Name);
         // That should never fail, but if that happens it is a real bug.
         if (!distroName.has_value()) {

@@ -64,7 +64,7 @@ namespace DistributionInfo
         // Before shutting down the distro, make sure we set the default
         // user through the WSL API.
         std::wifstream statusFile;
-        const std::wstring wslPrefix = L"\\\\wsl$\\" + DistributionInfo::Name;
+        const std::wstring wslPrefix = L"\\\\wsl.localhost\\" + DistributionInfo::Name;
 
         const TCHAR* subiquityRunPath = L"/run/subiquity/";
         const TCHAR* defaultUIDPath = L"default-uid";
@@ -127,9 +127,9 @@ namespace DistributionInfo
                 return commandLine;
             }
 
-            // Write it to a file inside \\wsl$ distro filesystem.
+            // Write it to a file inside \\wsl.localhost distro filesystem.
             const std::wstring prefillFileNameDest = L"/var/tmp/prefill-system-setup.yaml";
-            const std::wstring wslPrefix = L"\\\\wsl$\\" + DistributionInfo::Name;
+            const std::wstring wslPrefix = L"\\\\wsl.localhost\\" + DistributionInfo::Name;
             std::ofstream prefillFile;
             // Mixing slashes and backslashes that way is not a problem for Windows.
             prefillFile.open(wslPrefix + prefillFileNameDest, std::ios::ate);
