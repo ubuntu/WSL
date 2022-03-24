@@ -136,11 +136,11 @@ jobs:
           $pwd = ConvertTo-SecureString  '${{ secrets.CERTIFICATE_PASSWORD }}' -AsPlainText -Force
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
-      - name: Build the splash screen
-        # We should revisit this later to select only the WSLIDs for which the splash is relevant.
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Build the splash screen
+        # We should revisit this later to select only the WSLIDs for which the splash is relevant.
         run: |
           flutter config --enable-windows-desktop
           cd "${{ env.workDir }}/ubuntu-wsl-splash"
