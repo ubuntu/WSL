@@ -20,7 +20,7 @@ import (
 	"time"
 
 	shutil "github.com/termie/go-shutil"
-	"github.com/ubuntu/WSL/wsl-builder/common"
+	"github.com/ubuntu/wsl/wsl-builder/common"
 	"golang.org/x/sync/errgroup"
 )
 
