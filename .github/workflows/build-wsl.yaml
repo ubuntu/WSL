@@ -107,7 +107,6 @@ jobs:
         run: |
           set -eu
           # Download rootfses, checksum and place them at the correct place
-          # TODO: what if we changed only assets?
           go build ./wsl-builder/prepare-build
           extraArgs=""
           if [ ${{ matrix.Upload }} != "yes" ]; then
