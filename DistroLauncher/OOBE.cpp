@@ -61,55 +61,9 @@ namespace DistributionInfo
             return hr;
         }
 
-        // Before shutting down the distro, make sure we set the default
-        // user through the WSL API.
-        std::wifstream statusFile;
-        const std::wstring wslPrefix = L"\\\\wsl.localhost\\" + DistributionInfo::Name;
+        Oobe::ExitStatusHandling();
 
-        const TCHAR* subiquityRunPath = L"/run/subiquity/";
-        const TCHAR* defaultUIDPath = L"default-uid";
-        statusFile.open(wslPrefix + subiquityRunPath + defaultUIDPath, std::ios::in);
-        if (statusFile.fail()) {
-            Helpers::PrintErrorMessage(E_FAIL);
-            return E_FAIL;
-        }
-
-        ULONG defaultUID = UID_INVALID;
-        // The file should contain the UID and nothing else.
-        // TODO: migrate this to a more robust solution, like one single
-        // YAML file.
-        statusFile >> defaultUID;
-        if (statusFile.fail() || defaultUID == UID_INVALID) {
-            Helpers::PrintErrorMessage(E_FAIL);
-            return E_FAIL;
-        }
-        statusFile.close();
-
-        hr = g_wslApi.WslConfigureDistribution(defaultUID, WSL_DISTRIBUTION_FLAGS_DEFAULT);
-        if (FAILED(hr)) {
-            return hr;
-        }
-
-        // read the OOBE exit status file.
-        // Even without interop activated Windows can still access Linux files under WSL.
-        const TCHAR* launcherStatusPath = L"launcher-status";
-
-        statusFile.open(wslPrefix + subiquityRunPath + launcherStatusPath, std::ios::in);
-        if (statusFile.fail()) {
-            Helpers::PrintErrorMessage(E_FAIL);
-            return E_FAIL;
-        }
-
-        std::wstring launcherStatus;
-        // Launcher status file should have just one word.
-        statusFile >> launcherStatus;
-        if (statusFile.fail() || launcherStatus.empty()) {
-            Helpers::PrintErrorMessage(E_FAIL);
-            return E_FAIL;
-        }
-        statusFile.close();
-
-        return OOBEStatusHandling(launcherStatus);
+        return S_OK;
     }
 
     // Anonimous namespace to avoid exposing internal details of the implementation.
