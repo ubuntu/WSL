@@ -14,7 +14,7 @@ on:
     - cron: '42 0 * * 6'
 
 env:
-  goversion: '1.16'
+  goversion: '1.18'
 
 jobs:
   update-releases:
@@ -39,8 +39,7 @@ jobs:
           cat  /tmp/all-releases.csv
       - name: Update current metadata and asset for all releases
         run: |
-          cd wsl-builder/prepare-assets
-          go build .
+          go build ./wsl-builder/prepare-assets
           ./prepare-assets /tmp/all-releases.csv
       - name: Add any changes to git
         run: |
