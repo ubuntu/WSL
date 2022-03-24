@@ -107,7 +107,7 @@ int wmain(int argc, wchar_t const *argv[])
 
         // If the "--root" option is specified, do not create a user account.
         bool useRoot = ((installOnly) && (arguments.size() > 1) && (arguments[1] == ARG_INSTALL_ROOT));
-        hr = InstallDistribution(!useRoot, arguments[0] == ARG_SKIP_INSTALLER);
+        hr = InstallDistribution(!useRoot, DistributionInfo::shouldSkipInstaller(arguments, ARG_SKIP_INSTALLER));
         if (FAILED(hr)) {
             if (hr == HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS)) {
                 Helpers::PrintMessage(MSG_INSTALL_ALREADY_EXISTS);

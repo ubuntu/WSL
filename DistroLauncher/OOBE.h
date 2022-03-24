@@ -27,4 +27,8 @@ namespace DistributionInfo {
     // GetPrefillInfoInYaml generates a YAML string from Windows user 
     // and locale information, UTF-8 encoded, thus std::string.
     std::string GetPrefillInfoInYaml();
+
+    // Returns true if the argument ARG_SKIP_INSTALLER is present.
+    // Removes it from the argument vector if present to avoid interference with upstream code.
+    bool shouldSkipInstaller(std::vector<std::wstring_view>& arguments, std::wstring_view value);
 }
