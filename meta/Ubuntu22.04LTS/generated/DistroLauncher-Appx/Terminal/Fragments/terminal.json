@@ -23,8 +23,7 @@
           //"face": "Ubuntu Mono",
           "face": "Cascadia Mono",
           "size": 13
-        },
-        "useAcrylic": true
+        }
       }
     ],
     "schemes": [
