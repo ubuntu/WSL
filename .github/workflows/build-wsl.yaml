@@ -23,7 +23,7 @@ on:
 concurrency: build-wsl
 
 env:
-  goversion: '1.16'
+  goversion: '1.18'
 
 jobs:
   build-matrix:
@@ -66,8 +66,7 @@ jobs:
             )"
           else
             wsl-builder/lp-distro-info > /tmp/all-releases.csv
-            cd ./wsl-builder/prepare-build
-            go build .
+            go build ./wsl-builder/prepare-build
             builds_config="$(./prepare-build build-github-matrix /tmp/all-releases.csv)"
             builds="{\"include\":${builds_config}}"
           fi
@@ -109,9 +108,7 @@ jobs:
           set -eu
           # Download rootfses, checksum and place them at the correct place
           # TODO: what if we changed only assets?
-          cd wsl-builder/prepare-build
-          go build .
-          cd ../../
+          go build wsl-builder/prepare-build
           extraArgs=""
           if [ ${{ matrix.Upload }} != "yes" ]; then
               extraArgs="--build-id 9999"
@@ -119,7 +116,7 @@ jobs:
           if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
             extraArgs="${extraArgs} --no-checksum"
           fi
-          archsBundle="$(./wsl-builder/prepare-build/prepare-build prepare ${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
+          archsBundle="$(./prepare-build prepare ${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
 
           # Always StoreUpload mode to get appxupload file
