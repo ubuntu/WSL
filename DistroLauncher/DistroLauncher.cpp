@@ -12,15 +12,16 @@
 #define ARG_INSTALL_ROOT        L"--root"
 #define ARG_RUN                 L"run"
 #define ARG_RUN_C               L"-c"
+#define ARG_SKIP_INSTALLER      L"--skip-installer"
 
 // Helper class for calling WSL Functions:
 // https://msdn.microsoft.com/en-us/library/windows/desktop/mt826874(v=vs.85).aspx
 WslApiLoader g_wslApi(DistributionInfo::Name);
 
-static HRESULT InstallDistribution(bool createUser);
+static HRESULT InstallDistribution(bool createUser, bool skipInstaller);
 static HRESULT SetDefaultUser(std::wstring_view userName);
 
-HRESULT InstallDistribution(bool createUser)
+HRESULT InstallDistribution(bool createUser, bool skipInstaller)
 {
     // Register the distribution.
     Helpers::PrintMessage(MSG_STATUS_INSTALLING);
@@ -38,8 +39,10 @@ HRESULT InstallDistribution(bool createUser)
 
     // Create a user account.
     if (createUser) {
-        if (DistributionInfo::isOOBEAvailable()){
-            return DistributionInfo::OOBESetup();
+        if (DistributionInfo::isOOBEAvailable() && skipInstaller==false) {
+            if(SUCCEEDED(DistributionInfo::OOBESetup())) {
+                return S_OK;
+            }
         }
         Helpers::PrintMessage(MSG_CREATE_USER_PROMPT);
         std::wstring userName;
@@ -104,7 +107,7 @@ int wmain(int argc, wchar_t const *argv[])
 
         // If the "--root" option is specified, do not create a user account.
         bool useRoot = ((installOnly) && (arguments.size() > 1) && (arguments[1] == ARG_INSTALL_ROOT));
-        hr = InstallDistribution(!useRoot);
+        hr = InstallDistribution(!useRoot, arguments[0] == ARG_SKIP_INSTALLER);
         if (FAILED(hr)) {
             if (hr == HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS)) {
                 Helpers::PrintMessage(MSG_INSTALL_ALREADY_EXISTS);
