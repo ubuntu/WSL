@@ -16,7 +16,7 @@ import (
 	"text/template"
 
 	shutil "github.com/termie/go-shutil"
-	"github.com/ubuntu/WSL/wsl-builder/common"
+	"github.com/ubuntu/wsl/wsl-builder/common"
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
 
