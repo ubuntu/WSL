@@ -1,0 +1,7 @@
+go 1.18
+
+use (
+	./wsl-builder/common
+	./wsl-builder/prepare-assets
+	./wsl-builder/prepare-build
+)
