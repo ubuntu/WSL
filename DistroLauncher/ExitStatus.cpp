@@ -76,13 +76,13 @@ namespace Oobe
         if (parserResult.has_value()) {
             // Finally take the actions and delete the file.
             const KeyValuePairs& launcherCmds{parserResult.value()};
-            auto actionResult = act(launcherCmds);
-            if (!actionResult.has_value()) {
-                Helpers::PrintFromUtf8(actionResult.error().what());
-            }
             auto configResult = config(launcherCmds);
             if (!configResult.has_value()) {
                 Helpers::PrintFromUtf8(configResult.error().what());
+            }
+            auto actionResult = act(launcherCmds);
+            if (!actionResult.has_value()) {
+                Helpers::PrintFromUtf8(actionResult.error().what());
             }
         } else {
             wprintf(parserResult.error());
@@ -182,7 +182,7 @@ namespace Oobe
 
         namespace Actions
         {
-            VoidResult shutdownDistro()
+            VoidResult rebootDistro()
             {
                 const std::wstring shutdownCmd = L"wsl -t " + DistributionInfo::Name;
                 int cmdResult = _wsystem(shutdownCmd.c_str());
@@ -200,28 +200,12 @@ namespace Oobe
                 return VoidResult();
             }
 
-            VoidResult rebootDistro()
+            VoidResult shutdownDistro()
             {
-                auto res = shutdownDistro();
-                if (!res.has_value()) {
-                    return nonstd::make_unexpected(res.error());
-                }
-
-                // We could, but may not want to just `wsl -d Distro`. We can explore running our launcher in the
-                // future.
-                TCHAR launcherName[MAX_PATH];
-                DWORD fnLength = GetModuleFileName(nullptr, launcherName, MAX_PATH);
-                if (fnLength == 0) {
-                    return nonstd::make_unexpected(std::runtime_error(
-                        "Failed to determine the launcher path. Error Code: " + std::to_string(GetLastError())));
-                }
-
-                auto cmdResult = _wsystem(launcherName);
-                if (cmdResult != 0) {
-                    return nonstd::make_unexpected(std::runtime_error("Failed to relaunch the distro."));
-                }
-
-                return VoidResult();
+                // There is no proper shutdown semantics in WSL.
+                // The upstream code will restart the distro if shell is required.
+                // Unless we call exit(0) from here, which sounds dramatic and unnecessary.
+                return rebootDistro();
             }
         } // namespace Actions
 
