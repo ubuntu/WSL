@@ -297,8 +297,8 @@ DistroLauncher/messages.h
 *.tar.gz
 
 # Our own components
-prepare-assets
-prepare-build
+/prepare-assets
+/prepare-build
 wsl-builder/prepare-assets/prepare-assets
 wsl-builder/prepare-build/prepare-build
 
