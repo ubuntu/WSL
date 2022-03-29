@@ -297,5 +297,5 @@ jobs:
           for build in $(git diff-tree --no-commit-id --name-only -r HEAD | grep buildid); do
             WSLId=$(basename $build);
             WSLId=${WSLId%-buildid.md};
-            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker $WslID $GITHUB_RUN_ID
+            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker $WSLId $GITHUB_RUN_ID
           done
