@@ -186,6 +186,10 @@ func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, ro
 			return err
 		}
 
+		if filepath.Ext(dest) == ".tmpl" {
+			dest = strings.TrimSuffix(dest, ".tmpl")
+		}
+
 		data, err := os.ReadFile(src)
 		if err != nil {
 			return err
