@@ -41,8 +41,9 @@ namespace DistributionInfo
     // TODO: Remove this when the rootfs gets the missing groups added.
     void createMissingGroups(std::vector<std::wstring_view> groups)
     {
+        constexpr size_t cmdLenght = 80;
         std::wstring command;
-        command.reserve(80);
+        command.reserve(cmdLenght);
         if (groups.empty()) {
             return;
         }
@@ -54,7 +55,7 @@ namespace DistributionInfo
             command.append(L" 2>/dev/null");
             DWORD exitCode;
             // it doesn't really matter if it fails.
-            wslApi->WslLaunchInteractive(command.c_str(), false, &exitCode);
+            wslApi->WslLaunchInteractive(command.c_str(), FALSE, &exitCode);
         };
 
         std::for_each(std::begin(groups), std::end(groups), createOneGroup);
