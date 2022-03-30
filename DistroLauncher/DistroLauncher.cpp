@@ -39,6 +39,8 @@ HRESULT InstallDistribution(bool createUser, bool skipInstaller)
 
     // Create a user account.
     if (createUser) {
+        // TODO: Remove this when the rootfs gets the missing groups added.
+        DistributionInfo::createMissingGroups({L"admin", L"netdev"});
         if (DistributionInfo::isOOBEAvailable() && skipInstaller==false) {
             if(SUCCEEDED(DistributionInfo::OOBESetup())) {
                 return S_OK;
