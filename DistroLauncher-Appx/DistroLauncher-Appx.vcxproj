@@ -89,7 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <AppxManifest Include="../$(Platform)/MyDistro.appxmanifest">
+    <AppxManifest Include="MyDistro.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="DistroLauncher-Appx_StoreKey.pfx" />
