@@ -64,9 +64,9 @@ namespace DistributionInfo
     bool isOOBEAvailable()
     {
         DWORD exitCode = -1;
-        std::wstring whichCdm{L"which "};
-        whichCdm.append(DistributionInfo::OOBE_NAME);
-        HRESULT hr = g_wslApi.WslLaunchInteractive(whichCdm.c_str(), TRUE, &exitCode);
+        std::wstring whichCmd{L"which "};
+        whichCmd.append(DistributionInfo::OOBE_NAME);
+        HRESULT hr = g_wslApi.WslLaunchInteractive(whichCmd.c_str(), TRUE, &exitCode);
         // true if launching the process succeeds and `which` command returns 0.
         return ((SUCCEEDED(hr)) && (exitCode == 0));
     }
