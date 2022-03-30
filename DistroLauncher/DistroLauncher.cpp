@@ -12,7 +12,7 @@
 #define ARG_INSTALL_ROOT        L"--root"
 #define ARG_RUN                 L"run"
 #define ARG_RUN_C               L"-c"
-#define ARG_SKIP_INSTALLER      L"--skip-installer"
+#define ARG_ENABLE_INSTALLER      L"--enable-installer"
 
 // Helper class for calling WSL Functions:
 // https://msdn.microsoft.com/en-us/library/windows/desktop/mt826874(v=vs.85).aspx
@@ -107,7 +107,7 @@ int wmain(int argc, wchar_t const *argv[])
 
         // If the "--root" option is specified, do not create a user account.
         bool useRoot = ((installOnly) && (arguments.size() > 1) && (arguments[1] == ARG_INSTALL_ROOT));
-        hr = InstallDistribution(!useRoot, DistributionInfo::shouldSkipInstaller(arguments, ARG_SKIP_INSTALLER));
+        hr = InstallDistribution(!useRoot, DistributionInfo::shouldSkipInstaller(arguments, ARG_ENABLE_INSTALLER));
         if (FAILED(hr)) {
             if (hr == HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS)) {
                 Helpers::PrintMessage(MSG_INSTALL_ALREADY_EXISTS);
