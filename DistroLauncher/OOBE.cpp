@@ -66,6 +66,7 @@ namespace DistributionInfo
         DWORD exitCode = -1;
         std::wstring whichCmd{L"which "};
         whichCmd.append(DistributionInfo::OOBE_NAME);
+        whichCmd.append(L" &>/dev/null");
         HRESULT hr = g_wslApi.WslLaunchInteractive(whichCmd.c_str(), TRUE, &exitCode);
         // true if launching the process succeeds and `which` command returns 0.
         return ((SUCCEEDED(hr)) && (exitCode == 0));
