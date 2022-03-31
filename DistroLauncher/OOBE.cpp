@@ -16,7 +16,6 @@
  */
 
 #include "stdafx.h"
-#include <algorithm>
 
 namespace DistributionInfo
 {
@@ -36,28 +35,6 @@ namespace DistributionInfo
         auto r = std::distance(it, arguments.end());
         arguments.erase(it, arguments.end());
         return r == 0;
-    }
-
-    // TODO: Remove this when the rootfs gets the missing groups added.
-    void createMissingGroups(std::vector<std::wstring_view> groups)
-    {
-        std::wstring command;
-        command.reserve(80);
-        if (groups.empty()) {
-            return;
-        }
-
-        auto createOneGroup = [&command, wslApi = &g_wslApi](std::wstring_view grp) {
-            command.clear();
-            command.append(L"groupadd ");
-            command.append(grp);
-            command.append(L" 2>/dev/null");
-            DWORD exitCode;
-            // it doesn't really matter if it fails.
-            wslApi->WslLaunchInteractive(command.c_str(), false, &exitCode);
-        };
-
-        std::for_each(std::begin(groups), std::end(groups), createOneGroup);
     }
 
     bool isOOBEAvailable()

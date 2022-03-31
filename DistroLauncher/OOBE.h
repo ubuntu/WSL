@@ -32,7 +32,4 @@ namespace DistributionInfo
     // Returns true if the argument ARG_SKIP_INSTALLER is present.
     // Removes it from the argument vector if present to avoid interference with upstream code.
     bool shouldSkipInstaller(std::vector<std::wstring_view>& arguments, std::wstring_view value);
-
-    // Temporary workaround to create missing groups required by the current installation.
-    void createMissingGroups(std::vector<std::wstring_view> groups);
 }
