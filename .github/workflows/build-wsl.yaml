@@ -289,14 +289,13 @@ jobs:
       - name: Notify ISO Tracker
         if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
         env:
-          ISOTRACKER_USERNAME: ${{ secrets.ISOTrackerUsername }}
-          ISOTRACKER_PASSWORD: ${{ secrets.ISOTrackerPassword }}
+          ISOTRACKER_USERNAME: ${{ secrets.ISOTRACKER_USERNAME }}
+          ISOTRACKER_PASSWORD: ${{ secrets.ISOTRACKER_PASSWORD }}
         run: |
           [ -f /tmp/all-releases.csv ] || ${{ env.codeDir }}/wsl-builder/lp-distro-info > /tmp/all-releases.csv
           # There might have been more than one build in the latest commit 
           for build in $(git diff-tree --no-commit-id --name-only -r HEAD | grep buildid); do
             WSLId=$(basename $build);
             WSLId=${WSLId%-buildid.md};
-            # XXX: Temporarily we run this in debug mode - this should be removed after we confirm all works well
-            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker -d $WSLId $GITHUB_RUN_ID
+            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker $WSLId $GITHUB_RUN_ID
           done
