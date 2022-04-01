@@ -80,6 +80,7 @@ namespace Win32Utils
             assert(redirectTo.readHandle() != nullptr);
             // Attempting to find the console window is best-effort if it is not the old style console.
             // This has been tested for the new Windows Terminal. Other terminals out there may not fit.
+            Sleep(100);
             window_ = FindWindow(L"CASCADIA_HOSTING_WINDOW_CLASS", DistributionInfo::WindowTitle.c_str());
             if (window_ == NULL) {
                 window_ = GetConsoleWindow();
