@@ -63,6 +63,10 @@ def create_tracker_config(releases):
     username = os.environ.get("ISOTRACKER_USERNAME", "")
     password = os.environ.get("ISOTRACKER_PASSWORD", "")
 
+    if not username or not password:
+        logging.error("Tracker credentials are incomplete, cannot continue")
+        return None
+
     # Active milestone settings
 
     # First release = devel release
@@ -121,17 +125,19 @@ def main():
 
     # Generate ISOTracker configuration dynamically
     tracker_config = create_tracker_config(releases)
+    if not tracker_config:
+        logging.error("Failed creating tracker configuration.")
+        return 1
 
     target = "iso-%s" % series_name
     logging.debug("Pushing notification to the %s tracker", target)
-    try:
-        tracker = ISOTracker(target=target, config=tracker_config)
-        logging.debug("Logged in, now posting build to the tracker (%s)",
-            args.buildID)
-        tracker.post_build(PRODUCT_NAME, args.buildID)
-    except Exception:
-        logging.error("Failed to post image notification to the ISO Tracker")
-        return 1
+    # This is the end step, so we actually let errors be exceptions as there's
+    # a lot that can go wrong and the exceptions always provide useful
+    # information.
+    tracker = ISOTracker(target=target, config=tracker_config)
+    logging.debug("Logged in, now posting build to the tracker (%s)",
+        args.buildID)
+    tracker.post_build(PRODUCT_NAME, args.buildID)
 
     return 0
 
