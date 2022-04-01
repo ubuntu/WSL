@@ -12,17 +12,17 @@
 #define ARG_INSTALL_ROOT        L"--root"
 #define ARG_RUN                 L"run"
 #define ARG_RUN_C               L"-c"
-#define ARG_ENABLE_INSTALLER      L"--enable-installer"
 
 // Helper class for calling WSL Functions:
 // https://msdn.microsoft.com/en-us/library/windows/desktop/mt826874(v=vs.85).aspx
 WslApiLoader g_wslApi(DistributionInfo::Name);
 
-static HRESULT InstallDistribution(bool createUser, bool skipInstaller);
+static HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app);
 static HRESULT SetDefaultUser(std::wstring_view userName);
 
-HRESULT InstallDistribution(bool createUser, bool skipInstaller)
+HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
 {
+    app.runSplash();
     // Register the distribution.
     Helpers::PrintMessage(MSG_STATUS_INSTALLING);
     HRESULT hr = g_wslApi.WslRegisterDistribution();
@@ -39,8 +39,8 @@ HRESULT InstallDistribution(bool createUser, bool skipInstaller)
 
     // Create a user account.
     if (createUser) {
-        if (DistributionInfo::isOOBEAvailable() && skipInstaller==false) {
-            if(SUCCEEDED(DistributionInfo::OOBESetup())) {
+        if (!app.shouldSkipInstaller()) {
+            if (SUCCEEDED(app.setup())) {
                 return S_OK;
             }
         }
@@ -89,6 +89,7 @@ int wmain(int argc, wchar_t const *argv[])
         arguments.push_back(argv[index]);
     }
 
+    Oobe::Application<> app(arguments);
     // Ensure that the Windows Subsystem for Linux optional component is installed.
     DWORD exitCode = 1;
     if (!g_wslApi.WslIsOptionalComponentInstalled()) {
@@ -107,7 +108,7 @@ int wmain(int argc, wchar_t const *argv[])
 
         // If the "--root" option is specified, do not create a user account.
         bool useRoot = ((installOnly) && (arguments.size() > 1) && (arguments[1] == ARG_INSTALL_ROOT));
-        hr = InstallDistribution(!useRoot, DistributionInfo::shouldSkipInstaller(arguments, ARG_ENABLE_INSTALLER));
+        hr = InstallDistribution(!useRoot, app);
         if (FAILED(hr)) {
             if (hr == HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS)) {
                 Helpers::PrintMessage(MSG_INSTALL_ALREADY_EXISTS);
@@ -143,7 +144,7 @@ int wmain(int argc, wchar_t const *argv[])
             hr = g_wslApi.WslLaunchInteractive(Oobe::WrapCommand(command.c_str()).c_str(), true, &exitCode);
 
         } else if (arguments[0] == ARG_CONFIG) {
-            hr = E_INVALIDARG;
+            hr = app.reconfigure();
             if (arguments.size() == 3) {
                 if (arguments[1] == ARG_CONFIG_DEFAULT_USER) {
                     hr = SetDefaultUser(arguments[2]);
