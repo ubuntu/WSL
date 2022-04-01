@@ -66,6 +66,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleServiceTests.cpp" />
+    <ClCompile Include="ExtendedCliParserTests.cpp" />
     <ClCompile Include="InstallerControllerTests.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ExitStatusParserTests.cpp" />

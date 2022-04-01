@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="console_service.h" />
     <ClInclude Include="ExitStatus.h" />
+    <ClInclude Include="extended_cli_parser.h" />
     <ClInclude Include="installer_controller.h" />
     <ClInclude Include="installer_policy.h" />
     <ClInclude Include="not_null.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="ExitStatus.cpp" />
     <ClCompile Include="exit_status_parser.cpp" />
+    <ClCompile Include="extended_cli_parser.cpp" />
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="DistroLauncher.cpp" />
     <ClCompile Include="local_named_pipe.cpp" />
