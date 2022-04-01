@@ -33,6 +33,12 @@
 #include <any>
 #include <map>
 #include <unordered_map>
+#include <algorithm>
+#include <iostream>
+#include <filesystem>
+#include <optional>
+#include <variant>
+#include <type_traits>
 #include "expected.hpp"
 #include "not_null.h"
 #include "WslApiLoader.h"

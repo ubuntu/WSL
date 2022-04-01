@@ -16,9 +16,6 @@
  */
 
 #pragma once
-#include "state_machine.h"
-#include <filesystem>
-#include <iostream>
 
 namespace Oobe
 {

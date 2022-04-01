@@ -15,12 +15,6 @@
  *
  */
 #pragma once
-// TODO: Remove those includes when this file gets into stdafx.h
-#include <filesystem>
-#include <optional>
-#include <variant>
-#include <algorithm>
-
 #define ARG_EXT_ENABLE_INSTALLER L"--enable-installer"
 #define ARG_EXT_AUTOINSTALL      L"--autoinstall"
 
