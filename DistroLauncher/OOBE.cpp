@@ -22,7 +22,6 @@ namespace DistributionInfo
 
     namespace
     {
-        HRESULT OOBEStatusHandling(std::wstring_view status);
         bool EnsureStopped(unsigned int maxNoOfRetries);
         const TCHAR* const OOBE_NAME = L"/usr/libexec/wsl-setup";
     }
@@ -146,57 +145,6 @@ namespace DistributionInfo
     // Anonimous namespace to avoid exposing internal details of the implementation.
     namespace
     {
-        // OOBEStatusHandling checks the exit status of wsl-setup script
-        // and takes the required actions.
-        HRESULT OOBEStatusHandling(std::wstring_view status)
-        {
-            if (status.compare(L"complete") == 0) {
-                // Do nothing, just return.
-                return S_OK;
-            }
-
-            bool needsReboot = (status.compare(L"reboot") == 0);
-
-            // Neither reboot nor shutdown
-            if (!needsReboot && (status.compare(L"shutdown") != 0)) {
-                return E_INVALIDARG;
-            }
-
-            const std::wstring shutdownCmd = L"wsl -t " + DistributionInfo::Name;
-            int cmdResult = _wsystem(shutdownCmd.c_str());
-            if (cmdResult != 0) {
-                return ERROR_FAIL_SHUTDOWN;
-            }
-
-            if (!needsReboot) {
-                return S_OK;
-            }
-
-            // Before relaunching, give WSL some time to make sure
-            // distro is stopped.
-            bool stopSuccess = EnsureStopped(30); // NOLINT(readability-magic-numbers): only used here.
-            if (!stopSuccess) {
-                // We could try again, but who knows why
-                // we failed to stop the distro in the first time.
-                return ERROR_FAIL_SHUTDOWN;
-            }
-
-            // We could, but may not want to just `wsl -d Distro`.
-            // We can explore running our launcher in the future.
-            TCHAR launcherName[MAX_PATH];
-            DWORD fnLength = GetModuleFileName(nullptr, launcherName, MAX_PATH);
-            if (fnLength == 0) {
-                return HRESULT_FROM_WIN32(GetLastError());
-            }
-
-            cmdResult = _wsystem(launcherName);
-            if (cmdResult != 0) {
-                return ERROR_FAIL_RESTART;
-            }
-
-            return S_OK;
-        } // HRESULT OOBEStatusHandling(std::wstring_view status).
-
         // Polls WSL to ensure the distro is actually stopped.
         bool EnsureStopped(unsigned int maxNoOfRetries)
         {
