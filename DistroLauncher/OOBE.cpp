@@ -22,7 +22,6 @@ namespace DistributionInfo
 
     namespace
     {
-        bool EnsureStopped(unsigned int maxNoOfRetries);
         const TCHAR* const OOBE_NAME = L"/usr/libexec/wsl-setup";
     }
 
@@ -141,34 +140,4 @@ namespace DistributionInfo
             return !Helpers::WslGraphicsSupported();
         }
     }
-
-    // Anonimous namespace to avoid exposing internal details of the implementation.
-    namespace
-    {
-        // Polls WSL to ensure the distro is actually stopped.
-        bool EnsureStopped(unsigned int maxNoOfRetries)
-        {
-            for (unsigned int i = 0; i < maxNoOfRetries; ++i) {
-                auto runner = Helpers::ProcessRunner(L"wsl -l --quiet --running");
-                auto exitCode = runner.run();
-                if (exitCode != 0L) {
-                    // I'm sure we will want to customize those messages in the short future.
-                    Helpers::PrintErrorMessage(ERROR_FAIL_SHUTDOWN);
-                    return false;
-                }
-
-                // Returns true once we don't find the DistributionInfo::Name in process's stdout
-                auto output = runner.getStdOut();
-                if (output.find(DistributionInfo::Name) == std::wstring::npos) {
-                    return true;
-                }
-
-                // We don't need to be hard real time precise.
-                Sleep(997); // NOLINT(readability-magic-numbers): only used here.
-            }
-            return false;
-        }
-
-    } // namespace.
-
 } // namespace DistributionInfo.
