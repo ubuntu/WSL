@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Canonical Ltd
+ * Copyright (C) 2022 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #pragma once
 
 #include "extended_cli_parser.h"
@@ -77,6 +78,7 @@ namespace Oobe
 
             return hr;
         }
+
         /// Invokes the OOBE in reconfiguration mode.
         /// In order to trigger reconfiguration with the command `launcher.exe config`, the call-site has to be
         /// different from where the setup() function is called. Thus, checking whether the command line parsing
@@ -90,6 +92,7 @@ namespace Oobe
 
             return E_INVALIDARG;
         }
+
         /// Runs the splash application if the OOBE is enabled in interactive mode by the command line parsing.
         void runSplash()
         {

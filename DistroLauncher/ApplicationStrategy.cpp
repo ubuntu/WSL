@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Canonical Ltd
+ * Copyright (C) 2022 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -38,6 +38,7 @@ namespace Oobe
                        ok.value());
             return hr;
         }
+
         HRESULT do_autoinstall(InstallerController<>& controller, std::filesystem::path autoinstall_file)
         {
             auto& stateMachine = controller.sm;
@@ -59,9 +60,14 @@ namespace Oobe
                        ok.value());
             return hr;
         }
+    } // namespace.
 
+// The part of the code affected by the existence of the splash application in the package is excluded from compilation
+// for ARM64 due splash application being written in Dart/Flutter, which currently does not supported Windows ARM64
+// targets. See: https://github.com/flutter/flutter/issues/62597
 #ifndef _M_ARM64
-
+    namespace
+    {
         std::filesystem::path splashPath()
         {
             const wchar_t* splashName = L"ubuntu_wsl_splash.exe";
@@ -77,21 +83,23 @@ namespace Oobe
         }
     } // namespace.
 
-    x64Strategy::x64Strategy() : splashExePath{splashPath()}
+    SplashEnabledStrategy::SplashEnabledStrategy() : splashExePath{splashPath()}
     { }
 
-    void x64Strategy::do_run_splash()
+    void SplashEnabledStrategy::do_run_splash()
     {
         if (!std::filesystem::exists(splashExePath)) {
             wprintf(L"Splash executable [%s] not found.\n", splashExePath.c_str());
             return;
         }
+
         auto now = std::chrono::system_clock::now().time_since_epoch();
         auto pipe = Win32Utils::makeNamedPipe(true, false, std::to_wstring(now.count()));
         if (!pipe.has_value()) {
             wprintf(L"Unable to prepare for the execution of the splash. Error: %s.\n", pipe.error().c_str());
             return;
         }
+
         // Even though pipe will be moved soon, the handle is just a pointer value, it won't change or invalidate after
         // moving to another owner.
         consoleReadHandle = pipe.value().readHandle();
@@ -105,6 +113,7 @@ namespace Oobe
             wprintf(L"Failed to lock console state for modification. Somebody else is holding the lock.\n");
             return;
         }
+
         console.value().redirectConsole();
         auto transition = splash.value().sm.addEvent(SplashController<>::Events::Run{&(splash.value())});
         if (!transition.has_value()) {
@@ -118,12 +127,12 @@ namespace Oobe
         splashIsRunning = true;
     }
 
-    void x64Strategy::do_toggle_splash()
+    void SplashEnabledStrategy::do_toggle_splash()
     {
         splash.value().sm.addEvent(SplashController<>::Events::ToggleVisibility{});
     }
 
-    void x64Strategy::do_show_console()
+    void SplashEnabledStrategy::do_show_console()
     {
         if (consoleIsVisible) {
             return;
@@ -139,7 +148,7 @@ namespace Oobe
         consoleIsVisible = true;
     }
 
-    void x64Strategy::do_close_splash()
+    void SplashEnabledStrategy::do_close_splash()
     {
         if (splashIsRunning) {
             splash.value().sm.addEvent(SplashController<>::Events::Close{&(splash.value())});
@@ -148,7 +157,7 @@ namespace Oobe
         do_show_console();
     }
 
-    HRESULT x64Strategy::do_install()
+    HRESULT SplashEnabledStrategy::do_install()
     {
         std::array<InstallerController<>::Event, 3> eventSequence{InstallerController<>::Events::InteractiveInstall{},
                                                                   InstallerController<>::Events::StartInstaller{},
@@ -182,50 +191,53 @@ namespace Oobe
         return hr;
     }
 
-    HRESULT x64Strategy::do_reconfigure()
+    HRESULT SplashEnabledStrategy::do_reconfigure()
     {
         return Oobe::do_reconfigure(installer);
     }
 
-    HRESULT x64Strategy::do_autoinstall(std::filesystem::path autoinstall_file)
+    HRESULT SplashEnabledStrategy::do_autoinstall(std::filesystem::path autoinstall_file)
     {
         return Oobe::do_autoinstall(installer, autoinstall_file);
     }
-#else
 
-        HRESULT Arm64Strategy::do_install()
-        {
-            std::array<InstallerController<>::Event, 3> eventSequence{
-              InstallerController<>::Events::InteractiveInstall{}, InstallerController<>::Events::StartInstaller{},
-              InstallerController<>::Events::BlockOnInstaller{}};
-            HRESULT hr = E_NOTIMPL;
-            for (auto& ev : eventSequence) {
-                auto ok = installer.sm.addEvent(ev);
+#else // _M_ARM64
 
-                // unexpected transition occurred here?
-                if (!ok.has_value()) {
-                    return E_FAIL;
-                }
+    HRESULT NoSplashStrategy::do_install()
+    {
+        std::array<InstallerController<>::Event, 3> eventSequence{InstallerController<>::Events::InteractiveInstall{},
+                                                                  InstallerController<>::Events::StartInstaller{},
+                                                                  InstallerController<>::Events::BlockOnInstaller{}};
+        HRESULT hr = E_NOTIMPL;
+        for (auto& ev : eventSequence) {
+            auto ok = installer.sm.addEvent(ev);
 
-                std::visit(internal::overloaded{
-                             [&](InstallerController<>::States::Success& s) { hr = S_OK; },
-                             [&](InstallerController<>::States::UpstreamDefaultInstall& s) { hr = s.hr; },
-                             [&](auto&&... s) { hr = E_UNEXPECTED; },
-                           },
-                           ok.value());
+            // unexpected transition occurred here?
+            if (!ok.has_value()) {
+                return E_FAIL;
             }
 
-            return hr;
+            std::visit(internal::overloaded{
+                         [&](InstallerController<>::States::Success& s) { hr = S_OK; },
+                         [&](InstallerController<>::States::UpstreamDefaultInstall& s) { hr = s.hr; },
+                         [&](auto&&... s) { hr = E_UNEXPECTED; },
+                       },
+                       ok.value());
         }
 
-        HRESULT Arm64Strategy::do_reconfigure()
-        {
-            return Oobe::do_reconfigure(installer);
-        }
-        HRESULT Arm64Strategy::do_autoinstall(std::filesystem::path autoinstall_file)
-        {
-            return Oobe::do_autoinstall(installer, autoinstall_file);
-        }
+        return hr;
+    }
 
-#endif
-}
+    HRESULT NoSplashStrategy::do_reconfigure()
+    {
+        return Oobe::do_reconfigure(installer);
+    }
+
+    HRESULT NoSplashStrategy::do_autoinstall(std::filesystem::path autoinstall_file)
+    {
+        return Oobe::do_autoinstall(installer, autoinstall_file);
+    }
+
+#endif // _M_ARM64
+
+} // namespace Oobe.

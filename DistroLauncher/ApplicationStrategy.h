@@ -21,6 +21,8 @@
 #include "installer_policy.h"
 #include "installer_controller.h"
 
+// The splash application is written in Dart/Flutter, which currently does not supported Windows ARM64 targets.
+// See: https://github.com/flutter/flutter/issues/62597
 #ifndef _M_ARM64
 #include <mutex>
 #include "local_named_pipe.h"
@@ -32,7 +34,7 @@ namespace Oobe
     // This strategy fulfills the essential API required by the Oobe::Application<> class and augment it with the
     // machinery necessary to coordinate the splash screen application, the console service for console redirection and
     // visibility toggling and the OOBE itself running inside Ubuntu.
-    class x64Strategy
+    class SplashEnabledStrategy
     {
       private:
         // This mutex must be acquired before calling ConsoleService::redirectConsole() and
@@ -73,21 +75,21 @@ namespace Oobe
         /// Triggers the console redirection and launch the splash screen application.
         void do_run_splash();
 
-        x64Strategy(Win32Utils::LocalNamedPipe&& pipe);
-        x64Strategy();
-        ~x64Strategy() = default;
+        SplashEnabledStrategy();
+        ~SplashEnabledStrategy() = default;
     };
-
 }
-#define DefaultAppStrategy Oobe::x64Strategy
-#else
+
+#define DefaultAppStrategy Oobe::SplashEnabledStrategy
+
+#else // _M_ARM64
 
 namespace Oobe
 {
     // This strategy fulfills the essential API required to run the OOBE without the complexity required by the
     // synchronization of the slide show. That separation is necessary because Flutter is not supported on Windows
     // ARM64. See: https://github.com/flutter/flutter/issues/62597
-    struct Arm64Strategy
+    struct NoSplashStrategy
     {
         InstallerController<> installer;
 
@@ -107,7 +109,8 @@ namespace Oobe
         /// Places the sequence of events to make the OOBE perform an automatic installation.
         HRESULT do_reconfigure();
     };
-
 }
-#define DefaultAppStrategy Oobe::Arm64Strategy
-#endif
+
+#define DefaultAppStrategy Oobe::NoSplashStrategy
+
+#endif // _M_ARM64
