@@ -261,9 +261,9 @@ namespace Oobe
               mode == InstallerController::Mode::Text ? INFINITE : static_cast<DWORD>(1000 * 60 * 4); // 4 min.
             HANDLE oobeProcess = Policy::start_installer_async(command);
             if (oobeProcess == nullptr) {
-                return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                return typename InstallerController::States::UpstreamDefaultInstall{E_FAIL};
             }
-            return InstallerController::States::Ready{oobeProcess, timeoutMs};
+            return typename InstallerController::States::Ready{oobeProcess, timeoutMs};
         }
     };
 }
