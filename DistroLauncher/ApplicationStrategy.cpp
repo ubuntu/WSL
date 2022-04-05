@@ -109,7 +109,8 @@ namespace Oobe
         // unlocks automatically by its destructor.
         std::unique_lock<std::timed_mutex> guard{consoleGuard, std::defer_lock};
         using namespace std::chrono_literals;
-        if (!guard.try_lock_for(5s)) {
+        constexpr auto tryLockTimeout = 5s;
+        if (!guard.try_lock_for(tryLockTimeout)) {
             wprintf(L"Failed to lock console state for modification. Somebody else is holding the lock.\n");
             return;
         }
@@ -139,7 +140,8 @@ namespace Oobe
         }
         std::unique_lock<std::timed_mutex> guard{consoleGuard, std::defer_lock};
         using namespace std::chrono_literals;
-        if (!guard.try_lock_for(5s)) {
+        constexpr auto tryLockTimeout = 5s;
+        if (!guard.try_lock_for(tryLockTimeout)) {
             wprintf(L"Failed to lock console state for modification. Somebody else is holding the lock.\n");
             return;
         }
