@@ -95,3 +95,37 @@ Language=English
 Please enable the Virtual Machine Platform Windows feature and ensure virtualization is enabled in the BIOS.
 For information please visit https://aka.ms/enablevirtualization
 .
+
+MessageId=2001 SymbolicName=MSG_USAGE_EXTENDED
+Language=English
+Launches or configures a Linux distribution.
+
+Usage:
+    <no args>
+        Launches the user's default shell in the user's home directory.
+
+    install [options]
+        Install the distribution and do not launch the shell when complete.
+          --root
+              Do not create a user account and leave the default user set to root.
+          --autoinstall <AUTOINSTALL-FILE-PATH>
+              Reads information from an YAML file to automatically configure the distribution.
+          --enable-installer
+              Runs the Out of the Box Experience installer user interface.
+              Without the [install] option it launches the user's default shell after finishing installation.
+
+    run <command line>
+        Run the provided command line in the current working directory. If no
+        command line is provided, the default shell is launched.
+
+    config [setting [value]]
+        Configure settings for this distribution.
+        <no args>
+            Presents an user interface with some configuration options.
+        Settings:
+          --default-user <username>
+              Sets the default user to <username>. This must be an existing user.
+
+    help
+        Print usage information.
+.
