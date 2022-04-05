@@ -39,7 +39,7 @@ namespace Oobe
             return hr;
         }
 
-        HRESULT do_autoinstall(InstallerController<>& controller, std::filesystem::path autoinstall_file)
+        HRESULT do_autoinstall(InstallerController<>& controller, const std::filesystem::path& autoinstall_file)
         {
             auto& stateMachine = controller.sm;
 
@@ -196,7 +196,7 @@ namespace Oobe
         return Oobe::do_reconfigure(installer);
     }
 
-    HRESULT SplashEnabledStrategy::do_autoinstall(std::filesystem::path autoinstall_file)
+    HRESULT SplashEnabledStrategy::do_autoinstall(const std::filesystem::path& autoinstall_file)
     {
         return Oobe::do_autoinstall(installer, autoinstall_file);
     }

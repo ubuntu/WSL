@@ -64,7 +64,7 @@ namespace Oobe
 
       public:
         /// Places the sequence of events to make the OOBE perform an automatic installation.
-        HRESULT do_autoinstall(std::filesystem::path autoinstall_file);
+        HRESULT do_autoinstall(const std::filesystem::path& autoinstall_file);
 
         /// Places the sequence of events to make the OOBE perform an interactive installation.
         HRESULT do_install();
