@@ -15,10 +15,6 @@
  *
  */
 #pragma once
-
-#include <variant>
-#include <type_traits>
-
 // There are quite good state machine implementations out there, but since we are avoiding dependencies I took the
 // freedom to model one using std::variant. I plan to use this model in other pieces very soon so I made it
 // somewhat generic an abstract enough to be composed in multiple situations.

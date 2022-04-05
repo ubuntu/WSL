@@ -257,13 +257,13 @@ namespace Oobe
         // They only differ in the timeout option applied.
         static State start_installer_async(Mode mode, const wchar_t* command)
         {
-            DWORD timeoutMs =
-              mode == InstallerController::Mode::Text ? INFINITE : static_cast<DWORD>(1000 * 60 * 4); // 4 min.
+            constexpr auto fourMinuteTimeout = static_cast<DWORD>(1000 * 60 * 4);
+            DWORD timeoutMs = mode == InstallerController::Mode::Text ? INFINITE : fourMinuteTimeout;
             HANDLE oobeProcess = Policy::start_installer_async(command);
             if (oobeProcess == nullptr) {
-                return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                return typename InstallerController::States::UpstreamDefaultInstall{E_FAIL};
             }
-            return InstallerController::States::Ready{oobeProcess, timeoutMs};
+            return typename InstallerController::States::Ready{oobeProcess, timeoutMs};
         }
     };
 }

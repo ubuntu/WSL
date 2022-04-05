@@ -33,6 +33,12 @@
 #include <any>
 #include <map>
 #include <unordered_map>
+#include <algorithm>
+#include <iostream>
+#include <filesystem>
+#include <optional>
+#include <variant>
+#include <type_traits>
 #include "expected.hpp"
 #include "not_null.h"
 #include "WslApiLoader.h"
@@ -44,5 +50,7 @@
 #include "ProcessRunner.h"
 #include "WSLInfo.h"
 #include "Win32Utils.h"
+#include "ApplicationStrategy.h"
+#include "Application.h"
 // Message strings compiled from .MC file.
 #include "messages.h"

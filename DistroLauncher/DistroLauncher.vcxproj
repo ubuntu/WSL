@@ -138,6 +138,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="ApplicationStrategy.h" />
     <ClInclude Include="console_service.h" />
     <ClInclude Include="ExitStatus.h" />
     <ClInclude Include="extended_cli_parser.h" />
@@ -160,6 +162,7 @@
     <ClInclude Include="local_named_pipe.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ApplicationStrategy.cpp" />
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="ExitStatus.cpp" />
     <ClCompile Include="exit_status_parser.cpp" />
