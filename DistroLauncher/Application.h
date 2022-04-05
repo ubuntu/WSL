@@ -24,7 +24,7 @@ namespace Oobe
     /// Provides the high level API through which the controllers and services are integrated to run (or not) the OOBE
     /// according to the hardware platform capabilities and the result of the command line parsing. Platform specific
     /// code is provided by the Strategy template type.
-    template <typename Strategy=DefaultAppStrategy> class Application
+    template <typename Strategy = DefaultAppStrategy> class Application
     {
       private:
         Strategy impl_;
