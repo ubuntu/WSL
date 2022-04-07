@@ -32,7 +32,7 @@
         </uap3:Extension>
         <uap3:Extension Category="windows.appExtension">
           <uap3:AppExtension Name="com.microsoft.windows.terminal.settings"
-                             Id="Ubuntu18.04LTS"
+                             Id="Ubuntu-18.04"
                              DisplayName="Ubuntu 18.04.5 LTS"
                              PublicFolder="Terminal">
           </uap3:AppExtension>

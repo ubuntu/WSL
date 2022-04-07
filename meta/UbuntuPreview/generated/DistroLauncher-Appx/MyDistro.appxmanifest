@@ -32,7 +32,7 @@
         </uap3:Extension>
         <uap3:Extension Category="windows.appExtension">
           <uap3:AppExtension Name="com.microsoft.windows.terminal.settings"
-                             Id="UbuntuPreview"
+                             Id="Ubuntu-Preview"
                              DisplayName="Ubuntu (Preview)"
                              PublicFolder="Terminal">
           </uap3:AppExtension>
