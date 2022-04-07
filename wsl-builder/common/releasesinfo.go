@@ -21,6 +21,7 @@ import (
 // in the template files which are part of the WSL image and launcher build process.
 type WslReleaseInfo struct {
 	WslID               string   // uniquely identifies this distro in WSL context.
+	AppID               string   // uniquely identifies this distro in store context.
 	FullName            string   // full name of the distro bing built.
 	BuildVersion        string   // Ubuntu version we are building with the dot removed to be compatible with UWP version schema. 20.04 -> 2004
 	LauncherName        string   // name of the executable WSL launcher.
@@ -66,7 +67,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 
 		// There is always a development release, LTS or not
 		if isDevelopmentRelease {
-			wsl, err := newWslReleaseInfo("UbuntuPreview", "Ubuntu (Preview)", buildVersion, "ubuntupreview",
+			wsl, err := newWslReleaseInfo("Ubuntu-Preview", "UbuntuPreview", "Ubuntu (Preview)", buildVersion, "ubuntupreview",
 				release[0], "Preview", codeName, []string{"Ubuntu (Preview)"}, true)
 			if err != nil {
 				return nil, err
@@ -105,7 +106,8 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 		// we don’t want to display in FullName or ReleaseVersion the .0 suffix. BuildVersion stays as it.
 		version = strings.TrimSuffix(version, ".0")
 
-		wslID := fmt.Sprintf("Ubuntu%sLTS", release[0])
+		wslID := fmt.Sprintf("Ubuntu-%s", release[0])
+		appID := fmt.Sprintf("Ubuntu%sLTS", release[0])
 		// Reserve .pointReleases elements
 		reservedNames := []string{fmt.Sprintf("Ubuntu %s LTS", release[0])}
 		for i := 0; i < 10; i++ {
@@ -113,7 +115,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 		}
 
 		// Add per-release application
-		wsl, err := newWslReleaseInfo(wslID, fmt.Sprintf("Ubuntu %s LTS", version), buildVersion, launcherName,
+		wsl, err := newWslReleaseInfo(wslID, appID, fmt.Sprintf("Ubuntu %s LTS", version), buildVersion, launcherName,
 			release[0], fmt.Sprintf("%s LTS", release[0]), codeName, reservedNames, shouldBuild)
 		if err != nil {
 			return nil, err
@@ -129,6 +131,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 
 	// Select Ubuntu release		wslID := fmt.Sprintf("Ubuntu%sLTS", release[0])
 	ubuntuWSL.WslID = "Ubuntu"
+	ubuntuWSL.AppID = "Ubuntu"
 	ubuntuWSL.FullName = "Ubuntu"
 	ubuntuWSL.LauncherName = "ubuntu"
 	ubuntuWSL.ReleaseVersion = ""
@@ -186,9 +189,10 @@ func withinThreeWeeksOf(date time.Time) bool {
 }
 
 // newWslReleaseInfo creates a new WSL release info from parameters and computes the terminal profile GUID.
-func newWslReleaseInfo(wslID, fullName, buildVersion, launcherName, shortVersion, releaseVersion, codeName string, reservedNames []string, shouldBuild bool) (WslReleaseInfo, error) {
+func newWslReleaseInfo(wslID, appID, fullName, buildVersion, launcherName, shortVersion, releaseVersion, codeName string, reservedNames []string, shouldBuild bool) (WslReleaseInfo, error) {
 	w := WslReleaseInfo{
 		WslID:          wslID,
+		AppID:          appID,
 		FullName:       fullName,
 		BuildVersion:   buildVersion,
 		LauncherName:   launcherName,

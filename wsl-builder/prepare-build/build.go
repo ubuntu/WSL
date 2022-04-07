@@ -34,7 +34,7 @@ var (
 )
 
 // prepareBuild finds the correct paths of the VS projects, prepare build assets and get rootfs images.
-func prepareBuild(buildIDPath, wslID, rootfses string, noChecksum bool, buildID int) error {
+func prepareBuild(buildIDPath, appID, rootfses string, noChecksum bool, buildID int) error {
 	metaPath, err := common.GetPath("meta")
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func prepareBuild(buildIDPath, wslID, rootfses string, noChecksum bool, buildID 
 		return err
 	}
 
-	if err := prepareAssets(rootPath, wslID, buildNumber, archs); err != nil {
+	if err := prepareAssets(rootPath, appID, buildNumber, archs); err != nil {
 		return err
 	}
 

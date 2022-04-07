@@ -2,7 +2,7 @@ name: Build WSL
 on:
   workflow_dispatch:
     inputs:
-      wslID:
+      appID:
         description: 'Release name to use for the bundle'
         required: true
         default: 'UbuntuPreview'
@@ -27,7 +27,7 @@ env:
 
 jobs:
   build-matrix:
-    name: Build Matrix for WSLIDs to run on with rootfses, which can be manually supplied or automatically.
+    name: Build Matrix for AppIDs to run on with rootfses, which can be manually supplied or automatically.
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.build-matrix-release.outputs.matrix }}
@@ -40,22 +40,22 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.goversion }}
-      - name: Build Matrix for WSLIDs to run on with rootfses, which can be manually supplied or automatically
+      - name: Build Matrix for AppIDs to run on with rootfses, which can be manually supplied or automatically
         id: build-matrix-release
         run: |
           set -eux
           # Manual build
           if [ ${{ github.event_name }} = 'workflow_dispatch' ]; then
-            wslID="${{ github.event.inputs.wslID }}"
-            if [ -z "${wslID}" ]; then
-              wslID="UbuntuPreview"
+            appID="${{ github.event.inputs.appID }}"
+            if [ -z "${appID}" ]; then
+              appID="UbuntuPreview"
             fi
 
             builds="$(cat <<-EOF|jq -c
               {"include":
                 [
                   {
-                    "WslID": "${wslID}",
+                    "AppID": "${appID}",
                     "Rootfses": "${{ github.event.inputs.rootfses }}",
                     "RootfsesChecksum": "${{ github.event.inputs.rootfseschecksum }}",
                     "Upload": "${{ github.event.inputs.upload }}"
@@ -73,10 +73,10 @@ jobs:
 
           echo "${builds}"
           echo "::set-output name=matrix::${builds}"
-          echo "::notice::Building for: $(echo "${builds}" | jq '.include[] | "\(.WslID): \(.Rootfses). RootfsesChecksum: \(.RootfsesChecksum). Upload to store: \(.Upload)"')"
+          echo "::notice::Building for: $(echo "${builds}" | jq '.include[] | "\(.AppID): \(.Rootfses). RootfsesChecksum: \(.RootfsesChecksum). Upload to store: \(.Upload)"')"
 
   build-wsl:
-    name: Build ${{ matrix.WslID }}
+    name: Build ${{ matrix.AppID }}
     runs-on: windows-latest
     needs: build-matrix
     strategy:
@@ -116,7 +116,7 @@ jobs:
           if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
             extraArgs="${extraArgs} --no-checksum"
           fi
-          archsBundle="$(./prepare-build prepare ${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md ${{ matrix.WslID }} ${{ matrix.Rootfses }} ${extraArgs})"
+          archsBundle="$(./prepare-build prepare ${{ env.buildInfoPath }}/${{ matrix.AppID }}-buildid.md ${{ matrix.AppID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
 
           # Always StoreUpload mode to get appxupload file
@@ -166,14 +166,14 @@ jobs:
       - name: Allow downloading sideload appxbundle
         uses: actions/upload-artifact@v2
         with:
-          name: sideload-${{ matrix.WslID }}
+          name: sideload-${{ matrix.AppID }}
           path: |
             ${{ env.workDir }}/AppPackages/Ubuntu/Ubuntu_*/*
           retention-days: 7
       - name: Allow downloading store appxupload
         uses: actions/upload-artifact@v2
         with:
-          name: store-${{ matrix.WslID }}
+          name: store-${{ matrix.AppID }}
           path: |
             ${{ env.workDir }}/AppPackages/Ubuntu/Ubuntu_*.appxupload
           retention-days: 7
@@ -185,13 +185,13 @@ jobs:
         run: |
           set -eux
 
-          build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.WslID }}-buildid.md")
+          build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.AppID }}-buildid.md")
 
           echo "::set-output name=needs-upload::false"
 
           # Store md5sum of rootfs, launcher and assets related code
-          fingerprint_file="${{ matrix.WslID }}-fingerprint.md"
-          fingerprint_filepath="${{ env.buildInfoPath }}/${{ matrix.WslID }}-fingerprint.md"
+          fingerprint_file="${{ matrix.AppID }}-fingerprint.md"
+          fingerprint_filepath="${{ env.buildInfoPath }}/${{ matrix.AppID }}-fingerprint.md"
           # First. the rootfses
           echo '```' > "${fingerprint_filepath}"
           md5sum */install.tar.gz | sort -k2 >> "${fingerprint_filepath}"
@@ -216,10 +216,10 @@ jobs:
           echo "::set-output name=save-artifacts::true"
 
           if [ "${build_id}" = "0" ]; then
-            echo "::notice::This is the first build for ${{ matrix.WslID }}. It needs to be submitted manually to the Microsoft Store"
+            echo "::notice::This is the first build for ${{ matrix.AppID }}. It needs to be submitted manually to the Microsoft Store"
             exit 0
           fi
-          echo "::notice::Uploading to the store ${{ matrix.WslID }} build ${build_id}"
+          echo "::notice::Uploading to the store ${{ matrix.AppID }} build ${build_id}"
           echo "::set-output name=needs-upload::true"
 
           echo "Uploading new version: some files have changed:"
@@ -243,15 +243,15 @@ jobs:
           $cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ${{ secrets.AZUREAD_APPID }},$pass
           Set-StoreBrokerAuthentication -TenantId '${{ secrets.AZUREAD_TENANTID }}' -Credential $cred
 
-          # Get store app ID for WslID
-          $appid = (Get-Applications -GetAll | Where-Object PackageIdentityName -like '*${{ matrix.WslID }}').id
+          # Get store app ID for AppID
+          $appid = (Get-Applications -GetAll | Where-Object PackageIdentityName -like '*${{ matrix.AppID }}').id
           If($appid -eq '') {
-            echo "No app found for WslID: ${{ matrix.WslID }}"
+            echo "No app found for AppID: ${{ matrix.AppID }}"
             exit 1
           }
 
           # We want to publish UbuntuPreview automatically
-          If('${{ matrix.WslID }}' -eq 'UbuntuPreview') {
+          If('${{ matrix.AppID }}' -eq 'UbuntuPreview') {
             ((Get-Content -path meta\SBConfig.json -Raw) -replace 'Manual','Immediate') | Set-Content -Path meta\SBConfig.json
           }
 
@@ -264,8 +264,8 @@ jobs:
         if: ${{ steps.detect-upload-to-store.outputs.save-artifacts == 'true' }}
         uses: actions/upload-artifact@v2
         with:
-          name: build-artifacts-${{ matrix.WslID }}
-          path: ${{ env.workDir }}/${{ env.buildInfoPath }}/${{ matrix.WslID }}-*
+          name: build-artifacts-${{ matrix.AppID }}
+          path: ${{ env.workDir }}/${{ env.buildInfoPath }}/${{ matrix.AppID }}-*
 
 
   update-build-artifacts:
@@ -321,7 +321,7 @@ jobs:
           [ -f /tmp/all-releases.csv ] || ${{ env.codeDir }}/wsl-builder/lp-distro-info > /tmp/all-releases.csv
           # There might have been more than one build in the latest commit 
           for build in $(git diff-tree --no-commit-id --name-only -r HEAD | grep buildid); do
-            WSLId=$(basename $build);
-            WSLId=${WSLId%-buildid.md};
-            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker $WSLId $GITHUB_RUN_ID
+            AppID=$(basename $build);
+            AppID=${AppID%-buildid.md};
+            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker $AppID $GITHUB_RUN_ID
           done
