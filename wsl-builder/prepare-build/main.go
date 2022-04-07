@@ -41,7 +41,7 @@ func main() {
 	var noChecksum *bool
 	var buildID *int
 	prepareBuildCmd := &cobra.Command{
-		Use:   "prepare BUILDID_PATH WSL_ID ROOTFSES",
+		Use:   "prepare BUILDID_PATH APP_ID ROOTFSES",
 		Short: "Prepares the build source before calling msbuild",
 		Long: `This gets the root file systems and prepares the build before building 
 			the appx bundle. ROOTFSES must be a comma separated list of

@@ -53,7 +53,7 @@ def lpinit():
     return Launchpad.login_with('build-wsl', 'production', version='devel')
 
 
-def wslID_to_releases(lpconn):
+def appID_to_releases(lpconn):
     """returns the list of releases mapped by WSL_ID"""
     ubuntu = lpconn.distributions[DISTRIBUTION.lower()]
 
@@ -119,17 +119,17 @@ def main():
 
     lpconn = lpinit()
 
-    releases = wslID_to_releases(lpconn)
-    selected_wslID = None
+    releases = appID_to_releases(lpconn)
+    selected_appID = None
     selected_release = None
-    for wslID in releases:
-        if wslID.lower() == args.wslID.lower():
-            selected_wslID = wslID
-            selected_release = releases[wslID]
+    for appID in releases:
+        if appID.lower() == args.appID.lower():
+            selected_appID = appID
+            selected_release = releases[appID]
             break
 
-    if not selected_wslID:
-        logging.error("Unable to find a WSL release matching %s. Availables: %s", args.wslID, releases)
+    if not selected_appID:
+        logging.error("Unable to find a WSL release matching %s. Availables: %s", args.appID, releases)
         sys.exit(1)
 
     if args.ppas and args.rootfses:
@@ -222,7 +222,7 @@ def main():
     d = {
         "ref":"main", # WSL repo branch
         "inputs": {
-            "wslID": selected_wslID,
+            "appID": selected_appID,
             "rootfses": ",".join(rootfses),
             "rootfseschecksum": rootfseschecksum,
             "upload": upload,
@@ -230,7 +230,7 @@ def main():
     }
 
     # Request github appbundle build
-    logging.info("Requesting github appbundle build %s" % selected_wslID)
+    logging.info("Requesting github appbundle build %s" % selected_appID)
     r = requests.post("%s/workflows/build-wsl.yaml/dispatches" % ACTION_API_BASE_URL, json=d, headers=headers)
     if r.status_code != requests.codes.ok and r.status_code != requests.codes.no_content:
         logging.error("Failed to start building the appxbundle on github: %s" % r.text)
@@ -242,7 +242,7 @@ def main():
         logging.error("Failed to lookup latest appxbundle github build: %s" % r.text)
         sys.exit(1)
     run_id = r.json()["workflow_runs"][0]["id"]
-    logging.info("GitHub appbundle build %s started at %s", selected_wslID, r.json()["workflow_runs"][0]["html_url"])
+    logging.info("GitHub appbundle build %s started at %s", selected_appID, r.json()["workflow_runs"][0]["html_url"])
 
     # Wait for builds
     while True:
@@ -281,7 +281,7 @@ def _parse_arguments():
 
     # TODO: option for trigger a rebuild of official rootfses
     parser = argparse.ArgumentParser(description="Build wsl app packages. If --ppa is specified, the rootfs will be rebuilt first")
-    parser.add_argument("wslID", help="wslID for appbundle")
+    parser.add_argument("appID", help="appID for appbundle")
     parser.add_argument("-d", "--debug", action="store_true", default=False,
                         help="enable debug mode")
     parser.add_argument("-r", "--with-rootfs", dest="rootfses", action="append", default=[],

@@ -59,7 +59,7 @@ func updateAssets(csvPath string) error {
 
 	// Update each application
 	for _, r := range releasesInfo {
-		wslPath := filepath.Join(metaPath, r.WslID)
+		wslPath := filepath.Join(metaPath, r.AppID)
 		generatedPath := filepath.Join(wslPath, common.GeneratedDir)
 
 		// Cleanup previous generated directory
@@ -161,7 +161,7 @@ func listFilesForMeta(existing map[string]string, refPath string, blacklist []st
 func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, rootPath, generatedPath string) (err error) {
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("can't generate metadata file for %s: %v", r.WslID, err)
+			err = fmt.Errorf("can't generate metadata file for %s: %v", r.AppID, err)
 		}
 	}()
 
