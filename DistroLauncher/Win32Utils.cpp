@@ -17,40 +17,42 @@
 
 #include "stdafx.h"
 
-namespace Win32Utils {
-    nonstd::expected<std::wstring, std::wstring> utf8_to_wide_string(const std::string& utf8str) {
+namespace Win32Utils
+{
+    nonstd::expected<std::wstring, std::wstring> utf8_to_wide_string(const std::string& utf8str)
+    {
         if (utf8str.empty()) {
             return L"";
         }
 
-        const auto size_needed = MultiByteToWideChar(CP_UTF8, 0, &utf8str.at(0),
-                                                     static_cast<int>(utf8str.size()), nullptr, 0);
+        const auto size_needed =
+          MultiByteToWideChar(CP_UTF8, 0, &utf8str.at(0), static_cast<int>(utf8str.size()), nullptr, 0);
         if (size_needed <= 0) {
-            nonstd::make_unexpected(L"MultiByteToWideChar() failed. Win32 error code: "
-                                    + std::to_wstring(GetLastError()));
+            nonstd::make_unexpected(L"MultiByteToWideChar() failed. Win32 error code: " +
+                                    std::to_wstring(GetLastError()));
         }
 
         std::wstring result(size_needed, 0);
-        auto convResult = MultiByteToWideChar(CP_UTF8, 0, &utf8str.at(0), static_cast<int>(utf8str.size()),
-                                              &result.at(0), size_needed);
+        auto convResult =
+          MultiByteToWideChar(CP_UTF8, 0, &utf8str.at(0), static_cast<int>(utf8str.size()), &result.at(0), size_needed);
         if (convResult == 0) {
-            nonstd::make_unexpected(L"MultiByteToWideChar() failed. Win32 error code: "
-                                    + std::to_wstring(GetLastError()));
+            nonstd::make_unexpected(L"MultiByteToWideChar() failed. Win32 error code: " +
+                                    std::to_wstring(GetLastError()));
         }
         return result;
     }
 
-    nonstd::expected<std::string, std::wstring> wide_string_to_utf8(const std::wstring& wide_str) {
+    nonstd::expected<std::string, std::wstring> wide_string_to_utf8(const std::wstring& wide_str)
+    {
         if (wide_str.empty()) {
             return "";
         }
 
-        const auto size_needed = WideCharToMultiByte(CP_UTF8, 0, &wide_str.at(0),
-                                                     static_cast<int>(wide_str.size()),
+        const auto size_needed = WideCharToMultiByte(CP_UTF8, 0, &wide_str.at(0), static_cast<int>(wide_str.size()),
                                                      nullptr, 0, nullptr, nullptr);
         if (size_needed <= 0) {
-            nonstd::make_unexpected(L"WideCharToMultiByte() failed. Win32 error code: "
-                                    + std::to_wstring(GetLastError()));
+            nonstd::make_unexpected(L"WideCharToMultiByte() failed. Win32 error code: " +
+                                    std::to_wstring(GetLastError()));
         }
 
         std::string result(size_needed, 0);
@@ -58,8 +60,8 @@ namespace Win32Utils {
                                               &result.at(0), size_needed, nullptr, nullptr);
 
         if (convResult == 0) {
-            nonstd::make_unexpected(L"WideCharToMultiByte() failed. Win32 error code: "
-                                    + std::to_wstring(GetLastError()));
+            nonstd::make_unexpected(L"WideCharToMultiByte() failed. Win32 error code: " +
+                                    std::to_wstring(GetLastError()));
         }
         return result;
     }
