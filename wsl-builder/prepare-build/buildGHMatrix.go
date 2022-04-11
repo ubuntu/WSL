@@ -8,7 +8,7 @@ import (
 )
 
 type matrixElem struct {
-	WslID            string
+	AppID            string
 	Rootfses         string
 	RootfsesChecksum string
 	Upload           string
@@ -39,7 +39,7 @@ func buildGHMatrix(csvPath, metaPath string) error {
 		}
 
 		allBuilds = append(allBuilds, matrixElem{
-			WslID:            r.WslID,
+			AppID:            r.AppID,
 			Rootfses:         rootfses,
 			RootfsesChecksum: "yes",
 			Upload:           "yes",
