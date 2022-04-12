@@ -83,7 +83,7 @@ namespace Win32Utils
 
                 RECT rect;
 
-                if (GetWindowRect(window, &rect)==FALSE) {
+                if (GetWindowRect(window, &rect) == FALSE) {
                     return nonstd::make_unexpected(GetLastError());
                 }
                 auto width = rect.right - rect.left;
@@ -110,7 +110,7 @@ namespace Win32Utils
             DWORD place(HWND window, DWORD flags) const
             {
                 // NOLINTNEXTLINE(modernize-use-nullptr)
-                if (SetWindowPos(window, 0, x, y, width, height, flags)==FALSE) {
+                if (SetWindowPos(window, 0, x, y, width, height, flags) == FALSE) {
                     return GetLastError();
                 }
 
@@ -121,7 +121,7 @@ namespace Win32Utils
             /// on success. See docs for SetWindowPos function.
             DWORD place(HWND window, HWND topWindow, DWORD flags) const
             {
-                if (SetWindowPos(window, topWindow, x, y, width, height, flags)==FALSE) {
+                if (SetWindowPos(window, topWindow, x, y, width, height, flags) == FALSE) {
                     return GetLastError();
                 }
 

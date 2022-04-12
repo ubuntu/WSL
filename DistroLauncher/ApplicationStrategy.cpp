@@ -122,7 +122,7 @@ namespace Oobe
             console.value().restoreConsole();
             return;
         }
-        if(!std::holds_alternative<SplashController<>::States::Visible>(transition.value())) {
+        if (!std::holds_alternative<SplashController<>::States::Visible>(transition.value())) {
             // also rollback.
             console.value().restoreConsole();
             return;

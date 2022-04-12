@@ -158,7 +158,7 @@ namespace Oobe
             constexpr auto WM_CUSTOM_AUTO_HIDE = WM_USER + 7;
             constexpr auto sleepFor = 50;
             PostMessage(window, WM_CUSTOM_AUTO_HIDE, 0, 0);
-            while (IsWindowVisible(window)==TRUE) {
+            while (IsWindowVisible(window) == TRUE) {
                 Sleep(sleepFor);
             }
             return true;
