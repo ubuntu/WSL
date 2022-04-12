@@ -160,9 +160,7 @@ namespace Oobe::internal
         {
             ExpectedState maybe = std::visit(
               overloaded{
-                [&](auto& s) -> std::enable_if_t<is_variant_of_v<decltype(s.on_event(event)), State> ||
-                                                    std::is_same_v<decltype(s.on_event(event)), State> ||
-                                                    std::is_same_v<decltype(s.on_event(event)), ExpectedState>,
+                [&](auto& s) -> std::enable_if_t<std::is_convertible_v<decltype(s.on_event(event)), ExpectedState>,
                                                   ExpectedState> { return s.on_event(event); },
                 [&](auto&&... arg) -> ExpectedState {
                     return nonstd::make_unexpected(InvalidTransition{state_, event});
@@ -183,10 +181,8 @@ namespace Oobe::internal
             ExpectedState maybe = std::visit(
               overloaded{
                 [](auto& s,
-                   auto& event) -> std::enable_if_t<is_variant_of_v<decltype(s.on_event(event)), State> ||
-                                                       std::is_same_v<decltype(s.on_event(event)), State> ||
-                                                       std::is_same_v<decltype(s.on_event(event)), ExpectedState>,
-                                                     ExpectedState> { return s.on_event(event); },
+                   auto& event) -> std::enable_if_t<std::is_convertible_v<decltype(s.on_event(event)), ExpectedState>,
+                                                    ExpectedState> { return s.on_event(event); },
                 [&](auto&&... arg) -> ExpectedState {
                     return nonstd::make_unexpected(InvalidTransition{state_, event});
                 },
