@@ -43,6 +43,7 @@ namespace Oobe
         {
             // attempt to find the window by class "RAIL_WINDOW" and flutterCaption "Ubuntu WSL (UbuntuPreview)".
             // it appears before Subiquity is ready.
+            constexpr auto fastSleepFor = 10;
             HWND rdpWindow = nullptr;
             std::array<std::wstring, 2> possibleCaptions{L"Ubuntu WSL (", L"[WARN:COPY MODE] Ubuntu WSL ("};
             std::for_each(possibleCaptions.begin(), possibleCaptions.end(), [](auto& caption) {
@@ -53,8 +54,8 @@ namespace Oobe
             for (int i = 0; i < repeatTimes; ++i) {
 
                 for (const auto& caption : possibleCaptions) {
-                    auto res = FindWindow(L"RAIL_WINDOW", caption.c_str());
-                    if (res == 0) {
+                    HWND res = FindWindow(L"RAIL_WINDOW", caption.c_str());
+                    if (res == nullptr) {
                         continue;
                     }
 
@@ -62,7 +63,7 @@ namespace Oobe
                     ShowWindow(rdpWindow, SW_HIDE);
                     return rdpWindow;
                 };
-                Sleep(10);
+                Sleep(fastSleepFor);
             }
             return rdpWindow;
         }
@@ -84,12 +85,14 @@ namespace Oobe
         {
             using defer = std::unique_ptr<std::remove_pointer_t<HANDLE>, decltype(&::CloseHandle)>;
             constexpr DWORD watcherTimeout = 1000; // ms
+            constexpr auto initialDelay = 3e3F;
+            constexpr auto delayRatio = 0.65F;
 
             HANDLE sslxProcess;
             DWORD sslxExitCode;
             HRESULT sslxHr;
 
-            auto delaysGenerator = [cur = 3e3F, q = 0.65F]() mutable {
+            auto delaysGenerator = [cur = initialDelay, q = delayRatio]() mutable {
                 cur *= q;
                 return cur;
             };
