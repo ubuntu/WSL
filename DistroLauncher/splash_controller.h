@@ -147,6 +147,7 @@ namespace Oobe
         {
             // If the window was previously visible, the return value is nonzero.
             // If the window was previously hidden, the return value is zero.
+            // NOLINTNEXTLINE(performance-no-int-to-ptr) - That's the API, there is no way around it.
             SetWindowPos(window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
             return ShowWindow(window, SW_SHOWNA) == 0;
         }
