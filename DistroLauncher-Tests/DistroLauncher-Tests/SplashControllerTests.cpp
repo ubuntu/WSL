@@ -43,6 +43,12 @@ namespace Oobe
         {
             return nullptr;
         }
+
+        static bool do_show_window(HWND window)
+        {
+            return false;
+        }
+
         static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
         {
             return nullptr;
@@ -136,6 +142,12 @@ namespace Oobe
             {
                 return nullptr;
             }
+
+            static bool do_show_window(HWND window)
+            {
+                return false;
+            }
+
             static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
             {
                 return static_cast<HANDLE>(globalFakeWindow);

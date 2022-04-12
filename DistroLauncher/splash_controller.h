@@ -147,6 +147,8 @@ namespace Oobe
         {
             // If the window was previously visible, the return value is nonzero.
             // If the window was previously hidden, the return value is zero.
+            // NOLINTNEXTLINE(performance-no-int-to-ptr) - That's the API, there is no way around it.
+            SetWindowPos(window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
             return ShowWindow(window, SW_SHOWNA) == 0;
         }
 
@@ -330,6 +332,7 @@ namespace Oobe
                     controller->splashCloseNotifier =
                       Strategy::do_on_close(controller->procInfo.hProcess, onWindowClosedByUser, controller);
                     if (HWND window = Strategy::do_read_window_from_ipc(); window != nullptr) {
+                        Strategy::do_show_window(window); // ensures always on top while visible.
                         return Visible{window};
                     }
 
