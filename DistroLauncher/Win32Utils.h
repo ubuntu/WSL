@@ -15,11 +15,20 @@
  *
  */
 
- // This namespace holds a set of functions and utility classes to deal
- // with Win32 specificities in a modern way.
- // It aims to be lighweigth enough to justify not using more robust
- // solutions like those found in Boost libraries.
-namespace Win32Utils {
+// This namespace holds a set of functions and utility classes to deal
+// with Win32 specificities in a modern way.
+// It aims to be lighweigth enough to justify not using more robust
+// solutions like those found in Boost libraries.
+namespace Win32Utils
+{
     nonstd::expected<std::string, std::wstring> wide_string_to_utf8(const std::wstring& wide_string);
     nonstd::expected<std::wstring, std::wstring> utf8_to_wide_string(const std::string& utf8str);
+
+    /// Positions [window] at the center of the monitor it's displayed in with the Z-order right after [topWindow].
+    /// Returns 0 on success.
+    DWORD center_window(HWND window);
+
+    /// Resizes [window] to be equal in size and placement to [topWindow] while preserving [topWindow] on top.
+    /// Returns 0 on success.
+    DWORD resize_to(HWND window, HWND topWindow);
 }
