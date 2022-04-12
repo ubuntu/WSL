@@ -66,7 +66,11 @@ def run(*kwargs):
     print("==== Running clang-tidy with the following arguments:")
     print(cli)
 
-    proc = subprocess.run(cli)
+    for i in range(0, 9):
+        proc = subprocess.run(cli)
+        if proc.returncode < 100:
+            break
+        print("\n\nClang-Tidy exit code: {}\n\n".format(proc.returncode))
 
     if proc.returncode != 0:
         print("clang-tidy failed to complete its run.")
