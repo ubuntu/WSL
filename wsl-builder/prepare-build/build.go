@@ -396,8 +396,8 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 		if err != nil {
 			return fmt.Errorf("failed to read %q: %v", appxManifest, err)
 		}
-		d = bytes.ReplaceAll(d, []byte("[[BUILD_ID]]"), []byte(buildNumber))
-		d = bytes.ReplaceAll(d, []byte("[[WIN_ARCH]]"), []byte(strings.ToLower(arch)))
+		d = bytes.ReplaceAll(d, []byte("42"), []byte(buildNumber))
+		d = bytes.ReplaceAll(d, []byte("x64"), []byte(strings.ToLower(arch)))
 		if err := os.WriteFile(destPath, d, 0644); err != nil {
 			return fmt.Errorf("failed to write %q: %v", destPath, err)
 		}
