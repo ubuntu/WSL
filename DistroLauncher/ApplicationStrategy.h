@@ -50,6 +50,7 @@ namespace Oobe
         InstallerController<> installer;
         // optionals for lazy creation.
         std::optional<SplashController<>> splash;
+        std::optional<HWND> splashWindow;
         std::optional<Win32Utils::ConsoleService<Win32Utils::LocalNamedPipe>> console;
 
         /// Restores the console context, which means undo the console redirection and making the window visible.
