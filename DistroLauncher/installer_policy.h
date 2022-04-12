@@ -4,7 +4,8 @@ namespace Oobe
 {
     struct InstallerPolicy
     {
-        static const wchar_t* OobeCommand;
+        static const wchar_t* const OobeCommand;
+        static constexpr auto crashedExitCode = -5;
 
         static bool is_oobe_available()
         {
@@ -37,10 +38,49 @@ namespace Oobe
             return std::filesystem::copy_file(from, realDest, ec);
         }
 
+        /// Attempts to find and hide the installer GUI window.
+        static HWND try_hiding_installer_window(int repeatTimes)
+        {
+            // attempt to find the window by class "RAIL_WINDOW" and flutterCaption "Ubuntu WSL (UbuntuPreview)".
+            // it appears before Subiquity is ready.
+            HWND rdpWindow = nullptr;
+            std::array<std::wstring, 2> possibleCaptions{L"Ubuntu WSL (", L"[WARN:COPY MODE] Ubuntu WSL ("};
+            std::for_each(possibleCaptions.begin(), possibleCaptions.end(), [](auto& caption) {
+                caption.append(DistributionInfo::Name);
+                caption.append(1, ')');
+            });
+
+            for (int i = 0; i < repeatTimes; ++i) {
+
+                for (const auto& caption : possibleCaptions) {
+                    auto res = FindWindow(L"RAIL_WINDOW", caption.c_str());
+                    if (res == 0) {
+                        continue;
+                    }
+
+                    rdpWindow = res;
+                    ShowWindow(rdpWindow, SW_HIDE);
+                    return rdpWindow;
+                };
+                Sleep(10);
+            }
+            return rdpWindow;
+        }
+
+        static void show_window(HWND window)
+        {
+            // Currently when the window is moved programmatically its buttons and interactive elements appear
+            // mis calibrated in the screen, i.e. user needs to find some offset between the position of the interactive
+            // element and the clickable area.
+
+            // Win32Utils::center_window(window);
+            ShowWindow(window, SW_RESTORE);
+        }
         // Repeatedly launches asynchronously the [command] up to [repeatTimes] until it succeeds.
         // Return false if attempts are exhausted with no success. This is suitable for launching small processes that
         // can be used to monitor the status of long running processes.
-        static bool poll_success(const wchar_t* command, int repeatTimes)
+        // If the monitored process is never ready, this function will clean it up.
+        static bool poll_success(const wchar_t* command, int repeatTimes, HANDLE monitoredProcess)
         {
             using defer = std::unique_ptr<std::remove_pointer_t<HANDLE>, decltype(&::CloseHandle)>;
             constexpr DWORD watcherTimeout = 1000; // ms
@@ -49,7 +89,7 @@ namespace Oobe
             DWORD sslxExitCode;
             HRESULT sslxHr;
 
-            auto delaysGenerator = [cur = 11e3f, q = 0.65f]() mutable {
+            auto delaysGenerator = [cur = 3e3F, q = 0.65F]() mutable {
                 cur *= q;
                 return cur;
             };
@@ -57,7 +97,6 @@ namespace Oobe
             for (int i = 0; i < repeatTimes; ++i) {
                 sslxProcess = nullptr;
                 sslxExitCode = -1;
-                sslxHr = E_INVALIDARG;
 
                 sslxHr =
                   g_wslApi.WslLaunch(command, TRUE, GetStdHandle(STD_INPUT_HANDLE), GetStdHandle(STD_OUTPUT_HANDLE),
@@ -70,7 +109,7 @@ namespace Oobe
                     if (WaitForSingleObject(sslxProcess, watcherTimeout) != WAIT_OBJECT_0) {
 
                         // If the process didn't exit within the timeout we kill it.
-                        TerminateProcess(sslxProcess, -5);
+                        TerminateProcess(sslxProcess, crashedExitCode);
                     }
                     auto getExit = GetExitCodeProcess(sslxProcess, &sslxExitCode);
                     if (getExit != FALSE && sslxExitCode == 0) {
@@ -81,6 +120,10 @@ namespace Oobe
                 // Sleeps progressively less time than the last iteration.
                 Sleep(static_cast<DWORD>(delaysGenerator()));
             }
+
+            // started but is never ready, so we must kill it.
+            TerminateProcess(monitoredProcess, crashedExitCode);
+            CloseHandle(monitoredProcess);
             return false;
         }
 
@@ -94,12 +137,20 @@ namespace Oobe
 
             DWORD exitCode = -1;
             if (WaitForSingleObject(process, timeout) != WAIT_OBJECT_0) {
-                exitCode = -5;
+                exitCode = crashedExitCode;
                 TerminateProcess(process, exitCode);
                 return exitCode;
             }
 
             GetExitCodeProcess(process, &exitCode);
+            // The Flutter installer exits 0 on some crashes.
+            // And sometimes reports crash even though Subiquity has finished. This gets fixed in [UDI PR
+            // 786](https://github.com/canonical/ubuntu-desktop-installer/pull/786)
+            if (exitCode == 0) {
+                g_wslApi.WslLaunchInteractive(L"grep -E 'EXITED|DONE' /run/subiquity/server-state", FALSE, &exitCode);
+                DWORD clearExitCode;
+                g_wslApi.WslLaunchInteractive(L"clear", FALSE, &clearExitCode);
+            }
             return exitCode;
         }
 
@@ -109,8 +160,6 @@ namespace Oobe
         static HANDLE start_installer_async(const wchar_t* command,
                                             const wchar_t* watcher = L"ss -lx | grep subiquity &>/dev/null")
         {
-            constexpr int numIterations = 8;
-            DWORD exitCode = -1;
             HANDLE child = nullptr;
             HRESULT hr = g_wslApi.WslLaunch(command, TRUE, GetStdHandle(STD_INPUT_HANDLE),
                                             GetStdHandle(STD_OUTPUT_HANDLE), GetStdHandle(STD_ERROR_HANDLE), &child);
@@ -122,14 +171,7 @@ namespace Oobe
                 return nullptr;
             }
 
-            if (poll_success(watcher, numIterations)) {
-                // Ownership of the installer sslxProcess handle is being passed by.
-                return child;
-            }
-            // started but is never ready, so we must kill it.
-            TerminateProcess(child, -5);
-            CloseHandle(child);
-            return nullptr;
+            return child;
         }
 
         // Launches the OOBE command by [cli] synchronously, blocking this thread from start to finish.
@@ -149,5 +191,5 @@ namespace Oobe
     // This imposes deprecation of the symbol DistributionInfo::OOBE_NAME exposed in OOBE.h.
     // This is useful because the controller can launch the OOBE in a couple of different ways, but in all of them we
     // need `sudo`. At some point those files OOBE.cpp and OOBE.h will be dropped in favor of this one.
-    inline const wchar_t* InstallerPolicy::OobeCommand = L"sudo /usr/libexec/wsl-setup";
+    inline const wchar_t* const InstallerPolicy::OobeCommand = L"sudo /usr/libexec/wsl-setup";
 }
