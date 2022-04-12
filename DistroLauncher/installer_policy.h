@@ -101,9 +101,8 @@ namespace Oobe
                 sslxProcess = nullptr;
                 sslxExitCode = -1;
 
-                sslxHr =
-                  g_wslApi.WslLaunch(command, TRUE, GetStdHandle(STD_INPUT_HANDLE), GetStdHandle(STD_OUTPUT_HANDLE),
-                                     GetStdHandle(STD_ERROR_HANDLE), &sslxProcess);
+                // We most likely will not want to see any output of this command, just its exit code.
+                sslxHr = g_wslApi.WslLaunch(command, TRUE, nullptr, nullptr, nullptr, &sslxProcess);
 
                 if (SUCCEEDED(sslxHr)) {
                     defer guard{sslxProcess, CloseHandle};
@@ -157,11 +156,9 @@ namespace Oobe
             return exitCode;
         }
 
-        // Launches the OOBE installer [command] asynchronously and block this thread until it's ready for
-        // interaction, according to the prescription of the [watcher] command. If this succeeds, caller is responsible
-        // for the lifetime of the process represented by the returned handle.
-        static HANDLE start_installer_async(const wchar_t* command,
-                                            const wchar_t* watcher = L"ss -lx | grep subiquity &>/dev/null")
+        /// Launches the OOBE installer [command] asynchronously and return its handle if launched successfully without
+        /// waiting for its completion. It's caller responsibility to monitor and clean-up the returned process handle.
+        static HANDLE start_installer_async(const wchar_t* command)
         {
             HANDLE child = nullptr;
             HRESULT hr = g_wslApi.WslLaunch(command, TRUE, GetStdHandle(STD_INPUT_HANDLE),
