@@ -125,7 +125,8 @@ namespace Oobe
 
                 // Returns true once we don't find the DistributionInfo::Name in process's stdout
                 auto output = runner.getStdOut();
-                if (output.find(DistributionInfo::Name) == std::wstring::npos) {
+                auto distroNameLine = DistributionInfo::Name + L'\r';
+                if (output.find(distroNameLine) == std::wstring::npos) {
                     return true;
                 }
 
