@@ -197,6 +197,10 @@ func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, ro
 		}
 		templateData := string(data)
 
+		// Replace magic 4.10 tag with the templatized content. This allows building directly from the root
+		// directory.
+		templateData = strings.ReplaceAll(templateData, "4.10.", "UbuntuDev.BuildVersion.Dev.")
+
 		// Not a template or file we will replace later: direct copy
 		if !strings.Contains(templateData, textualStartTag) || filepath.Base(dest) == "ProductDescription.xml" {
 			if err := shutil.CopyFile(src, dest, false); err != nil {
