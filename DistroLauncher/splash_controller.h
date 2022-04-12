@@ -156,7 +156,11 @@ namespace Oobe
         {
             // This enables Flutter code to react on our hide request.
             constexpr auto WM_CUSTOM_AUTO_HIDE = WM_USER + 7;
+            constexpr auto sleepFor = 50;
             PostMessage(window, WM_CUSTOM_AUTO_HIDE, 0, 0);
+            while (IsWindowVisible(window)==TRUE) {
+                Sleep(sleepFor);
+            }
             return true;
         }
 
@@ -249,7 +253,7 @@ namespace Oobe
         // Any need for synchronization must be taken care of by the callable itself.
         static void onWindowClosedByUser(void* data, BOOLEAN /*unused*/)
         {
-            auto* self = static_cast<typename SplashController<Strategy>*>(data);
+            auto* self = static_cast<SplashController<Strategy>*>(data);
             self->notifyListener();
         }
 
