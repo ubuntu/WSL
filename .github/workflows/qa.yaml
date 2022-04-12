@@ -26,7 +26,7 @@ jobs:
         shell: powershell
         run: | 
           copy .github\workflows\clang_lint\msbuild\Directory.Build.props DistroLauncher\
-          msbuild -p:Platform=x64 -p:Configuration=Debug -t:ClangTidy DistroLauncher\DistroLauncher.vcxproj
+          msbuild -p:Platform=x64 -p:Configuration=Debug -m:1 -t:ClangTidy DistroLauncher\DistroLauncher.vcxproj
       # Runs clang-format. At this point clang-tidy already ran and produced the fixes.yaml.
       # This piece is meant to be cross-platform to enable maximum future reuse. That's why bash.
       - name: Lint with Clang tools
