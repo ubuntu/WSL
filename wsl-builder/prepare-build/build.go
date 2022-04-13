@@ -387,14 +387,17 @@ func prepareAssets(rootPath, wslID, buildNumber string, arches []string) (err er
 	// Prepare appxmanifest
 	appxManifest := filepath.Join("DistroLauncher-Appx", "MyDistro.appxmanifest")
 	for _, arch := range arches {
+		destPath := appxManifest
+		if arch != "x64" {
+			destPath = filepath.Join(rootPath, arch, filepath.Base(appxManifest))
+		}
+
 		d, err := os.ReadFile(appxManifest)
 		if err != nil {
 			return fmt.Errorf("failed to read %q: %v", appxManifest, err)
 		}
-		d = bytes.ReplaceAll(d, []byte("[[BUILD_ID]]"), []byte(buildNumber))
-		d = bytes.ReplaceAll(d, []byte("[[WIN_ARCH]]"), []byte(strings.ToLower(arch)))
-
-		destPath := filepath.Join(rootPath, arch, filepath.Base(appxManifest))
+		d = bytes.ReplaceAll(d, []byte("42"), []byte(buildNumber))
+		d = bytes.ReplaceAll(d, []byte("x64"), []byte(strings.ToLower(arch)))
 		if err := os.WriteFile(destPath, d, 0644); err != nil {
 			return fmt.Errorf("failed to write %q: %v", destPath, err)
 		}

@@ -20,6 +20,11 @@ import (
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
 
+const (
+	textualStartTag = "UbuntuDev"
+	textualEndTag   = ".Dev"
+)
+
 // updateAssets orchestrates the distro launcher metadata and assets generation from a csv file path.
 func updateAssets(csvPath string) error {
 	// pngquant is a required dependency
@@ -141,7 +146,7 @@ func listFilesForMeta(existing map[string]string, refPath string, blacklist []st
 				if err != nil {
 					return err
 				}
-				if !strings.Contains(string(data), "{{.") && filepath.Ext(path) != ".png" && filepath.Ext(path) != ".svg" {
+				if !strings.Contains(string(data), textualStartTag) && filepath.Ext(path) != ".png" && filepath.Ext(path) != ".svg" {
 					return nil
 				}
 			}
@@ -157,7 +162,7 @@ func listFilesForMeta(existing map[string]string, refPath string, blacklist []st
 	return files, nil
 }
 
-// generateMetaForRelease updates all teamplated non img files for a given release.
+// generateMetaForRelease updates all templated non img files for a given release.
 func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, rootPath, generatedPath string) (err error) {
 	defer func() {
 		if err != nil {
@@ -186,18 +191,18 @@ func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, ro
 			return err
 		}
 
-		if filepath.Ext(dest) == ".tmpl" {
-			dest = strings.TrimSuffix(dest, ".tmpl")
-		}
-
 		data, err := os.ReadFile(src)
 		if err != nil {
 			return err
 		}
 		templateData := string(data)
 
+		// Replace magic 4.10 tag with the templatized content. This allows building directly from the root
+		// directory.
+		templateData = strings.ReplaceAll(templateData, "4.10.", "UbuntuDev.BuildVersion.Dev.")
+
 		// Not a template or file we will replace later: direct copy
-		if !strings.Contains(templateData, "{{.") || filepath.Base(dest) == "ProductDescription.xml" {
+		if !strings.Contains(templateData, textualStartTag) || filepath.Base(dest) == "ProductDescription.xml" {
 			if err := shutil.CopyFile(src, dest, false); err != nil {
 				return err
 			}
@@ -205,7 +210,7 @@ func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, ro
 		}
 
 		// Replace template content
-		t := template.Must(template.New("").Parse(templateData))
+		t := template.Must(template.New("").Delims(textualStartTag, textualEndTag).Parse(templateData))
 		f, err := os.Create(dest)
 		if err != nil {
 			return nil
