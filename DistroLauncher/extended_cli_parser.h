@@ -24,7 +24,7 @@
 namespace Oobe::internal
 {
     static constexpr std::array allExtendedArgs{ARG_EXT_AUTOINSTALL, ARG_EXT_DISABLE_INSTALLER, ARG_EXT_INSTALLER_GUI,
-                                                  ARG_EXT_INSTALLER_TUI};
+                                                ARG_EXT_INSTALLER_TUI};
     // compile-time array concatenation.
     template <typename T, std::size_t SizeA, std::size_t SizeB>
     constexpr std::array<T, SizeA + SizeB> join(const std::array<T, SizeA>& a, const std::array<T, SizeB>& b)
