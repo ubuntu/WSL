@@ -54,3 +54,4 @@
 #include "Application.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
+#include "extended_messages.h"

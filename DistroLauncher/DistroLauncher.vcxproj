@@ -143,6 +143,7 @@
     <ClInclude Include="console_service.h" />
     <ClInclude Include="ExitStatus.h" />
     <ClInclude Include="extended_cli_parser.h" />
+    <ClInclude Include="extended_messages.h" />
     <ClInclude Include="installer_controller.h" />
     <ClInclude Include="installer_policy.h" />
     <ClInclude Include="not_null.h" />

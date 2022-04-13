@@ -103,9 +103,10 @@ Launches or configures a Linux distribution.
 Usage:
     <no args>
         Launches the user's default shell in the user's home directory.
+
     --installer=[gui/tui/none]
         Runs the Out of the Box Experience installer user interface, unless the option [none] is passed.
-        Passing [gui] enables running the graphical interface, which is the default behavior if this option is not supplied.
+        Pass [gui] to enable running the graphical interface, which is the default behavior if this option is not supplied.
         Pass [tui] instead to force the terminal user interface instead.
         Pass [none] to run the minimal setup experience instead of the Out of the Box Experience.
         Can be prepended with the [install] option below with no further options.
