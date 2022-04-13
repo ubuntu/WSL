@@ -64,10 +64,10 @@ namespace Oobe
             HRESULT hr = std::visit(
               internal::overloaded{
                 [&](internal::AutoInstall& option) { return impl_.do_autoinstall(option.autoInstallFile); },
-                [&](internal::InteractiveInstallOnly<internal::OobeGui>& option) { return impl_.do_install(); },
-                [&](internal::InteractiveInstallOnly<internal::OobeTui>& option) { return impl_.do_install(); },
-                [&](internal::InteractiveInstallShell<internal::OobeGui>& option) { return impl_.do_install(); },
-                [&](internal::InteractiveInstallShell<internal::OobeTui>& option) { return impl_.do_install(); },
+                [&](internal::InteractiveInstallOnly<internal::OobeGui>& option) { return impl_.do_install(false); },
+                [&](internal::InteractiveInstallOnly<internal::OobeTui>& option) { return impl_.do_install(true); },
+                [&](internal::InteractiveInstallShell<internal::OobeGui>& option) { return impl_.do_install(false); },
+                [&](internal::InteractiveInstallShell<internal::OobeTui>& option) { return impl_.do_install(true); },
                 [&](auto&& option) { return E_INVALIDARG; }, // for the cases not treated by this function.
               },
               arg);
