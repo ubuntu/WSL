@@ -28,6 +28,8 @@ jobs:
           export DEBIAN_FRONTEND=noninteractive
           apt update
           apt install -y python3-launchpadlib libmagickwand-dev git pngquant fonts-ubuntu
+      - name: work around permission issue with git vulnerability (we are local here). TODO: remove
+        run: git config --global --add safe.directory /__w/WSL/WSL
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
