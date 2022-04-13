@@ -23,6 +23,8 @@
 
 namespace Oobe::internal
 {
+    static constexpr std::array allExtendedArgs{ARG_EXT_AUTOINSTALL, ARG_EXT_DISABLE_INSTALLER, ARG_EXT_INSTALLER_GUI,
+                                                  ARG_EXT_INSTALLER_TUI};
     // compile-time array concatenation.
     template <typename T, std::size_t SizeA, std::size_t SizeB>
     constexpr std::array<T, SizeA + SizeB> join(const std::array<T, SizeA>& a, const std::array<T, SizeB>& b)
@@ -67,9 +69,11 @@ namespace Oobe::internal
     {
         static constexpr std::array<std::wstring_view, 1> requirements{L"config"};
     };
+
+    // InteractiveInstallOnly<SkipInstaller> and InteractiveInstallShell<SkipInstaller> are actually std::monostate,
+    // i.e. both go to upstream resolution.
     using Opts =
-      std::variant<std::monostate, AutoInstall, InteractiveInstallOnly<SkipInstaller>, InteractiveInstallOnly<OobeGui>,
-                   InteractiveInstallOnly<OobeTui>, InteractiveInstallShell<SkipInstaller>,
+      std::variant<std::monostate, AutoInstall, InteractiveInstallOnly<OobeGui>, InteractiveInstallOnly<OobeTui>,
                    InteractiveInstallShell<OobeGui>, InteractiveInstallShell<OobeTui>, Reconfig>;
 
     /// Parses a vector of command line arguments according to the extended command line options declared above. The
@@ -78,5 +82,5 @@ namespace Oobe::internal
     /// vector. See DistroLauncher.cpp main() function.
     Opts parseExtendedOptions(std::vector<std::wstring_view>& arguments);
 
-    using DEFAULT_EMPTY_CLI_CASE=InteractiveInstallShell<OobeGui>;
+    using DEFAULT_EMPTY_CLI_CASE = InteractiveInstallShell<OobeGui>;
 }
