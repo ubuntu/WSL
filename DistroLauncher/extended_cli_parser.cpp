@@ -25,7 +25,7 @@ namespace Oobe::internal
     template <typename ParsedOpt> std::optional<ParsedOpt> tryParse(const std::vector<std::wstring_view>& arguments)
     {
         if constexpr (std::is_same_v<ParsedOpt, DEFAULT_EMPTY_CLI_CASE>) {
-            if (arguments.size() == 0) {
+            if (arguments.empty()) {
                 return DEFAULT_EMPTY_CLI_CASE{};
             }
         }
