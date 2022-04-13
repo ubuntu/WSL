@@ -48,7 +48,7 @@ namespace Oobe
             return false;
         }
 
-        static bool poll_success(const wchar_t* command, int repeatTimes)
+        static bool poll_success(const wchar_t* command, int repeatTimes, HANDLE monitoredProcess)
         {
             return false;
         }
@@ -68,6 +68,14 @@ namespace Oobe
         {
             return -1;
         }
+
+        static HWND try_hiding_installer_window(int repeatTimes)
+        {
+            return nullptr;
+        }
+
+        static void show_window(HWND window)
+        { }
     };
 
     const wchar_t* NothingWorksPolicy::OobeCommand = cmd; // unused
@@ -99,7 +107,7 @@ namespace Oobe
             return true;
         }
 
-        static bool poll_success(const wchar_t* command, int repeatTimes)
+        static bool poll_success(const wchar_t* command, int repeatTimes, HANDLE monitoredProcess)
         {
             return true;
         }
@@ -119,6 +127,14 @@ namespace Oobe
         {
             return 0;
         }
+
+        static HWND try_hiding_installer_window(int repeatTimes)
+        {
+            return static_cast<HWND>(GetStdHandle(STD_OUTPUT_HANDLE));
+        }
+
+        static void show_window(HWND window)
+        { }
     };
 
     const wchar_t* EverythingWorksPolicy::OobeCommand = cmd;
@@ -150,7 +166,7 @@ namespace Oobe
             return true;
         }
         // Socket is never listening.
-        static bool poll_success(const wchar_t* command, int repeatTimes)
+        static bool poll_success(const wchar_t* command, int repeatTimes, HANDLE monitoredProcess)
         {
             return true;
         }
@@ -165,6 +181,14 @@ namespace Oobe
         {
             return nullptr; // no child process.
         }
+
+        static HWND try_hiding_installer_window(int repeatTimes)
+        {
+            return nullptr;
+        }
+
+        static void show_window(HWND window)
+        { }
 
         static DWORD do_launch_sync(const wchar_t* cli)
         {
@@ -200,7 +224,7 @@ namespace Oobe
             return true;
         }
 
-        static bool poll_success(const wchar_t* command, int repeatTimes)
+        static bool poll_success(const wchar_t* command, int repeatTimes, HANDLE monitoredProcess)
         {
             return true;
         }
@@ -220,6 +244,14 @@ namespace Oobe
         {
             return -1;
         }
+
+        static HWND try_hiding_installer_window(int repeatTimes)
+        {
+            return static_cast<HWND>(GetStdHandle(STD_OUTPUT_HANDLE));
+        }
+
+        static void show_window(HWND window)
+        { }
     };
     const wchar_t* OobeCrashDetectedPolicy::OobeCommand = cmd;
 }

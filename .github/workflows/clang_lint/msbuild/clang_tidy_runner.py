@@ -66,7 +66,19 @@ def run(*kwargs):
     print("==== Running clang-tidy with the following arguments:")
     print(cli)
 
-    proc = subprocess.run(cli)
+    # Workaround due crashes clang-tidy started to present while instantiating
+    # some template code. Some templating optimizations were done and didn't
+    # succeed in prevent the crash. It was noticed that just trying to run
+    # the linter again would succeed by the second or third attempt in average.
+    # This behavior was observed even when invoking the linter without this
+    # workflow or even without msbuild at all. Further investigation will be
+    # done and a bug report will be issued if confirmed to be a bug.
+    # TODO: Revert this workaround once a proper solution is discovered.
+    for i in range(0, 9):
+        proc = subprocess.run(cli)
+        if proc.returncode < 100:
+            break
+        print("\n\nClang-Tidy exit code: {}\n\n".format(proc.returncode))
 
     if proc.returncode != 0:
         print("clang-tidy failed to complete its run.")

@@ -122,7 +122,12 @@ namespace Oobe
             console.value().restoreConsole();
             return;
         }
-
+        if (!std::holds_alternative<SplashController<>::States::Visible>(transition.value())) {
+            // also rollback.
+            console.value().restoreConsole();
+            return;
+        }
+        splashWindow = std::get<SplashController<>::States::Visible>(transition.value()).window;
         console.value().hideConsoleWindow();
         consoleIsVisible = false;
         splashIsRunning = true;
@@ -145,18 +150,23 @@ namespace Oobe
             wprintf(L"Failed to lock console state for modification. Somebody else is holding the lock.\n");
             return;
         }
-        console.value().showConsoleWindow();
         console.value().restoreConsole();
+        HWND topWindow = nullptr;
+        if (splashWindow.has_value()) {
+            topWindow = splashWindow.value();
+        }
+        console.value().showConsoleWindow(topWindow);
         consoleIsVisible = true;
     }
 
     void SplashEnabledStrategy::do_close_splash()
     {
+        do_show_console();
         if (splashIsRunning) {
             splash.value().sm.addEvent(SplashController<>::Events::Close{&(splash.value())});
             splashIsRunning = false;
+            splashWindow.reset();
         }
-        do_show_console();
     }
 
     HRESULT SplashEnabledStrategy::do_install()

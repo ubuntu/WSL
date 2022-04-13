@@ -63,14 +63,15 @@ namespace Win32Utils
         {
             // Overriding the std streams with the handle to the write end of the pipe. For sake of simplicity on
             // the consumer side, both stdout and stderr goes to the same file.
-            if (state == consoleState())
+            if (state == consoleState()) {
                 return;
+            }
             fflush(stderrStream);
             fflush(stdoutStream);
             SetStdHandle(nStderrHandle, state.stdErrHandle);
             SetStdHandle(nStdoutHandle, state.stdOutHandle);
-            auto res2 = _dup2(state.stdErrFileDescriptor, _fileno(stderrStream));
-            auto res = _dup2(state.stdOutFileDescriptor, _fileno(stdoutStream));
+            [[maybe_unused]] auto res2 = _dup2(state.stdErrFileDescriptor, _fileno(stderrStream));
+            [[maybe_unused]] auto res = _dup2(state.stdOutFileDescriptor, _fileno(stdoutStream));
         }
 
       public:
@@ -78,11 +79,12 @@ namespace Win32Utils
         ConsoleService(Pipe&& pipe) noexcept : redirectTo{std::forward<Pipe>(pipe)}
         {
             assert(redirectTo.readHandle() != nullptr);
+            constexpr auto sleepFor = 100;
             // Attempting to find the console window is best-effort if it is not the old style console.
             // This has been tested for the new Windows Terminal. Other terminals out there may not fit.
-            Sleep(100);
+            Sleep(sleepFor);
             window_ = FindWindow(L"CASCADIA_HOSTING_WINDOW_CLASS", DistributionInfo::WindowTitle.c_str());
-            if (window_ == NULL) {
+            if (window_ == nullptr) {
                 window_ = GetConsoleWindow();
             }
         }
@@ -157,10 +159,14 @@ namespace Win32Utils
             return ShowWindow(window_, SW_HIDE) != FALSE;
         }
 
-        bool showConsoleWindow() const
+        bool showConsoleWindow(HWND topWindow) const
         {
-            ShowWindow(window_, SW_RESTORE);
-            return BringWindowToTop(window_) == 0;
+            if (auto res = Win32Utils::resize_to(window_, topWindow); res != 0) {
+                Helpers::PrintErrorMessage(HRESULT_FROM_WIN32(res));
+            }
+            // If the window was previously visible, the return value is nonzero.
+            // If the window was previously hidden, the return value is zero.
+            return ShowWindow(window_, SW_SHOWNORMAL) == FALSE;
         }
     };
 

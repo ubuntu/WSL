@@ -201,7 +201,18 @@ namespace Oobe
                 Mode mode = Mode::Text;
                 StateVariant on_event(typename Events::StartInstaller /*unused*/)
                 {
-                    return InstallerController::start_installer_async(mode, cli.c_str());
+                    const wchar_t* watcher = L"ss -lx | grep subiquity &>/dev/null";
+                    HANDLE oobeProcess = Policy::start_installer_async(cli.c_str());
+                    if (oobeProcess == nullptr) {
+                        return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                    }
+
+                    constexpr auto pollAttempts = 80;
+                    if (!Policy::poll_success(watcher, pollAttempts, oobeProcess)) {
+                        return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                    }
+
+                    return InstallerController::States::Ready{oobeProcess, nullptr, INFINITE};
                 }
             };
 
@@ -211,7 +222,21 @@ namespace Oobe
                 Mode mode = Mode::Gui;
                 StateVariant on_event(typename Events::StartInstaller /*unused*/)
                 {
-                    return InstallerController::start_installer_async(mode, cli.c_str());
+                    const wchar_t* watcher = L"ss -lx | grep subiquity &>/dev/null";
+                    HANDLE oobeProcess = Policy::start_installer_async(cli.c_str());
+                    if (oobeProcess == nullptr) {
+                        return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                    }
+
+                    HWND rdpWindow = nullptr;
+                    constexpr auto numAttempts = 1000;
+                    constexpr auto pollAttempts = 8;
+                    rdpWindow = Policy::try_hiding_installer_window(numAttempts);
+                    if (!Policy::poll_success(watcher, pollAttempts, oobeProcess)) {
+                        return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                    }
+
+                    return InstallerController::States::Ready{oobeProcess, rdpWindow, INFINITE};
                 }
             };
 
@@ -219,13 +244,18 @@ namespace Oobe
             {
               private:
                 HANDLE oobeProcess = nullptr;
+                HWND window = nullptr;
                 DWORD timeout = 0;
 
               public:
-                Ready(HANDLE oobeProcess, DWORD timeout) : oobeProcess{oobeProcess}, timeout{timeout} {};
+                Ready(HANDLE oobeProcess, HWND window, DWORD timeout) :
+                    oobeProcess{oobeProcess}, window{window}, timeout{timeout} {};
 
-                StateVariant on_event(typename Events::BlockOnInstaller /*unused*/)
+                StateVariant on_event(typename Events::BlockOnInstaller event)
                 {
+                    if (window != nullptr) {
+                        Policy::show_window(window);
+                    }
                     // Policy::consume_process must consume the handle otherwise it will leak.
                     if (auto exitCode = Policy::consume_process(oobeProcess, timeout); exitCode != 0) {
                         return UpstreamDefaultInstall{E_FAIL};
@@ -251,19 +281,5 @@ namespace Oobe
         using Event = typename Events::EventVariant;
 
         internal::state_machine<InstallerController> sm;
-
-      private:
-        // Just to avoid code repetition on PreparedGui and PreparedTui states on StartInstaller event.
-        // They only differ in the timeout option applied.
-        static State start_installer_async(Mode mode, const wchar_t* command)
-        {
-            constexpr auto fourMinuteTimeout = static_cast<DWORD>(1000 * 60 * 4);
-            DWORD timeoutMs = mode == InstallerController::Mode::Text ? INFINITE : fourMinuteTimeout;
-            HANDLE oobeProcess = Policy::start_installer_async(command);
-            if (oobeProcess == nullptr) {
-                return typename InstallerController::States::UpstreamDefaultInstall{E_FAIL};
-            }
-            return typename InstallerController::States::Ready{oobeProcess, timeoutMs};
-        }
     };
 }
