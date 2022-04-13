@@ -36,8 +36,8 @@ jobs:
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt update
           sudo DEBIAN_FRONTEND=noninteractive apt install -y jq
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
           go-version: ${{ env.goversion }}
       - name: Build Matrix for AppIDs to run on with rootfses, which can be manually supplied or automatically
@@ -99,7 +99,7 @@ jobs:
         run: |
           mkdir -p ${{ env.workDir }}/wiki/
           git clone https://github.com/ubuntu/wsl.wiki ${{ env.workDir }}/wiki --depth 1
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: ${{ env.goversion }}
       - name: Prepare project metadata, assets and download rootfses
@@ -279,7 +279,7 @@ jobs:
       codeDir: '/tmp/update-codedir'
     steps:
       - name: Checkout wiki
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ubuntu/wsl.wiki
       - name: Download artifacts from all previous matrix runs

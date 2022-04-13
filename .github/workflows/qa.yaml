@@ -14,7 +14,7 @@ jobs:
     name: Lint C++ sources with LLVM
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: microsoft/setup-msbuild@v1.0.2
       # Ensures compilation of message resources before clang-tidy. Fails fast if that's not possible.
       - name: Generates Launcher compilation artifacts
