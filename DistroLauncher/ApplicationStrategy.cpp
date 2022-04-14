@@ -169,9 +169,9 @@ namespace Oobe
         }
     }
 
-    HRESULT SplashEnabledStrategy::do_install()
+    HRESULT SplashEnabledStrategy::do_install(Mode ui)
     {
-        std::array<InstallerController<>::Event, 3> eventSequence{InstallerController<>::Events::InteractiveInstall{},
+        std::array<InstallerController<>::Event, 3> eventSequence{InstallerController<>::Events::InteractiveInstall{ui},
                                                                   InstallerController<>::Events::StartInstaller{},
                                                                   InstallerController<>::Events::BlockOnInstaller{}};
         HRESULT hr = E_NOTIMPL;
@@ -215,11 +215,11 @@ namespace Oobe
 
 #else // _M_ARM64
 
-    HRESULT NoSplashStrategy::do_install()
+    HRESULT NoSplashStrategy::do_install(Mode ui)
     {
-        std::array<InstallerController<>::Event, 3> eventSequence{InstallerController<>::Events::InteractiveInstall{},
-                                                                  InstallerController<>::Events::StartInstaller{},
-                                                                  InstallerController<>::Events::BlockOnInstaller{}};
+        std::array<InstallerController<>::Event, 3> eventSequence{
+          InstallerController<>::Events::InteractiveInstall{Mode ui}, InstallerController<>::Events::StartInstaller{},
+          InstallerController<>::Events::BlockOnInstaller{}};
         HRESULT hr = E_NOTIMPL;
         for (auto& ev : eventSequence) {
             auto ok = installer.sm.addEvent(ev);

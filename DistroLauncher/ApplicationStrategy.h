@@ -31,6 +31,7 @@
 
 namespace Oobe
 {
+    using Mode = InstallerController<>::Mode;
     // This strategy fulfills the essential API required by the Oobe::Application<> class and augment it with the
     // machinery necessary to coordinate the splash screen application, the console service for console redirection and
     // visibility toggling and the OOBE itself running inside Ubuntu.
@@ -68,7 +69,9 @@ namespace Oobe
         HRESULT do_autoinstall(const std::filesystem::path& autoinstall_file);
 
         /// Places the sequence of events to make the OOBE perform an interactive installation.
-        HRESULT do_install();
+        /// By default GUI support is checked before launching the OOBE, unless [forceTextMode]
+        /// is set to true, in which case the check is skipped and the installer run in TUI mode.
+        HRESULT do_install(Mode ui);
 
         /// Places the sequence of events to make the OOBE perform an automatic installation.
         HRESULT do_reconfigure();
@@ -105,7 +108,7 @@ namespace Oobe
         HRESULT do_autoinstall(std::filesystem::path autoinstall_file);
 
         /// Places the sequence of events to make the OOBE perform an interactive installation.
-        HRESULT do_install();
+        HRESULT do_install(Mode ui);
 
         /// Places the sequence of events to make the OOBE perform an automatic installation.
         HRESULT do_reconfigure();

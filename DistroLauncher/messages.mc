@@ -110,9 +110,13 @@ Usage:
               Do not create a user account and leave the default user set to root.
           --autoinstall <AUTOINSTALL-FILE-PATH>
               Reads information from an YAML file to automatically configure the distribution.
-          --enable-installer
-              Runs the Out of the Box Experience installer user interface.
-              Without the [install] option it launches the user's default shell after finishing installation.
+
+    --ui=[gui/tui/none]
+        Runs the Out of the Box Experience installer user interface to perform the final setup, unless the option [none] is passed.
+        Pass [gui] to enable running the graphical interface, which is the default behavior if this option is not supplied.
+        Pass [tui] instead to select the terminal user interface instead.
+        Pass [none] to run the minimal setup experience instead of the Out of the Box Experience.
+        Can be applied with the [install] option above to avoid launching the shell when complete.
 
     run <command line>
         Run the provided command line in the current working directory. If no
