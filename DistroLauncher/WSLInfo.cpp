@@ -110,7 +110,7 @@ namespace Oobe::internal
     // Returns true if /etc/wsl.conf file contains the boot command to activate systemd.
     bool is_systemd_enabled()
     {
-        std::wstring wslConfPath{L"\\\\wsl.localhost\\"};
+        std::wstring wslConfPath{WslPathPrefix()};
         wslConfPath.append(DistributionInfo::Name);
         wslConfPath.append(L"/etc/wsl.conf");
         std::wifstream wslConf;

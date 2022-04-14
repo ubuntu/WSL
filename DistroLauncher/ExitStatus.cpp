@@ -45,21 +45,15 @@ namespace Oobe
 
     namespace
     {
-        static const char* launcherCommandFilePath{"/run/launcher-command"};
+        static const wchar_t* const launcherCommandFilePath{L"/run/launcher-command"};
         VoidResult act(const KeyValuePairs& cmds);
         VoidResult config(const KeyValuePairs& cmds);
     }
 
     void ExitStatusHandling()
     {
-        std::string prefixedFilePath{"\\\\wsl.localhost\\"};
-        auto distroName = Win32Utils::wide_string_to_utf8(DistributionInfo::Name);
-        // That should never fail, but if that happens it is a real bug.
-        if (!distroName.has_value()) {
-            wprintf(distroName.error().c_str());
-            return;
-        }
-        prefixedFilePath.append(distroName.value());
+        std::wstring prefixedFilePath{WslPathPrefix()};
+        prefixedFilePath.append(DistributionInfo::Name);
         prefixedFilePath.append(launcherCommandFilePath);
         std::ifstream launcherCmdFile;
         if (!std::filesystem::exists(prefixedFilePath)) {

@@ -31,7 +31,7 @@ namespace Oobe
 
         static bool copy_file_into_distro(const std::filesystem::path& from, const std::wstring& to)
         {
-            std::wstring wslPrefixedDest = L"\\\\wsl.localhost\\" + DistributionInfo::Name;
+            std::wstring wslPrefixedDest = WslPathPrefix() + DistributionInfo::Name;
             wslPrefixedDest.append(to);
             std::filesystem::path realDest{wslPrefixedDest};
             std::error_code ec;

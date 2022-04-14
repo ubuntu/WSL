@@ -84,9 +84,9 @@ namespace DistributionInfo
             return commandLine;
         }
 
-        // Write it to a file inside \\wsl.localhost distro filesystem.
+        // Write it to a file inside the distribution filesystem.
         const std::wstring prefillFileNameDest = L"/var/tmp/prefill-system-setup.yaml";
-        const std::wstring wslPrefix = L"\\\\wsl.localhost\\" + DistributionInfo::Name;
+        const std::wstring wslPrefix = Oobe::WslPathPrefix() + DistributionInfo::Name;
         std::ofstream prefillFile;
         // Mixing slashes and backslashes that way is not a problem for Windows.
         prefillFile.open(wslPrefix + prefillFileNameDest, std::ios::ate);
