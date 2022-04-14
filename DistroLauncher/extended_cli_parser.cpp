@@ -54,16 +54,36 @@ namespace Oobe::internal
 
     Opts parse(const std::vector<std::wstring_view>& arguments)
     {
-        // launcher.exe install --autoinstall <autoinstallfile>
-        if (auto result = tryParse<AutoInstall>(arguments); result.has_value()) {
-            return result.value();
-        }
-
         // launcher.exe - Runs the OOBE (auto detect graphics support) and brings the shell at the end.
         if (auto result = tryParse<InstallDefault>(arguments); result.has_value()) {
             return result.value();
         }
-        // launcher.exe --ui=gui - Same as above.
+
+        // launcher.exe install - Runs the OOBE (auto detect graphics support) and quits.
+        if (auto result = tryParse<InstallOnlyDefault>(arguments); result.has_value()) {
+            return result.value();
+        }
+
+        // launcher.exe config - Runs the OOBE in reconfiguration mode.
+        if (auto result = tryParse<Reconfig>(arguments); result.has_value()) {
+            return result.value();
+        }
+
+        // launcher.exe --ui=none - Upstream minimal setup experience with the shell in the end.
+        if (auto result = tryParse<InteractiveInstallShell<SkipInstaller>>(arguments); result.has_value()) {
+            return std::monostate{};
+        }
+
+        // launcher.exe install --ui=none - Upstream minimal setup experience and quit.
+        if (auto result = tryParse<InteractiveInstallOnly<SkipInstaller>>(arguments); result.has_value()) {
+            return std::monostate{};
+        }
+
+        // launcher.exe install --autoinstall <autoinstallfile>
+        if (auto result = tryParse<AutoInstall>(arguments); result.has_value()) {
+            return result.value();
+        }
+        // launcher.exe --ui=gui - Runs the OOBE (forces GUI) and brings the shell at the end.
         if (auto result = tryParse<InteractiveInstallShell<OobeGui>>(arguments); result.has_value()) {
             return result.value();
         }
@@ -73,32 +93,13 @@ namespace Oobe::internal
             return result.value();
         }
 
-        // launcher.exe --ui=none - Upstream minimal setup experience with the shell in the end.
-        if (auto result = tryParse<InteractiveInstallShell<SkipInstaller>>(arguments); result.has_value()) {
-            return std::monostate{};
-        }
-
-        // launcher.exe install - Runs the OOBE (auto detect graphics support) and quits.
-        if (auto result = tryParse<InstallOnlyDefault>(arguments); result.has_value()) {
-            return result.value();
-        }
-        // launcher.exe install --ui=gui - Same as above.
+        // launcher.exe install --ui=gui - Runs the OOBE (forces GUI) and quits.
         if (auto result = tryParse<InteractiveInstallOnly<OobeGui>>(arguments); result.has_value()) {
             return result.value();
         }
 
         // launcher.exe install --ui=tui - Runs the OOBE (forces TUI) and quits.
         if (auto result = tryParse<InteractiveInstallOnly<OobeTui>>(arguments); result.has_value()) {
-            return result.value();
-        }
-
-        // launcher.exe install --ui=none - Upstream minimal setup experience and quit.
-        if (auto result = tryParse<InteractiveInstallOnly<SkipInstaller>>(arguments); result.has_value()) {
-            return std::monostate{};
-        }
-
-        // launcher.exe config - Runs the OOBE in reconfiguration mode.
-        if (auto result = tryParse<Reconfig>(arguments); result.has_value()) {
             return result.value();
         }
 
