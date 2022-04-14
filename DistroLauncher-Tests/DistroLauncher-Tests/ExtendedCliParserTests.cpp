@@ -60,7 +60,7 @@ namespace Oobe::internal
 
     TEST(ExtendedCliParserTests, InstallOobeWithShellTui)
     {
-        // launcher.exe install --ui=tui
+        // launcher.exe --ui=tui
         std::vector<std::wstring_view> args{ARG_EXT_INSTALLER_TUI};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<InteractiveInstallShell<OobeTui>>(opts));
