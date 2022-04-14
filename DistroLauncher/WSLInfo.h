@@ -42,9 +42,13 @@ namespace Oobe::internal
     /// This is intended to be called once, thus no caching.
     bool ini_find_value(std::wistream& ini, std::wstring_view section, std::wstring_view key,
                         std::wstring_view valueContains);
+
 }
 
 namespace Oobe
 {
     std::wstring WrapCommand(std::wstring_view intendedCommand);
+
+    // Returns the preferred file path prefix to access files inside the Linux file system.
+    const wchar_t* WslPathPrefix();
 }

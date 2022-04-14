@@ -148,4 +148,10 @@ namespace Oobe
         command.append(intendedCommand);
         return command;
     }
+
+    const wchar_t* WslPathPrefix()
+    {
+        static const wchar_t* prefix = Win32Utils::os_version() == 10 ? L"\\\\wsl$\\" : L"\\\\wsl.localhost\\";
+        return prefix;
+    }
 }
