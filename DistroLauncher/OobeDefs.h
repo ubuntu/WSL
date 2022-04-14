@@ -20,5 +20,5 @@
 namespace Oobe
 {
     using KeyValuePairs = std::unordered_map<std::string, std::any>;
-    using VoidResult = nonstd::expected<void, std::exception>;
+    using VoidResult = nonstd::expected<void, std::runtime_error>;
 }

@@ -143,7 +143,7 @@ namespace Oobe
 
             auto f = capabilities.find(action);
             if (f == capabilities.end()) {
-                return nonstd::make_unexpected(std::domain_error(action));
+                return nonstd::make_unexpected(std::runtime_error(action));
             }
 
             auto res = f->second();
