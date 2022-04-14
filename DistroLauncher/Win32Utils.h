@@ -31,4 +31,11 @@ namespace Win32Utils
     /// Resizes [window] to be equal in size and placement to [topWindow] while preserving [topWindow] on top.
     /// Returns 0 on success.
     DWORD resize_to(HWND window, HWND topWindow);
+
+    /// Returns the operating system version. Assumes Windows 10 or higher.
+    DWORD os_version();
+
+    /// Returns the operating system build number or 0 on failure.
+    DWORD os_build_number();
+
 }

@@ -162,4 +162,41 @@ namespace Win32Utils
         return target.place(window, SWP_SHOWWINDOW);
     }
 
+    DWORD read_build_from_registry()
+    {
+        DWORD valueType = 0;
+        DWORD bufSize = 20;
+        wchar_t buffer[20] = {0};
+        auto res = RegGetValue(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                               L"CurrentBuildNumber", RRF_RT_REG_SZ, &valueType, static_cast<void*>(buffer), &bufSize);
+        if (res != ERROR_SUCCESS) {
+            return 0;
+        }
+        std::wstring readValue(buffer, bufSize);
+        DWORD build = 0;
+        try {
+            build = std::stoul(readValue);
+        } catch (const std::invalid_argument& ex) {
+            std::cerr << ex.what() << '\n';
+            return 0;
+        } catch (const std::out_of_range& ex) {
+            std::cerr << ex.what() << '\n';
+            return 0;
+        }
+
+        return build;
+    }
+
+    DWORD os_version()
+    {
+        // lets presume windows 10 on error.
+        static DWORD version = os_build_number() >= 22000 ? 11 : 10;
+        return version;
+    }
+
+    DWORD os_build_number()
+    {
+        static DWORD build = read_build_from_registry();
+        return build;
+    }
 } // namespace Win32Utils
