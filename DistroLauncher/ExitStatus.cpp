@@ -18,7 +18,8 @@
 #include "stdafx.h"
 #include <filesystem>
 
-namespace Helpers {
+namespace Helpers
+{
     // TODO: find a better place for this function. Inside Win32Utils, probably. Useful for dealing with std:exception.
     void PrintFromUtf8(const char* msg)
     {
@@ -85,7 +86,6 @@ namespace Oobe
         launcherCmdFile.close();
         // We don't want that file existing after actions were taken.
         std::filesystem::remove(prefixedFilePath);
-
     }
 
     namespace
@@ -103,7 +103,7 @@ namespace Oobe
             VoidResult rebootDistro();
             VoidResult shutdownDistro();
         };
-        using Action = VoidResult(*)();
+        using Action = VoidResult (*)();
         const std::unordered_map<std::string_view, Action> capabilities{{"reboot", &Actions::rebootDistro},
                                                                         {"shutdown", &Actions::shutdownDistro}};
 
@@ -169,7 +169,7 @@ namespace Oobe
             auto hr = g_wslApi.WslConfigureDistribution(default_uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
             if (FAILED(hr)) {
                 return nonstd::make_unexpected(std::runtime_error(
-                    "Could not configure distro to the new default UID: " + std::to_string(default_uid)));
+                  "Could not configure distro to the new default UID: " + std::to_string(default_uid)));
             }
 
             return VoidResult();
