@@ -104,19 +104,19 @@ Usage:
     <no args>
         Launches the user's default shell in the user's home directory.
 
-    --installer=[gui/tui/none]
-        Runs the Out of the Box Experience installer user interface, unless the option [none] is passed.
-        Pass [gui] to enable running the graphical interface, which is the default behavior if this option is not supplied.
-        Pass [tui] instead to force the terminal user interface instead.
-        Pass [none] to run the minimal setup experience instead of the Out of the Box Experience.
-        Can be prepended with the [install] option below with no further options.
-
     install [options]
         Install the distribution and do not launch the shell when complete.
           --root
               Do not create a user account and leave the default user set to root.
           --autoinstall <AUTOINSTALL-FILE-PATH>
               Reads information from an YAML file to automatically configure the distribution.
+
+    --ui=[gui/tui/none]
+        Runs the Out of the Box Experience installer user interface to perform the final setup, unless the option [none] is passed.
+        Pass [gui] to enable running the graphical interface, which is the default behavior if this option is not supplied.
+        Pass [tui] instead to select the terminal user interface instead.
+        Pass [none] to run the minimal setup experience instead of the Out of the Box Experience.
+        Can be applied with the [install] option above to avoid launching the shell when complete.
 
     run <command line>
         Run the provided command line in the current working directory. If no

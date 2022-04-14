@@ -36,7 +36,7 @@ namespace Oobe::internal
 
     TEST(ExtendedCliParserTests, InstallOobeNoShellGui)
     {
-        // launcher.exe install --installer=gui
+        // launcher.exe install --ui=gui
         std::vector<std::wstring_view> args{L"install", ARG_EXT_INSTALLER_GUI};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<InteractiveInstallOnly<OobeGui>>(opts));
@@ -44,7 +44,7 @@ namespace Oobe::internal
 
     TEST(ExtendedCliParserTests, InstallOobeWithShellGui)
     {
-        // launcher.exe --installer=gui
+        // launcher.exe --ui=gui
         std::vector<std::wstring_view> args{ARG_EXT_INSTALLER_GUI};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<InteractiveInstallShell<OobeGui>>(opts));
@@ -52,7 +52,7 @@ namespace Oobe::internal
 
     TEST(ExtendedCliParserTests, InstallOobeNoShellTui)
     {
-        // launcher.exe install --installer=tui
+        // launcher.exe install --ui=tui
         std::vector<std::wstring_view> args{L"install", ARG_EXT_INSTALLER_TUI};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<InteractiveInstallOnly<OobeTui>>(opts));
@@ -60,7 +60,7 @@ namespace Oobe::internal
 
     TEST(ExtendedCliParserTests, InstallOobeWithShellTui)
     {
-        // launcher.exe install --installer=tui
+        // launcher.exe install --ui=tui
         std::vector<std::wstring_view> args{ARG_EXT_INSTALLER_TUI};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<InteractiveInstallShell<OobeTui>>(opts));
@@ -68,7 +68,7 @@ namespace Oobe::internal
 
     TEST(ExtendedCliParserTests, SkipInstallerNoShell)
     {
-        // launcher.exe install --installer=none
+        // launcher.exe install --ui=none
         std::vector<std::wstring_view> args{L"install", ARG_EXT_DISABLE_INSTALLER};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));
@@ -76,7 +76,7 @@ namespace Oobe::internal
 
     TEST(ExtendedCliParserTests, SkipInstallerWithShell)
     {
-        // launcher.exe --installer=none
+        // launcher.exe --ui=none
         std::vector<std::wstring_view> args{ARG_EXT_DISABLE_INSTALLER};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));
@@ -84,19 +84,31 @@ namespace Oobe::internal
 
     TEST(ExtendedCliParserTests, BrokenOptionGoesUpstream1)
     {
-        // [X] launcher.exe install --installer
-        std::vector<std::wstring_view> args{L"install", L"--installer"};
+        // [X] launcher.exe install --ui
+        std::vector<std::wstring_view> args{L"install", L"--ui"};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));
     }
 
     TEST(ExtendedCliParserTests, BrokenOptionGoesUpstream2)
     {
-        // [X] launcher.exe --installer
-        std::vector<std::wstring_view> args{L"--installer"};
+        // [X] launcher.exe --ui
+        std::vector<std::wstring_view> args{L"--ui"};
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));
     }
+
+    // This also used to be upstream, but now is OOBE
+    TEST(ExtendedCliParserUpstreamPreservedTests, InstallOnlyOobeNoShell)
+    {
+        // launcher.exe install
+        std::vector<std::wstring_view> args{L"install"};
+        auto previousSize = args.size();
+        auto opts = parseExtendedOptions(args);
+        ASSERT_TRUE(std::holds_alternative<InteractiveInstallOnly<OobeGui>>(opts));
+        ASSERT_EQ(previousSize, args.size());
+    }
+
     TEST(ExtendedCliParserTests, OobeReconfig)
     {
         // launcher.exe config
@@ -117,14 +129,6 @@ namespace Oobe::internal
     TEST(ExtendedCliParserTests, InstallRootIsUpstream)
     {
         std::vector<std::wstring_view> args{L"install", L"--root"};
-        auto previousSize = args.size();
-        auto opts = parseExtendedOptions(args);
-        ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));
-        ASSERT_EQ(previousSize, args.size());
-    }
-    TEST(ExtendedCliParserUpstreamPreservedTests, InstallOobeDisabledNoShell)
-    {
-        std::vector<std::wstring_view> args{L"install"};
         auto previousSize = args.size();
         auto opts = parseExtendedOptions(args);
         ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));

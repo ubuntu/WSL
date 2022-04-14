@@ -81,6 +81,9 @@ namespace Oobe::internal
         }
 
         // launcher.exe install - Runs the OOBE (auto detect graphics support) and quits.
+        if (auto result = tryParse<InstallOnlyDefault>(arguments); result.has_value()) {
+            return InteractiveInstallOnly<OobeGui>{};
+        }
         // launcher.exe install --installer=gui - Same as above.
         if (auto result = tryParse<InteractiveInstallOnly<OobeGui>>(arguments); result.has_value()) {
             return result.value();

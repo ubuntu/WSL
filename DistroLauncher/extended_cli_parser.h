@@ -15,7 +15,7 @@
  *
  */
 #pragma once
-#define ARG_EXT_ENABLE_INSTALLER  L"--installer="
+#define ARG_EXT_ENABLE_INSTALLER  L"--ui="
 #define ARG_EXT_INSTALLER_GUI     ARG_EXT_ENABLE_INSTALLER L"gui"
 #define ARG_EXT_INSTALLER_TUI     ARG_EXT_ENABLE_INSTALLER L"tui"
 #define ARG_EXT_DISABLE_INSTALLER ARG_EXT_ENABLE_INSTALLER L"none"
@@ -56,10 +56,13 @@ namespace Oobe::internal
     {
         static constexpr std::array<std::wstring_view, 1> requirements{ARG_EXT_INSTALLER_TUI};
     };
-    template <typename InstallerOption> struct InteractiveInstallOnly
+    struct InstallOnlyDefault
     {
-        static constexpr std::array<std::wstring_view, 1> thisRequirements{L"install"};
-        static constexpr auto requirements = join(thisRequirements, InstallerOption::requirements);
+        static constexpr std::array<std::wstring_view, 1> requirements{L"install"};
+    };
+    template <typename InstallerOption> struct InteractiveInstallOnly : InstallOnlyDefault
+    {
+        static constexpr auto requirements = join(InstallOnlyDefault::requirements, InstallerOption::requirements);
     };
     template <typename InstallerOption> struct InteractiveInstallShell : InstallerOption
     {
