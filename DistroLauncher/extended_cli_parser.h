@@ -56,6 +56,10 @@ namespace Oobe::internal
     {
         static constexpr std::array<std::wstring_view, 1> requirements{ARG_EXT_INSTALLER_TUI};
     };
+    struct InstallDefault
+    {
+        static constexpr std::array<std::wstring_view, 0> requirements{};
+    };
     struct InstallOnlyDefault
     {
         static constexpr std::array<std::wstring_view, 1> requirements{L"install"};
@@ -75,15 +79,13 @@ namespace Oobe::internal
 
     // InteractiveInstallOnly<SkipInstaller> and InteractiveInstallShell<SkipInstaller> are actually std::monostate,
     // i.e. both go to upstream resolution.
-    using Opts =
-      std::variant<std::monostate, AutoInstall, InteractiveInstallOnly<OobeGui>, InteractiveInstallOnly<OobeTui>,
-                   InteractiveInstallShell<OobeGui>, InteractiveInstallShell<OobeTui>, Reconfig>;
+    using Opts = std::variant<std::monostate, AutoInstall, InstallDefault, InstallOnlyDefault,
+                              InteractiveInstallOnly<OobeGui>, InteractiveInstallOnly<OobeTui>,
+                              InteractiveInstallShell<OobeGui>, InteractiveInstallShell<OobeTui>, Reconfig>;
 
     /// Parses a vector of command line arguments according to the extended command line options declared above. The
     /// extended options are removed from the original vector as a side effect to avoid confusing the "upstream command
     /// line parsing" routines. Notice that argv[0], i.e. the program name, is presumed not to be part of the arguments
     /// vector. See DistroLauncher.cpp main() function.
     Opts parseExtendedOptions(std::vector<std::wstring_view>& arguments);
-
-    using DEFAULT_EMPTY_CLI_CASE = InteractiveInstallShell<OobeGui>;
 }

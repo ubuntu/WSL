@@ -99,13 +99,13 @@ namespace Oobe::internal
     }
 
     // This also used to be upstream, but now is OOBE
-    TEST(ExtendedCliParserUpstreamPreservedTests, InstallOnlyOobeNoShell)
+    TEST(ExtendedCliParserTests, InstallOnlyOobeNoShell)
     {
         // launcher.exe install
         std::vector<std::wstring_view> args{L"install"};
         auto previousSize = args.size();
         auto opts = parseExtendedOptions(args);
-        ASSERT_TRUE(std::holds_alternative<InteractiveInstallOnly<OobeGui>>(opts));
+        ASSERT_TRUE(std::holds_alternative<InstallOnlyDefault>(opts));
         ASSERT_EQ(previousSize, args.size());
     }
 
@@ -117,12 +117,12 @@ namespace Oobe::internal
         ASSERT_TRUE(std::holds_alternative<Reconfig>(opts));
     }
 
-    TEST(ExtendedCliParserUpstreamPreservedTests, DefaultEmptyCase)
+    // used to be upstream minimal setup experience, but it's now OOBE GUI.
+    TEST(ExtendedCliParserTests, DefaultEmptyCase)
     {
-        // used to be upstream minimal setup experience, but it's now OOBE GUI.
         std::vector<std::wstring_view> args{};
         auto opts = parseExtendedOptions(args);
-        ASSERT_TRUE(std::holds_alternative<DEFAULT_EMPTY_CLI_CASE>(opts));
+        ASSERT_TRUE(std::holds_alternative<InstallDefault>(opts));
     }
 
     // Tests whether the upstream options remain preserved:

@@ -70,6 +70,7 @@ namespace Oobe
       public:
         enum class Mode
         {
+            AutoDetect,
             Gui,
             Text
         };
@@ -85,7 +86,7 @@ namespace Oobe
             // The opposite of the AutoInstalling, triggered by launching in install mode where OOBE exists.
             struct InteractiveInstall
             {
-                bool forceTextMode = false;
+                Mode ui = Mode::AutoDetect;
             };
 
             // Command line parsing equivalent of `launcher config`. Implies the distro is already installed.
@@ -157,13 +158,21 @@ namespace Oobe
                     commandLine += Policy::prepare_prefill_info();
 
                     // OOBE runs GUI by default, unless command line option --text is set.
-                    // short circuiting ensures the function call will not happen if event.forceTextMode is true.
-                    if (event.forceTextMode || Policy::must_run_in_text_mode()) {
+                    auto uiMode = event.ui;
+                    switch (uiMode) {
+                    case Mode::AutoDetect:
+                        if (Policy::must_run_in_text_mode()) {
+                            uiMode = Mode::Text;
+                        } else {
+                            uiMode = Mode::Gui;
+                        }
+                        // no breaks to avoid code repetition.
+                    case Mode::Gui:
+                        return PreparedGui{commandLine};
+                    case Mode::Text:
                         commandLine.append(L" --text");
                         return PreparedTui{commandLine};
                     }
-
-                    return PreparedGui{commandLine};
                 }
 
                 // Effectively launches the OOBE in reconfiguration variant from start to finish.

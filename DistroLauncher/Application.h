@@ -60,17 +60,20 @@ namespace Oobe
         /// problem or wrong call-site.
         HRESULT setup()
         {
+            using namespace internal;
             wprintf(L"Unpacking is complete!\n");
-            HRESULT hr = std::visit(
-              internal::overloaded{
-                [&](internal::AutoInstall& option) { return impl_.do_autoinstall(option.autoInstallFile); },
-                [&](internal::InteractiveInstallOnly<internal::OobeGui>& option) { return impl_.do_install(false); },
-                [&](internal::InteractiveInstallOnly<internal::OobeTui>& option) { return impl_.do_install(true); },
-                [&](internal::InteractiveInstallShell<internal::OobeGui>& option) { return impl_.do_install(false); },
-                [&](internal::InteractiveInstallShell<internal::OobeTui>& option) { return impl_.do_install(true); },
-                [&](auto&& option) { return E_INVALIDARG; }, // for the cases not treated by this function.
-              },
-              arg);
+            HRESULT hr =
+              std::visit(internal::overloaded{
+                           [&](AutoInstall& option) { return impl_.do_autoinstall(option.autoInstallFile); },
+                           [&](InstallDefault& option) { return impl_.do_install(Mode::AutoDetect); },
+                           [&](InstallOnlyDefault& option) { return impl_.do_install(Mode::AutoDetect); },
+                           [&](InteractiveInstallOnly<OobeGui>& option) { return impl_.do_install(Mode::Gui); },
+                           [&](InteractiveInstallOnly<OobeTui>& option) { return impl_.do_install(Mode::Text); },
+                           [&](InteractiveInstallShell<OobeGui>& option) { return impl_.do_install(Mode::Gui); },
+                           [&](InteractiveInstallShell<OobeTui>& option) { return impl_.do_install(Mode::Text); },
+                           [&](auto&& option) { return E_INVALIDARG; }, // for the cases not treated by this function.
+                         },
+                         arg);
 
             if (FAILED(hr) && hr != E_NOTIMPL && hr != E_INVALIDARG) {
                 wprintf(L"Installer did not complete successfully.\n");
