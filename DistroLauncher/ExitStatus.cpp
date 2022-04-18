@@ -46,7 +46,7 @@ namespace Oobe
 
     namespace
     {
-        static const wchar_t* const launcherCommandFilePath{L"/run/launcher-command"};
+        const wchar_t* const launcherCommandFilePath{L"/run/launcher-command"};
         VoidResult act(const KeyValuePairs& cmds);
         VoidResult config(const KeyValuePairs& cmds);
     }

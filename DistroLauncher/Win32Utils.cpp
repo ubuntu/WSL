@@ -164,9 +164,11 @@ namespace Win32Utils
 
     DWORD read_build_from_registry()
     {
+        constexpr auto REGBUFSIZE = 20;
+        DWORD bufSize = REGBUFSIZE;
+        wchar_t buffer[REGBUFSIZE] = {0};
         DWORD valueType = 0;
-        DWORD bufSize = 20;
-        wchar_t buffer[20] = {0};
+        // NOLINTNEXTLINE(performance-no-int-to-ptr) - Win32 default HKEY's are pointers converted from integer values.
         auto res = RegGetValue(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
                                L"CurrentBuildNumber", RRF_RT_REG_SZ, &valueType, static_cast<void*>(buffer), &bufSize);
         if (res != ERROR_SUCCESS) {
