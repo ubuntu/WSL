@@ -189,16 +189,28 @@ namespace Win32Utils
         return build;
     }
 
-    DWORD os_version()
+    WinVersion from_build_number(DWORD buildNo)
     {
+        // Note for future self: augment this from the top on newer OS version releases.
+        if (buildNo >= static_cast<DWORD>(WinVersion::Win11)) {
+            return WinVersion::Win11;
+        }
+        if (buildNo >= static_cast<DWORD>(WinVersion::Win10)) {
+            return WinVersion::Win10;
+        }
         // lets presume windows 10 on error.
-        static DWORD version = os_build_number() >= 22000 ? 11 : 10;
+        return WinVersion::Win10;
+    }
+
+    WinVersion os_version()
+    {
+        static const auto version = from_build_number(os_build_number());
         return version;
     }
 
     DWORD os_build_number()
     {
-        static DWORD build = read_build_from_registry();
+        static const auto build = read_build_from_registry();
         return build;
     }
 } // namespace Win32Utils

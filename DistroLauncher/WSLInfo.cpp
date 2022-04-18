@@ -151,7 +151,17 @@ namespace Oobe
 
     const wchar_t* WslPathPrefix()
     {
-        static const wchar_t* prefix = Win32Utils::os_version() == 10 ? L"\\\\wsl$\\" : L"\\\\wsl.localhost\\";
+        // This seams more readable than a ternary operator expression, specially if future OS versions require a
+        // different path prefix.
+        static const wchar_t* prefix = [](auto version) {
+            switch (version) {
+            case Win32Utils::WinVersion::Win10:
+                return L"\\\\wsl$\\";
+            case Win32Utils::WinVersion::Win11:
+                return L"\\\\wsl.localhost\\";
+            }
+        }(Win32Utils::os_version());
+
         return prefix;
     }
 }
