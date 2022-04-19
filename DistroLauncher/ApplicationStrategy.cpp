@@ -226,7 +226,7 @@ namespace Oobe
 
             // unexpected transition occurred here?
             if (!ok.has_value()) {
-                return E_FAIL;
+                return hr;
             }
 
             std::visit(internal::overloaded{
