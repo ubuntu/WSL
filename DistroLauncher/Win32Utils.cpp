@@ -162,4 +162,55 @@ namespace Win32Utils
         return target.place(window, SWP_SHOWWINDOW);
     }
 
+    DWORD read_build_from_registry()
+    {
+        constexpr auto REGBUFSIZE = 20;
+        DWORD bufSize = REGBUFSIZE;
+        wchar_t buffer[REGBUFSIZE] = {0};
+        DWORD valueType = 0;
+        // NOLINTNEXTLINE(performance-no-int-to-ptr) - Win32 default HKEY's are pointers converted from integer values.
+        auto res = RegGetValue(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                               L"CurrentBuildNumber", RRF_RT_REG_SZ, &valueType, static_cast<void*>(buffer), &bufSize);
+        if (res != ERROR_SUCCESS) {
+            return 0;
+        }
+        std::wstring readValue(buffer, bufSize);
+        DWORD build = 0;
+        try {
+            build = std::stoul(readValue);
+        } catch (const std::invalid_argument& ex) {
+            std::cerr << ex.what() << '\n';
+            return 0;
+        } catch (const std::out_of_range& ex) {
+            std::cerr << ex.what() << '\n';
+            return 0;
+        }
+
+        return build;
+    }
+
+    WinVersion from_build_number(DWORD buildNo)
+    {
+        // Note for future self: augment this from the top on newer OS version releases.
+        if (buildNo >= static_cast<DWORD>(WinVersion::Win11)) {
+            return WinVersion::Win11;
+        }
+        if (buildNo >= static_cast<DWORD>(WinVersion::Win10)) {
+            return WinVersion::Win10;
+        }
+        // lets presume windows 10 on error.
+        return WinVersion::Win10;
+    }
+
+    WinVersion os_version()
+    {
+        static const auto version = from_build_number(os_build_number());
+        return version;
+    }
+
+    DWORD os_build_number()
+    {
+        static const auto build = read_build_from_registry();
+        return build;
+    }
 } // namespace Win32Utils

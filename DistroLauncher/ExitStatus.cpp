@@ -18,7 +18,8 @@
 #include "stdafx.h"
 #include <filesystem>
 
-namespace Helpers {
+namespace Helpers
+{
     // TODO: find a better place for this function. Inside Win32Utils, probably. Useful for dealing with std:exception.
     void PrintFromUtf8(const char* msg)
     {
@@ -45,21 +46,15 @@ namespace Oobe
 
     namespace
     {
-        static const char* launcherCommandFilePath{"/run/launcher-command"};
+        const wchar_t* const launcherCommandFilePath{L"/run/launcher-command"};
         VoidResult act(const KeyValuePairs& cmds);
         VoidResult config(const KeyValuePairs& cmds);
     }
 
     void ExitStatusHandling()
     {
-        std::string prefixedFilePath{"\\\\wsl.localhost\\"};
-        auto distroName = Win32Utils::wide_string_to_utf8(DistributionInfo::Name);
-        // That should never fail, but if that happens it is a real bug.
-        if (!distroName.has_value()) {
-            wprintf(distroName.error().c_str());
-            return;
-        }
-        prefixedFilePath.append(distroName.value());
+        std::wstring prefixedFilePath{WslPathPrefix()};
+        prefixedFilePath.append(DistributionInfo::Name);
         prefixedFilePath.append(launcherCommandFilePath);
         std::ifstream launcherCmdFile;
         if (!std::filesystem::exists(prefixedFilePath)) {
@@ -91,7 +86,6 @@ namespace Oobe
         launcherCmdFile.close();
         // We don't want that file existing after actions were taken.
         std::filesystem::remove(prefixedFilePath);
-
     }
 
     namespace
@@ -109,7 +103,7 @@ namespace Oobe
             VoidResult rebootDistro();
             VoidResult shutdownDistro();
         };
-        using Action = VoidResult(*)();
+        using Action = VoidResult (*)();
         const std::unordered_map<std::string_view, Action> capabilities{{"reboot", &Actions::rebootDistro},
                                                                         {"shutdown", &Actions::shutdownDistro}};
 
@@ -149,7 +143,7 @@ namespace Oobe
 
             auto f = capabilities.find(action);
             if (f == capabilities.end()) {
-                return nonstd::make_unexpected(std::domain_error(action));
+                return nonstd::make_unexpected(std::runtime_error(action));
             }
 
             auto res = f->second();
@@ -175,7 +169,7 @@ namespace Oobe
             auto hr = g_wslApi.WslConfigureDistribution(default_uid, WSL_DISTRIBUTION_FLAGS_DEFAULT);
             if (FAILED(hr)) {
                 return nonstd::make_unexpected(std::runtime_error(
-                    "Could not configure distro to the new default UID: " + std::to_string(default_uid)));
+                  "Could not configure distro to the new default UID: " + std::to_string(default_uid)));
             }
 
             return VoidResult();
