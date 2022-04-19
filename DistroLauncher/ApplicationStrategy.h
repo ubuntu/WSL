@@ -90,6 +90,7 @@ namespace Oobe
 
 namespace Oobe
 {
+    using Mode = InstallerController<>::Mode;
     // This strategy fulfills the essential API required to run the OOBE without the complexity required by the
     // synchronization of the slide show. That separation is necessary because Flutter is not supported on Windows
     // ARM64. See: https://github.com/flutter/flutter/issues/62597
