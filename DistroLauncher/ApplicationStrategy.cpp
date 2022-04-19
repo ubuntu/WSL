@@ -217,9 +217,9 @@ namespace Oobe
 
     HRESULT NoSplashStrategy::do_install(Mode ui)
     {
-        std::array<InstallerController<>::Event, 3> eventSequence{
-          InstallerController<>::Events::InteractiveInstall{Mode ui}, InstallerController<>::Events::StartInstaller{},
-          InstallerController<>::Events::BlockOnInstaller{}};
+        std::array<InstallerController<>::Event, 3> eventSequence{InstallerController<>::Events::InteractiveInstall{ui},
+                                                                  InstallerController<>::Events::StartInstaller{},
+                                                                  InstallerController<>::Events::BlockOnInstaller{}};
         HRESULT hr = E_NOTIMPL;
         for (auto& ev : eventSequence) {
             auto ok = installer.sm.addEvent(ev);
