@@ -75,6 +75,48 @@ namespace DistributionInfo
             return yamlStr.value();
         } // std::wstring WindowsUserInfo::toYamlUtf8()
 
+        std::wstring GetUserDisplayName()
+        {
+            constexpr auto size = LOCALE_NAME_MAX_LENGTH;
+            WCHAR userRealName[size];
+            ULONG nSize = size;
+
+            BOOLEAN ret = GetUserNameExW(EXTENDED_NAME_FORMAT::NameDisplay, userRealName, &nSize);
+            if (ret != 0) {
+                return std::wstring{userRealName, nSize};
+            }
+
+            ret = GetUserNameExW(EXTENDED_NAME_FORMAT::NameGivenName, userRealName, &nSize);
+            if (ret != 0) {
+                std::wstring realName{userRealName, nSize};
+                ret = GetUserNameExW(EXTENDED_NAME_FORMAT::NameSurname, userRealName, &nSize);
+                if (ret != 0) {
+                    realName.append(1, L' ');
+                    realName.append(userRealName, nSize);
+                }
+                return realName;
+            }
+            PrintLastError();
+            return {};
+        }
+
+        std::wstring GetUserRealName()
+        {
+            constexpr auto size = LOCALE_NAME_MAX_LENGTH;
+            WCHAR userRealName[size];
+            ULONG nSize = size;
+
+            auto ret = GetUserNameExW(EXTENDED_NAME_FORMAT::NameSamCompatible, userRealName, &nSize);
+            if (ret == 0) {
+                PrintLastError();
+                return {};
+            }
+
+            std::wstring_view samView{userRealName, nSize};
+            std::wstring_view justTheUserName = samView.substr(samView.find_first_of('\\') + 1, samView.length());
+            return std::wstring{justTheUserName};
+        }
+
         // QueryWindowsUserInfo queries Win32 API's to provide launcher with locale, user real and login names.
         // Those pieces of information will be used in the Ubuntu OOBE to enhance the UX.
         WindowsUserInfo QueryWindowsUserInfo()
@@ -97,24 +139,9 @@ namespace DistributionInfo
                 userInfo.localeName = std::wstring{loc, result - 1};
             }
 
-            WCHAR userRealName[size];
-            ULONG nSize = size;
-            BOOLEAN ret = GetUserNameExW(EXTENDED_NAME_FORMAT::NameDisplay, userRealName, &nSize);
-            if (ret == 0) {
-                PrintLastError();
-            } else {
-                userInfo.realName = std::wstring{userRealName, nSize};
-            }
+            userInfo.realName = GetUserDisplayName();
 
-            nSize = size;
-            ret = GetUserNameExW(EXTENDED_NAME_FORMAT::NameSamCompatible, userRealName, &nSize);
-            if (ret == 0) {
-                PrintLastError();
-            } else {
-                std::wstring_view samView{userRealName, nSize};
-                std::wstring_view justTheUserName = samView.substr(samView.find_first_of('\\') + 1, samView.length());
-                userInfo.userName = std::wstring{justTheUserName};
-            }
+            userInfo.userName = GetUserRealName();
 
             return userInfo;
         } // WindowsUserInfo QueryWindowsUserInfo().
