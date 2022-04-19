@@ -85,8 +85,8 @@ namespace Oobe
         {
             using defer = std::unique_ptr<std::remove_pointer_t<HANDLE>, decltype(&::CloseHandle)>;
             constexpr DWORD watcherTimeout = 1000; // ms
-            constexpr auto initialDelay = 3e3F;
-            constexpr auto delayRatio = 0.65F;
+            constexpr auto initialDelay = 4e3F;
+            constexpr auto delayRatio = 0.85F;
 
             HANDLE sslxProcess;
             DWORD sslxExitCode;

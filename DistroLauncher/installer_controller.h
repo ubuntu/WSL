@@ -128,7 +128,7 @@ namespace Oobe
                     }
                     if (!std::filesystem::exists(event.autoinstall_file)) {
                         wprintf(L"Autoinstall file not found. Cannot proceed with auto installation\n");
-                        return UpstreamDefaultInstall{E_FAIL};
+                        return UpstreamDefaultInstall{ERROR_PATH_NOT_FOUND};
                     }
                     auto source{event.autoinstall_file};
                     std::wstring destination{L"/var/tmp/"};
@@ -136,7 +136,7 @@ namespace Oobe
                     if (!Policy::copy_file_into_distro(source, destination)) {
                         wprintf(L"Failed to copy the autoinstall file into the distro file system. Cannot proceed with "
                                 L"auto installation\n");
-                        return UpstreamDefaultInstall{E_FAIL};
+                        return UpstreamDefaultInstall{COMADMIN_E_CANTCOPYFILE};
                     }
 
                     std::wstring commandLine{Policy::OobeCommand};
@@ -166,7 +166,7 @@ namespace Oobe
                         } else {
                             uiMode = Mode::Gui;
                         }
-                        // no breaks to avoid code repetition.
+                        [[fallthrough]]; // no breaks to avoid code repetition.
                     case Mode::Gui:
                         return PreparedGui{commandLine};
                     case Mode::Text:
@@ -216,12 +216,12 @@ namespace Oobe
                     const wchar_t* watcher = L"ss -lx | grep subiquity &>/dev/null";
                     HANDLE oobeProcess = Policy::start_installer_async(cli.c_str());
                     if (oobeProcess == nullptr) {
-                        return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                        return InstallerController::States::UpstreamDefaultInstall{E_HANDLE};
                     }
 
-                    constexpr auto pollAttempts = 80;
+                    constexpr auto pollAttempts = 50;
                     if (!Policy::poll_success(watcher, pollAttempts, oobeProcess)) {
-                        return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                        return InstallerController::States::UpstreamDefaultInstall{E_APPLICATION_ACTIVATION_TIMED_OUT};
                     }
 
                     return InstallerController::States::Ready{oobeProcess, nullptr, INFINITE};
@@ -237,15 +237,16 @@ namespace Oobe
                     const wchar_t* watcher = L"ss -lx | grep subiquity &>/dev/null";
                     HANDLE oobeProcess = Policy::start_installer_async(cli.c_str());
                     if (oobeProcess == nullptr) {
-                        return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                        return InstallerController::States::UpstreamDefaultInstall{E_HANDLE};
                     }
 
                     HWND rdpWindow = nullptr;
                     constexpr auto numAttempts = 1000;
-                    constexpr auto pollAttempts = 8;
                     rdpWindow = Policy::try_hiding_installer_window(numAttempts);
+
+                    constexpr auto pollAttempts = 8;
                     if (!Policy::poll_success(watcher, pollAttempts, oobeProcess)) {
-                        return InstallerController::States::UpstreamDefaultInstall{E_FAIL};
+                        return InstallerController::States::UpstreamDefaultInstall{E_APPLICATION_ACTIVATION_TIMED_OUT};
                     }
 
                     return InstallerController::States::Ready{oobeProcess, rdpWindow, INFINITE};
@@ -270,7 +271,7 @@ namespace Oobe
                     }
                     // Policy::consume_process must consume the handle otherwise it will leak.
                     if (auto exitCode = Policy::consume_process(oobeProcess, timeout); exitCode != 0) {
-                        return UpstreamDefaultInstall{E_FAIL};
+                        return UpstreamDefaultInstall{E_ABORT};
                     }
                     Policy::handle_exit_status();
                     return Success{};

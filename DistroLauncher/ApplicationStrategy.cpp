@@ -181,7 +181,7 @@ namespace Oobe
             // unexpected transition occurred here?
             if (!ok.has_value()) {
                 do_close_splash();
-                return E_FAIL;
+                return hr;
             }
 
             std::visit(internal::overloaded{
