@@ -37,7 +37,7 @@ namespace DistributionInfo
         inline void PrintLastError()
         {
             HRESULT error = HRESULT_FROM_WIN32(GetLastError());
-            Helpers::PrintErrorMessage(error);
+            wprintf(L"Recovering user information failed with the code: %lx\n", error);
         }
 
         // toYaml hand-codes the YAML generation to avoid adding a lib just
