@@ -75,6 +75,8 @@ namespace Oobe
             // element and the clickable area.
 
             // Win32Utils::center_window(window);
+            ShowWindow(window, SW_MINIMIZE);
+            Sleep(50);
             ShowWindow(window, SW_RESTORE);
         }
         // Repeatedly launches asynchronously the [command] up to [repeatTimes] until it succeeds.
