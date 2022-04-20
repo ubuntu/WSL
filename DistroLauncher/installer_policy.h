@@ -76,7 +76,8 @@ namespace Oobe
 
             // Win32Utils::center_window(window);
             ShowWindow(window, SW_MINIMIZE);
-            Sleep(50);
+            constexpr auto shortSleep = 50;
+            Sleep(shortSleep);
             ShowWindow(window, SW_RESTORE);
         }
         // Repeatedly launches asynchronously the [command] up to [repeatTimes] until it succeeds.
