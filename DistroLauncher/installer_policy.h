@@ -43,7 +43,7 @@ namespace Oobe
         {
             // attempt to find the window by class "RAIL_WINDOW" and flutterCaption "Ubuntu WSL (UbuntuPreview)".
             // it appears before Subiquity is ready.
-            constexpr auto fastSleepFor = 10;
+            constexpr auto fastSleepFor = 20;
             HWND rdpWindow = nullptr;
             std::array<std::wstring, 2> possibleCaptions{L"Ubuntu WSL (", L"[WARN:COPY MODE] Ubuntu WSL ("};
             std::for_each(possibleCaptions.begin(), possibleCaptions.end(), [](auto& caption) {
