@@ -23,19 +23,33 @@ namespace Oobe
         // Those functions would be complete duplicates if they were methods in both strategy classes.
         HRESULT do_reconfigure(Oobe::InstallerController<>& controller)
         {
-            HRESULT hr = E_NOTIMPL;
+            std::array<InstallerController<>::Event, 3> eventSequence{
+              InstallerController<>::Events::Reconfig{}, InstallerController<>::Events::StartInstaller{},
+              InstallerController<>::Events::BlockOnInstaller{}};
 
-            auto ok = controller.sm.addEvent(InstallerController<>::Events::Reconfig{});
-            if (!ok) {
-                return hr;
+            // for better readability.
+            constexpr auto S_CONTINUE = E_NOTIMPL;
+            HRESULT hr = S_CONTINUE;
+
+            for (int i = 0; i < eventSequence.size() && hr == S_CONTINUE; ++i) {
+                auto ok = controller.sm.addEvent(eventSequence[i]);
+                if (!ok) {
+                    return hr;
+                }
+
+                // We can now have:
+                // States::UpstreamDefaultInstall on failure;
+                // States::Closed -> States::Success (for text mode) or
+                // States::Closed -> States::PreparedGui -> States::Ready -> States::Success (for GUI)
+                hr = std::visit(internal::overloaded{
+                                  [&](InstallerController<>::States::Success& s) { return S_OK; },
+                                  [&](InstallerController<>::States::PreparedGui& s) { return S_CONTINUE; },
+                                  [&](InstallerController<>::States::Ready& s) { return S_CONTINUE; },
+                                  [&](InstallerController<>::States::UpstreamDefaultInstall& s) { return s.hr; },
+                                  [&](auto&&... s) { return E_UNEXPECTED; },
+                                },
+                                ok.value());
             }
-
-            std::visit(internal::overloaded{
-                         [&](InstallerController<>::States::Success& s) { hr = S_OK; },
-                         [&](InstallerController<>::States::UpstreamDefaultInstall& s) { hr = s.hr; },
-                         [&](auto&&... s) { hr = E_UNEXPECTED; },
-                       },
-                       ok.value());
             return hr;
         }
 

@@ -139,6 +139,65 @@ namespace Oobe
 
     const wchar_t* EverythingWorksPolicy::OobeCommand = cmd;
 
+    struct EverythingWorksTuiPolicy
+    {
+        static const wchar_t* OobeCommand;
+
+        static bool is_oobe_available()
+        {
+            return true;
+        }
+
+        static std::wstring prepare_prefill_info()
+        {
+            return L"";
+        }
+
+        static bool must_run_in_text_mode()
+        {
+            return true;
+        }
+
+        static void handle_exit_status()
+        { }
+
+        static bool copy_file_into_distro(const std::filesystem::path& from, const std::wstring& to)
+        {
+            return true;
+        }
+
+        static bool poll_success(const wchar_t* command, int repeatTimes, HANDLE monitoredProcess)
+        {
+            return true;
+        }
+
+        static DWORD consume_process(HANDLE process, DWORD timeout)
+        {
+            return 0;
+        }
+
+        static HANDLE start_installer_async(const wchar_t* command,
+                                            const wchar_t* watcher = L"ss -lx | grep subiquity &>/dev/null")
+        {
+            return GetStdHandle(STD_OUTPUT_HANDLE);
+        }
+
+        static DWORD do_launch_sync(const wchar_t* cli)
+        {
+            return 0;
+        }
+
+        static HWND try_hiding_installer_window(int repeatTimes)
+        {
+            return static_cast<HWND>(GetStdHandle(STD_OUTPUT_HANDLE));
+        }
+
+        static void show_window(HWND window)
+        { }
+    };
+
+    const wchar_t* EverythingWorksTuiPolicy::OobeCommand = cmd;
+
     struct FailsToLaunchPolicy
     {
         static const wchar_t* OobeCommand;
