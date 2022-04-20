@@ -108,8 +108,6 @@ Usage:
         Install the distribution and do not launch the shell when complete.
           --root
               Do not create a user account and leave the default user set to root.
-          --autoinstall <AUTOINSTALL-FILE-PATH>
-              Reads information from an YAML file to automatically configure the distribution.
 
     --ui=[gui/tui/none]
         Runs the Out of the Box Experience installer user interface to perform the final setup, unless the option [none] is passed.

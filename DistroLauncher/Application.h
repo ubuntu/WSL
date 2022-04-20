@@ -64,7 +64,10 @@ namespace Oobe
             wprintf(L"Unpacking is complete!\n");
             HRESULT hr =
               std::visit(internal::overloaded{
-                           [&](AutoInstall& option) { return impl_.do_autoinstall(option.autoInstallFile); },
+                           [&](AutoInstall& option) {
+                               wprintf(L"Automatic installation is not supported by this version.\n");
+                               return E_NOTIMPL;
+                           },
                            [&](InstallDefault& option) { return impl_.do_install(Mode::AutoDetect); },
                            [&](InstallOnlyDefault& option) { return impl_.do_install(Mode::AutoDetect); },
                            [&](InteractiveInstallOnly<OobeGui>& option) { return impl_.do_install(Mode::Gui); },
