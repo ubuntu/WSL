@@ -86,6 +86,18 @@ namespace Oobe
         using Controller = InstallerController<EverythingWorksPolicy>;
         Controller controller{};
         auto ok = controller.sm.addEvent(Controller::Events::Reconfig{});
+        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::PreparedGui>());
+        controller.sm.addEvent(Controller::Events::StartInstaller{});
+        // opportunity for the application to react and ensure the context is ready for user interaction.
+        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Ready>());
+        controller.sm.addEvent(Controller::Events::BlockOnInstaller{});
+        ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Success>());
+    }
+    TEST(InstallerControllerTests, HappyReconfigTui)
+    {
+        using Controller = InstallerController<EverythingWorksTuiPolicy>;
+        Controller controller{};
+        auto ok = controller.sm.addEvent(Controller::Events::Reconfig{});
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Success>());
     }
     TEST(InstallerControllerTests, HappyInteractiveInstall)

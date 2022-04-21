@@ -15,7 +15,7 @@ namespace Oobe
     ///
     /// Closed                  - not running, initial state upon startup.
     /// AutoInstalling          - ready to run the OOBE in `autoinstall` mode. This implies text mode with the
-    /// assumption
+    ///                           assumption
     ///                           that it might be launched in some automated form.
     /// PreparedGui             - preparation steps such as generating the user information used to seed the GUI
     ///                           input fields is complete and detected that OOBE can run in GUI mode.
@@ -27,10 +27,7 @@ namespace Oobe
     ///                           environment and then react when OOBE is ready for the user.
     /// Success                 - OOBE finished successfully. From that point on this controller is meaningless.
     /// UpstreamDefaultInstall  - OOBE cannot run (failed or not existing in this distribution version). From that point
-    ///                           on this controller is meaningless.
-    ///
-    /// TuiReconfig             - Command line parsing requested OOBE reconfiguration variant, but TUI is required.
-    /// GuiReconfig             - Same as above, but can run in GUI mode.
+    ///                           on this controller is meaningless
     ///
     ///
     /// The expected state transitions are as follows (using PlantUML notation syntax with the <<choice>> notation
@@ -39,7 +36,11 @@ namespace Oobe
     /// [*] --> Closed
     ///
     /// Closed --> Success                  : Events::Reconfig
-    /// note on link: Command line detected request for reconfiguration. OOBE is launched synchronously.
+    /// note on link: Command line detected request for reconfiguration. OOBE is launched synchronously in text mode.
+    ///
+    /// /// Closed --> PreparedGui          : Events::Reconfig
+    /// note on link: Command line detected request for reconfiguration. OOBE is launched asynchronously in GUI mode.
+    ///               In this mode the OOBE will follow the same state transitions as the GUI install.
     ///
     /// Closed --> AutoInstalling           : Events::AutoInstall{autoinstall_file}
     /// note on link: This must be a direct result of command line option `install --autoinstall <autoinstall_file>`
@@ -174,6 +175,9 @@ namespace Oobe
                         commandLine.append(L" --text");
                         return PreparedTui{commandLine};
                     }
+
+                    // this should be unreachable.
+                    return UpstreamDefaultInstall{E_UNEXPECTED};
                 }
 
                 // Effectively launches the OOBE in reconfiguration variant from start to finish.
@@ -186,12 +190,14 @@ namespace Oobe
                     std::wstring commandLine{Policy::OobeCommand};
                     if (Policy::must_run_in_text_mode()) {
                         commandLine.append(L" --text");
+                        if (auto exitCode = Policy::do_launch_sync(commandLine.c_str()); exitCode != 0) {
+                            return UpstreamDefaultInstall{E_FAIL};
+                        }
+
+                        return Success{};
                     }
 
-                    if (auto exitCode = Policy::do_launch_sync(commandLine.c_str()); exitCode != 0) {
-                        return UpstreamDefaultInstall{E_FAIL};
-                    }
-                    return Success{};
+                    return PreparedGui{commandLine};
                 }
             };
 
