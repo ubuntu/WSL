@@ -105,7 +105,7 @@ namespace Oobe
                 sslxExitCode = -1;
 
                 // We most likely will not want to see any output of this command, just its exit code.
-                sslxHr = g_wslApi.WslLaunch(command, TRUE, nullptr, nullptr, nullptr, &sslxProcess);
+                sslxHr = g_wslApi.WslLaunch(command, FALSE, nullptr, nullptr, nullptr, &sslxProcess);
 
                 if (SUCCEEDED(sslxHr)) {
                     defer guard{sslxProcess, CloseHandle};
@@ -164,7 +164,7 @@ namespace Oobe
         static HANDLE start_installer_async(const wchar_t* command)
         {
             HANDLE child = nullptr;
-            HRESULT hr = g_wslApi.WslLaunch(command, TRUE, GetStdHandle(STD_INPUT_HANDLE),
+            HRESULT hr = g_wslApi.WslLaunch(command, FALSE, GetStdHandle(STD_INPUT_HANDLE),
                                             GetStdHandle(STD_OUTPUT_HANDLE), GetStdHandle(STD_ERROR_HANDLE), &child);
             if (FAILED(hr)) {
                 if (child != nullptr) {
