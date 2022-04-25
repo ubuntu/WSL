@@ -104,7 +104,7 @@
    y="1132.092"
    style="fill:#fff;stroke-width:10;font-size:149.333px;"><tspan
      style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Light'"
-     id="tspan5390">{{.ReleaseVersion}}</tspan></text>
+     id="tspan5390">{{.IconVersion}}</tspan></text>
 
 
 </svg>
