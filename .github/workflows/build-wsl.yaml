@@ -68,6 +68,10 @@ jobs:
             wsl-builder/lp-distro-info > /tmp/all-releases.csv
             go build ./wsl-builder/prepare-build
             builds_config="$(./prepare-build build-github-matrix /tmp/all-releases.csv)"
+            if [ "${builds_config}" == "null" ]; then
+              echo "No active application to build"
+              exit 0
+            fi
             builds="{\"include\":${builds_config}}"
           fi
 

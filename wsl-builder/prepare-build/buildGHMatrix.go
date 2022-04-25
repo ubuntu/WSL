@@ -21,7 +21,7 @@ func buildGHMatrix(csvPath, metaPath string) error {
 		return err
 	}
 
-	allBuilds := make([]matrixElem, 0)
+	var allBuilds []matrixElem
 	// List which releases we should try building
 	for _, r := range releasesInfo {
 		if !r.ShouldBuild {
