@@ -135,6 +135,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 	ubuntuWSL.AppID = "Ubuntu"
 	ubuntuWSL.FullName = "Ubuntu"
 	ubuntuWSL.LauncherName = "ubuntu"
+	ubuntuWSL.IconVersion = ""
 	ubuntuWSL.ReservedNames = []string{ubuntuWSL.FullName}
 	if err := ubuntuWSL.refreshedTerminalProfileID(); err != nil {
 		return nil, err
