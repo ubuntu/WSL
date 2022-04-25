@@ -102,7 +102,7 @@
    id="text22"
    x="300.7608"
    y="1172.592"
-   style="fill:#fff;stroke-width:10;-inkscape-font-specification:'Ubuntu Light';font-family:Ubuntu;font-size:160px;font-stretch:normal;font-weight:300;font-variant:normal;font-style:normal;">{{.ReleaseVersion}}</text>
+   style="fill:#fff;stroke-width:10;-inkscape-font-specification:'Ubuntu Light';font-family:Ubuntu;font-size:160px;font-stretch:normal;font-weight:300;font-variant:normal;font-style:normal;">{{.IconVersion}}</text>
 
 
 </svg>

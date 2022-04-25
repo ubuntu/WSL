@@ -18,7 +18,7 @@ Key features:
   - A consistent development to deployment workflow when using Ubuntu in the cloud
   - 5 years of security patching with Ubuntu Long Term Support (LTS) releases
 
-{{.FullName}} is always the latest LTS version of Ubuntu. When new LTS versions are released, {{.FullName}} can be upgraded from the command line by using:
+{{.FullName}} currently provides the {{.ReleaseVersion}} release. When new LTS versions are released, {{.FullName}} can be upgraded once the first point release is available. This can be done from the command line by using:
 
     sudo do-release-upgrade
 
@@ -45,7 +45,7 @@ https://wiki.ubuntu.com/WSL
     <AppFeature>Linux Terminal</AppFeature>
     <AppFeature>GUI</AppFeature>
   </AppFeatures>
-  <CopyrightAndTrademark>© 2021 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.</CopyrightAndTrademark>
+  <CopyrightAndTrademark>© 2022 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.</CopyrightAndTrademark>
   <AdditionalLicenseTerms>https://www.ubuntu.com/legal/terms-and-policies</AdditionalLicenseTerms>
 
   <!-- Empty fields to overwrite them with every updates -->
