@@ -147,15 +147,12 @@ namespace Oobe
                 return exitCode;
             }
 
-            GetExitCodeProcess(process, &exitCode);
-            // The Flutter installer exits 0 on some crashes.
-            // And sometimes reports crash even though Subiquity has finished. This gets fixed in [UDI PR
-            // 786](https://github.com/canonical/ubuntu-desktop-installer/pull/786)
-            if (exitCode == 0) {
-                g_wslApi.WslLaunchInteractive(L"grep -E 'EXITED|DONE' /run/subiquity/server-state", FALSE, &exitCode);
-                DWORD clearExitCode;
-                g_wslApi.WslLaunchInteractive(L"clear", FALSE, &clearExitCode);
+            // Whether the OOBE exit code is 0 or not, what trully matters is whether Subiquity finished its job:
+            g_wslApi.WslLaunchInteractive(L"grep -E 'EXITED|DONE' /run/subiquity/server-state", FALSE, &exitCode);
+            if (exitCode != 0) {
+                GetExitCodeProcess(process, &exitCode);
             }
+
             return exitCode;
         }
 
