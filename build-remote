@@ -48,6 +48,13 @@ def set_logging(debugmode=False):
     logging.debug("Debug mode enabled")
 
 
+def strip_ppa(string):
+    """Helper function for Python pre-3.9 to strip the ppa: suffix"""
+    if string.startswith("ppa:"):
+        return string[4:]
+    return string
+
+
 def lpinit(anonymous=False):
     """Initialize the connection to LP"""
     if anonymous:
@@ -153,8 +160,8 @@ def main():
     # Sanitize input by accepting "ppa:" prefix
     ppas = []
     for ppa in args.ppas:
-        ppas.append(ppa.lstrip("ppa:"))
-    livecd_rootfs = args.livecd_rootfs.lstrip("ppa:")
+        ppas.append(strip_ppa(ppa))
+    livecd_rootfs = strip_ppa(args.livecd_rootfs)
 
     rootfses = []
 
