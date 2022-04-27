@@ -32,14 +32,6 @@ namespace DistributionInfo
             std::string toYamlUtf8() const;
         };
 
-        // PrintLastError converts the last error code from Win32 API's into
-        // an error message.
-        inline void PrintLastError()
-        {
-            HRESULT error = HRESULT_FROM_WIN32(GetLastError());
-            wprintf(L"Recovering user information failed with the code: %lx\n", error);
-        }
-
         // toYaml hand-codes the YAML generation to avoid adding a lib just
         // because of such small feature, which would be an overkill. Shall the need
         // for more YAML manipulation in the DistroLauncher arise, thus function should
@@ -67,8 +59,7 @@ namespace DistributionInfo
             auto yamlStr = Win32Utils::wide_string_to_utf8(fullYaml);
             if (!yamlStr.has_value()) {
                 // Failure in this case affects UX just a little bit, yet it would be useful to know why.
-                wprintf(yamlStr.error().c_str());
-                PrintLastError();
+                // TODO: Log to a debug channel. Make sure it won't disturb users.
                 return std::string{};
             }
 
@@ -96,7 +87,7 @@ namespace DistributionInfo
                 }
                 return realName;
             }
-            PrintLastError();
+            // TODO: Log to a debug channel. Make sure it won't disturb users.
             return {};
         }
 
@@ -108,7 +99,7 @@ namespace DistributionInfo
 
             auto ret = GetUserNameExW(EXTENDED_NAME_FORMAT::NameSamCompatible, userRealName, &nSize);
             if (ret == 0) {
-                PrintLastError();
+                // TODO: Log to a debug channel. Make sure it won't disturb users.
                 return {};
             }
 
@@ -128,7 +119,7 @@ namespace DistributionInfo
             std::size_t result = GetUserDefaultLocaleName(loc, LOCALE_NAME_MAX_LENGTH);
             // `Prefill` should handle partial data, thus a missing piece of information is not a function failure.
             if (result == 0) {
-                PrintLastError();
+                // TODO: Log to a debug channel. Make sure it won't disturb users.
             } else {
                 std::wstring_view view{loc, result};
                 std::size_t dashPos = view.find_first_of('-');
