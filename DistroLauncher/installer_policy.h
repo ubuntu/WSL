@@ -153,6 +153,9 @@ namespace Oobe
                 GetExitCodeProcess(process, &exitCode);
             }
 
+            [[maybe_unused]] DWORD clearExitCode = 0;
+            g_wslApi.WslLaunchInteractive(L"clear", FALSE, &clearExitCode);
+
             return exitCode;
         }
 
