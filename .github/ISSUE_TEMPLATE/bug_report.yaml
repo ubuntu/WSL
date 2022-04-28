@@ -2,10 +2,17 @@ name: Bug report
 description: Something went wrong with Ubuntu WSL.
 labels: ["triage"]
 body:
+- type: input
+  attributes:
+    label: cmd /c ver
+    description: Identifies the Windows OS version affected.
+    placeholder: Microsoft Windows [Version 10.0.22598.200]
+  validations:
+    required: true
 - type: textarea
   attributes:
-    label: wsl.exe --status
-    description: The output of that command helps filtering Windows and WSL versions affected.
+    label: wsl --status
+    description: The output of that command helps filtering versions of the WSL components affected.
   validations:
     required: true
 - type: checkboxes
