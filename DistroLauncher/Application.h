@@ -38,6 +38,11 @@ namespace Oobe
             return std::holds_alternative<internal::Reconfig>(arg);
         }
 
+        bool canHideConsole() const
+        {
+            return std::holds_alternative<internal::ManifestMatchedInstall>(arg);
+        }
+
       public:
         /// Returns true if the command line parsing doesn't require running the OOBE.
         /// That implies partial command line parsing, with the required actions deferred to the upstream code.
@@ -65,6 +70,7 @@ namespace Oobe
             HRESULT hr =
               std::visit(internal::overloaded{
                            [&](AutoInstall& option) { return impl_.do_autoinstall(option.autoInstallFile); },
+                           [&](ManifestMatchedInstall& option) { return impl_.do_install(Mode::AutoDetect); },
                            [&](InstallDefault& option) { return impl_.do_install(Mode::AutoDetect); },
                            [&](InstallOnlyDefault& option) { return impl_.do_install(Mode::AutoDetect); },
                            [&](InteractiveInstallOnly<OobeGui>& option) { return impl_.do_install(Mode::Gui); },
@@ -104,7 +110,7 @@ namespace Oobe
             if (isAutoInstall() || shouldSkipInstaller()) {
                 return;
             }
-            impl_.do_run_splash();
+            impl_.do_run_splash(canHideConsole());
         }
     };
 }
