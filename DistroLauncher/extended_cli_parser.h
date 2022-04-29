@@ -20,11 +20,12 @@
 #define ARG_EXT_INSTALLER_TUI     ARG_EXT_ENABLE_INSTALLER L"tui"
 #define ARG_EXT_DISABLE_INSTALLER ARG_EXT_ENABLE_INSTALLER L"none"
 #define ARG_EXT_AUTOINSTALL       L"--autoinstall"
+#define ARG_EXT_UAP10_PARAMETERS  L"--from-start-menu-or-store"
 
 namespace Oobe::internal
 {
     static constexpr std::array allExtendedArgs{ARG_EXT_AUTOINSTALL, ARG_EXT_DISABLE_INSTALLER, ARG_EXT_INSTALLER_GUI,
-                                                ARG_EXT_INSTALLER_TUI};
+                                                ARG_EXT_INSTALLER_TUI, ARG_EXT_UAP10_PARAMETERS};
     // compile-time array concatenation.
     template <typename T, std::size_t SizeA, std::size_t SizeB>
     constexpr std::array<T, SizeA + SizeB> join(const std::array<T, SizeA>& a, const std::array<T, SizeB>& b)
@@ -56,6 +57,10 @@ namespace Oobe::internal
     {
         static constexpr std::array<std::wstring_view, 1> requirements{ARG_EXT_INSTALLER_TUI};
     };
+    struct ManifestMatchedInstall // matches the invocation declared in the .appxmanifest.
+    {
+        static constexpr std::array<std::wstring_view, 1> requirements{ARG_EXT_UAP10_PARAMETERS};
+    };
     struct InstallDefault
     {
         static constexpr std::array<std::wstring_view, 0> requirements{};
@@ -79,7 +84,7 @@ namespace Oobe::internal
 
     // InteractiveInstallOnly<SkipInstaller> and InteractiveInstallShell<SkipInstaller> are actually std::monostate,
     // i.e. both go to upstream resolution.
-    using Opts = std::variant<std::monostate, AutoInstall, InstallDefault, InstallOnlyDefault,
+    using Opts = std::variant<std::monostate, AutoInstall, ManifestMatchedInstall, InstallDefault, InstallOnlyDefault,
                               InteractiveInstallOnly<OobeGui>, InteractiveInstallOnly<OobeTui>,
                               InteractiveInstallShell<OobeGui>, InteractiveInstallShell<OobeTui>, Reconfig>;
 
