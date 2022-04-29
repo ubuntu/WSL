@@ -100,7 +100,7 @@ namespace Oobe
     SplashEnabledStrategy::SplashEnabledStrategy() : splashExePath{splashPath()}
     { }
 
-    void SplashEnabledStrategy::do_run_splash()
+    void SplashEnabledStrategy::do_run_splash(bool hideConsole)
     {
         if (!std::filesystem::exists(splashExePath)) {
             wprintf(L"Splash executable [%s] not found.\n", splashExePath.c_str());
@@ -142,8 +142,9 @@ namespace Oobe
             return;
         }
         splashWindow = std::get<SplashController<>::States::Visible>(transition.value()).window;
-        console.value().hideConsoleWindow();
-        consoleIsVisible = false;
+        if (hideConsole) {
+            consoleIsVisible = !console.value().hideConsoleWindow();
+        }
         splashIsRunning = true;
     }
 
@@ -154,9 +155,6 @@ namespace Oobe
 
     void SplashEnabledStrategy::do_show_console()
     {
-        if (consoleIsVisible) {
-            return;
-        }
         std::unique_lock<std::timed_mutex> guard{consoleGuard, std::defer_lock};
         using namespace std::chrono_literals;
         constexpr auto tryLockTimeout = 5s;
@@ -169,8 +167,9 @@ namespace Oobe
         if (splashWindow.has_value()) {
             topWindow = splashWindow.value();
         }
-        console.value().showConsoleWindow(topWindow);
-        consoleIsVisible = true;
+        if (!consoleIsVisible) {
+            consoleIsVisible = console.value().showConsoleWindow(topWindow);
+        }
     }
 
     void SplashEnabledStrategy::do_close_splash()

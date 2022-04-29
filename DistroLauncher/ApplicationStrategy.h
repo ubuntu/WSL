@@ -77,7 +77,7 @@ namespace Oobe
         HRESULT do_reconfigure();
 
         /// Triggers the console redirection and launch the splash screen application.
-        void do_run_splash();
+        void do_run_splash(bool hideConsole = false);
 
         SplashEnabledStrategy();
         ~SplashEnabledStrategy() = default;
@@ -100,7 +100,7 @@ namespace Oobe
 
         /// Prints to the console an error message informing that this platform doesn't support running the splash
         /// screen.
-        void do_run_splash()
+        void do_run_splash(bool hideConsole = false)
         {
             wprintf(L"This device architecture doesn't support running the splash screen.\n");
         }
