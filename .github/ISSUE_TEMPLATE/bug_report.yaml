@@ -5,14 +5,14 @@ body:
 - type: input
   attributes:
     label: cmd /c ver
-    description: Identifies the Windows OS version affected.
+    description: Open powershell or command prompt, hit the command above and paste here the output.
     placeholder: Microsoft Windows [Version 10.0.22598.200]
   validations:
     required: true
 - type: textarea
   attributes:
     label: wsl --status
-    description: The output of that command helps filtering versions of the WSL components affected.
+    description: Open powershell or command prompt, hit the command above and paste here the output.
   validations:
     required: true
 - type: checkboxes
@@ -47,7 +47,7 @@ body:
   attributes:
     label: Additional information
     description: |
-      Logs, links, screenshots, videos, or anything that may help us to understand and resolve the issue.
+      Drag and drop or paste here logs, links, screenshots, videos, or anything that may help us to understand and resolve the issue.
     placeholder: |
       - /var/log/installer/ubuntu_desktop_installer.log
       - /var/log/installer/subiquity-server-debug.log
