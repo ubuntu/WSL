@@ -1,0 +1,54 @@
+name: Bug report
+description: Something went wrong with Ubuntu WSL.
+labels: ["triage"]
+body:
+- type: input
+  attributes:
+    label: cmd /c ver
+    description: Open powershell or command prompt, hit the command above and paste here the output.
+    placeholder: Microsoft Windows [Version 10.0.22598.200]
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: wsl --status
+    description: Open powershell or command prompt, hit the command above and paste here the output.
+  validations:
+    required: true
+- type: checkboxes
+  id: launcher_bug
+  attributes:
+    label: Did the problem occur during installation?
+    options:
+      - label: "Yes"
+- type: textarea
+  attributes:
+    label: What happened?
+    description: A concise description of what went wrong, the actual result.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: What was expected?
+    description: A concise description of what was expected to happen.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Steps to reproduce
+    placeholder: |
+      1. Go to '...'
+      2. Click on '...'
+      3. Scroll down to '...'
+      4. See '...'
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Additional information
+    description: |
+      Drag and drop or paste here logs, links, screenshots, videos, or anything that may help us to understand and resolve the issue.
+    placeholder: |
+      - /var/log/installer/ubuntu_desktop_installer.log
+      - /var/log/installer/subiquity-server-debug.log
+      - demo.gif

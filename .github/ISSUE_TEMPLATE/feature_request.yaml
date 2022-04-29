@@ -1,0 +1,28 @@
+name: Suggest an Improvement or Feature
+description: How can we further enhance the experience with Ubuntu WSL?
+labels: ["enhancement"]
+body:
+- type: textarea
+  attributes:
+    label: Description
+    description: A concise description of the feature. It will be considered but it doesn't mean a commitment.
+- type: textarea
+  attributes:
+    label: Need and use case
+    description: Help us finding the right motivation to work on your idea.
+    placeholder: |
+      Please describe:
+      - What problem it will solve?
+      - How it will benefit the users?
+      - What is your expectation?
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Additional information
+    description: |
+      Drag and drop or paste here links, screenshots, videos, or anything that may further clarify the ideas you're communicating.
+    placeholder: |
+      - wireframe.png
+      - diagram.jpg
+      - demo.gif
