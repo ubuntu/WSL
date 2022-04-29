@@ -54,6 +54,11 @@ namespace Oobe::internal
 
     Opts parse(const std::vector<std::wstring_view>& arguments)
     {
+        // launcher.exe --hide-console - Windows Shell GUI invocation as declared in the appxmanifest. Hides the
+        // console, runs the OOBE (auto detect graphics support) and brings the shell at the end.
+        if (auto result = tryParse<ManifestMatchedInstall>(arguments); result.has_value()) {
+            return result.value();
+        }
         // launcher.exe - Runs the OOBE (auto detect graphics support) and brings the shell at the end.
         if (auto result = tryParse<InstallDefault>(arguments); result.has_value()) {
             return result.value();
