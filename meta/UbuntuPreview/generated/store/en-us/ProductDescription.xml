@@ -28,7 +28,7 @@ For more information about Ubuntu WSL and how Canonical supports developers plea
 
 https://wiki.ubuntu.com/WSL
 </Description>
-  <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver=22.04</ReleaseNotes>
+  <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver=22.10</ReleaseNotes>
   <DevStudio>Canonical Ltd. and the OpenSource community</DevStudio>
   <ScreenshotCaptions>
     <!-- Valid length: 200 character limit, up to 9 elements per platform -->
@@ -42,7 +42,7 @@ https://wiki.ubuntu.com/WSL
     <AppFeature>Linux Terminal</AppFeature>
     <AppFeature>GUI</AppFeature>
   </AppFeatures>
-  <CopyrightAndTrademark>© 2021 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.</CopyrightAndTrademark>
+  <CopyrightAndTrademark>© 2022 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.</CopyrightAndTrademark>
   <AdditionalLicenseTerms>https://www.ubuntu.com/legal/terms-and-policies</AdditionalLicenseTerms>
 
   <!-- Empty fields to overwrite them with every updates -->
