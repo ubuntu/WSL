@@ -115,11 +115,20 @@ namespace Oobe::internal
     Opts parseExtendedOptions(std::vector<std::wstring_view>& arguments)
     {
         Opts options{parse(arguments)};
+
         // Erasing the extended command line options to avoid confusion in the upstream code.
         auto it = std::remove_if(arguments.begin(), arguments.end(), [](auto arg) {
             return std::find(allExtendedArgs.begin(), allExtendedArgs.end(), arg) != allExtendedArgs.end();
         });
         arguments.erase(it, arguments.end());
+
+#ifdef UNSUPPORTED_EXTENDED_CLI
+        if (shouldWarnUnsupported(options)) {
+            wprintf(L"Warning: ignoring command line options invalid for this Ubuntu release.\n");
+        }
+        return {};
+#else
         return options;
+#endif // UNSUPPORTED_EXTENDED_CLI
     }
 }
