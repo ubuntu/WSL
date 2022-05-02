@@ -109,7 +109,10 @@ namespace Oobe::internal
     {
         // [ARG_EXT_UAP10_PARAMETERS] must be accepted in the old releases, even though it will be jsut discarded,
         // thus we should not warn for this case. The same stands for the empty CLI case.
-        return !(std::holds_alternative<ManifestMatchedInstall>(options) ||
-                 std::holds_alternative<InstallDefault>(options));
+        bool noWarnIf = std::holds_alternative<ManifestMatchedInstall>(options) ||
+                        std::holds_alternative<InstallDefault>(options) ||
+                        std::holds_alternative<std::monostate>(options);
+
+        return !noWarnIf;
     }
 }
