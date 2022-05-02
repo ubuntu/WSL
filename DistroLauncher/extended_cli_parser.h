@@ -20,7 +20,7 @@
 #define ARG_EXT_INSTALLER_TUI     ARG_EXT_ENABLE_INSTALLER L"tui"
 #define ARG_EXT_DISABLE_INSTALLER ARG_EXT_ENABLE_INSTALLER L"none"
 #define ARG_EXT_AUTOINSTALL       L"--autoinstall"
-#define ARG_EXT_UAP10_PARAMETERS  L"--from-start-menu-or-store"
+#define ARG_EXT_UAP10_PARAMETERS  L"--hide-console"
 
 namespace Oobe::internal
 {
