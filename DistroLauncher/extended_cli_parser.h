@@ -93,4 +93,14 @@ namespace Oobe::internal
     /// line parsing" routines. Notice that argv[0], i.e. the program name, is presumed not to be part of the arguments
     /// vector. See DistroLauncher.cpp main() function.
     Opts parseExtendedOptions(std::vector<std::wstring_view>& arguments);
+
+    /// Returns true if the command line parsing result is invalid for the case when the extended CLI is unsupported
+    /// (the case for older releases).
+    inline bool shouldWarnUnsupported(const Opts& options)
+    {
+        // [ARG_EXT_UAP10_PARAMETERS] must be accepted in the old releases, even though it will be jsut discarded,
+        // thus we should not warn for this case. The same stands for the empty CLI case.
+        return !(std::holds_alternative<ManifestMatchedInstall>(options) ||
+                 std::holds_alternative<InstallDefault>(options));
+    }
 }

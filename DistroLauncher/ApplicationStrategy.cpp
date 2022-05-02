@@ -155,6 +155,9 @@ namespace Oobe
 
     void SplashEnabledStrategy::do_show_console()
     {
+        if (!console.has_value()) {
+            return;
+        }
         std::unique_lock<std::timed_mutex> guard{consoleGuard, std::defer_lock};
         using namespace std::chrono_literals;
         constexpr auto tryLockTimeout = 5s;
