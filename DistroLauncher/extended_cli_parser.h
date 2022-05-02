@@ -84,10 +84,19 @@ namespace Oobe::internal
 
     // InteractiveInstallOnly<SkipInstaller> and InteractiveInstallShell<SkipInstaller> are actually std::monostate,
     // i.e. both go to upstream resolution.
-    using Opts = std::variant<std::monostate, AutoInstall, ManifestMatchedInstall, InstallDefault, InstallOnlyDefault,
-                              InteractiveInstallOnly<OobeGui>, InteractiveInstallOnly<OobeTui>,
-                              InteractiveInstallShell<OobeGui>, InteractiveInstallShell<OobeTui>, Reconfig>;
-
+    // clang-format off
+    // [clang-format appears to have trouble with long declarations like the following.]
+    using Opts = std::variant<std::monostate, // The upstream command line parsing effects.
+                              AutoInstall,
+                              ManifestMatchedInstall,
+                              InstallDefault,
+                              InstallOnlyDefault,
+                              InteractiveInstallOnly<OobeGui>,
+                              InteractiveInstallOnly<OobeTui>,
+                              InteractiveInstallShell<OobeGui>,
+                              InteractiveInstallShell<OobeTui>,
+                              Reconfig>;
+    // clang-format on
     /// Parses a vector of command line arguments according to the extended command line options declared above. The
     /// extended options are removed from the original vector as a side effect to avoid confusing the "upstream command
     /// line parsing" routines. Notice that argv[0], i.e. the program name, is presumed not to be part of the arguments
