@@ -125,6 +125,39 @@ namespace Oobe::internal
         ASSERT_TRUE(std::holds_alternative<InstallDefault>(opts));
     }
 
+    // Tests the ManifestMatchedInstall and combinations with it.
+    TEST(ExtendedCliParserTests, StoreStartMenuInvocation)
+    {
+        std::vector<std::wstring_view> args{ARG_EXT_UAP10_PARAMETERS};
+        auto opts = parseExtendedOptions(args);
+        ASSERT_TRUE(std::holds_alternative<ManifestMatchedInstall>(opts));
+        ASSERT_TRUE(args.empty());
+    }
+
+    TEST(ExtendedCliParserTests, InvalidCombinationWithManifestMatched1)
+    {
+        std::vector<std::wstring_view> args{L"install", ARG_EXT_UAP10_PARAMETERS};
+        auto opts = parseExtendedOptions(args);
+        ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));
+        ASSERT_EQ(args.size(), 1);
+    }
+
+    TEST(ExtendedCliParserTests, InvalidCombinationWithManifestMatched2)
+    {
+        std::vector<std::wstring_view> args{L"install", ARG_EXT_INSTALLER_GUI, ARG_EXT_UAP10_PARAMETERS};
+        auto opts = parseExtendedOptions(args);
+        ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));
+        ASSERT_EQ(args.size(), 1);
+    }
+
+    TEST(ExtendedCliParserTests, InvalidCombinationWithManifestMatched3)
+    {
+        std::vector<std::wstring_view> args{L"config", ARG_EXT_UAP10_PARAMETERS};
+        auto opts = parseExtendedOptions(args);
+        ASSERT_TRUE(std::holds_alternative<std::monostate>(opts));
+        ASSERT_EQ(args.size(), 1);
+    }
+
     // Tests whether the upstream options remain preserved:
     TEST(ExtendedCliParserTests, InstallRootIsUpstream)
     {

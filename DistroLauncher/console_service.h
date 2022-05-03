@@ -161,9 +161,12 @@ namespace Win32Utils
 
         bool showConsoleWindow(HWND topWindow) const
         {
-            if (auto res = Win32Utils::resize_to(window_, topWindow); res != 0) {
-                Helpers::PrintErrorMessage(HRESULT_FROM_WIN32(res));
+            if (IsWindowVisible(topWindow) == TRUE) {
+                if (auto res = Win32Utils::resize_to(window_, topWindow); res != 0) {
+                    Helpers::PrintErrorMessage(HRESULT_FROM_WIN32(res));
+                }
             }
+
             // If the window was previously visible, the return value is nonzero.
             // If the window was previously hidden, the return value is zero.
             return ShowWindow(window_, SW_SHOWNORMAL) == FALSE;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Canonical Ltd
+ * Copyright (C) 2022 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -54,6 +54,11 @@ namespace Oobe::internal
 
     Opts parse(const std::vector<std::wstring_view>& arguments)
     {
+        // launcher.exe --hide-console - Windows Shell GUI invocation as declared in the appxmanifest. Hides the
+        // console, runs the OOBE (auto detect graphics support) and brings the shell at the end.
+        if (auto result = tryParse<ManifestMatchedInstall>(arguments); result.has_value()) {
+            return result.value();
+        }
         // launcher.exe - Runs the OOBE (auto detect graphics support) and brings the shell at the end.
         if (auto result = tryParse<InstallDefault>(arguments); result.has_value()) {
             return result.value();
@@ -110,11 +115,20 @@ namespace Oobe::internal
     Opts parseExtendedOptions(std::vector<std::wstring_view>& arguments)
     {
         Opts options{parse(arguments)};
+
         // Erasing the extended command line options to avoid confusion in the upstream code.
         auto it = std::remove_if(arguments.begin(), arguments.end(), [](auto arg) {
             return std::find(allExtendedArgs.begin(), allExtendedArgs.end(), arg) != allExtendedArgs.end();
         });
         arguments.erase(it, arguments.end());
+
+#ifdef UNSUPPORTED_EXTENDED_CLI
+        if (shouldWarnUnsupported(options)) {
+            wprintf(L"Warning: ignoring command line options invalid for this Ubuntu release.\n");
+        }
+        return {};
+#else
         return options;
+#endif // UNSUPPORTED_EXTENDED_CLI
     }
 }
