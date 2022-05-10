@@ -23,6 +23,8 @@
     "appSubmission": {
         "targetPublishMode": "Manual",
 
+	"visibility": "Public",
+
         "allowTargetFutureDeviceFamilies": {
             "Xbox": false,
             "Team": false,
