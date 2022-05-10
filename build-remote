@@ -48,9 +48,19 @@ def set_logging(debugmode=False):
     logging.debug("Debug mode enabled")
 
 
-def lpinit():
+def strip_ppa(string):
+    """Helper function for Python pre-3.9 to strip the ppa: suffix"""
+    if string.startswith("ppa:"):
+        return string[4:]
+    return string
+
+
+def lpinit(anonymous=False):
     """Initialize the connection to LP"""
-    return Launchpad.login_with('build-wsl', 'production', version='devel')
+    if anonymous:
+        return Launchpad.login_anonymously('build-wsl', 'production', version='devel')
+    else:
+        return Launchpad.login_with('build-wsl', 'production', version='devel')
 
 
 def appID_to_releases(lpconn):
@@ -117,7 +127,15 @@ def main():
         logging.error("GitHub token not found in environment or passed with -t")
         sys.exit(1)
 
-    lpconn = lpinit()
+    # Use proxies for the request callse, if needed
+    proxies = {}
+    https_proxy = os.environ.get("HTTPS_PROXY")
+    if args.https_proxy:
+        https_proxy = args.https_proxy
+    if https_proxy:
+        proxies["https"] = https_proxy
+
+    lpconn = lpinit(args.no_lp_login)
 
     releases = appID_to_releases(lpconn)
     selected_appID = None
@@ -142,8 +160,8 @@ def main():
     # Sanitize input by accepting "ppa:" prefix
     ppas = []
     for ppa in args.ppas:
-        ppas.append(ppa.removeprefix("ppa:"))
-    livecd_rootfs = args.livecd_rootfs.removeprefix("ppa:")
+        ppas.append(strip_ppa(ppa))
+    livecd_rootfs = strip_ppa(args.livecd_rootfs)
 
     rootfses = []
 
@@ -231,13 +249,13 @@ def main():
 
     # Request github appbundle build
     logging.info("Requesting github appbundle build %s" % selected_appID)
-    r = requests.post("%s/workflows/build-wsl.yaml/dispatches" % ACTION_API_BASE_URL, json=d, headers=headers)
+    r = requests.post("%s/workflows/build-wsl.yaml/dispatches" % ACTION_API_BASE_URL, json=d, headers=headers, proxies=proxies)
     if r.status_code != requests.codes.ok and r.status_code != requests.codes.no_content:
         logging.error("Failed to start building the appxbundle on github: %s" % r.text)
         sys.exit(1)
     # Wait for the build to be listed
     time.sleep(1)
-    r = requests.get("%s/runs" % ACTION_API_BASE_URL, headers=headers)
+    r = requests.get("%s/runs" % ACTION_API_BASE_URL, headers=headers, proxies=proxies)
     if r.status_code != requests.codes.ok and r.status_code != requests.codes.no_content:
         logging.error("Failed to lookup latest appxbundle github build: %s" % r.text)
         sys.exit(1)
@@ -248,7 +266,7 @@ def main():
     while True:
         time.sleep(30)
         logging.debug("checking appxbundle build status")
-        r = requests.get("%s/runs/%s" % (ACTION_API_BASE_URL, run_id), headers=headers)
+        r = requests.get("%s/runs/%s" % (ACTION_API_BASE_URL, run_id), headers=headers, proxies=proxies)
         if r.status_code != requests.codes.ok and r.status_code != requests.codes.no_content:
             logging.error("Failed to lookup appxbundle build status: %s" % r.text)
             continue
@@ -296,6 +314,10 @@ def _parse_arguments():
                         help="upload the appbundle to the Microsoft Store")
     parser.add_argument("-t", "--github-token", dest="wsl_github_token",
                         help="Pass a github token with the repo:public_repo permission to run github worklows. Override WSL_GITHUB_TOKEN env variable")
+    parser.add_argument("--no-lp-login", action="store_true", default=False,
+                        help="login anonymously to Launchpad instead of authenticating")
+    parser.add_argument("--https-proxy",
+                        help="HTTPS proxy url, if applicable")
 
     return parser.parse_args()
 
