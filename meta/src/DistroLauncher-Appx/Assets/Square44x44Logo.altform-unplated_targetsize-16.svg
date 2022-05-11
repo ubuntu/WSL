@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   data-name="Layer 1"
+   viewBox="0 0 1280 1280"
+   version="1.1"
+   sodipodi:docname="small-Square44x44Logo.svg"
+   width="1280"
+   height="1280"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview23"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.44"
+     inkscape:cx="618.18182"
+     inkscape:cy="553.40909"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{isolation:isolate;font-size:7.5px;font-family:Ubuntu;}.cls-1,.cls-2{fill:#fff;}.cls-3{fill:#e95420;}</style>
+  </defs>
+  <rect
+     class="cls-3"
+     id="rect862"
+     width="1280"
+     height="1280"
+     x="0"
+     y="0" />
+  <rect
+     class="cls-2"
+     x="240"
+     width="816"
+     height="1280"
+     id="rect8"
+     y="0"
+     style="fill:#ffffff;stroke-width:65.3196" />
+  <g
+     id="g916"
+     transform="translate(0,466)">
+    <circle
+       class="cls-3"
+       cx="424"
+       cy="415.46667"
+       r="85.866669"
+       id="circle10"
+       style="stroke-width:53.3333" />
+    <circle
+       class="cls-3"
+       cx="781.86664"
+       cy="227.20001"
+       r="85.866669"
+       id="circle12"
+       style="stroke-width:53.3333" />
+    <path
+       class="cls-3"
+       d="M 617.6,636.8 A 209.6,209.6 0 0 1 475.2,530.13333 128.53333,128.53333 0 0 1 401.6,539.2 a 281.06667,281.06667 0 0 0 201.6,168.53333 290.66667,290.66667 0 0 0 60.8,6.4 A 125.33333,125.33333 0 0 1 640,640 Z"
+       id="path14"
+       style="stroke-width:53.3333" />
+    <circle
+       class="cls-3"
+       cx="762.66669"
+       cy="636.79999"
+       r="85.866669"
+       id="circle16"
+       style="stroke-width:53.3333" />
+    <path
+       class="cls-3"
+       d="M 882.13333,605.33333 A 280.53333,280.53333 0 0 0 896,276.26667 127.46667,127.46667 0 0 1 847.46667,332.8 a 209.06667,209.06667 0 0 1 20.26666,142.4 223.46667,223.46667 0 0 1 -26.66666,66.13333 130.66667,130.66667 0 0 1 41.06666,64 z"
+       id="path18"
+       style="stroke-width:53.3333" />
+    <path
+       class="cls-3"
+       d="m 417.6,292.8 h 9.06667 a 145.06667,145.06667 0 0 1 26.13333,0 124.8,124.8 0 0 1 38.93333,16 210.13333,210.13333 0 0 1 168.53334,-90.13333 c 0,-6.4 0,-12.8 2.66666,-19.2 A 133.86667,133.86667 0 0 1 686.4,148.8 282.13333,282.13333 0 0 0 417.6,292.8 Z"
+       id="path20"
+       style="stroke-width:53.3333" />
+  </g>
+</svg>
