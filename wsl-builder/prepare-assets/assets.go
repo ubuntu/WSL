@@ -309,13 +309,22 @@ func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPa
 			return err
 		}
 
-		// 2. Compute template name
+		// 2. Compute template name:
+		// - prefer any name matching exactly the image name (with svg extension).
+		// - fallback to any name, matching the image name without size.
 		templateName := filepath.Base(f.Name())
-		templateName = strings.Split(templateName, ".")[0]
-		if strings.Contains(f.Name(), "altform-unplated") {
-			templateName = fmt.Sprintf("%s.altform-unplated", templateName)
+		exactMatchTemplate := strings.TrimSuffix(templateName, filepath.Ext(templateName))
+		templateRelPath := filepath.Join(relDir, fmt.Sprintf("%s.svg", exactMatchTemplate))
+		if _, ok := templates[templateRelPath]; ok {
+			templateName = exactMatchTemplate
+		} else {
+			templateName = strings.Split(templateName, ".")[0]
+			if strings.Contains(f.Name(), "altform-unplated") {
+				templateName = fmt.Sprintf("%s.altform-unplated", templateName)
+			}
+			// override it with generic template name
+			templateRelPath = filepath.Join(relDir, fmt.Sprintf("%s.svg", templateName))
 		}
-		templateRelPath := filepath.Join(relDir, fmt.Sprintf("%s.svg", templateName))
 
 		// 3. Replace any version id if present
 		templateData, err := os.ReadFile(templates[templateRelPath])
