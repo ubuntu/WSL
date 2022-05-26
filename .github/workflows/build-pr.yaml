@@ -23,10 +23,11 @@ jobs:
           cd ${{ env.workDir }}
           git checkout "${GITHUB_SHA}"
           git submodule update --init --recursive
-      - name: Setup x64 rootfs
+      - name: Download rootfs and configure project to only build x64
         working-directory: ${{ env.workDir }}
         shell: powershell
         run: |
+          Set-Content -Path "DistroLauncher.sln" -Value (get-content -Path "DistroLauncher.sln" | Select-String -Pattern 'ARM64' -NotMatch)
           mkdir x64/
           $client = new-object System.Net.WebClient
           $client.DownloadFile("${{ env.rootfs64}}","x64/install.tar.gz")
