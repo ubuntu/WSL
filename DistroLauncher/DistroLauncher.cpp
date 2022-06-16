@@ -121,6 +121,9 @@ int wmain(int argc, wchar_t const *argv[])
         exitCode = SUCCEEDED(hr) ? 0 : 1;
     }
 
+    // Check and run any pre-launch instruction
+    Oobe::ExitStatusHandling();
+
     // Parse the command line arguments.
     if ((SUCCEEDED(hr)) && (!installOnly)) {
         if (arguments.empty()) {
