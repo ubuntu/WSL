@@ -150,7 +150,10 @@ namespace Oobe
 
     void SplashEnabledStrategy::do_toggle_splash()
     {
-        splash.value().sm.addEvent(SplashController<>::Events::ToggleVisibility{});
+        if (splash.has_value())
+        {
+            splash.value().sm.addEvent(SplashController<>::Events::ToggleVisibility{});
+        }
     }
 
     void SplashEnabledStrategy::do_show_console()
