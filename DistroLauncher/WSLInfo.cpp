@@ -160,6 +160,8 @@ namespace Oobe
             case Win32Utils::WinVersion::Win11:
                 return L"\\\\wsl.localhost\\";
             }
+            assert("Unsupported Windows version.", false);
+            __assume(0); // Unreachable
         }(Win32Utils::os_version());
 
         return prefix;
