@@ -178,5 +178,8 @@ int wmain(int argc, wchar_t const *argv[])
         }
     }
 
+    // Check and run any cleanup instruction
+    Oobe::ExitStatusHandling();
+
     return SUCCEEDED(hr) ? exitCode : 1;
 }
