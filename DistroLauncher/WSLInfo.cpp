@@ -157,8 +157,8 @@ namespace Oobe
             switch (version) {
             case Win32Utils::WinVersion::Win10:
                 return L"\\\\wsl$\\";
-            /*case Win32Utils::WinVersion::Win11:
-                return L"\\\\wsl.localhost\\";*/
+            case Win32Utils::WinVersion::Win11:
+                return L"\\\\wsl.localhost\\";
             }
             assert(false && "Unsupported Windows version.");
             __assume(0); // Unreachable
