@@ -31,7 +31,7 @@ static HRESULT SetDefaultUser(std::wstring_view userName);
 {
     constexpr const std::wstring_view app_id = APP_ID;
 
-    if (app_id == L"Ubuntu (Preview)")
+    if (app_id == L"UbuntuPreview")
         return L"normal";
     if (app_id == L"Ubuntu")
         return L"lts";
