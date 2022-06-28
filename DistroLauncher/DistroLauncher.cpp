@@ -15,11 +15,6 @@
 #define ARG_RUN                 L"run"
 #define ARG_RUN_C               L"-c"
 
-#define ARG_NO_DEFAULT_UPGRADE_POLICY L"--no-default-upgrade-policy"
-#ifndef DEFAULT_UPGRADE_POLICY
-#define APP_ID L""
-#endif
-
 // Helper class for calling WSL Functions:
 // https://msdn.microsoft.com/en-us/library/windows/desktop/mt826874(v=vs.85).aspx
 WslApiLoader g_wslApi(DistributionInfo::Name);
@@ -27,15 +22,29 @@ WslApiLoader g_wslApi(DistributionInfo::Name);
 static HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app);
 static HRESULT SetDefaultUser(std::wstring_view userName);
 
+// Replace with std::wstring_view::starts_with in C++20
+[[nodiscard]] constexpr bool starts_with(const std::wstring_view str, const std::wstring_view other)
+{
+    return (str.size() >= other.size()) &&
+           (std::mismatch(other.cbegin(), other.cend(), str.cbegin()).first == other.cend());
+}
+
+// Replace with std::wstring_view::ends_with in C++20
+[[nodiscard]] constexpr bool ends_with(const std::wstring_view str, const std::wstring_view other)
+{
+    return (str.size() >= other.size()) &&
+           (std::mismatch(other.crbegin(), other.crend(), str.crbegin()).first == other.crend());
+}
+
 [[nodiscard]] constexpr std::wstring_view GetDefaultUpgradePolicy()
 {
-    constexpr const std::wstring_view app_id = APP_ID;
-
-    if (app_id == L"UbuntuPreview")
+    const std::wstring_view app_id = DistributionInfo::Name;
+    if (app_id == L"Ubuntu (Preview)")
         return L"normal";
     if (app_id == L"Ubuntu")
         return L"lts";
-    if (app_id.rfind(L"Ubuntu", 0) == 0 && app_id.rfind(L"LTS", app_id.size()-3)) // Replace with starts_with and ends_with in C++20
+    if (starts_with(app_id, L"Ubuntu") &&
+        ends_with(app_id, L"LTS"))
         return L"never";
     return L"normal"; // Default to development build
 }
@@ -49,7 +58,7 @@ HRESULT OverrideUpgradePolicy(DWORD& exitCode)
     return g_wslApi.WslLaunchInteractive(command.str().c_str(), true, &exitCode);
 }
 
-HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app, bool overrideUpgradePolicy)
+HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
 {
     app.runSplash();
     // Register the distribution.
@@ -66,10 +75,8 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app, bool over
         return hr;
     }
 
-    if (overrideUpgradePolicy) {
-        if (hr = OverrideUpgradePolicy(exitCode); FAILED(hr)) {
-            return hr;
-        }
+    if (hr = OverrideUpgradePolicy(exitCode); FAILED(hr)) {
+        return hr;
     }
 
     // Create a user account.
@@ -142,12 +149,8 @@ int wmain(int argc, wchar_t const *argv[])
     if (!g_wslApi.WslIsDistributionRegistered()) {
 
         // If the "--root" option is specified, do not create a user account.
-        const bool useRoot = installOnly && Oobe::internal::hasFlag(arguments, ARG_INSTALL_ROOT);
-
-        // If the --no-default-upgrade-policy option is specified, do not override /etc/update-manager/release-upgrades
-        const bool overrideUpgradePolicy = !Oobe::internal::hasFlag(arguments, ARG_NO_DEFAULT_UPGRADE_POLICY);
-
-        hr = InstallDistribution(!useRoot, app, overrideUpgradePolicy);
+        bool useRoot = ((installOnly) && (arguments.size() > 1) && (arguments[1] == ARG_INSTALL_ROOT));
+        hr = InstallDistribution(!useRoot, app);
         if (FAILED(hr)) {
             if (hr == HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS)) {
                 Helpers::PrintMessage(MSG_INSTALL_ALREADY_EXISTS);

@@ -115,9 +115,4 @@ namespace Oobe::internal
 
         return !noWarnIf;
     }
-
-    inline bool hasFlag(const std::vector<std::wstring_view>& arguments, const std::wstring_view flag)
-    {
-        return std::find(arguments.cbegin(), arguments.cend(), flag) != arguments.cend();
-    }
 }
