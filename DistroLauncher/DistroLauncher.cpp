@@ -3,9 +3,8 @@
 // Licensed under the terms described in the LICENSE file in the root of this project.
 //
 
-#include <sstream>
 #include "stdafx.h"
-#include <sstream>
+#include "AfterInstall.h"
 
 // Commandline arguments: 
 #define ARG_CONFIG              L"config"
@@ -21,42 +20,6 @@ WslApiLoader g_wslApi(DistributionInfo::Name);
 
 static HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app);
 static HRESULT SetDefaultUser(std::wstring_view userName);
-
-// Replace with std::wstring_view::starts_with in C++20
-[[nodiscard]] constexpr bool starts_with(const std::wstring_view str, const std::wstring_view other)
-{
-    return (str.size() >= other.size()) &&
-           (std::mismatch(other.cbegin(), other.cend(), str.cbegin()).first == other.cend());
-}
-
-// Replace with std::wstring_view::ends_with in C++20
-[[nodiscard]] constexpr bool ends_with(const std::wstring_view str, const std::wstring_view other)
-{
-    return (str.size() >= other.size()) &&
-           (std::mismatch(other.crbegin(), other.crend(), str.crbegin()).first == other.crend());
-}
-
-[[nodiscard]] constexpr std::wstring_view GetDefaultUpgradePolicy()
-{
-    const std::wstring_view app_id = DistributionInfo::Name;
-    if (app_id == L"Ubuntu (Preview)")
-        return L"normal";
-    if (app_id == L"Ubuntu")
-        return L"lts";
-    if (starts_with(app_id, L"Ubuntu") &&
-        ends_with(app_id, L"LTS"))
-        return L"never";
-    return L"normal"; // Default to development build
-}
-
-HRESULT OverrideUpgradePolicy(DWORD& exitCode)
-{
-    std::wstringstream command;
-    command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
-            << LR"(/" "/etc/update-manager/release-upgrades")";
-
-    return g_wslApi.WslLaunchInteractive(command.str().c_str(), true, &exitCode);
-}
 
 HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
 {
@@ -75,9 +38,9 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
         return hr;
     }
 
-    if (hr = OverrideUpgradePolicy(exitCode); FAILED(hr)) {
+    if (hr = AfterInstall(exitCode); FAILED(hr)) {
         return hr;
-    }
+     };
 
     // Create a user account.
     if (createUser) {
