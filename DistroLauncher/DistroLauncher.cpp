@@ -51,11 +51,11 @@ static HRESULT SetDefaultUser(std::wstring_view userName);
 
 HRESULT OverrideUpgradePolicy(DWORD& exitCode)
 {
-    std::wstringstream command;
-    command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
-            << LR"(/" "/etc/update-manager/release-upgrades")";
-
-    return g_wslApi.WslLaunchInteractive(command.str().c_str(), true, &exitCode);
+    std::wstringstream ss_command;
+    ss_command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
+               << LR"(/" "/etc/update-manager/release-upgrades")";
+    const auto command = ss_command.str();
+    return g_wslApi.WslLaunchInteractive(command.c_str(), true, &exitCode);
 }
 
 HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
