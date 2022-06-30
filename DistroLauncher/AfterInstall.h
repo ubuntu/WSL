@@ -21,7 +21,7 @@
 #include "DistributionInfo.h"
 
 // Replace with std::wstring_view::starts_with and ends_with in C++20
-[[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view other);
+[[nodiscard]] bool starts_with(std::wstring_view str, const std::wstring_view other);
 [[nodiscard]] bool ends_with(const std::wstring_view str, const std::wstring_view other);
 
 [[nodiscard]] std::wstring_view GetDefaultUpgradePolicy();
