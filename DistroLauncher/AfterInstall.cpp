@@ -22,14 +22,14 @@
 [[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view other)
 {
     return (str.size() >= other.size()) &&
-            (std::mismatch(other.cbegin(), other.cend(), str.cbegin()).first == other.cend());
+           (std::mismatch(other.cbegin(), other.cend(), str.cbegin()).first == other.cend());
 }
 
 // Replace with std::wstring_view::ends_with in C++20
 [[nodiscard]] bool ends_with(const std::wstring_view str, const std::wstring_view other)
 {
     return (str.size() >= other.size()) &&
-            (std::mismatch(other.crbegin(), other.crend(), str.crbegin()).first == other.crend());
+           (std::mismatch(other.crbegin(), other.crend(), str.crbegin()).first == other.crend());
 }
 
 [[nodiscard]] std::wstring_view GetDefaultUpgradePolicy()
