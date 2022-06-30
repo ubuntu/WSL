@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AfterInstall.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
     <ClInclude Include="console_service.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="local_named_pipe.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AfterInstall.cpp" />
     <ClCompile Include="ApplicationStrategy.cpp" />
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="ExitStatus.cpp" />
