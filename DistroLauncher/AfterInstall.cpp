@@ -50,7 +50,7 @@ HRESULT OverrideUpgradePolicy(DWORD& exitCode)
     ss_command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
                << LR"(/" "/etc/update-manager/release-upgrades")";
     const auto command = ss_command.str();
-    return g_wslApi.WslLaunchInteractive(command.c_str(), true, &exitCode);
+    return g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
 }
 
 HRESULT AfterInstall(DWORD& exitCode)
