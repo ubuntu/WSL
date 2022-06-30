@@ -40,7 +40,7 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
 
     if (hr = AfterInstall(exitCode); FAILED(hr)) {
         return hr;
-     };
+    }
 
     // Create a user account.
     if (createUser) {
