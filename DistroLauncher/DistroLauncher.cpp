@@ -4,7 +4,7 @@
 //
 
 #include "stdafx.h"
-#include "AfterInstall.h"
+
 
 // Commandline arguments: 
 #define ARG_CONFIG              L"config"

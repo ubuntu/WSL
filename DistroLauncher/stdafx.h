@@ -52,6 +52,7 @@
 #include "Win32Utils.h"
 #include "ApplicationStrategy.h"
 #include "Application.h"
+#include "AfterInstall.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"

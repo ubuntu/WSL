@@ -16,7 +16,6 @@
  */
 
 #include "stdafx.h"
-#include "AfterInstall.h"
 
 // Replace with std::wstring_view::starts_with in C++20
 [[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view other)
