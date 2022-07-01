@@ -50,13 +50,7 @@ void OverrideUpgradePolicy()
                << LR"(/" "/etc/update-manager/release-upgrades")";
     const auto command = ss_command.str();
     DWORD exitCode;
-    [[maybe_unused]] const HRESULT hr = g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
-
-#ifndef DNDEBUG
-    if (FAILED(hr)) {
-        Helpers::PrintErrorMessage(hr);
-    }
-#endif
+    g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
 }
 
 void AfterInstall()
