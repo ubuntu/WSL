@@ -26,6 +26,6 @@
 
 [[nodiscard]] std::wstring_view GetDefaultUpgradePolicy();
 
-HRESULT OverrideUpgradePolicy(DWORD& exitCode);
+void OverrideUpgradePolicy();
 
-HRESULT AfterInstall(DWORD& exitCode);
+void AfterInstall();

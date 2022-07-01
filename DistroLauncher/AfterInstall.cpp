@@ -43,21 +43,23 @@
     return L"normal"; // Default to development build
 }
 
-HRESULT OverrideUpgradePolicy(DWORD& exitCode)
+void OverrideUpgradePolicy()
 {
     std::wstringstream ss_command{};
     ss_command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
                << LR"(/" "/etc/update-manager/release-upgrades")";
     const auto command = ss_command.str();
-    return g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
+    DWORD exitCode;
+    [[maybe_unused]] const HRESULT hr = g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
+
+#ifndef DNDEBUG
+    if (FAILED(hr)) {
+        Helpers::PrintErrorMessage(hr);
+    }
+#endif
 }
 
-HRESULT AfterInstall(DWORD& exitCode)
+void AfterInstall()
 {
-    HRESULT hr;
-    if (hr = OverrideUpgradePolicy(exitCode); FAILED(hr)) {
-        return hr;
-    }
-
-    return hr;
+    OverrideUpgradePolicy();
 }

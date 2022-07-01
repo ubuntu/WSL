@@ -38,12 +38,7 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
         return hr;
     }
 
-    hr = AfterInstall(exitCode);
-#ifndef DNDEBUG
-    if (FAILED(hr)) {
-        return hr;
-    }
-#endif
+    AfterInstall();
 
     // Create a user account.
     if (createUser) {
