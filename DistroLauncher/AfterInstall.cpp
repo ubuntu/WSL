@@ -18,17 +18,17 @@
 #include "stdafx.h"
 
 // Replace with std::wstring_view::starts_with in C++20
-[[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view other)
+[[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view pattern)
 {
-    return (str.size() >= other.size()) &&
-           (std::mismatch(other.cbegin(), other.cend(), str.cbegin()).first == other.cend());
+    return (str.size() >= pattern.size()) &&
+           (std::mismatch(pattern.cbegin(), pattern.cend(), str.cbegin()).first == pattern.cend());
 }
 
 // Replace with std::wstring_view::ends_with in C++20
-[[nodiscard]] bool ends_with(const std::wstring_view str, const std::wstring_view other)
+[[nodiscard]] bool ends_with(const std::wstring_view str, const std::wstring_view pattern)
 {
-    return (str.size() >= other.size()) &&
-           (std::mismatch(other.crbegin(), other.crend(), str.crbegin()).first == other.crend());
+    return (str.size() >= pattern.size()) &&
+           (std::mismatch(pattern.crbegin(), pattern.crend(), str.crbegin()).first == pattern.crend());
 }
 
 [[nodiscard]] std::wstring_view GetDefaultUpgradePolicy()
