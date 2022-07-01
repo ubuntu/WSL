@@ -45,12 +45,29 @@
 
 void OverrideUpgradePolicy()
 {
+#ifdef DNDEBUG
+    constexpr bool debug = false;
+#else
+    constexpr bool debug = true;
+#endif
+
     std::wstringstream ss_command{};
     ss_command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
                << LR"(/" "/etc/update-manager/release-upgrades")";
+
+    if constexpr (debug) {
+        ss_command << L"&> /dev/null";
+    }
+
     const auto command = ss_command.str();
     DWORD exitCode;
-    g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
+    [[maybe_unused]] const HRESULT hr = g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
+
+    if constexpr (debug) {
+        if (FAILED(hr)) {
+            std::wcerr << L"Failed to set up default update policy.\n";
+        }
+    }
 }
 
 void AfterInstall()
