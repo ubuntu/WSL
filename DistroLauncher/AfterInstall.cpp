@@ -50,7 +50,17 @@ void OverrideUpgradePolicy()
 #else
     constexpr bool debug = true;
 #endif
+    // Checking if overriden already
+    DWORD do_override;
+    g_wslApi.WslLaunchInteractive(L"test -e /etc/update-manager/wlslauncher-do-not-override &> /dev/nul", 1,
+                                  &do_override);
+    if (!do_override) {
+        return;
+    }
+    DWORD exitCode;
+    g_wslApi.WslLaunchInteractive(L"touch /etc/update-manager/wlslauncher-do-not-override", 1, &exitCode);
 
+    // Overriding
     std::wstringstream ss_command{};
     ss_command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
                << LR"(/" "/etc/update-manager/release-upgrades")";
@@ -60,7 +70,6 @@ void OverrideUpgradePolicy()
     }
 
     const auto command = ss_command.str();
-    DWORD exitCode;
     [[maybe_unused]] const HRESULT hr = g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
 
     if constexpr (debug) {

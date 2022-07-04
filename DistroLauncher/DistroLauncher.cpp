@@ -38,8 +38,6 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
         return hr;
     }
 
-    AfterInstall();
-
     // Create a user account.
     if (createUser) {
         if (!app.shouldSkipInstaller()) {
@@ -123,6 +121,8 @@ int wmain(int argc, wchar_t const *argv[])
 
         exitCode = SUCCEEDED(hr) ? 0 : 1;
     }
+
+    AfterInstall();
 
     // Parse the command line arguments.
     if ((SUCCEEDED(hr)) && (!installOnly)) {
