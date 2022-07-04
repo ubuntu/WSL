@@ -64,7 +64,7 @@ void OverrideUpgradePolicy()
     [[maybe_unused]] const HRESULT hr = g_wslApi.WslLaunchInteractive(command.c_str(), 1, &exitCode);
 
     if constexpr (debug) {
-        if (FAILED(hr)) {
+        if (exitCode || FAILED(hr)) {
             std::wcerr << L"Failed to set up default update policy.\n";
         }
     }
