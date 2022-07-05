@@ -51,4 +51,7 @@ namespace Oobe
 
     // Returns the preferred file path prefix to access files inside the Linux file system.
     const wchar_t* WslPathPrefix();
+
+    // Returns the windows path to access files inside the Linux file system.
+    const std::filesystem::path WindowsPath(const std::wstring_view distro_path);
 }

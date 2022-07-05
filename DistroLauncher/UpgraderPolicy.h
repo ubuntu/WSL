@@ -16,16 +16,6 @@
  */
 #pragma once
 
-#include <sstream>
+#include "stdafx.h"
 
-#include "DistributionInfo.h"
-
-// Replace with std::wstring_view::starts_with and ends_with in C++20
-[[nodiscard]] bool starts_with(std::wstring_view str, std::wstring_view pattern);
-[[nodiscard]] bool ends_with(std::wstring_view str, std::wstring_view pattern);
-
-[[nodiscard]] std::wstring_view GetDefaultUpgradePolicy();
-
-void OverrideUpgradePolicy();
-
-void AfterInstall();
+void OverrideReleaseUpdatePolicy();

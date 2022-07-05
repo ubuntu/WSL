@@ -122,10 +122,11 @@ int wmain(int argc, wchar_t const *argv[])
         exitCode = SUCCEEDED(hr) ? 0 : 1;
     }
 
-    AfterInstall();
-
     // Parse the command line arguments.
     if ((SUCCEEDED(hr)) && (!installOnly)) {
+
+        OverrideReleaseUpdatePolicy();
+
         if (arguments.empty()) {
             hr = g_wslApi.WslLaunchInteractive(Oobe::WrapCommand(L"").c_str(), false, &exitCode);
 

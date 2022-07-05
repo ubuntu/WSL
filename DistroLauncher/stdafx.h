@@ -18,6 +18,7 @@
 #include <conio.h>
 #include <io.h>
 #include <string>
+#include <sstream>
 #include <memory>
 #include <assert.h>
 #include <locale>
@@ -52,7 +53,8 @@
 #include "Win32Utils.h"
 #include "ApplicationStrategy.h"
 #include "Application.h"
-#include "AfterInstall.h"
+#include "UpgraderPolicy.h"
+#include "RootUser.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"
