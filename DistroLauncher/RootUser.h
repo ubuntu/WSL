@@ -37,12 +37,6 @@ class RootSession
 
     // Swaps user back to default
     ~RootSession();
-
-    // Does the same as the destructor, but allows for capturing the result
-    HRESULT Release();
-
-    // Captures the result of last opening/closing
-    HRESULT GetHResult() const noexcept;
 };
 
 HRESULT WSLLaunchInteractiveAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode);
