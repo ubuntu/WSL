@@ -72,7 +72,7 @@ namespace
 void OverrideReleaseUpdatePolicy()
 {
     // Checking if overriden already
-    const auto file_linux = L"/etc/update-manager/wsl-launcher-do-not-override";
+    const auto *const file_linux = L"/etc/update-manager/wsl-launcher-do-not-override";
     const auto file_windows = Oobe::WindowsPath(file_linux);
 
     if (std::filesystem::exists(file_windows)) {
