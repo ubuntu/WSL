@@ -83,7 +83,7 @@ void OverrideReleaseUpdatePolicy()
     DWORD exitCode;
     const HRESULT hr = OverrideReleaseUpdatePolicyImpl(exitCode);
 
-    if (SUCCEEDED(hr) && !exitCode) {
+    if (SUCCEEDED(hr) && exitCode == 0) {
         const auto command = std::wstring{L"touch "} + file_linux;
         WSLLaunchInteractiveAsRoot(command.c_str(), 1, &exitCode);
         return;
