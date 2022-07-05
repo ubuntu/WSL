@@ -59,7 +59,7 @@ namespace
     {
         std::wstringstream command{};
         command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
-                   << LR"(/" "/etc/update-manager/release-upgrades")";
+                << LR"(/" "/etc/update-manager/release-upgrades")";
 
         if constexpr (!debug()) {
             command << L"&> /dev/null";
@@ -97,4 +97,3 @@ void OverrideReleaseUpdatePolicy()
         std::wcerr << '\n';
     }
 }
-
