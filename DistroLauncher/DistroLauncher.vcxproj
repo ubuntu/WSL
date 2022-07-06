@@ -139,7 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="RootUser.h" />
-    <ClInclude Include="UpgraderPolicy.h" />
+    <ClInclude Include="ApplyUpdates.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
     <ClInclude Include="console_service.h" />

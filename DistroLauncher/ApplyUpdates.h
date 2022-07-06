@@ -18,4 +18,4 @@
 
 #include "stdafx.h"
 
-void OverrideReleaseUpdatePolicy();
+void ApplyUpdates();
