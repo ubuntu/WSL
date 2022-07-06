@@ -65,7 +65,7 @@ namespace
             command << L"&> /dev/null";
         }
 
-        return WSLLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
+        return WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
     }
 }
 
@@ -85,7 +85,7 @@ void OverrideReleaseUpdatePolicy()
 
     if (SUCCEEDED(hr) && exitCode == 0) {
         const auto command = std::wstring{L"touch "} + file_linux;
-        WSLLaunchInteractiveAsRoot(command.c_str(), 1, &exitCode);
+        WslLaunchInteractiveAsRoot(command.c_str(), 1, &exitCode);
         return;
     }
 

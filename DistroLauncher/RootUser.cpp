@@ -50,7 +50,7 @@ RootSession::~RootSession()
     }
 }
 
-HRESULT WSLLaunchInteractiveAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode)
+HRESULT WslLaunchInteractiveAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode)
 {
     HRESULT hr{};
     RootSession sudo(&hr);
@@ -60,7 +60,7 @@ HRESULT WSLLaunchInteractiveAsRoot(PCWSTR command, BOOL useCurrentWorkingDirecto
     return g_wslApi.WslLaunchInteractive(command, useCurrentWorkingDirectory, exitCode);
 }
 
-HRESULT WSLLaunchAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut, HANDLE stdErr,
+HRESULT WslLaunchAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut, HANDLE stdErr,
                         HANDLE* process)
 {
     HRESULT hr{};
