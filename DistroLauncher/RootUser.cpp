@@ -39,8 +39,8 @@ RootSession::RootSession(HRESULT* hr_ptr)
     }
 
     // Switching to ROOT
-    const ULONG uid = DistributionInfo::QueryUid(L"root");
-    *hr = g_wslApi.WslConfigureDistribution(uid, wslDistributionFlags);
+    constexpr ULONG root_uid = 0;
+    *hr = g_wslApi.WslConfigureDistribution(root_uid, wslDistributionFlags);
 }
 
 RootSession::~RootSession()
