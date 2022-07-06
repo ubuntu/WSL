@@ -5,6 +5,10 @@ on:
     - main
   pull_request:
 
+concurrency:
+  group: QA-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   pull_request_id: ${{ github.event.pull_request.number }}
   INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
