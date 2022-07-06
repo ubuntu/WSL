@@ -5,7 +5,6 @@
 
 #include "stdafx.h"
 
-
 // Commandline arguments: 
 #define ARG_CONFIG              L"config"
 #define ARG_CONFIG_DEFAULT_USER L"--default-user"
