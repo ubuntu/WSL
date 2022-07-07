@@ -17,7 +17,7 @@
 
 #include "stdafx.h"
 
-namespace Changes_2210_0_88_0 // TODO: This should be the next version!
+namespace change_2210_0_88_1
 {
     // Replace with std::wstring_view::starts_with in C++20
     [[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view pattern)
@@ -78,15 +78,14 @@ namespace Changes_2210_0_88_0 // TODO: This should be the next version!
         return WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
     }
 
-    // TODO: This should be the next version!
-    const inline PACKAGE_VERSION up_to_date_version = Version::make(2210, 0, 88, 0);
+    const inline PACKAGE_VERSION version = Version::make(2210, 0, 88, 1);
 
-    bool needs_update(PACKAGE_VERSION curr_version)
+    bool requires_update(PACKAGE_VERSION installed_version)
     {
-        return Version::left_is_older(curr_version, up_to_date_version);
+        return Version::left_is_older(installed_version, version);
     }
 
-    bool check_and_apply(PACKAGE_VERSION curr_version)
+    bool apply_changes()
     {
         // Creating launcher version parent directory
         {
@@ -113,16 +112,20 @@ namespace Changes_2210_0_88_0 // TODO: This should be the next version!
     }
 };
 
-PACKAGE_VERSION ApplyUpdatesImpl(PACKAGE_VERSION curr_version)
+void ApplyUpdates()
 {
+    VersionFile version_file{L"/var/lib/wsl/launcher.version"};
+    PACKAGE_VERSION version = version_file.read();
+
     {
-        using namespace Changes_2210_0_88_0;
-        if (needs_update(curr_version)) {
-            const bool success = check_and_apply(curr_version);
+        namespace Change = change_2210_0_88_1;
+        if (Change::requires_update(version)) {
+            const bool success = Change::apply_changes();
             if (!success) {
-                return curr_version;
+                return;
             }
-            curr_version = up_to_date_version;
+            version = Change::version;
+            version_file.write(version);
         }
     }
 
@@ -130,20 +133,8 @@ PACKAGE_VERSION ApplyUpdatesImpl(PACKAGE_VERSION curr_version)
         // Future changes here
     }
 
-    PACKAGE_VERSION buffer;
-    if (HRESULT hr = Version::current(&buffer); SUCCEEDED(hr)) {
-        curr_version = buffer;
-    };
-
-    return curr_version;
-}
-
-void ApplyUpdates()
-{
-    VersionFile version_file{L"/var/lib/wsl/launcher.version"};
-    PACKAGE_VERSION curr_version = version_file.read();
-
-    PACKAGE_VERSION updated_to = ApplyUpdatesImpl(curr_version);
-
-    version_file.write(updated_to);
+    const PACKAGE_VERSION launcher_v = Version::current();
+    if (Version::left_is_newer(launcher_v, version)) {
+        version_file.write(launcher_v);
+    }
 }

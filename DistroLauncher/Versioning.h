@@ -5,7 +5,7 @@ namespace Version
 {
     [[nodiscard]] PACKAGE_VERSION make(USHORT major, USHORT minor = 0, USHORT build = 0, USHORT revision = 0) noexcept;
 
-    [[nodiscard]] HRESULT current(PACKAGE_VERSION *version);
+    [[nodiscard]] PACKAGE_VERSION current();
 
     [[nodiscard]] constexpr bool left_is_newer(PACKAGE_VERSION left, PACKAGE_VERSION right) noexcept
     {
@@ -31,4 +31,3 @@ struct VersionFile
 
     HRESULT write(PACKAGE_VERSION version);
 };
-

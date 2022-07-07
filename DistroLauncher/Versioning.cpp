@@ -12,7 +12,7 @@ namespace Version
         return v;
     }
 
-    HRESULT current(PACKAGE_VERSION *version)
+    PACKAGE_VERSION current()
     {
         UINT32 buffer_len = sizeof(PACKAGE_ID);
         std::vector<BYTE> pkg_id_buffer(buffer_len, 0);
@@ -25,11 +25,10 @@ namespace Version
         }
 
         if (hr != ERROR_SUCCESS) {
-            return hr;
+            return Version::make(0);
         }
 
-        *version = reinterpret_cast<PACKAGE_ID *>(pkg_id_buffer.data())->version;
-        return hr;
+        return reinterpret_cast<PACKAGE_ID *>(pkg_id_buffer.data())->version;
     }
 
 }
@@ -50,7 +49,7 @@ PACKAGE_VERSION VersionFile::read() const
     }
 
     std::wifstream f(windows_path);
-    
+
     PACKAGE_VERSION v{};
     f >> std::hex >> v.Version;
     return v;
