@@ -17,7 +17,7 @@
 
 #include "stdafx.h"
 
-namespace Changes_2210_0_88_0
+namespace Changes_2210_0_88_0 // TODO: This should be the next version!
 {
     // Replace with std::wstring_view::starts_with in C++20
     [[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view pattern)
@@ -78,12 +78,12 @@ namespace Changes_2210_0_88_0
         return WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
     }
 
-    const inline PACKAGE_VERSION update_version =
-      Version::make(2210, 0, 88, 0); // TODO: This should be the next version!
+    // TODO: This should be the next version!
+    const inline PACKAGE_VERSION up_to_date_version = Version::make(2210, 0, 88, 0);
 
     bool needs_update(PACKAGE_VERSION curr_version)
     {
-        return Version::left_is_older(curr_version, update_version);
+        return Version::left_is_older(curr_version, up_to_date_version);
     }
 
     bool check_and_apply(PACKAGE_VERSION curr_version)
@@ -122,7 +122,7 @@ PACKAGE_VERSION ApplyUpdatesImpl(PACKAGE_VERSION curr_version)
             if (!success) {
                 return curr_version;
             }
-            curr_version = update_version;
+            curr_version = up_to_date_version;
         }
     }
 
