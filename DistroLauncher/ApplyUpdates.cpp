@@ -17,24 +17,17 @@
 
 #include "stdafx.h"
 
-class VersionChanges
-{
-  public:
-    virtual bool check_and_apply(PACKAGE_VERSION) const = 0;
-    virtual PACKAGE_VERSION version() const noexcept = 0;
-};
-
-class VersionChanges2210_0_88_0 : public VersionChanges
+namespace Changes_2210_0_88_0
 {
     // Replace with std::wstring_view::starts_with in C++20
-    [[nodiscard]] static bool starts_with(const std::wstring_view str, const std::wstring_view pattern)
+    [[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view pattern)
     {
         return (str.size() >= pattern.size()) &&
                (std::mismatch(pattern.cbegin(), pattern.cend(), str.cbegin()).first == pattern.cend());
     }
 
     // Replace with std::wstring_view::ends_with in C++20
-    [[nodiscard]] static bool ends_with(const std::wstring_view str, const std::wstring_view pattern)
+    [[nodiscard]] bool ends_with(const std::wstring_view str, const std::wstring_view pattern)
     {
         return (str.size() >= pattern.size()) &&
                (std::mismatch(pattern.crbegin(), pattern.crend(), str.crbegin()).first == pattern.crend());
@@ -49,7 +42,7 @@ class VersionChanges2210_0_88_0 : public VersionChanges
 #endif
     }
 
-    [[nodiscard]] static std::wstring_view GetDefaultUpgradePolicy()
+    [[nodiscard]] std::wstring_view GetDefaultUpgradePolicy()
     {
         const std::wstring_view app_id = DistributionInfo::Name;
         if (app_id == L"Ubuntu (Preview)")
@@ -61,7 +54,7 @@ class VersionChanges2210_0_88_0 : public VersionChanges
         return L"normal"; // Default to development build
     }
 
-    static HRESULT CreateVersionFileFolder(DWORD& exitCode)
+    HRESULT CreateVersionFileFolder(DWORD& exitCode)
     {
         const std::wstring linux_path = L"/var/lib/wsl/";
         if (std::filesystem::exists(Oobe::WindowsPath(linux_path))) {
@@ -72,7 +65,7 @@ class VersionChanges2210_0_88_0 : public VersionChanges
         return WslLaunchInteractiveAsRoot(command.c_str(), 1, &exitCode);
     }
 
-    static HRESULT OverrideReleaseUpdatePolicy(DWORD& exitCode)
+    HRESULT OverrideReleaseUpdatePolicy(DWORD& exitCode)
     {
         std::wstringstream command{};
         command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
@@ -85,18 +78,16 @@ class VersionChanges2210_0_88_0 : public VersionChanges
         return WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
     }
 
-  public:
-    PACKAGE_VERSION version() const noexcept override
+    const inline PACKAGE_VERSION update_version =
+      Version::make(2210, 0, 88, 0); // TODO: This should be the next version!
+
+    bool needs_update(PACKAGE_VERSION curr_version)
     {
-        return Version::make(2210, 0, 88, 0);
+        return Version::left_is_older(curr_version, update_version);
     }
 
-    bool check_and_apply(PACKAGE_VERSION curr_version) const override
+    bool check_and_apply(PACKAGE_VERSION curr_version)
     {
-        if (Version::left_is_newer(curr_version, version())) {
-            return true;
-        }
-
         // Creating launcher version parent directory
         {
             DWORD exitCode;
@@ -122,23 +113,37 @@ class VersionChanges2210_0_88_0 : public VersionChanges
     }
 };
 
+PACKAGE_VERSION ApplyUpdatesImpl(PACKAGE_VERSION curr_version)
+{
+    {
+        using namespace Changes_2210_0_88_0;
+        if (needs_update(curr_version)) {
+            const bool success = check_and_apply(curr_version);
+            if (!success) {
+                return curr_version;
+            }
+            curr_version = update_version;
+        }
+    }
+
+    {
+        // Future changes here
+    }
+
+    PACKAGE_VERSION buffer;
+    if (HRESULT hr = Version::current(&buffer); SUCCEEDED(hr)) {
+        curr_version = buffer;
+    };
+
+    return curr_version;
+}
+
 void ApplyUpdates()
 {
     VersionFile version_file{L"/var/lib/wsl/launcher.version"};
-    PACKAGE_VERSION version = version_file.read();
+    PACKAGE_VERSION curr_version = version_file.read();
 
-    std::array<std::unique_ptr<VersionChanges>, 1> change_set = {
-      std::make_unique<VersionChanges2210_0_88_0>()
-      // ...
-      // future upgrades here
-    };
+    PACKAGE_VERSION updated_to = ApplyUpdatesImpl(curr_version);
 
-    for (auto& version_changes : change_set) {
-        const bool success = version_changes->check_and_apply(version);
-        if (!success) {
-            break;
-        }
-        version = std::max(version, version_changes->version(), Version::left_is_older);
-    }
-    version_file.write(version);
+    version_file.write(updated_to);
 }
