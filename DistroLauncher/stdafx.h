@@ -13,7 +13,9 @@
 
 #include <stdio.h>
 #include <tchar.h>
+#define NOMINMAX
 #include <Windows.h>
+#include <Appmodel.h>
 #include <stdio.h>
 #include <conio.h>
 #include <io.h>

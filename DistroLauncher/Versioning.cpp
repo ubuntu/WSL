@@ -1,75 +1,37 @@
 #include "stdafx.h"
 
-Version::Version(const wchar_t* const str)
+namespace Version
 {
-    std::array<unsigned, 4> tmp{0, 0, 0, 0};
-    std::size_t read = swscanf_s(str, L"%u.%u.%u.%u", &tmp[0], &tmp[1], &tmp[2], &tmp[3]);
-    const auto copy_until = std::next(tmp.cbegin(), read);
-    std::copy(tmp.cbegin(), copy_until, v.begin());
-}
-
-Version::Version(const std::wstring& str) : Version(str.c_str())
-{ }
-
-bool Version::operator==(const Version& other) const
-{
-    return compare(other) == comparisson::EQUAL;
-}
-
-bool Version::operator<(const Version& other) const
-{
-    return compare(other) == comparisson::LESSER;
-}
-
-bool Version::operator>(const Version& other) const
-{
-    return compare(other) == comparisson::GREATER;
-}
-
-bool Version::operator!=(const Version& other) const
-{
-    return !(*this == other);
-}
-
-bool Version::operator<=(const Version& other) const
-{
-    return !(*this > other);
-}
-
-bool Version::operator>=(const Version& other) const
-{
-    return !(*this < other);
-}
-
-void Version::upgrade(const Version& other)
-{
-    if (*this < other) {
-        v = other.v;
+    PACKAGE_VERSION make(USHORT major, USHORT minor, USHORT build, USHORT revision) noexcept
+    {
+        PACKAGE_VERSION v{};
+        v.Revision = revision;
+        v.Build = build;
+        v.Minor = minor;
+        v.Major = major;
+        return v;
     }
-}
 
-/// Prints version number without trailing zeros
-std::wostream& operator<<(std::wostream& os, const Version& version)
-{
-    auto it_minor = std::next(version.v.cbegin());
-    auto end_nonzeros = std::find_if(version.v.crbegin(), std::make_reverse_iterator(it_minor), [](auto x) { return x != 0; }).base();
+    HRESULT current(PACKAGE_VERSION *version)
+    {
+        UINT32 buffer_len = sizeof(PACKAGE_ID);
+        std::vector<BYTE> pkg_id_buffer(buffer_len, 0);
 
-    os << version.major();
-    std::for_each(it_minor, end_nonzeros, [&](auto n) { os << "." << n; });
+        LONG hr = GetCurrentPackageId(&buffer_len, pkg_id_buffer.data());
 
-    return os;
-}
+        if (hr == ERROR_INSUFFICIENT_BUFFER) {
+            pkg_id_buffer.resize(buffer_len);
+            LONG hr = GetCurrentPackageId(&buffer_len, pkg_id_buffer.data());
+        }
 
-Version::comparisson Version::compare(const Version& other) const
-{
-    const auto diff = std::mismatch(v.cbegin(), v.cend(), other.v.cbegin());
-    if (diff.first == v.end()) {
-        return comparisson::EQUAL;
+        if (hr != ERROR_SUCCESS) {
+            return hr;
+        }
+
+        *version = reinterpret_cast<PACKAGE_ID *>(pkg_id_buffer.data())->version;
+        return hr;
     }
-    if (*diff.first < *diff.second) {
-        return comparisson::LESSER;
-    }
-    return comparisson::GREATER;
+
 }
 
 VersionFile::VersionFile(std::wstring_view linuxpath) :
@@ -81,22 +43,23 @@ bool VersionFile::exists() const
     return std::filesystem::exists(windows_path);
 }
 
-Version VersionFile::read() const
+PACKAGE_VERSION VersionFile::read() const
 {
     if (!exists()) {
-        return Version{};
+        return Version::make(0);
     }
 
     std::wifstream f(windows_path);
-    std::wstringstream ss;
-    ss << f.rdbuf();
-    return Version{ss.str()};
+    
+    PACKAGE_VERSION v{};
+    f >> std::hex >> v.Version;
+    return v;
 }
 
-HRESULT VersionFile::write(const Version& version)
+HRESULT VersionFile::write(PACKAGE_VERSION version)
 {
     DWORD exitCode;
     std::wstringstream command;
-    command << L"echo " << version << " > " << linux_path;
+    command << L"echo " << std::hex << version.Version << " > " << linux_path;
     return WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
 }

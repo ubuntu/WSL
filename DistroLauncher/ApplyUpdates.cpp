@@ -20,8 +20,8 @@
 class VersionChanges
 {
   public:
-    virtual bool check_and_apply(Version const&) = 0;
-    virtual Version version() const noexcept = 0;
+    virtual bool check_and_apply(PACKAGE_VERSION) const = 0;
+    virtual PACKAGE_VERSION version() const noexcept = 0;
 };
 
 class VersionChanges2210_0_88_0 : public VersionChanges
@@ -84,17 +84,15 @@ class VersionChanges2210_0_88_0 : public VersionChanges
         return WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
     }
 
-    static constexpr Version version_{2210, 0, 88, 0}; // TODO: Find out which number it is
-
   public:
-    Version version() const noexcept override
+    PACKAGE_VERSION version() const noexcept override
     {
-        return version_;
+        return Version::make(2210, 0, 88, 0);
     }
 
-    bool check_and_apply(Version const& curr_version) override
+    bool check_and_apply(PACKAGE_VERSION curr_version) const override
     {
-        if (curr_version >= version()) {
+        if (Version::left_is_newer(curr_version, version())) {
             return true;
         }
 
@@ -126,7 +124,7 @@ class VersionChanges2210_0_88_0 : public VersionChanges
 void ApplyUpdates()
 {
     VersionFile version_file{L"/var/lib/wsl/launcher.version"};
-    Version version = version_file.read();
+    PACKAGE_VERSION version = version_file.read();
 
     std::array<std::unique_ptr<VersionChanges>, 1> change_set = {
       std::make_unique<VersionChanges2210_0_88_0>()
@@ -139,7 +137,7 @@ void ApplyUpdates()
         if (!success) {
             break;
         }
-        version.upgrade(version_changes->version());
+        version = std::max(version, version_changes->version(), Version::left_is_older);
     }
     version_file.write(version);
 }
