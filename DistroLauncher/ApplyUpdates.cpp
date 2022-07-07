@@ -65,6 +65,7 @@ class VersionChanges2210_0_88_0 : public VersionChanges
     {
         const std::wstring linux_path = L"/var/lib/wsl/";
         if (std::filesystem::exists(Oobe::WindowsPath(linux_path))) {
+            exitCode = 0;
             return S_OK;
         }
         std::wstring command = L"mkdir " + linux_path;
