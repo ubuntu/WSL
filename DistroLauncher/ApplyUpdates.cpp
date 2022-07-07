@@ -139,7 +139,7 @@ void ApplyUpdates()
         if (!success) {
             break;
         }
-        version = version_changes->version();
+        version.upgrade(version_changes->version());
     }
     version_file.write(version);
 }
