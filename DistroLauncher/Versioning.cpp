@@ -60,6 +60,6 @@ HRESULT VersionFile::write(PACKAGE_VERSION version)
 {
     DWORD exitCode;
     std::wstringstream command;
-    command << L"echo " << std::hex << version.Version << " > " << linux_path;
+    command << L"echo 0x" << std::hex << version.Version << " > " << linux_path;
     return WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
 }
