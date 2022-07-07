@@ -51,15 +51,11 @@ void Version::upgrade(const Version& other)
 /// Prints version number without trailing zeros
 std::wostream& operator<<(std::wostream& os, const Version& version)
 {
-    auto second_value = std::next(version.v.cbegin());
+    auto it_minor = std::next(version.v.cbegin());
+    auto end_nonzeros = std::find_if(version.v.crbegin(), std::make_reverse_iterator(it_minor), [](auto x) { return x != 0; }).base();
 
-    auto end_nonzeros = std::find_if(version.v.crbegin(), version.v.crend(), [](auto x) { return x != 0; }).base();
-    if (end_nonzeros == version.v.cbegin()) {
-        end_nonzeros = version.v.cend(); // No trailing zeros
-    }
-
-    os << version.v[0];
-    std::for_each(second_value, end_nonzeros, [&](auto n) { os << "." << n; });
+    os << version.major();
+    std::for_each(it_minor, end_nonzeros, [&](auto n) { os << "." << n; });
 
     return os;
 }

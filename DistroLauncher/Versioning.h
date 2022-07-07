@@ -25,6 +25,26 @@ struct Version
 
     friend std::wostream& operator<<(std::wostream& os, const Version& version);
 
+    [[nodiscard]] auto major() const noexcept
+    {
+        return v[0];
+    }
+
+    [[nodiscard]] auto minor() const noexcept
+    {
+        return v[1];
+    }
+
+    [[nodiscard]] auto build() const noexcept
+    {
+        return v[2];
+    }
+
+    [[nodiscard]] auto revision() const noexcept
+    {
+        return v[3];
+    }
+
   private:
     std::array<unsigned, 4> v{};
 
