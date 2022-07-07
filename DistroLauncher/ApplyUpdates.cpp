@@ -17,6 +17,11 @@
 
 #include "stdafx.h"
 
+namespace
+{
+    static constexpr auto versionfile_linux_path = L"/var/lib/wsl/launcher.version";
+}
+
 namespace change_2210_0_88_1
 {
     // Replace with std::wstring_view::starts_with in C++20
@@ -56,7 +61,7 @@ namespace change_2210_0_88_1
 
     HRESULT CreateVersionFileFolder(DWORD& exitCode)
     {
-        const std::wstring linux_path = L"/var/lib/wsl/";
+        const std::wstring linux_path = std::filesystem::path{versionfile_linux_path}.parent_path().wstring();
         if (std::filesystem::exists(Oobe::WindowsPath(linux_path))) {
             exitCode = 0;
             return S_OK;
@@ -114,7 +119,7 @@ namespace change_2210_0_88_1
 
 void ApplyUpdates()
 {
-    VersionFile version_file{L"/var/lib/wsl/launcher.version"};
+    VersionFile version_file{versionfile_linux_path};
     PACKAGE_VERSION version = version_file.read();
 
     {
