@@ -21,7 +21,7 @@ namespace Version
 
         if (hr == ERROR_INSUFFICIENT_BUFFER) {
             pkg_id_buffer.resize(buffer_len);
-            LONG hr = GetCurrentPackageId(&buffer_len, pkg_id_buffer.data());
+            hr = GetCurrentPackageId(&buffer_len, pkg_id_buffer.data());
         }
 
         if (hr != ERROR_SUCCESS) {
