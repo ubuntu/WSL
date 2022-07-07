@@ -168,6 +168,7 @@
   <ItemGroup>
     <ClCompile Include="RootUser.cpp" />
     <ClCompile Include="ApplyUpdates.cpp" />
+    <ClCompile Include="Versioning.cpp" />
     <ClCompile Include="ApplicationStrategy.cpp" />
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="ExitStatus.cpp" />
