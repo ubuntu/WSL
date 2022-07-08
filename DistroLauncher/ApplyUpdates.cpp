@@ -19,7 +19,7 @@
 
 namespace
 {
-    static constexpr auto versionfile_linux_path = L"/var/lib/wsl/launcher.version";
+    constexpr auto versionfile_linux_path = L"/var/lib/wsl/launcher.version";
 }
 
 namespace change_2210_0_88_1
