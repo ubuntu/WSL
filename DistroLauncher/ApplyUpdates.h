@@ -18,4 +18,26 @@
 
 #include "stdafx.h"
 
-void ApplyUpdates();
+constexpr std::wstring_view patches_log_linux_path = L"/var/lib/WSL/patches.log";
+constexpr std::wstring_view patches_windows_path = L"patches/";
+
+struct PatchLog
+{
+    PatchLog(std::wstring_view linuxpath);
+
+    std::filesystem::path linux_path;
+    std::filesystem::path windows_path;
+
+    [[nodiscard]] bool exists() const;
+
+    void read();
+    void write();
+
+    void push_back(std::wstring_view patchname);
+    [[nodiscard]] bool contains(std::wstring_view patchname) const;
+
+  private:
+    std::vector<std::wstring> data;
+};
+
+void ApplyPatches();

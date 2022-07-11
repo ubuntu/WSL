@@ -19,127 +19,116 @@
 
 namespace
 {
-    static constexpr auto versionfile_linux_path = L"/var/lib/wsl/launcher.version";
+    std::wstring& trim(std::wstring& str)
+    {
+        constexpr std::wstring_view ws = L"\n\t ";
+        const auto not_whitespace = [&](auto ch) { return std::find(ws.cbegin(), ws.cend(), ch) == ws.cend(); };
+        str.erase(str.cbegin(), std::find_if(str.cbegin(), str.cend(), not_whitespace));
+        str.erase(std::find_if(str.crbegin(), str.crend(), not_whitespace).base(), str.cend());
+        return str;
+    }
 }
 
-namespace change_2210_0_88_1
+PatchLog::PatchLog(std::wstring_view linuxpath) : linux_path(linuxpath), windows_path(Oobe::WindowsPath(linuxpath))
+{ }
+
+bool PatchLog::exists() const
 {
-    // Replace with std::wstring_view::starts_with in C++20
-    [[nodiscard]] bool starts_with(const std::wstring_view str, const std::wstring_view pattern)
-    {
-        return (str.size() >= pattern.size()) &&
-               (std::mismatch(pattern.cbegin(), pattern.cend(), str.cbegin()).first == pattern.cend());
+    return std::filesystem::exists(windows_path);
+}
+
+void PatchLog::read()
+{
+    data = std::vector<std::wstring>{};
+    if (!exists()) {
+        return;
     }
 
-    // Replace with std::wstring_view::ends_with in C++20
-    [[nodiscard]] bool ends_with(const std::wstring_view str, const std::wstring_view pattern)
-    {
-        return (str.size() >= pattern.size()) &&
-               (std::mismatch(pattern.crbegin(), pattern.crend(), str.crbegin()).first == pattern.crend());
-    }
+    std::wifstream f(windows_path);
+    std::wstring buffer;
+    while (f) {
+        std::getline(f, buffer);
 
-    static constexpr bool is_debug()
-    {
-#ifdef DNDEBUG
-        return false;
-#else
-        return true;
-#endif
-    }
+        trim(buffer);
 
-    [[nodiscard]] std::wstring_view GetDefaultUpgradePolicy()
-    {
-        const std::wstring_view app_id = DistributionInfo::Name;
-        if (app_id == L"Ubuntu (Preview)")
-            return L"normal";
-        if (app_id == L"Ubuntu")
-            return L"lts";
-        if (starts_with(app_id, L"Ubuntu") && ends_with(app_id, L"LTS"))
-            return L"never";
-        return L"normal"; // Default to development build
-    }
-
-    HRESULT CreateVersionFileFolder(DWORD& exitCode)
-    {
-        const std::wstring linux_path = std::filesystem::path{versionfile_linux_path}.parent_path().wstring();
-        if (std::filesystem::exists(Oobe::WindowsPath(linux_path))) {
-            exitCode = 0;
-            return S_OK;
-        }
-        std::wstring command = L"mkdir " + linux_path;
-        return WslLaunchInteractiveAsRoot(command.c_str(), 1, &exitCode);
-    }
-
-    HRESULT OverrideReleaseUpdatePolicy(DWORD& exitCode)
-    {
-        std::wstringstream command{};
-        command << LR"(sed -i "s/^Prompt\w*[=:].*$/Prompt=)" << GetDefaultUpgradePolicy()
-                << LR"(/" "/etc/update-manager/release-upgrades")";
-
-        if constexpr (!is_debug()) {
-            command << L"&> /dev/null";
+        // Comments and empty lines
+        if (buffer.empty() || buffer.front() == '#') {
+            continue;
         }
 
-        return WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
+        data.push_back(std::move(buffer));
+        buffer.clear();
     }
+}
 
-    const inline PACKAGE_VERSION version = Version::make(2210, 0, 88, 1);
+void PatchLog::write()
+{
+    DWORD exitCode;
+    std::wstringstream command;
+    command << L"echo \"# WSL patches log. Do not modify this file.\n";
+    std::for_each(data.cbegin(), data.cend(), [&](auto patch) { command << patch << '\n'; });
+    command << "\" > " << linux_path;
 
-    bool requires_update(PACKAGE_VERSION installed_version)
-    {
-        return Version::left_is_older(installed_version, version);
-    }
+    WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
+}
 
-    bool apply_changes()
-    {
-        // Creating launcher version parent directory
-        {
-            DWORD exitCode;
-            HRESULT hr = CreateVersionFileFolder(exitCode);
-            if (FAILED(hr) || exitCode != 0) {
-                std::wcerr << L"Failed to start launcher version directory.";
-                return false;
-            }
-        }
-
-        // Overriding release update policy
-        {
-            DWORD exitCode;
-            const HRESULT hr = OverrideReleaseUpdatePolicy(exitCode);
-            if (FAILED(hr) || exitCode != 0) {
-                if constexpr (is_debug()) {
-                    std::wcerr << L"Failed to set up default release update policy.\n";
-                }
-                return false;
-            }
-        }
-        return true;
-    }
+void PatchLog::push_back(std::wstring_view patchname)
+{
+    data.emplace_back(patchname);
 };
 
-void ApplyUpdates()
+bool PatchLog::contains(std::wstring_view patchname) const
 {
-    VersionFile version_file{versionfile_linux_path};
-    PACKAGE_VERSION version = version_file.read();
+    return std::find(data.cbegin(), data.cend(), patchname) == data.end();
+}
 
-    {
-        namespace Change = change_2210_0_88_1;
-        if (Change::requires_update(version)) {
-            const bool success = Change::apply_changes();
-            if (!success) {
-                return;
-            }
-            version = Change::version;
-            version_file.write(version);
+bool ApplyPatch(std::wstring_view patchname)
+{
+    namespace fs = std::filesystem;
+
+    const auto patch_path = fs::path{patches_windows_path} += patchname;
+
+    HRESULT status;
+    RootSession sudo{&status};
+
+    if (FAILED(status)) {
+        return false;
+    }
+
+    bool success = std::filesystem::copy_file(patch_path, Oobe::WindowsPath(L"/tmp/wsl.patch"), fs::copy_options::overwrite_existing);
+    if (!success) {
+        return false;
+    }
+
+    DWORD errorCode;
+    const HRESULT hr = g_wslApi.WslLaunchInteractive(L"patch -ruN /tmp/wsl.patch", 1, &errorCode);
+
+    return SUCCEEDED(hr) && errorCode == 0;
+}
+
+[[nodiscard]] std::vector<std::wstring> PatchList()
+{
+    return {};
+}
+
+void ApplyPatches()
+{
+    PatchLog patch_log{patches_log_linux_path};
+    patch_log.read();
+
+    for (const auto& patchname : PatchList()) {
+
+        if (patch_log.contains(patchname)) {
+            continue;
         }
+
+        const bool status = ApplyPatch(patchname);
+        if (!status) {
+            break;
+        }
+
+        patch_log.push_back(patchname);
     }
 
-    {
-        // Future changes here
-    }
-
-    const PACKAGE_VERSION launcher_v = Version::current();
-    if (Version::left_is_newer(launcher_v, version)) {
-        version_file.write(launcher_v);
-    }
+    patch_log.write();
 }
