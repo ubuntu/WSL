@@ -79,14 +79,14 @@ void PatchLog::push_back(std::wstring_view patchname)
 
 bool PatchLog::contains(std::wstring_view patchname) const
 {
-    return std::find(data.cbegin(), data.cend(), patchname) == data.end();
+    return std::find(data.cbegin(), data.cend(), patchname) != data.cend();
 }
 
 bool ApplyPatch(std::wstring_view patchname)
 {
     namespace fs = std::filesystem;
 
-    const auto patch_path = fs::path{patches_windows_path} += patchname;
+    const auto patch_path = (fs::path{patches_windows_path} += patchname) += L".diff";
 
     HRESULT status;
     RootSession sudo{&status};
@@ -95,13 +95,14 @@ bool ApplyPatch(std::wstring_view patchname)
         return false;
     }
 
-    bool success = std::filesystem::copy_file(patch_path, Oobe::WindowsPath(L"/tmp/wsl.patch"), fs::copy_options::overwrite_existing);
+    bool success = std::filesystem::copy_file(patch_path, Oobe::WindowsPath(L"/tmp/wslpatch.diff"),
+                                              fs::copy_options::overwrite_existing);
     if (!success) {
         return false;
     }
 
     DWORD errorCode;
-    const HRESULT hr = g_wslApi.WslLaunchInteractive(L"patch -ruN /tmp/wsl.patch", 1, &errorCode);
+    const HRESULT hr = g_wslApi.WslLaunchInteractive(L"patch -ruN < /tmp/wslpatch.diff", 1, &errorCode);
 
     return SUCCEEDED(hr) && errorCode == 0;
 }
