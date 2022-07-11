@@ -145,6 +145,7 @@ void ApplyPatches()
         // Restarts distro
         ShutdownDistro();
 
+        // Import and apply patches
         auto patches_end = std::find_if_not(patches_begin, patchlist.cend(), [](auto patchname) {
             return ImportPatch(patchname) && ApplyPatch(patchname);
         });
