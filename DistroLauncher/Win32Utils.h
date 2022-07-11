@@ -46,6 +46,9 @@ namespace Win32Utils
     /// Returns the operating system build number or 0 on failure.
     DWORD os_build_number();
 
+    /// Returns the current user's profile directory path or the empty path on failure.
+    std::filesystem::path homedir();
+
     /// Returns this app's directory or the empty path on failure.
     std::filesystem::path thisAppRootdir();
 }
