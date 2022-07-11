@@ -147,7 +147,33 @@ command = /usr/libexec/wsl-systemd
 
 )"};
             std::wstringstream fakeFile{buffer};
-            ASSERT_TRUE((fakeFile, L"boot", L"command", L"/usr/libexec/wsl-systemd"));
+            ASSERT_TRUE(ini_find_value(fakeFile, L"boot", L"command", L"/usr/libexec/wsl-systemd"));
+        }
+        TEST(IniFindValueTests, LocalhostForwarding)
+        {
+            std::wstring buffer{LR"([wsl2]
+# Turn off default connection to bind WSL 2 localhost to Windows localhost
+localhostforwarding=true
+)"};
+            std::wstringstream fakeFile{buffer};
+            ASSERT_FALSE(ini_find_value(fakeFile, L"wsl2", L"localhostforwarding", L"false"));
+        }
+        TEST(IniFindValueTests, LocalhostForwarding2)
+        {
+            std::wstring buffer{LR"([wsl2]
+# Turn off default connection to bind WSL 2 localhost to Windows localhost
+localhostforwarding=false
+)"};
+            std::wstringstream fakeFile{buffer};
+            ASSERT_TRUE(ini_find_value(fakeFile, L"wsl2", L"localhostforwarding", L"false"));
+        }
+        TEST(IniFindValueTests, LocalhostForwarding3)
+        {
+            std::wstring buffer{LR"([wsl2]
+# Turn off default connection to bind WSL 2 localhost to Windows localhost
+)"};
+            std::wstringstream fakeFile{buffer};
+            ASSERT_FALSE(ini_find_value(fakeFile, L"wsl2", L"localhostforwarding", L"false"));
         }
     }
 }
