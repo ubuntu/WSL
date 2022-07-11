@@ -145,8 +145,9 @@ void ApplyPatches()
         // Restarts distro
         ShutdownDistro();
 
-        auto patches_end =
-          std::find_if_not(patches_begin, patchlist.cend(), [](auto x) { return ImportPatch(x) && ApplyPatch(x); });
+        auto patches_end = std::find_if_not(patches_begin, patchlist.cend(), [](auto patchname) {
+            return ImportPatch(patchname) && ApplyPatch(patchname);
+        });
 
         // Log applied patches
         std::for_each(patches_begin, patches_end, [&](auto& pname) { patch_log.push_back(std::move(pname)); });
