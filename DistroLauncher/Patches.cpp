@@ -98,8 +98,9 @@ std::vector<std::wstring>::const_iterator ImportPatches(std::vector<std::wstring
 {
     return std::find_if_not(cbegin, cend, [](auto patchname) {
         const auto patch_windows_path = (std::filesystem::path{patches::windows_dir} += patchname) += L".diff";
+        const auto tmp_diff_path = L"/tmp/" + patchname + L".diff";
         std::error_code errcode;
-        bool success = std::filesystem::copy_file(patch_windows_path, Oobe::WindowsPath(patches::tmp_diff_path),
+        bool success = std::filesystem::copy_file(patch_windows_path, Oobe::WindowsPath(tmp_diff_path),
                                                   std::filesystem::copy_options::overwrite_existing, errcode);
         return success && !errcode;
     });
@@ -110,7 +111,7 @@ bool ApplyPatch(std::wstring_view patchname)
     DWORD errorCode;
     std::wstringstream command;
 
-    command << L"patch -ruN < \"" << patches::tmp_diff_path << "\" &> \"" << patches::output_log << '"';
+    command << LR"(patch -ruN < "/tmp/)" << patchname << LR"(.diff" &> ")" << patches::output_log << '"';
     const HRESULT hr = g_wslApi.WslLaunchInteractive(command.str().c_str(), 0, &errorCode);
 
     return SUCCEEDED(hr) && errorCode == 0;
