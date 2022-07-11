@@ -147,7 +147,7 @@ void ApplyPatches()
     }
 
     WslAsRoot([&]() {
-        // Restarts distro
+        // Restart distro
         ShutdownDistro();
 
         // Import and apply patches
