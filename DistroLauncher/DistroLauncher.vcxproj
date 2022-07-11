@@ -139,8 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="RootUser.h" />
-    <ClInclude Include="ApplyUpdates.h" />
-    <ClInclude Include="Versioning.h" />
+    <ClInclude Include="Patches.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
     <ClInclude Include="console_service.h" />
@@ -167,8 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RootUser.cpp" />
-    <ClCompile Include="ApplyUpdates.cpp" />
-    <ClCompile Include="Versioning.cpp" />
+    <ClCompile Include="Patches.cpp" />
     <ClCompile Include="ApplicationStrategy.cpp" />
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="ExitStatus.cpp" />

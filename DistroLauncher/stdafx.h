@@ -56,9 +56,8 @@
 #include "Win32Utils.h"
 #include "ApplicationStrategy.h"
 #include "Application.h"
-#include "ApplyUpdates.h"
+#include "Patches.h"
 #include "RootUser.h"
-#include "Versioning.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"
