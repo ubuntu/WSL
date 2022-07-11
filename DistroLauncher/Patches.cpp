@@ -139,7 +139,7 @@ void ApplyPatches()
         // Import patches
         auto patches_end = ImportPatches(patches_begin, patchlist.cend());
 
-        // Apply succesfully imported, non-redundant patches
+        // Apply successfully imported, non-redundant patches
         patches_end = std::find_if_not(patches_begin, patches_end, ApplyPatch);
 
         // Log applied patches
