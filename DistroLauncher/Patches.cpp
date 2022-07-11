@@ -91,19 +91,15 @@ bool ShutdownDistro()
     return true;
 }
 
-
 // Imports all patches in [cbegin, cend), and returns an iterator past the last patch to be succesfully imported
-std::vector<std::wstring>::const_iterator ImportPatches(std::vector<std::wstring>::const_iterator cbegin,
-                                                        std::vector<std::wstring>::const_iterator cend)
+bool ImportPatch(std::wstring_view patchname)
 {
-    return std::find_if_not(cbegin, cend, [](auto patchname) {
-        const auto patch_windows_path = (std::filesystem::path{patches::windows_dir} += patchname) += L".diff";
-        const auto tmp_diff_path = L"/tmp/" + patchname + L".diff";
-        std::error_code errcode;
-        bool success = std::filesystem::copy_file(patch_windows_path, Oobe::WindowsPath(tmp_diff_path),
-                                                  std::filesystem::copy_options::overwrite_existing, errcode);
-        return success && !errcode;
-    });
+    const auto patch_windows_path = (std::filesystem::path{patches::windows_dir} += patchname) += L".diff";
+    const auto tmp_diff_path = (std::wstring{L"/tmp/"} += patchname) + L".diff";
+    std::error_code errcode;
+    bool success = std::filesystem::copy_file(patch_windows_path, Oobe::WindowsPath(tmp_diff_path),
+                                              std::filesystem::copy_options::overwrite_existing, errcode);
+    return success && !errcode;
 }
 
 bool ApplyPatch(std::wstring_view patchname)
@@ -149,11 +145,8 @@ void ApplyPatches()
         // Restarts distro
         ShutdownDistro();
 
-        // Import patches
-        auto patches_end = ImportPatches(patches_begin, patchlist.cend());
-
-        // Apply successfully imported, non-redundant patches
-        patches_end = std::find_if_not(patches_begin, patches_end, ApplyPatch);
+        auto patches_end =
+          std::find_if_not(patches_begin, patchlist.cend(), [](auto x) { return ImportPatch(x) && ApplyPatch(x); });
 
         // Log applied patches
         std::for_each(patches_begin, patches_end, [&](auto& pname) { patch_log.push_back(std::move(pname)); });
