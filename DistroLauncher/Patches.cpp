@@ -135,6 +135,10 @@ void ApplyPatches()
     const auto patches_begin =
       std::find_if_not(patchlist.cbegin(), patchlist.cend(), [&](auto pname) { return patch_log.contains(pname); });
 
+    if (patches_begin == patchlist.cend()) {
+        return;
+    }
+
     WslAsRoot([&]() {
         // Import patches
         auto patches_end = ImportPatches(patches_begin, patchlist.cend());
