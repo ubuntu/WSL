@@ -1,11 +1,17 @@
 name: Build windows package
 on:
   pull_request:
+    types:
+        - opened
+        - reopened
+        - synchronize
+        - ready_for_review
 
 jobs:
   build-wsl:
     name: Build
     runs-on: windows-latest
+    if: ${{ !github.event.pull_request.draft }}
     env:
       rootfs64: 'http://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-wsl.rootfs.tar.gz'
       workDir: 'C:/Temp/builddir'
