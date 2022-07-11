@@ -18,8 +18,14 @@
 
 #include "stdafx.h"
 
-constexpr std::wstring_view patches_log_linux_path = L"/var/lib/WSL/patches.log";
-constexpr std::wstring_view patches_windows_path = L"patches/";
+namespace patches
+{
+    const std::wstring linux_dir = L"/var/lib/WSL/";
+    const auto install_log = linux_dir + L"patches.log"; // What patches are installed
+    const auto output_log = linux_dir + L"patches_output.log"; // Last patch install run
+    constexpr std::wstring_view windows_dir = L"C:/Users/edu19/Work/WSL/patches/"; // Location of patches
+    constexpr std::wstring_view tmp_diff_path = L"/tmp/wslpatch.diff";
+}
 
 struct PatchLog
 {
@@ -33,11 +39,11 @@ struct PatchLog
     void read();
     void write();
 
-    void push_back(std::wstring_view patchname);
+    void push_back(std::wstring patchname);
     [[nodiscard]] bool contains(std::wstring_view patchname) const;
 
-  private:
-    std::vector<std::wstring> data;
+private:
+    std::vector<std::wstring> patches;
 };
 
 void ApplyPatches();

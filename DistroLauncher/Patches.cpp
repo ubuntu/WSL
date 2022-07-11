@@ -39,7 +39,7 @@ bool PatchLog::exists() const
 
 void PatchLog::read()
 {
-    data = std::vector<std::wstring>{};
+    patches = std::vector<std::wstring>{};
     if (!exists()) {
         return;
     }
@@ -56,7 +56,7 @@ void PatchLog::read()
             continue;
         }
 
-        data.push_back(std::move(buffer));
+        patches.push_back(std::move(buffer));
         buffer.clear();
     }
 }
@@ -66,70 +66,84 @@ void PatchLog::write()
     DWORD exitCode;
     std::wstringstream command;
     command << L"echo \"# WSL patches log. Do not modify this file.\n";
-    std::for_each(data.cbegin(), data.cend(), [&](auto patch) { command << patch << '\n'; });
+    std::for_each(patches.cbegin(), patches.cend(), [&](auto patch) { command << patch << '\n'; });
     command << "\" > " << linux_path;
 
-    WslLaunchInteractiveAsRoot(command.str().c_str(), 1, &exitCode);
+    g_wslApi.WslLaunchInteractive(command.str().c_str(), 1, &exitCode);
 }
 
-void PatchLog::push_back(std::wstring_view patchname)
+void PatchLog::push_back(std::wstring patchname)
 {
-    data.emplace_back(patchname);
+    patches.emplace_back(std::move(patchname));
 };
 
 bool PatchLog::contains(std::wstring_view patchname) const
 {
-    return std::find(data.cbegin(), data.cend(), patchname) != data.cend();
+    return std::find(patches.cbegin(), patches.cend(), patchname) != patches.cend();
+}
+
+// Imports all patches in [cbegin, cend), and returns an iterator past the last patch to be succesfully imported
+std::vector<std::wstring>::const_iterator ImportPatches(std::vector<std::wstring>::const_iterator cbegin,
+                                                        std::vector<std::wstring>::const_iterator cend)
+{
+    const std::wstring shutdownCmd = L"wsl -t " + DistributionInfo::Name;
+    if (int cmdResult = _wsystem(shutdownCmd.c_str()); cmdResult != 0) {
+        return cbegin;
+    }
+
+    return std::find_if_not(cbegin, cend, [](auto patchname) {
+        const auto patch_windows_path = (std::filesystem::path{patches::windows_dir} += patchname) += L".diff";
+        std::error_code errcode;
+        bool success = std::filesystem::copy_file(patch_windows_path, Oobe::WindowsPath(patches::tmp_diff_path),
+                                                  std::filesystem::copy_options::overwrite_existing, errcode);
+        return success && !errcode;
+    });
 }
 
 bool ApplyPatch(std::wstring_view patchname)
 {
-    namespace fs = std::filesystem;
-
-    const auto patch_path = (fs::path{patches_windows_path} += patchname) += L".diff";
-
-    HRESULT status;
-    RootSession sudo{&status};
-
-    if (FAILED(status)) {
-        return false;
-    }
-
-    bool success = std::filesystem::copy_file(patch_path, Oobe::WindowsPath(L"/tmp/wslpatch.diff"),
-                                              fs::copy_options::overwrite_existing);
-    if (!success) {
-        return false;
-    }
-
     DWORD errorCode;
-    const HRESULT hr = g_wslApi.WslLaunchInteractive(L"patch -ruN < /tmp/wslpatch.diff", 1, &errorCode);
+    std::wstringstream command;
+
+    command << L"patch -ruN < \"" << patches::tmp_diff_path << "\" &> \"" << patches::output_log << '"';
+    const HRESULT hr = g_wslApi.WslLaunchInteractive(command.str().c_str(), 0, &errorCode);
 
     return SUCCEEDED(hr) && errorCode == 0;
 }
 
 [[nodiscard]] std::vector<std::wstring> PatchList()
 {
-    return {};
+    return {L"2210_0_8_0-0001"};
 }
 
 void ApplyPatches()
 {
-    PatchLog patch_log{patches_log_linux_path};
-    patch_log.read();
+    PatchLog patch_log{patches::install_log};
 
-    for (const auto& patchname : PatchList()) {
-
-        if (patch_log.contains(patchname)) {
-            continue;
+    if (!patch_log.exists()) {
+        DWORD exitCode;
+        HRESULT hr = WslLaunchInteractiveAsRoot((L"mkdir -p " + patches::linux_dir).c_str(), 1, &exitCode);
+        if (FAILED(hr) || exitCode != 0) {
+            return;
         }
-
-        const bool status = ApplyPatch(patchname);
-        if (!status) {
-            break;
-        }
-
-        patch_log.push_back(patchname);
     }
 
-    patch_log.write();
+    patch_log.read();
+    const auto patchlist = PatchList();
+
+    // Filter patches already applied
+    const auto patches_begin =
+      std::find_if_not(patchlist.cbegin(), patchlist.cend(), [&](auto pname) { return patch_log.contains(pname); });
+
+    WslAsRoot([&]() {
+        // Import patches
+        auto patches_end = ImportPatches(patches_begin, patchlist.cend());
+
+        // Apply succesfully imported, non-redundant patches
+        patches_end = std::find_if_not(patches_begin, patches_end, ApplyPatch);
+
+        // Log applied patches
+        std::for_each(patches_begin, patches_end, [&](auto& pname) { patch_log.push_back(std::move(pname)); });
+        patch_log.write();
+    });
 }

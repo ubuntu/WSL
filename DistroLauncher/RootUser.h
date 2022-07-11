@@ -42,3 +42,32 @@ class RootSession
 HRESULT WslLaunchInteractiveAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode);
 HRESULT WslLaunchAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut, HANDLE stdErr,
                         HANDLE* process);
+
+template <typename Callable, typename ReturnType = std::result_of_t<typename Callable(void)>>
+HRESULT WslAsRoot(Callable f, ReturnType* r)
+{
+    HRESULT hr{};
+    RootSession sudo(&hr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    *r = f();
+    return hr;
+}
+
+template <typename Callable>
+HRESULT WslAsRoot(Callable f)
+{
+    HRESULT hr{};
+    RootSession sudo(&hr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    if constexpr (std::is_same<HRESULT, std::invoke_result_t<Callable(void)>>::value) {
+        return f();
+    }
+    f();
+    return hr;
+}
