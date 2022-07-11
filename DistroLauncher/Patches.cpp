@@ -82,15 +82,20 @@ bool PatchLog::contains(std::wstring_view patchname) const
     return std::find(patches.cbegin(), patches.cend(), patchname) != patches.cend();
 }
 
+bool ShutdownDistro()
+{
+    const std::wstring shutdownCmd = L"wsl -t " + DistributionInfo::Name;
+    if (int cmdResult = _wsystem(shutdownCmd.c_str()); cmdResult != 0) {
+        return false;
+    }
+    return true;
+}
+
+
 // Imports all patches in [cbegin, cend), and returns an iterator past the last patch to be succesfully imported
 std::vector<std::wstring>::const_iterator ImportPatches(std::vector<std::wstring>::const_iterator cbegin,
                                                         std::vector<std::wstring>::const_iterator cend)
 {
-    const std::wstring shutdownCmd = L"wsl -t " + DistributionInfo::Name;
-    if (int cmdResult = _wsystem(shutdownCmd.c_str()); cmdResult != 0) {
-        return cbegin;
-    }
-
     return std::find_if_not(cbegin, cend, [](auto patchname) {
         const auto patch_windows_path = (std::filesystem::path{patches::windows_dir} += patchname) += L".diff";
         std::error_code errcode;
@@ -140,6 +145,9 @@ void ApplyPatches()
     }
 
     WslAsRoot([&]() {
+        // Restarts distro
+        ShutdownDistro();
+
         // Import patches
         auto patches_end = ImportPatches(patches_begin, patchlist.cend());
 
