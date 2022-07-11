@@ -41,6 +41,7 @@ void PatchLog::read()
 {
     patches = std::vector<std::wstring>{};
     if (!exists()) {
+        any_changes = true;
         return;
     }
 
@@ -63,6 +64,9 @@ void PatchLog::read()
 
 void PatchLog::write()
 {
+    if (!any_changes) {
+        return;
+    }
     DWORD exitCode;
     std::wstringstream command;
     command << L"echo \"# WSL patches log. Do not modify this file.\n";
@@ -74,6 +78,7 @@ void PatchLog::write()
 
 void PatchLog::push_back(std::wstring patchname)
 {
+    any_changes = true;
     patches.emplace_back(std::move(patchname));
 };
 

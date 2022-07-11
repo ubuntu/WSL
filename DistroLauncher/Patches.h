@@ -41,8 +41,9 @@ struct PatchLog
     void push_back(std::wstring patchname);
     [[nodiscard]] bool contains(std::wstring_view patchname) const;
 
-private:
+  private:
     std::vector<std::wstring> patches;
+    bool any_changes = false;
 };
 
 void ApplyPatches();
