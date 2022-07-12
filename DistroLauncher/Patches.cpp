@@ -137,7 +137,7 @@ void ApplyPatches()
     PatchLog patch_log{patches::install_log};
 
     if (!patch_log.exists()) {
-        if (auto success = CreateLogDirectory(); !success) {
+        if (const bool success = CreateLogDirectory(); !success) {
             return;
         }
     }
