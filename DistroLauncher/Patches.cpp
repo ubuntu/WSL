@@ -47,10 +47,10 @@ void PatchLog::read()
         return;
     }
 
-    std::wifstream f(windows_path);
+    std::wifstream file_handle(windows_path);
     std::wstring buffer;
-    while (f) {
-        std::getline(f, buffer);
+    while (file_handle) {
+        std::getline(file_handle, buffer);
 
         trim(buffer);
 
@@ -92,8 +92,12 @@ bool PatchLog::contains(std::wstring_view patchname) const
 bool CreateLogDirectory()
 {
     DWORD exitCode;
+    if (std::filesystem::exists(Oobe::WindowsPath(patches::linux_dir))) {
+        return true;
+    }
+
     const auto command = L"mkdir -p " + patches::linux_dir.wstring();
-    HRESULT hr = WslLaunchInteractiveAsRoot(command.c_str(), 1, &exitCode);
+    HRESULT hr = Sudo::WslLaunchInteractive(command.c_str(), 1, &exitCode);
     return SUCCEEDED(hr) && exitCode == 0;
 }
 
@@ -158,7 +162,7 @@ void ApplyPatches()
         return;
     }
 
-    WslAsRoot([&]() {
+    Sudo::Run([&]() {
         // Restart distro
         ShutdownDistro();
 

@@ -17,20 +17,19 @@
 
 #include "stdafx.h"
 
-RootSession::RootSession(HRESULT* hr_ptr)
+HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags)
 {
-    hr = hr_ptr;
-
     ULONG distributionVersion;
     PSTR* defaultEnvironmentVariables = nullptr;
     ULONG defaultEnvironmentVariableCount = 0;
 
-    *hr = g_wslApi.WslGetDistributionConfiguration(&distributionVersion, &defaultUID, &wslDistributionFlags,
-                                                   &defaultEnvironmentVariables, &defaultEnvironmentVariableCount);
+    const HRESULT hr =
+      g_wslApi.WslGetDistributionConfiguration(&distributionVersion, &defaultUID, &wslDistributionFlags,
+                                               &defaultEnvironmentVariables, &defaultEnvironmentVariableCount);
 
-    if (FAILED(*hr) || distributionVersion == 0) {
-        Helpers::PrintErrorMessage(*hr);
-        return;
+    if (FAILED(hr) || distributionVersion == 0) {
+        Helpers::PrintErrorMessage(hr);
+        return hr;
     }
 
     // discarding the env variable string array otherwise they would leak.
@@ -38,35 +37,46 @@ RootSession::RootSession(HRESULT* hr_ptr)
         CoTaskMemFree(static_cast<LPVOID>(defaultEnvironmentVariables[i]));
     }
 
-    // Switching to ROOT
-    constexpr ULONG root_uid = 0;
-    *hr = g_wslApi.WslConfigureDistribution(root_uid, wslDistributionFlags);
+    return hr;
 }
 
-RootSession::~RootSession()
+HRESULT Sudo::acquire()
 {
-    if (SUCCEEDED(*hr)) {
-        *hr = g_wslApi.WslConfigureDistribution(defaultUID, wslDistributionFlags);
+    HRESULT hr = WslGetDefaultUserAndFlags(defaultUID, wslDistributionFlags);
+
+    if (SUCCEEDED(hr)) {
+        hr = g_wslApi.WslConfigureDistribution(root_uid, wslDistributionFlags);
+        acquired_ = SUCCEEDED(hr);
     }
+    return hr;
 }
 
-HRESULT WslLaunchInteractiveAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode)
+HRESULT Sudo::release()
 {
-    HRESULT hr{};
-    RootSession sudo(&hr);
-    if (FAILED(hr)) {
-        return hr;
+    if (acquired()) {
+        return g_wslApi.WslConfigureDistribution(defaultUID, wslDistributionFlags);
+        acquired_ = false;
     }
-    return g_wslApi.WslLaunchInteractive(command, useCurrentWorkingDirectory, exitCode);
+    return S_FALSE;
 }
 
-HRESULT WslLaunchAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut, HANDLE stdErr,
+HRESULT Sudo::WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode)
+{
+    HRESULT launch_result = S_FALSE;
+    auto f = [&]() { launch_result = g_wslApi.WslLaunchInteractive(command, useCurrentWorkingDirectory, exitCode); };
+    HRESULT sudo_result = Run(f);
+
+    return FAILED(sudo_result) ? sudo_result : launch_result;
+}
+
+HRESULT Sudo::WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut, HANDLE stdErr,
                         HANDLE* process)
 {
-    HRESULT hr{};
-    RootSession sudo(&hr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-    return g_wslApi.WslLaunch(command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr, process);
+    HRESULT launch_result = S_FALSE;
+    auto f = [&]() {
+        launch_result = g_wslApi.WslLaunch(command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr, process);
+    };
+    HRESULT sudo_result = Run(f);
+
+    return FAILED(sudo_result) ? sudo_result : launch_result;
 }

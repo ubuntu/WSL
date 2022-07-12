@@ -18,56 +18,69 @@
 #pragma once
 #include "stdafx.h"
 
+HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags);
+
 /**
  * RAII class to switch to root user, and back to default user
+ * 
+ * This class is very prone to miss-use, so a static API is provided and 
+ * all methods are private.
  */
-class RootSession
+class Sudo
 {
-    HRESULT* hr;
+  public:
+    // Calls the passed function and returns the worst HRESULT of Root Acquisition and LauchInteractive commands
+    static HRESULT WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode);
+
+    // Calls the passed function and returns the worst HRESULT of Root Acquisition and Lauch commands
+    static HRESULT WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
+                             HANDLE stdErr, HANDLE* process);
+
+    // Calls the passed function and returns the HRESULT of root acquisition
+    template <typename Callable> static HRESULT Run(Callable f)
+    {
+        try {
+            Sudo root_scope_lock;
+            if (!root_scope_lock.acquired()) {
+                return S_OK;
+            }
+            f();
+            return S_FALSE;
+        } catch (std::exception& exception) {
+            // Catching-and-rethrowing to destroy the RootSession
+            throw exception;
+        }
+    }
+
+    [[nodiscard]] bool acquired() const noexcept
+    {
+        return acquired_;
+    }
+
+    static constexpr ULONG root_uid = 0;
+
+  private:
     ULONG defaultUID;
     WSL_DISTRIBUTION_FLAGS wslDistributionFlags;
+    bool acquired_ = false;
 
-  public:
-    RootSession(RootSession&) = delete;
-    RootSession(RootSession&&) = delete;
-    RootSession operator=(RootSession&) = delete;
+    Sudo(Sudo&) = delete;
+    Sudo(Sudo&&) = delete;
+    Sudo operator=(Sudo&) = delete;
 
-    // Swaps user with root
-    RootSession(HRESULT* hr);
+    Sudo()
+    {
+        acquire();
+    }
+
+    ~Sudo()
+    {
+        release();
+    }
+
+    // Swaps default user with root
+    HRESULT acquire();
 
     // Swaps user back to default
-    ~RootSession();
+    HRESULT release();
 };
-
-HRESULT WslLaunchInteractiveAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode);
-HRESULT WslLaunchAsRoot(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut, HANDLE stdErr,
-                        HANDLE* process);
-
-template <typename Callable, typename ReturnType = std::result_of_t<typename Callable(void)>>
-HRESULT WslAsRoot(Callable f, ReturnType* r)
-{
-    HRESULT hr{};
-    RootSession sudo(&hr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-
-    *r = f();
-    return hr;
-}
-
-template <typename Callable>
-HRESULT WslAsRoot(Callable f)
-{
-    HRESULT hr{};
-    RootSession sudo(&hr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-
-    if constexpr (std::is_same<HRESULT, std::invoke_result_t<Callable(void)>>::value) {
-        return f();
-    }
-    f();
-    return hr;
-}
