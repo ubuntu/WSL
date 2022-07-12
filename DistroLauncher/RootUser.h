@@ -22,6 +22,9 @@ HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wsl
 
 /**
  * RAII class to switch to root user, and back to default user
+ * 
+ * This class is very prone to miss-use, so a static API is provided and 
+ * all methods are private.
  */
 class Sudo
 {
