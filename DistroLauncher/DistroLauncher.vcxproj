@@ -203,7 +203,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\patches\2210_0_8_0-0001.diff">
+    <CopyFileToFolders Include="..\patches\0001-init-log.diff">
       <FileType>Document</FileType>
       <DestinationFolders>$(OutDir)/patches</DestinationFolders>
     </CopyFileToFolders>

@@ -126,7 +126,6 @@ bool ApplyPatch(std::wstring_view patchname)
     const auto output_log_linux_path = patches::output_log.wstring();
 
     command << L"patch -ruN < " << std::quoted(patch_linux_path) << L" &>> " << std::quoted(output_log_linux_path);
-    std::wcout << command.str() << std::endl;
     const HRESULT hr = g_wslApi.WslLaunchInteractive(command.str().c_str(), 0, &errorCode);
 
     return SUCCEEDED(hr) && errorCode == 0;
@@ -134,7 +133,7 @@ bool ApplyPatch(std::wstring_view patchname)
 
 [[nodiscard]] std::vector<std::wstring> PatchList()
 {
-    return {L"2210_0_8_0-0001"};
+    return {L"0001-init-log"};
 }
 
 void ApplyPatches()
