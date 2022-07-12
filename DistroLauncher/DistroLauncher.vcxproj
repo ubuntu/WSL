@@ -205,7 +205,13 @@
   <ItemGroup>
     <CopyFileToFolders Include="..\patches\0001-init-log.diff">
       <FileType>Document</FileType>
-      <DestinationFolders>$(OutDir)/patches</DestinationFolders>
+      <DestinationFolders>$(OutDir)patches</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\patches\0002-release-upgrade-policy.diff">
+      <FileType>Document</FileType>
+      <DestinationFolders>$(OutDir)patches</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

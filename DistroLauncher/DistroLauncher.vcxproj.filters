@@ -80,5 +80,8 @@
     <CopyFileToFolders Include="..\patches\0001-init-log.diff">
       <Filter>Patches</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\patches\0002-release-upgrade-policy.diff">
+      <Filter>Patches</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
