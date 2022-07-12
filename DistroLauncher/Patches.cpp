@@ -20,8 +20,8 @@
 
 std::wstring& trim(std::wstring& str)
 {
-    constexpr std::wstring_view ws = L"\n\t ";
-    const auto not_whitespace = [&](auto ch) { return std::find(ws.cbegin(), ws.cend(), ch) == ws.cend(); };
+    constexpr std::wstring_view wspace = L"\n\t ";
+    const auto not_whitespace = [&](auto ch) { return std::find(wspace.cbegin(), wspace.cend(), ch) == wspace.cend(); };
     str.erase(str.cbegin(), std::find_if(str.cbegin(), str.cend(), not_whitespace));
     str.erase(std::find_if(str.crbegin(), str.crend(), not_whitespace).base(), str.cend());
     return str;
@@ -103,11 +103,8 @@ bool CreateLogDirectory()
 
 bool ShutdownDistro()
 {
-    const std::wstring shutdownCmd = L"wsl -t " + DistributionInfo::Name;
-    if (int cmdResult = _wsystem(shutdownCmd.c_str()); cmdResult != 0) {
-        return false;
-    }
-    return true;
+    const std::wstring shutdown_command = L"wsl -t " + DistributionInfo::Name;
+    return _wsystem(shutdown_command.c_str()) == 0;
 }
 
 bool ImportPatch(std::wstring_view patchname)
