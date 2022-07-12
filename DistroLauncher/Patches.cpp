@@ -17,16 +17,13 @@
 
 #include "stdafx.h"
 
-namespace
+std::wstring& trim(std::wstring& str)
 {
-    std::wstring& trim(std::wstring& str)
-    {
-        constexpr std::wstring_view ws = L"\n\t ";
-        const auto not_whitespace = [&](auto ch) { return std::find(ws.cbegin(), ws.cend(), ch) == ws.cend(); };
-        str.erase(str.cbegin(), std::find_if(str.cbegin(), str.cend(), not_whitespace));
-        str.erase(std::find_if(str.crbegin(), str.crend(), not_whitespace).base(), str.cend());
-        return str;
-    }
+    constexpr std::wstring_view ws = L"\n\t ";
+    const auto not_whitespace = [&](auto ch) { return std::find(ws.cbegin(), ws.cend(), ch) == ws.cend(); };
+    str.erase(str.cbegin(), std::find_if(str.cbegin(), str.cend(), not_whitespace));
+    str.erase(std::find_if(str.crbegin(), str.crend(), not_whitespace).base(), str.cend());
+    return str;
 }
 
 PatchLog::PatchLog(std::wstring_view linuxpath) : linux_path(linuxpath), windows_path(Oobe::WindowsPath(linuxpath))
