@@ -63,14 +63,14 @@ HRESULT Sudo::release()
 HRESULT Sudo::WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode)
 {
     HRESULT launch_result = S_FALSE;
-    auto f = [&]() { g_wslApi.WslLaunchInteractive(command, useCurrentWorkingDirectory, exitCode); };
+    auto f = [&]() { launch_result = g_wslApi.WslLaunchInteractive(command, useCurrentWorkingDirectory, exitCode); };
     HRESULT sudo_result = Run(f);
 
     return FAILED(sudo_result) ? sudo_result : launch_result;
 }
 
-HRESULT Sudo::WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                               HANDLE stdErr, HANDLE* process)
+HRESULT Sudo::WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut, HANDLE stdErr,
+                        HANDLE* process)
 {
     HRESULT launch_result = S_FALSE;
     auto f = [&]() {
