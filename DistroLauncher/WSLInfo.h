@@ -54,5 +54,5 @@ namespace Oobe
 
     // Returns the windows path to access files inside the Linux file system.
     std::filesystem::path WindowsPath(std::wstring_view distro_path);
-    std::filesystem::path WindowsPath(const std::filesystem::path distro_path);
+    std::filesystem::path WindowsPath(std::filesystem::path distro_path);
 }
