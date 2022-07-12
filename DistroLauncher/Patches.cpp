@@ -93,7 +93,7 @@ bool CreateLogDirectory()
 {
     DWORD exitCode;
     const auto command = L"mkdir -p " + patches::linux_dir.wstring();
-    HRESULT hr = WslLaunchInteractiveAsRoot(command.c_str(), 1, &exitCode);
+    HRESULT hr = Sudo::WslLaunchInteractive(command.c_str(), 1, &exitCode);
     return SUCCEEDED(hr) && exitCode == 0;
 }
 
@@ -158,7 +158,7 @@ void ApplyPatches()
         return;
     }
 
-    WslAsRoot([&]() {
+    Sudo::Run([&]() {
         // Restart distro
         ShutdownDistro();
 
