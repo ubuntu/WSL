@@ -92,6 +92,10 @@ bool PatchLog::contains(std::wstring_view patchname) const
 bool CreateLogDirectory()
 {
     DWORD exitCode;
+    if (std::filesystem::exists(Oobe::WindowsPath(patches::linux_dir))) {
+        return true;
+    }
+
     const auto command = L"mkdir -p " + patches::linux_dir.wstring();
     HRESULT hr = Sudo::WslLaunchInteractive(command.c_str(), 1, &exitCode);
     return SUCCEEDED(hr) && exitCode == 0;
