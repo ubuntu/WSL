@@ -29,6 +29,10 @@ std::wstring& trim(std::wstring& str)
 PatchLog::PatchLog(std::wstring_view linuxpath) : linux_path(linuxpath), windows_path(Oobe::WindowsPath(linuxpath))
 { }
 
+PatchLog::PatchLog(std::filesystem::path linuxpath) :
+    linux_path(std::move(linuxpath)), windows_path(Oobe::WindowsPath(linux_path))
+{ }
+
 bool PatchLog::exists() const
 {
     return std::filesystem::exists(windows_path);
@@ -93,13 +97,13 @@ bool ShutdownDistro()
     return true;
 }
 
-// Imports all patches in [cbegin, cend), and returns an iterator past the last patch to be succesfully imported
 bool ImportPatch(std::wstring_view patchname)
 {
-    const auto patch_windows_path = (std::filesystem::path{patches::windows_dir} += patchname) += L".diff";
-    const auto tmp_diff_path = (std::wstring{L"/tmp/"} += patchname) + L".diff";
+    const auto patch_windows_path{(std::filesystem::path{patches::windows_dir} += patchname) += L".diff"};
+    const auto patch_linux_path{Oobe::WindowsPath(patches::tmp_location)};
+
     std::error_code errcode;
-    bool success = std::filesystem::copy_file(patch_windows_path, Oobe::WindowsPath(tmp_diff_path),
+    bool success = std::filesystem::copy_file(patch_windows_path, patch_linux_path,
                                               std::filesystem::copy_options::overwrite_existing, errcode);
     return success && !errcode;
 }
@@ -109,7 +113,7 @@ bool ApplyPatch(std::wstring_view patchname)
     DWORD errorCode;
     std::wstringstream command;
 
-    command << LR"(patch -ruN < "/tmp/)" << patchname << LR"(.diff" &> ")" << patches::output_log << '"';
+    command << LR"(patch -ruN < ")" << patches::tmp_location << LR"(" &>> ")" << patches::output_log << '"';
     const HRESULT hr = g_wslApi.WslLaunchInteractive(command.str().c_str(), 0, &errorCode);
 
     return SUCCEEDED(hr) && errorCode == 0;
