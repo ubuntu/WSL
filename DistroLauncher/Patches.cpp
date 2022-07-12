@@ -125,7 +125,7 @@ bool ApplyPatch(std::wstring_view patchname)
     const auto patch_linux_path = patches::tmp_location.wstring();
     const auto output_log_linux_path = patches::output_log.wstring();
 
-    command << L"patch -p0 < " << std::quoted(patch_linux_path) << L" &>> " << std::quoted(output_log_linux_path);
+    command << L"patch -d/ -p0 < " << std::quoted(patch_linux_path) << L" &>> " << std::quoted(output_log_linux_path);
     const HRESULT hr = g_wslApi.WslLaunchInteractive(command.str().c_str(), 0, &errorCode);
 
     return SUCCEEDED(hr) && errorCode == 0;
