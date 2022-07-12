@@ -171,4 +171,9 @@ namespace Oobe
     {
         return {Oobe::WslPathPrefix() + DistributionInfo::Name + std::wstring{distro_path}};
     }
+
+    std::filesystem::path WindowsPath(const std::filesystem::path distro_path)
+    {
+        return Oobe::WslPathPrefix() + DistributionInfo::Name + std::wstring{distro_path};
+    }
 }

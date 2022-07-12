@@ -139,8 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="RootUser.h" />
-    <ClInclude Include="ApplyUpdates.h" />
-    <ClInclude Include="Versioning.h" />
+    <ClInclude Include="Patches.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
     <ClInclude Include="console_service.h" />
@@ -167,8 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RootUser.cpp" />
-    <ClCompile Include="ApplyUpdates.cpp" />
-    <ClCompile Include="Versioning.cpp" />
+    <ClCompile Include="Patches.cpp" />
     <ClCompile Include="ApplicationStrategy.cpp" />
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="ExitStatus.cpp" />
@@ -203,6 +201,12 @@
       <Message>Compiling Messages...</Message>
       <Outputs>%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\patches\2210_0_8_0-0001.diff">
+      <FileType>Document</FileType>
+      <DestinationFolders>$(OutDir)/patches</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

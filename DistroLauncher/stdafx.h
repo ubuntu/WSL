@@ -13,9 +13,7 @@
 
 #include <stdio.h>
 #include <tchar.h>
-#define NOMINMAX
 #include <Windows.h>
-#include <Appmodel.h>
 #include <stdio.h>
 #include <conio.h>
 #include <io.h>
@@ -56,9 +54,8 @@
 #include "Win32Utils.h"
 #include "ApplicationStrategy.h"
 #include "Application.h"
-#include "ApplyUpdates.h"
+#include "Patches.h"
 #include "RootUser.h"
-#include "Versioning.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"
