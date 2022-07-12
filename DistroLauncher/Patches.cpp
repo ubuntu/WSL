@@ -88,6 +88,14 @@ bool PatchLog::contains(std::wstring_view patchname) const
     return std::find(patches.cbegin(), patches.cend(), patchname) != patches.cend();
 }
 
+bool CreateLogDirectory()
+{
+    DWORD exitCode;
+    const auto command = L"mkdir -p " + patches::linux_dir.wstring();
+    HRESULT hr = WslLaunchInteractiveAsRoot(command.c_str(), 1, &exitCode);
+    return SUCCEEDED(hr) && exitCode == 0;
+}
+
 bool ShutdownDistro()
 {
     const std::wstring shutdownCmd = L"wsl -t " + DistributionInfo::Name;
@@ -129,9 +137,7 @@ void ApplyPatches()
     PatchLog patch_log{patches::install_log};
 
     if (!patch_log.exists()) {
-        DWORD exitCode;
-        HRESULT hr = WslLaunchInteractiveAsRoot((L"mkdir -p " + patches::linux_dir).c_str(), 1, &exitCode);
-        if (FAILED(hr) || exitCode != 0) {
+        if (auto success = CreateLogDirectory(); !success) {
             return;
         }
     }
