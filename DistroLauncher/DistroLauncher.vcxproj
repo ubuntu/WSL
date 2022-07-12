@@ -202,6 +202,12 @@
       <Outputs>%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\patches\2210_0_8_0-0001.diff">
+      <FileType>Document</FileType>
+      <DestinationFolders>$(OutDir)/patches</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

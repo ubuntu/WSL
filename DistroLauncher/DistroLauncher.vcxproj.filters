@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Patches">
+      <UniqueIdentifier>{5fc0cb9e-6ad6-4a02-a1f5-02ecbe8fc06d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -72,5 +75,10 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="messages.mc" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\patches\2210_0_8_0-0001.diff">
+      <Filter>Patches</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
