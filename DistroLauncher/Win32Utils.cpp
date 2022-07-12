@@ -213,4 +213,17 @@ namespace Win32Utils
         static const auto build = read_build_from_registry();
         return build;
     }
+
+    std::filesystem::path thisAppRootdir()
+    {
+        TCHAR launcherName[MAX_PATH];
+        DWORD fnLength = GetModuleFileName(nullptr, launcherName, MAX_PATH);
+        if (fnLength == 0) {
+            return std::filesystem::path();
+        }
+        std::filesystem::path exePath{std::wstring_view{launcherName, fnLength}};
+        exePath.remove_filename();
+
+        return exePath;
+    }
 } // namespace Win32Utils

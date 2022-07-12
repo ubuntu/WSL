@@ -84,16 +84,7 @@ namespace Oobe
     {
         std::filesystem::path splashPath()
         {
-            const wchar_t* splashName = L"ubuntu_wsl_splash.exe";
-            TCHAR launcherName[MAX_PATH];
-            DWORD fnLength = GetModuleFileName(nullptr, launcherName, MAX_PATH);
-            if (fnLength == 0) {
-                return splashName;
-            }
-            std::filesystem::path splashPath{std::wstring_view{launcherName, fnLength}};
-            splashPath.replace_filename(splashName);
-
-            return splashPath;
+            return Win32Utils::thisAppRootdir() / L"ubuntu_wsl_splash.exe";
         }
     } // namespace.
 
