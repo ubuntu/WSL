@@ -134,7 +134,7 @@ bool ApplyPatch(std::wstring_view patchname)
 
 [[nodiscard]] std::vector<std::wstring> PatchList()
 {
-    return {L"2210_0_8_0-0001"};
+    return {L"0001-init-log"};
 }
 
 void ApplyPatches()
