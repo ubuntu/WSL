@@ -16,6 +16,7 @@
  */
 
 #include "stdafx.h"
+#include <iomanip>
 
 std::wstring& trim(std::wstring& str)
 {
@@ -108,10 +109,10 @@ bool ShutdownDistro()
 bool ImportPatch(std::wstring_view patchname)
 {
     const auto patch_windows_path{(std::filesystem::path{patches::windows_dir} += patchname) += L".diff"};
-    const auto patch_linux_path{Oobe::WindowsPath(patches::tmp_location)};
+    const auto patch_wsl_tmp_path{Oobe::WindowsPath(patches::tmp_location)};
 
     std::error_code errcode;
-    bool success = std::filesystem::copy_file(patch_windows_path, patch_linux_path,
+    bool success = std::filesystem::copy_file(patch_windows_path, patch_wsl_tmp_path,
                                               std::filesystem::copy_options::overwrite_existing, errcode);
     return success && !errcode;
 }
@@ -121,7 +122,11 @@ bool ApplyPatch(std::wstring_view patchname)
     DWORD errorCode;
     std::wstringstream command;
 
-    command << LR"(patch -ruN < ")" << patches::tmp_location << LR"(" &>> ")" << patches::output_log << '"';
+    const auto patch_linux_path = patches::tmp_location.wstring();
+    const auto output_log_linux_path = patches::output_log.wstring();
+
+    command << L"patch -ruN < " << std::quoted(patch_linux_path) << L" &>> " << std::quoted(output_log_linux_path);
+    std::wcout << command.str() << std::endl;
     const HRESULT hr = g_wslApi.WslLaunchInteractive(command.str().c_str(), 0, &errorCode);
 
     return SUCCEEDED(hr) && errorCode == 0;
