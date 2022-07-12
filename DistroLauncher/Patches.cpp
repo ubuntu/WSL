@@ -47,10 +47,10 @@ void PatchLog::read()
         return;
     }
 
-    std::wifstream f(windows_path);
+    std::wifstream file_handle(windows_path);
     std::wstring buffer;
-    while (f) {
-        std::getline(f, buffer);
+    while (file_handle) {
+        std::getline(file_handle, buffer);
 
         trim(buffer);
 
