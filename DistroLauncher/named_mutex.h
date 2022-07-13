@@ -112,8 +112,10 @@ class NamedMutex
 
         Lock& operator=(Lock&& other) noexcept
         {
-            std::swap(parent_, other.parent_);
-            std::swap(response_, other.response_);
+            if (this != &other) {
+                parent_ = std::exchange(other.parent_, nullptr);
+                response_ = std::exchange(other.response_, 0);
+            }
             return *this;
         }
 
