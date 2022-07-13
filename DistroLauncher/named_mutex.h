@@ -99,9 +99,15 @@ class NamedMutex
 
         ~Lock() noexcept
         {
+            release();
+        }
+
+        void release() noexcept
+        {
             if (ok()) {
                 parent_->release();
             }
+            parent_ = nullptr;
         }
 
         Lock& operator=(Lock&& other) noexcept
@@ -118,7 +124,7 @@ class NamedMutex
 
         DWORD why() const noexcept
         {
-            return response_;
+            return parent_ ? 0 : response_;
         }
 
         template <typename Callable> Lock& and_then(Callable&& f)
@@ -127,12 +133,10 @@ class NamedMutex
                 try {
                     f();
                 } catch (std::exception& exception) {
-                    parent_->release();
-                    parent_ = nullptr;
+                    release();
                     throw exception;
                 } catch (...) {
-                    parent_->release();
-                    parent_ = nullptr;
+                    release();
                     throw;
                 }
             }
