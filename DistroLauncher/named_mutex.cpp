@@ -22,7 +22,7 @@ DWORD NamedMutex::create() noexcept
     mutex_handle = CreateMutex(NULL, FALSE, mutex_name.c_str());
     if (!mutex_handle) {
         const auto error = GetLastError();
-        return error ? error : ~0; // Ensuring return value is always != 0 when mutex_handle is nullptr
+        return error ? error : ~DWORD(0); // Ensuring return value is always != 0 when mutex_handle is nullptr
     }
     return 0;
 }
