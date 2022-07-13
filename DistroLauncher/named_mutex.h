@@ -168,6 +168,7 @@ class NamedMutex
   private:
     HANDLE mutex_handle;
     std::wstring mutex_name;
+    static constexpr DWORD timeout_ms = 1000;
 
     DWORD create() noexcept;
     DWORD destroy() noexcept;

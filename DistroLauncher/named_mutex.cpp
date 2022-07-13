@@ -44,7 +44,7 @@ DWORD NamedMutex::wait_and_acquire() noexcept
         }
     }
     __assume(mutex_handle);
-    return WaitForSingleObject(mutex_handle, 1000);
+    return WaitForSingleObject(mutex_handle, timeout_ms);
 }
 
 DWORD NamedMutex::release() noexcept
