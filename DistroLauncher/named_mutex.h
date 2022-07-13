@@ -142,7 +142,7 @@ class NamedMutex
         template <typename Callable> Lock& or_else(Callable&& f)
         {
             if (!ok()) {
-                f()
+                f();
             }
             return *this;
         }
