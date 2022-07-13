@@ -121,7 +121,7 @@ class NamedMutex
             return response_;
         }
 
-        template <typename Callable> Lock& and_then(Callable f)
+        template <typename Callable> Lock& and_then(Callable&& f)
         {
             if (ok()) {
                 try {
@@ -139,7 +139,7 @@ class NamedMutex
             return *this;
         }
 
-        template <typename Callable> Lock& or_else(Callable f)
+        template <typename Callable> Lock& or_else(Callable&& f)
         {
             if (!ok()) {
                 f()
