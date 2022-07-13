@@ -37,19 +37,20 @@
  *
  *  In order to acquire a lock, you have two options.
  *  Use the first one unless you've got a good reason not to.
- *   1. Use a lambda wrapper:
+ *   1. Use the monadic interface:
  *      ```
- *      DWORD response = my_mutex.Run([](){
+ *      my_mutex.lock().and_then([](){
  *          // do stuff
- *      });
- *      if(response != 0) {
+ *      }).or_else([](){
  *          throw "Oh, no!";
- *      }
+ *      });
  *      ```
+ *      Note that the ordering of the functions doesn't matter,
+ *      and both are optional and repeatable.
  *
  *   2. Use a scope guard:
  *      ```
- *      NamedMutex::Guard scope_guard = my_mutex.get();
+ *      NamedMutex::Guard scope_guard = my_mutex.lock();
  *      if(scope_guard.ok()) {
  *          // do stuff
  *      } else {
@@ -81,29 +82,29 @@ class NamedMutex
         destroy();
     }
 
-    class Guard
+    class Lock
     {
       public:
-        constexpr Guard() noexcept : parent_(nullptr), response_(0)
+        constexpr Lock() noexcept : parent_(nullptr), response_(0)
         { }
 
-        Guard(NamedMutex& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
+        Lock(NamedMutex& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
         { }
 
-        Guard(Guard& other) = delete;
-        Guard(Guard&& other) noexcept : Guard()
+        Lock(Lock& other) = delete;
+        Lock(Lock&& other) noexcept : Lock()
         {
-            *this = Guard(std::move(other));
+            *this = Lock(std::move(other));
         }
 
-        ~Guard() noexcept
+        ~Lock() noexcept
         {
             if (ok()) {
                 parent_->release();
             }
         }
 
-        Guard& operator=(Guard&& other) noexcept
+        Lock& operator=(Lock&& other) noexcept
         {
             std::swap(parent_, other.parent_);
             std::swap(response_, other.response_);
@@ -120,32 +121,38 @@ class NamedMutex
             return response_;
         }
 
-      private:
+        template <typename Callable> Lock& and_then(Callable f)
+        {
+            if (ok()) {
+                try {
+                    f();
+                } catch (std::exception& exception) {
+                    parent_->release();
+                    parent_ = nullptr;
+                    throw exception;
+                }
+            }
+            return *this;
+        }
 
+        template <typename Callable> Lock& or_else(Callable f)
+        {
+            if (!ok()) {
+                f()
+            }
+            return *this;
+        }
+
+      private:
         NamedMutex* parent_;
         DWORD response_;
 
         friend class NamedMutex;
     };
 
-    Guard get()
+    Lock lock()
     {
-        return Guard(*this);
-    }
-
-    template <typename Callable> DWORD Run(Callable f)
-    {
-        try {
-            if (DWORD failure = wait_and_acquire(); failure) {
-                return failure;
-            }
-            f();
-        } catch (std::exception except) {
-            release();
-            throw except;
-        }
-
-        return release();
+        return Lock(*this);
     }
 
   private:
