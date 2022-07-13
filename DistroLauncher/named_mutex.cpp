@@ -19,17 +19,18 @@
 
 DWORD NamedMutex::create() noexcept
 {
-    mutex_handle = CreateMutex(NULL, FALSE, mutex_name.c_str());
-    if (!mutex_handle) {
+    mutex_handle = CreateMutex(nullptr, FALSE, mutex_name.c_str());
+    if (mutex_handle == nullptr) {
         const auto error = GetLastError();
-        return error ? error : ~DWORD(0); // Ensuring return value is always != 0 when mutex_handle is nullptr
+        return error != 0 ? error
+                          : ~static_cast<DWORD>(0); // Ensuring return value is always != 0 when mutex_handle is nullptr
     }
     return 0;
 }
 
 DWORD NamedMutex::destroy() noexcept
 {
-    if (mutex_handle) {
+    if (static_cast<bool>(mutex_handle)) {
         return CloseHandle(mutex_handle);
     }
     return 0;
@@ -43,7 +44,7 @@ DWORD NamedMutex::wait_and_acquire() noexcept
             return success;
         }
     }
-    __assume(mutex_handle);
+    __assume(static_cast<bool>(mutex_handle));
     return WaitForSingleObject(mutex_handle, timeout_ms);
 }
 
