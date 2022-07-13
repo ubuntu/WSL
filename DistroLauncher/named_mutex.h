@@ -130,6 +130,10 @@ class NamedMutex
                     parent_->release();
                     parent_ = nullptr;
                     throw exception;
+                } catch (...) {
+                    parent_->release();
+                    parent_ = nullptr;
+                    throw;
                 }
             }
             return *this;
