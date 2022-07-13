@@ -61,15 +61,17 @@
  *      your mutex may not be released. Option 1 takes care of
  *      this automatically, hence why it's recommended.
  */
-class NamedMutex
+
+// Templated for testing/dependency injection reasons, always use the alias at the end of the file
+template <typename MutexAPI> class NamedMutexWrapper
 {
   public:
-    NamedMutex() = delete;
-    NamedMutex(NamedMutex&) = delete;
-    NamedMutex(NamedMutex&&) = delete;
+    NamedMutexWrapper() = delete;
+    NamedMutexWrapper(NamedMutexWrapper&) = delete;
+    NamedMutexWrapper(NamedMutexWrapper&&) = delete;
 
     /// Some mutexes are almost never used. This makes for an easy optimization by not initializing them unless needed.
-    NamedMutex(std::wstring name, bool lazy_init = false) :
+    NamedMutexWrapper(std::wstring name, bool lazy_init = false) :
         mutex_handle(nullptr), mutex_name(L"WSL_" + DistributionInfo::Name + L"_" + name)
     {
         if (!lazy_init) {
@@ -77,7 +79,7 @@ class NamedMutex
         }
     }
 
-    ~NamedMutex()
+    virtual ~NamedMutexWrapper() noexcept
     {
         destroy();
     }
@@ -88,13 +90,13 @@ class NamedMutex
         constexpr Lock() noexcept : parent_(nullptr), response_(0)
         { }
 
-        Lock(NamedMutex& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
+        Lock(NamedMutexWrapper& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
         { }
 
         Lock(Lock& other) = delete;
         Lock(Lock&& other) noexcept : Lock()
         {
-            *this = Lock(std::move(other));
+            *this = std::move(other);
         }
 
         ~Lock() noexcept
@@ -129,7 +131,7 @@ class NamedMutex
             return parent_ ? 0 : response_;
         }
 
-        template <typename Callable> Lock& and_then(Callable&& f)
+        template <typename Callable> Lock&& and_then(Callable&& f)
         {
             if (ok()) {
                 try {
@@ -142,22 +144,22 @@ class NamedMutex
                     throw;
                 }
             }
-            return *this;
+            return std::move(*this);
         }
 
-        template <typename Callable> Lock& or_else(Callable&& f)
+        template <typename Callable> Lock&& or_else(Callable&& f)
         {
             if (!ok()) {
                 f();
             }
-            return *this;
+            return std::move(*this);
         }
 
       private:
-        NamedMutex* parent_;
+        NamedMutexWrapper* parent_;
         DWORD response_;
 
-        friend class NamedMutex;
+        friend class NamedMutexWrapper;
     };
 
     Lock lock()
@@ -165,13 +167,41 @@ class NamedMutex
         return Lock(*this);
     }
 
-  private:
+  protected:
     HANDLE mutex_handle;
     std::wstring mutex_name;
-    static constexpr DWORD timeout_ms = 1000;
 
-    DWORD create() noexcept;
-    DWORD destroy() noexcept;
-    DWORD wait_and_acquire() noexcept;
-    DWORD release() noexcept;
+    DWORD create() noexcept
+    {
+        return MutexAPI::create(mutex_handle, mutex_name.c_str());
+    };
+    DWORD destroy() noexcept
+    {
+        return MutexAPI::destroy(mutex_handle, mutex_name.c_str());
+    };
+    DWORD wait_and_acquire() noexcept
+    {
+        if (!mutex_handle) {
+            DWORD success = create();
+            if (success != 0) {
+                return success;
+            }
+        }
+        return MutexAPI::wait_and_acquire(mutex_handle, mutex_name.c_str());
+    };
+    DWORD release() noexcept
+    {
+        return MutexAPI::release(mutex_handle, mutex_name.c_str());
+    };
 };
+
+struct Win32MutexApi
+{
+    static constexpr DWORD timeout_ms = 1000;
+    static DWORD create(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept;
+    static DWORD destroy(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept;
+    static DWORD wait_and_acquire(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept;
+    static DWORD release(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept;
+};
+
+using NamedMutex = NamedMutexWrapper<Win32MutexApi>;

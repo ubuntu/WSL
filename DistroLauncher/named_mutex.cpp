@@ -17,9 +17,9 @@
 
 #include "stdafx.h"
 
-DWORD NamedMutex::create() noexcept
+DWORD Win32MutexApi::create(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
 {
-    mutex_handle = CreateMutex(nullptr, FALSE, mutex_name.c_str());
+    mutex_handle = CreateMutex(nullptr, FALSE, mutex_name);
     if (mutex_handle == nullptr) {
         const auto error = GetLastError();
         return error != 0 ? error
@@ -28,27 +28,21 @@ DWORD NamedMutex::create() noexcept
     return 0;
 }
 
-DWORD NamedMutex::destroy() noexcept
+DWORD Win32MutexApi::destroy(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
 {
     if (static_cast<bool>(mutex_handle)) {
         return CloseHandle(mutex_handle);
+        mutex_handle = nullptr;
     }
     return 0;
 }
 
-DWORD NamedMutex::wait_and_acquire() noexcept
+DWORD Win32MutexApi::wait_and_acquire(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
 {
-    if (!mutex_handle) {
-        DWORD success = create();
-        if (success != 0) {
-            return success;
-        }
-    }
-    __assume(static_cast<bool>(mutex_handle));
     return WaitForSingleObject(mutex_handle, timeout_ms);
 }
 
-DWORD NamedMutex::release() noexcept
+DWORD Win32MutexApi::release(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
 {
     return ReleaseMutex(mutex_handle);
 }
