@@ -162,7 +162,7 @@ template <typename MutexAPI> class NamedMutexWrapper
         friend class NamedMutexWrapper;
     };
 
-    Lock lock()
+    Lock lock() noexcept
     {
         return Lock(*this);
     }
