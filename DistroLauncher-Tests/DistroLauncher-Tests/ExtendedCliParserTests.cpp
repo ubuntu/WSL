@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
-#include "extended_cli_parser.cpp"
 
 namespace Oobe::internal
 {

@@ -65,6 +65,23 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\DistroLauncher\ApplicationStrategy.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\DistributionInfo.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\ExitStatus.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\exit_status_parser.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\extended_cli_parser.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\find_main_thread_window.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\Helpers.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\ini_find_value.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\local_named_pipe.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\named_mutex.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\OOBE.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\ProcessRunner.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\stdafx.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\Win32Utils.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\WindowsUserInfo.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\WslApiLoader.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\WSLInfo.cpp" />
     <ClCompile Include="ConsoleServiceTests.cpp" />
     <ClCompile Include="ExtendedCliParserTests.cpp" />
     <ClCompile Include="InstallerControllerTests.cpp" />
@@ -125,7 +142,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(SharedPchDir)stdafx.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SharedPchDir)stdafx.obj;%(AdditionalDependencies);onecore.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

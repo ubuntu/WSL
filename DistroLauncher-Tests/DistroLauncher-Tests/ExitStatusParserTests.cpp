@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
-#include "exit_status_parser.cpp"
 
 namespace Oobe
 {

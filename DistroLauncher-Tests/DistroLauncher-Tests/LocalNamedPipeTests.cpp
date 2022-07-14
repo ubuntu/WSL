@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
 #include "local_named_pipe.h"
-#include "local_named_pipe.cpp"
 
 namespace Win32Utils
 {
