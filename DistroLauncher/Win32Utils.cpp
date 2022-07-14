@@ -16,6 +16,7 @@
  */
 
 #include "stdafx.h"
+#include <ShlObj_core.h>
 
 namespace Win32Utils
 {
@@ -212,6 +213,19 @@ namespace Win32Utils
     {
         static const auto build = read_build_from_registry();
         return build;
+    }
+
+    std::filesystem::path homedir()
+    {
+        wchar_t* pathStr = nullptr;
+        auto hRes = SHGetKnownFolderPath(FOLDERID_Profile, KF_FLAG_DEFAULT, nullptr, &pathStr);
+        // Ensures the memory allocated by the SHGetKnownFolderPath gets cleaned in the end of the scope no matter what.
+        // Simpler than writing a class just for that.
+        std::unique_ptr<wchar_t, decltype(&::CoTaskMemFree)> scope_guard{pathStr, ::CoTaskMemFree};
+        if (FAILED(hRes)) {
+            return std::filesystem::path();
+        }
+        return std::filesystem::path(pathStr);
     }
 
     std::filesystem::path thisAppRootdir()

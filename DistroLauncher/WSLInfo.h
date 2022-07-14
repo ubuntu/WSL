@@ -43,6 +43,12 @@ namespace Oobe::internal
     bool ini_find_value(std::wistream& ini, std::wstring_view section, std::wstring_view key,
                         std::wstring_view valueContains);
 
+    /// Returns true if ports bound to wildcard or localhost in the WSL 2 VM should be connectable from the host via
+    /// localhost:port.
+    /// See
+    /// <https://docs.microsoft.com/en-us/windows/wsl/wsl-config#:~:text=WSL%202%20VM.-,localhostForwarding,-boolean>
+    bool isLocalhostForwardingEnabled(const std::filesystem::path& wslConfig);
+
 }
 
 namespace Oobe
