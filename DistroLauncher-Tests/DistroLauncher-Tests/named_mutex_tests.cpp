@@ -121,32 +121,32 @@ TEST(NamedMutexTests, CreateAndDestroy)
     auto& dbe = TestMutexApi::dummy_back_end;
     std::list<TestMutexApi::dummy_mutex>::const_iterator it;
     {
-        TestNamedMutex mutex(L"test_1");
-        it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test_1"));
+        TestNamedMutex mutex(L"test-lifetime");
+        it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
         ASSERT_NE(it, dbe.cend());  // Added name to database -> Create called
         ASSERT_EQ(it->refcount, 1); // destroy called once -> Create called once
         ASSERT_FALSE(it->locked);   // Not locked -> wait_and_acquire not called
 
         {
-            TestNamedMutex mutex_2(L"test_1");
-            it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test_1"));
+            TestNamedMutex mutex_2(L"test-lifetime");
+            it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
             ASSERT_NE(it, dbe.cend());  // Name still in -> destroy not called
             ASSERT_EQ(it->refcount, 2); // create called twice
             ASSERT_FALSE(it->locked);   // Still not locked -> wait_and_acquire not called
         }
 
-        it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test_1"));
+        it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
         ASSERT_NE(it, dbe.cend());  // Name not in database -> destroy called once
         ASSERT_EQ(it->refcount, 1); // destroy called once
     }
 
-    it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test_1"));
+    it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
     ASSERT_EQ(it, dbe.cend()); // Name not in database -> destroy called twice
 }
 
 TEST(NamedMutexTests, StateTransitions)
 {
-    TestNamedMutex lazy_mutex(L"test", true);
+    TestNamedMutex lazy_mutex(L"test-state-transitions", true);
 
     ASSERT_EQ(lazy_mutex.get_mutex_handle(), nullptr); // Initialization delayed
 
@@ -181,7 +181,7 @@ TEST(NamedMutexTests, StateTransitions)
 
 TEST(NamedMutexTests, MonadicInterface)
 {
-    TestNamedMutex mutex(L"test");
+    TestNamedMutex mutex(L"test-monadic-api");
 
     // Testing success
     bool and_then = false;
@@ -190,10 +190,81 @@ TEST(NamedMutexTests, MonadicInterface)
     ASSERT_TRUE(and_then);
     ASSERT_FALSE(or_else);
 
-    // Testing failure (fails because it's locked alredy)
+    // Testing failure (fails because it's locked already)
     and_then = false;
     or_else = false;
     mutex.lock().and_then([&] { and_then = true; }).or_else([&] { or_else = true; });
     ASSERT_FALSE(and_then);
     ASSERT_TRUE(or_else);
+}
+
+TEST(NamedMutexTests, Exceptions)
+{
+    TestNamedMutex mutex(L"test-exceptions");
+
+    // derived from std::exception
+    {
+        try {
+            mutex.lock().and_then([]() { throw std::runtime_error("Hello!"); });
+        } catch (std::runtime_error& err) {
+            ASSERT_EQ(err.what(), std::string{"Hello!"});
+        } catch (int&) {
+            FAIL();
+        } catch (...) {
+            FAIL();
+        }
+
+        std::optional<bool> previous_mutex_released = std::nullopt;
+
+        mutex.lock().and_then([&] { previous_mutex_released = {true}; }).or_else([&]() noexcept {
+            previous_mutex_released = {false};
+        });
+
+        ASSERT_TRUE(previous_mutex_released.has_value());
+        ASSERT_TRUE(previous_mutex_released.value());
+    }
+
+    // some other type
+    {
+        try {
+            mutex.lock().and_then([]() { throw 42; });
+        } catch (std::runtime_error&) {
+            FAIL();
+        } catch(int& err) {
+            ASSERT_EQ(err, 42);
+        } catch (...) {
+            FAIL();
+        }
+
+        std::optional<bool> previous_mutex_released = std::nullopt;
+
+        mutex.lock().and_then([&] { previous_mutex_released = {true}; }).or_else([&]() noexcept {
+            previous_mutex_released = {false};
+        });
+
+        ASSERT_TRUE(previous_mutex_released.has_value());
+        ASSERT_TRUE(previous_mutex_released.value());
+    }
+
+    // no type
+    {
+        try {
+            mutex.lock().and_then([]() { throw; });
+        } catch (std::runtime_error&) {
+            FAIL();
+        } catch (int&) {
+            FAIL();
+        } catch (...) {
+            SUCCEED();
+        }
+
+        std::optional<bool> previous_mutex_released = std::nullopt;
+
+        mutex.lock().and_then([&] { previous_mutex_released = {true}; }).or_else([&]() noexcept {
+            previous_mutex_released = {false};
+        });
+
+        ASSERT_TRUE(previous_mutex_released.has_value());
+        ASSERT_TRUE(previous_mutex_released.value());
+    }
 }

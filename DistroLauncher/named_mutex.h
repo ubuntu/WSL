@@ -136,7 +136,7 @@ template <typename MutexAPI> class NamedMutexWrapper
         template <typename Callable> Lock&& and_then(Callable&& f)
         {
             if (ok()) {
-                safe_execute(std::forward<Callable>(f), [&] noexcept { release(); });
+                safe_execute(std::forward<Callable>(f), [&] () noexcept { release(); });
             }
             return std::move(*this);
         }
@@ -198,9 +198,6 @@ template <typename CallableExec, typename CallablePanic> void safe_execute(Calla
 
     try {
         f();
-    } catch (std::exception& exception) {
-        panic();
-        throw exception;
     } catch (...) {
         panic();
         throw;
