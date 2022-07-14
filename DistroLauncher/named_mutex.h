@@ -46,7 +46,9 @@
  *      });
  *      ```
  *      Note that the ordering of the functions doesn't matter,
- *      and both are optional and repeatable.
+ *      and both are optional and repeatable, so long as no
+ *      exceptions are thrown. In this case, the mutex will be
+ *      released and the exception re-thrown.
  *
  *   2. Use a scope guard:
  *      ```
