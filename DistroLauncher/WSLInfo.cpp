@@ -82,6 +82,22 @@ namespace Oobe::internal
         return isX11UnixSocketMounted();
     }
 
+    bool isLocalhostForwardingEnabled(const std::filesystem::path& wslConfig)
+    {
+        if (!std::filesystem::exists(wslConfig)) {
+            return true; // enabled by default.
+        }
+
+        std::wifstream config;
+        config.open(wslConfig.wstring(), std::ios::beg);
+        if (config.fail()) {
+            return false; // unsure whether the user disabled or not.
+        }
+
+        bool isDisabled = ini_find_value(config, L"wsl2", L"localhostforwarding", L"false");
+        return !isDisabled;
+    }
+
     namespace
     {
         // Returns true if the WSL successfully launches a list
