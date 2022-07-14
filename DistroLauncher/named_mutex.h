@@ -136,15 +136,7 @@ template <typename MutexAPI> class NamedMutexWrapper
         template <typename Callable> Lock&& and_then(Callable&& f)
         {
             if (ok()) {
-                try {
-                    f();
-                } catch (std::exception& exception) {
-                    release();
-                    throw exception;
-                } catch (...) {
-                    release();
-                    throw;
-                }
+                safe_execute(std::forward<Callable>(f), [&] noexcept { release(); });
             }
             return std::move(*this);
         }
@@ -196,6 +188,24 @@ template <typename MutexAPI> class NamedMutexWrapper
         return MutexAPI::release(mutex_handle, mutex_name.c_str());
     };
 };
+
+template <typename CallableExec, typename CallablePanic> void safe_execute(CallableExec&& f, [[maybe_unused]] CallablePanic&& panic)
+{
+    if constexpr (std::is_nothrow_invocable_v<CallableExec, void>) {
+        f();
+        return;
+    }
+
+    try {
+        f();
+    } catch (std::exception& exception) {
+        panic();
+        throw exception;
+    } catch (...) {
+        panic();
+        throw;
+    }
+}
 
 struct Win32MutexApi
 {
