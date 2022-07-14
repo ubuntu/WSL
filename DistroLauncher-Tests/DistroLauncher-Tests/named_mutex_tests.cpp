@@ -245,26 +245,4 @@ TEST(NamedMutexTests, Exceptions)
         ASSERT_TRUE(previous_mutex_released.has_value());
         ASSERT_TRUE(previous_mutex_released.value());
     }
-
-    // no type
-    {
-        try {
-            mutex.lock().and_then([]() { throw; });
-        } catch (std::runtime_error&) {
-            FAIL();
-        } catch (int&) {
-            FAIL();
-        } catch (...) {
-            SUCCEED();
-        }
-
-        std::optional<bool> previous_mutex_released = std::nullopt;
-
-        mutex.lock().and_then([&] { previous_mutex_released = {true}; }).or_else([&]() noexcept {
-            previous_mutex_released = {false};
-        });
-
-        ASSERT_TRUE(previous_mutex_released.has_value());
-        ASSERT_TRUE(previous_mutex_released.value());
-    }
 }
