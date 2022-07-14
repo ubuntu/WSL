@@ -41,7 +41,7 @@
  *  There are three interface styles. The first two are valid, and equally safe.
  *  The last one should be avoided.
  *
- *                             MONADIC INTERFACE (UNSAFE)
+ *                             MONADIC INTERFACE (SAFE)
  *
  *  This interface uses `and_then` and `or_else` in order to perform actions.
  *  Example:
