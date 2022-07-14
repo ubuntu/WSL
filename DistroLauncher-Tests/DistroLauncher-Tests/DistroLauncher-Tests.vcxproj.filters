@@ -76,9 +76,16 @@
     <ClCompile Include="StateMachineTests.cpp">
       <Filter>TestSources</Filter>
     </ClCompile>
+    <ClCompile Include="sudo_tests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="named_mutex_tests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />
+    <ClInclude Include="dummy_apis.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
