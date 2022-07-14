@@ -74,6 +74,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="..\..\DistroLauncher\Helpers.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ini_find_value.cpp" />
     <ClCompile Include="..\..\DistroLauncher\local_named_pipe.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\named_mutex.cpp" />
     <ClCompile Include="..\..\DistroLauncher\OOBE.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ProcessRunner.cpp" />
     <ClCompile Include="..\..\DistroLauncher\stdafx.cpp" />

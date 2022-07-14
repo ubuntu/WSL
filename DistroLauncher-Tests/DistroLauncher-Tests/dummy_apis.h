@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include "stdafx.h"
+
 /*
  * This file contains a few of dummy API used for testing
  */
