@@ -58,5 +58,5 @@ namespace Oobe
     // Returns the preferred file path prefix to access files inside the Linux file system.
     const wchar_t* WslPathPrefix();
 
-    HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags);
+    HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags) noexcept;
 }

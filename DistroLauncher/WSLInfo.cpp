@@ -183,7 +183,7 @@ namespace Oobe
         return prefix;
     }
 
-    HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags)
+    HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags) noexcept
     {
         ULONG distributionVersion;
         PSTR* defaultEnvironmentVariables = nullptr;

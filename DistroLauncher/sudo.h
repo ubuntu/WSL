@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright (C) 2022 Canonical Ltd
  *
@@ -15,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+#pragma once
 
 #include "stdafx.h"
 
@@ -92,7 +93,7 @@
 namespace SudoInternals
 {
     // Templated for testing/dependency injection reasons, always use the alias at the end of the file
-    template <typename MutexType> class SudoInterface
+    template <typename MutexType, typename WslAPI> class SudoInterface
     {
       public:
         enum class Status
@@ -104,12 +105,47 @@ namespace SudoInternals
             INACTIVE
         };
 
-        SudoInterface() noexcept;
         SudoInterface(SudoInterface&) = delete;
-        SudoInterface::SudoInterface(SudoInterface&& other) noexcept;
-        ~SudoInterface();
-
         SudoInterface& operator=(SudoInterface& other) = delete;
+
+        SudoInterface() noexcept
+        {
+            auto lock = sudo_mutex.lock();
+            if (!lock.ok()) {
+                status = Status::FAILED_MUTEX;
+                return;
+            }
+
+            if (const HRESULT hr = WslAPI::GetDefaultUserAndFlags(default_user_id, wsl_distribution_flags);
+                FAILED(hr)) {
+                status = Status::FAILED_GET_USER;
+                return;
+            }
+
+            constexpr ULONG root_uid = 1;
+            if (const HRESULT hr = WslAPI::SetDefaultUserAndFlags(root_uid, wsl_distribution_flags); FAILED(hr)) {
+                status = Status::FAILED_SET_ROOT;
+                return;
+            }
+
+            mutex_lock = std::move(lock);
+            status = Status::OK;
+        }
+
+        SudoInterface(SudoInterface&& other) noexcept
+        {
+            if (this != &other) {
+                mutex_lock = std::exchange(other.mutex_lock, {});
+                default_user_id = std::exchange(other.default_user_id, 0);
+                wsl_distribution_flags = std::exchange(other.wsl_distribution_flags, {});
+                status = std::exchange(other.status, Status::INACTIVE);
+            }
+        }
+
+        ~SudoInterface()
+        {
+            reset_user();
+        }
 
         bool ok() const noexcept
         {
@@ -150,98 +186,73 @@ namespace SudoInternals
         }
 
         // wsl API interface
-        static HRESULT SudoInterface::WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory,
-                                                           DWORD* exitCode);
-        static HRESULT SudoInterface::WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn,
-                                                HANDLE stdOut, HANDLE stdErr, HANDLE* process);
+        static HRESULT WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode)
+        {
+            HRESULT hr = S_FALSE;
+            SudoInterface()
+              .and_then([&]() { hr = WslAPI::LaunchInteractive(command, useCurrentWorkingDirectory, exitCode); })
+              .or_else([&] { hr = WAIT_FAILED; });
+
+            return hr;
+        }
+
+        static HRESULT WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
+                                 HANDLE stdErr, HANDLE* process)
+        {
+            HRESULT hr = S_FALSE;
+            SudoInterface()
+              .and_then([&]() noexcept {
+                  hr = WslAPI::Launch(command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr, process);
+              })
+              .or_else([&] { hr = WAIT_FAILED; });
+
+            return hr;
+        }
 
       private:
         static MutexType sudo_mutex;
-
-        void reset_user() noexcept;
-
         typename MutexType::Lock mutex_lock{};
 
         Status status = Status::INACTIVE;
         ULONG default_user_id = 0;
         WSL_DISTRIBUTION_FLAGS wsl_distribution_flags{};
+
+        void reset_user() noexcept
+        {
+            if (ok()) {
+                WslAPI::SetDefaultUserAndFlags(default_user_id, wsl_distribution_flags);
+                MutexType::Lock dummy_lock;
+                std::swap(mutex_lock, dummy_lock);
+                status = Status::INACTIVE;
+            }
+        }
     };
 
-    template <typename MutexType> SudoInterface<MutexType>::SudoInterface() noexcept
+    struct WslWindowsAPI
     {
-        auto lock = sudo_mutex.lock();
-        if (!lock.ok()) {
-            status = Status::FAILED_MUTEX;
-            return;
+        static HRESULT GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags)
+        {
+            return Oobe::WslGetDefaultUserAndFlags(defaultUID, wslDistributionFlags);
         }
 
-        if (const HRESULT hr = Oobe::WslGetDefaultUserAndFlags(default_user_id, wsl_distribution_flags); FAILED(hr)) {
-            status = Status::FAILED_GET_USER;
-            return;
+        static HRESULT SetDefaultUserAndFlags(ULONG defaultUID, WSL_DISTRIBUTION_FLAGS wslDistributionFlags) noexcept
+        {
+            return g_wslApi.WslConfigureDistribution(defaultUID, wslDistributionFlags);
         }
 
-        constexpr ULONG root_uid = 1;
-        if (const HRESULT hr = g_wslApi.WslConfigureDistribution(root_uid, wsl_distribution_flags); FAILED(hr)) {
-            status = Status::FAILED_SET_ROOT;
-            return;
+        static HRESULT LaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode) noexcept
+        {
+            return g_wslApi.WslLaunchInteractive(command, useCurrentWorkingDirectory, exitCode);
         }
 
-        mutex_lock = std::move(lock);
-        status = Status::OK;
-    }
-
-    template <typename MutexType> SudoInterface<MutexType>::SudoInterface(SudoInterface&& other) noexcept
-    {
-        if (this != &other) {
-            mutex_lock = std::exchange(other.mutex_lock, {});
-            default_user_id = std::exchange(other.default_user_id, 0);
-            wsl_distribution_flags = std::exchange(other.wsl_distribution_flags, {});
-            status = std::exchange(other.status, Status::INACTIVE);
+        static HRESULT Launch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
+                                 HANDLE stdErr, HANDLE* process) noexcept
+        {
+            return g_wslApi.WslLaunch(command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr, process);
         }
-    }
-
-    template <typename MutexType> void SudoInterface<MutexType>::reset_user() noexcept
-    {
-        if (ok()) {
-            g_wslApi.WslConfigureDistribution(default_user_id, wsl_distribution_flags);
-            MutexType::Lock dummy_lock;
-            std::swap(mutex_lock, dummy_lock);
-            status = Status::INACTIVE;
-        }
-    }
-
-    template <typename MutexType> SudoInterface<MutexType>::~SudoInterface()
-    {
-        reset_user();
-    }
-
-    template <typename MutexType>
-    HRESULT SudoInterface<MutexType>::WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory,
-                                                           DWORD* exitCode)
-    {
-        HRESULT hr = S_FALSE;
-        SudoInterface()
-          .and_then([&]() { hr = g_wslApi.WslLaunchInteractive(command, useCurrentWorkingDirectory, exitCode); })
-          .or_else([&] { hr = S_FALSE; });
-
-        return hr;
-    }
-
-    template <typename MutexType>
-    HRESULT SudoInterface<MutexType>::WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn,
-                                                HANDLE stdOut, HANDLE stdErr, HANDLE* process)
-    {
-        HRESULT hr = S_FALSE;
-        SudoInterface()
-          .and_then([&]() noexcept {
-              hr = g_wslApi.WslLaunch(command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr, process);
-          })
-          .or_else([&] { hr = S_FALSE; });
-
-        return hr;
-    }
+    };
 
 }
 
-using Sudo = SudoInternals::SudoInterface<NamedMutex>;
+using Sudo = SudoInternals::SudoInterface<NamedMutex, SudoInternals::WslWindowsAPI>;
 inline NamedMutex Sudo::sudo_mutex(L"root-user", true);

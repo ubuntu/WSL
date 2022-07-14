@@ -17,98 +17,7 @@
 
 #include "stdafx.h"
 #include "gtest/gtest.h"
-
-struct TestMutexApi
-{
-    static constexpr DWORD timeout_ms = 1000;
-    static DWORD create(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept;
-    static DWORD destroy(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept;
-    static DWORD wait_and_acquire(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept;
-    static DWORD release(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept;
-
-    // Instead of a Windows back-end, we have a registry of dummy mutexes as our back-end
-    struct dummy_mutex
-    {
-        std::wstring name;
-        unsigned refcount = 1;
-        bool locked = false;
-
-        bool operator==(std::wstring_view name) const
-        {
-            return name == this->name;
-        }
-    };
-
-    static std::list<dummy_mutex> dummy_back_end; // Using list for pointer stability
-
-    // For testing purposes
-    static bool& locked(HANDLE& mutex_handle) noexcept
-    {
-        return static_cast<dummy_mutex*>(mutex_handle)->locked;
-    }
-};
-
-class TestNamedMutex : public NamedMutexWrapper<TestMutexApi>
-{
-  public:
-    TestNamedMutex(std::wstring name, bool lazy_init = false) : NamedMutexWrapper(name, lazy_init)
-    { }
-
-    // Exposing internal state for testing
-    HANDLE& get_mutex_handle()
-    {
-        return mutex_handle;
-    }
-    bool& locked()
-    {
-        return TestMutexApi::locked(mutex_handle);
-    }
-};
-
-std::list<TestMutexApi::dummy_mutex> TestMutexApi::dummy_back_end{};
-
-// Overriding back-end API
-DWORD TestMutexApi::create(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
-{
-    auto it = std::find(dummy_back_end.begin(), dummy_back_end.end(), mutex_name);
-    if (it == dummy_back_end.cend()) {
-        dummy_back_end.push_back(dummy_mutex{std::wstring(mutex_name)});
-        mutex_handle = static_cast<HANDLE>(&dummy_back_end.back());
-    } else {
-        ++it->refcount;
-        mutex_handle = static_cast<HANDLE>(&(*it));
-    }
-    return 0;
-}
-
-DWORD TestMutexApi::destroy(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
-{
-    auto it = std::find(dummy_back_end.begin(), dummy_back_end.end(), mutex_name);
-
-    if (it == dummy_back_end.cend()) {
-        return 1; // Destroyed a non-existing mutex
-    }
-
-    --it->refcount;
-    if (it->refcount == 0) {
-        dummy_back_end.erase(it);
-    }
-    return 0;
-}
-
-DWORD TestMutexApi::wait_and_acquire(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
-{
-    if (locked(mutex_handle))
-        return 1;
-    locked(mutex_handle) = true;
-    return 0;
-}
-
-DWORD TestMutexApi::release(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
-{
-    locked(mutex_handle) = false;
-    return 0;
-}
+#include "dummy_apis.h"
 
 std::wstring mangle_name(std::wstring name)
 {
@@ -118,17 +27,18 @@ std::wstring mangle_name(std::wstring name)
 // Testing Create and Destroy
 TEST(NamedMutexTests, CreateAndDestroy)
 {
-    auto& dbe = TestMutexApi::dummy_back_end;
-    std::list<TestMutexApi::dummy_mutex>::const_iterator it;
+    Testing::MutexMockAPI::reset_back_end();
+    auto& dbe = Testing::MutexMockAPI::dummy_back_end;
+    std::list<Testing::MutexMockAPI::dummy_mutex>::const_iterator it;
     {
-        TestNamedMutex mutex(L"test-lifetime");
+        Testing::NamedMutex mutex(L"test-lifetime");
         it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
         ASSERT_NE(it, dbe.cend());  // Added name to database -> Create called
         ASSERT_EQ(it->refcount, 1); // destroy called once -> Create called once
         ASSERT_FALSE(it->locked);   // Not locked -> wait_and_acquire not called
 
         {
-            TestNamedMutex mutex_2(L"test-lifetime");
+            Testing::NamedMutex mutex_2(L"test-lifetime");
             it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
             ASSERT_NE(it, dbe.cend());  // Name still in -> destroy not called
             ASSERT_EQ(it->refcount, 2); // create called twice
@@ -146,7 +56,8 @@ TEST(NamedMutexTests, CreateAndDestroy)
 
 TEST(NamedMutexTests, StateTransitions)
 {
-    TestNamedMutex lazy_mutex(L"test-state-transitions", true);
+    Testing::MutexMockAPI::reset_back_end();
+    Testing::NamedMutex lazy_mutex(L"test-state-transitions", true);
 
     ASSERT_EQ(lazy_mutex.get_mutex_handle(), nullptr); // Initialization delayed
 
@@ -181,12 +92,14 @@ TEST(NamedMutexTests, StateTransitions)
 
 TEST(NamedMutexTests, MonadicInterface)
 {
-    TestNamedMutex mutex(L"test-monadic-api");
+    Testing::MutexMockAPI::reset_back_end();
+    Testing::NamedMutex mutex(L"test-monadic-api");
 
     // Testing success
     bool and_then = false;
     bool or_else = false;
-    auto scope_lock = mutex.lock().and_then([&] { and_then = true; }).or_else([&] { or_else = true; });
+    Testing::NamedMutex::Lock scope_lock =
+      mutex.lock().and_then([&] { and_then = true; }).or_else([&] { or_else = true; });
     ASSERT_TRUE(and_then);
     ASSERT_FALSE(or_else);
 
@@ -200,7 +113,8 @@ TEST(NamedMutexTests, MonadicInterface)
 
 TEST(NamedMutexTests, Exceptions)
 {
-    TestNamedMutex mutex(L"test-exceptions");
+    Testing::MutexMockAPI::reset_back_end();
+    Testing::NamedMutex mutex(L"test-exceptions");
 
     // derived from std::exception
     {
@@ -230,32 +144,10 @@ TEST(NamedMutexTests, Exceptions)
             mutex.lock().and_then([]() { throw 42; });
         } catch (std::runtime_error&) {
             FAIL();
-        } catch(int& err) {
+        } catch (int& err) {
             ASSERT_EQ(err, 42);
         } catch (...) {
             FAIL();
-        }
-
-        std::optional<bool> previous_mutex_released = std::nullopt;
-
-        mutex.lock().and_then([&] { previous_mutex_released = {true}; }).or_else([&]() noexcept {
-            previous_mutex_released = {false};
-        });
-
-        ASSERT_TRUE(previous_mutex_released.has_value());
-        ASSERT_TRUE(previous_mutex_released.value());
-    }
-
-    // no type
-    {
-        try {
-            mutex.lock().and_then([]() { throw; });
-        } catch (std::runtime_error&) {
-            FAIL();
-        } catch (int&) {
-            FAIL();
-        } catch (...) {
-            SUCCEED();
         }
 
         std::optional<bool> previous_mutex_released = std::nullopt;

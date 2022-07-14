@@ -54,6 +54,7 @@
 #include "ApplicationStrategy.h"
 #include "Application.h"
 #include "named_mutex.h"
+#include "sudo.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"
