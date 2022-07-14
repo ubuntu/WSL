@@ -39,6 +39,7 @@
 #include <optional>
 #include <variant>
 #include <type_traits>
+#include <utility>
 #include "expected.hpp"
 #include "not_null.h"
 #include "WslApiLoader.h"
