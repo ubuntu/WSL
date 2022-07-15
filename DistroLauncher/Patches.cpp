@@ -133,11 +133,6 @@ bool ApplyPatch(std::wstring_view patchname)
     return SUCCEEDED(hr) && errorCode == 0;
 }
 
-[[nodiscard]] std::vector<std::wstring> PatchList()
-{
-    return {L"0001-init-log", L"0002-upgrader-policy"};
-}
-
 void ApplyPatchesImpl()
 {
 
@@ -150,7 +145,7 @@ void ApplyPatchesImpl()
     }
 
     patch_log.read();
-    const auto patchlist = PatchList();
+    const auto patchlist = GetPatchList();
 
     // Filter patches already applied
     const auto patches_begin =
