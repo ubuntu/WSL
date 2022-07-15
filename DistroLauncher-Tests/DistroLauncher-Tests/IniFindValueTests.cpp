@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
 
-
 // The assertions below derive from real life experiments in WSL.
 namespace Oobe
 {
