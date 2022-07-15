@@ -50,4 +50,7 @@ struct PatchLog
     bool any_changes = false;
 };
 
+
+[[nodiscard]] std::vector<std::wstring> GetPatchList();
+
 void ApplyPatches();
