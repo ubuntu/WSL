@@ -204,4 +204,14 @@ namespace Oobe
 
         return hr;
     }
+
+    std::filesystem::path WindowsPath(const std::wstring_view distro_path)
+    {
+        return {Oobe::WslPathPrefix() + DistributionInfo::Name + std::wstring{distro_path}};
+    }
+
+    std::filesystem::path WindowsPath(const std::filesystem::path distro_path)
+    {
+        return Oobe::WslPathPrefix() + DistributionInfo::Name + std::wstring{distro_path};
+    }
 }

@@ -151,7 +151,7 @@
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
-    <ClInclude Include="Patches.h" />
+    <ClInclude Include="patches.h" />
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="splash_controller.h" />
@@ -176,7 +176,7 @@
     <ClCompile Include="local_named_pipe.cpp" />
     <ClCompile Include="named_mutex.cpp" />
     <ClCompile Include="OOBE.cpp" />
-    <ClCompile Include="Patches.cpp" />
+    <ClCompile Include="patches.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="ini_find_value.cpp" />

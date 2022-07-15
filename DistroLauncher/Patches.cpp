@@ -16,7 +16,7 @@
  */
 
 #include "stdafx.h"
-#include <iomanip>
+
 
 std::wstring& trim(std::wstring& str)
 {
@@ -138,8 +138,9 @@ bool ApplyPatch(std::wstring_view patchname)
     return {L"0001-init-log"};
 }
 
-void ApplyPatches()
+void ApplyPatchesImpl()
 {
+
     PatchLog patch_log{patches::install_log};
 
     if (!patch_log.exists()) {
@@ -159,17 +160,33 @@ void ApplyPatches()
         return;
     }
 
-    Sudo::Run([&]() {
-        // Restart distro
-        ShutdownDistro();
+    Sudo()
+      .and_then([&]() {
+          // Restart distro
+          ShutdownDistro();
 
-        // Import and apply patches
-        auto patches_end = std::find_if_not(patches_begin, patchlist.cend(), [](auto patchname) {
-            return ImportPatch(patchname) && ApplyPatch(patchname);
-        });
+          // Import and apply patches
+          auto patches_end = std::find_if_not(patches_begin, patchlist.cend(), [](auto patchname) {
+              return ImportPatch(patchname) && ApplyPatch(patchname);
+          });
 
-        // Log applied patches
-        std::for_each(patches_begin, patches_end, [&](auto& pname) { patch_log.push_back(std::move(pname)); });
-        patch_log.write();
+          // Log applied patches
+          std::for_each(patches_begin, patches_end, [&](auto& pname) { patch_log.push_back(std::move(pname)); });
+          patch_log.write();
+      })
+      .or_else([](auto why) {
+#ifndef DNDEBUG
+          std::wcerr << "Failed to set root user during install. Error code: " << static_cast<int>(why) << std::endl;
+#endif
+      });
+}
+
+void ApplyPatches()
+{
+    static auto update_mutex = NamedMutex(L"install-mutex", true);
+    update_mutex.lock().and_then(ApplyPatchesImpl).or_else([] {
+#ifndef DNDEBUG
+        std::wcerr << "Failed to acquire update mutex" << std::endl;
+#endif
     });
 }
