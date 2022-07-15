@@ -122,7 +122,7 @@ namespace SudoInternals
                 return;
             }
 
-            constexpr ULONG root_uid = 1;
+            constexpr ULONG root_uid = 0;
             if (const HRESULT hr = WslAPI::SetDefaultUserAndFlags(root_uid, wsl_distribution_flags); FAILED(hr)) {
                 status = Status::FAILED_SET_ROOT;
                 return;
