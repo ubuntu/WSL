@@ -101,9 +101,9 @@ namespace Win32Utils
                 if (!GetMonitorInfo(monitor, &mInfo)) {
                     return nonstd::make_unexpected(GetLastError());
                 }
-                int x = (mInfo.rcWork.right - width) / 2;
-                int y = (mInfo.rcWork.bottom - height) / 2;
-                return placement{x, y, width, height};
+                int px_x = (mInfo.rcWork.right - width) / 2;
+                int px_y = (mInfo.rcWork.bottom - height) / 2;
+                return placement{px_x, px_y, width, height};
             }
 
             /// Applies this placement to [window] according to [flags]. Returns 0 on success.

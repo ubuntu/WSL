@@ -74,16 +74,16 @@ namespace Win32Utils
         template <typename... Args>
         explicit LocalNamedPipe(bool inheritRead, bool inheritWrite, Args&&... args) :
             readSA{sizeof(SECURITY_ATTRIBUTES), nullptr, true}, writeSA{sizeof(SECURITY_ATTRIBUTES), nullptr, true},
-            inheritWrite{inheritWrite}, szPipeName{pipeNameFrom(std::forward<Args>(args)...)}
+            szPipeName{pipeNameFrom(std::forward<Args>(args)...)}, inheritWrite{inheritWrite}
         {
-            auto handle = CreateNamedPipe(szPipeName.c_str(),
-                                          PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
-                                          PIPE_TYPE_MESSAGE | PIPE_READMODE_BYTE | PIPE_WAIT,
-                                          PIPE_UNLIMITED_INSTANCES,
-                                          0,
-                                          0,
-                                          0,
-                                          &readSA);
+            HANDLE handle = CreateNamedPipe(szPipeName.c_str(),
+                                            PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
+                                            PIPE_TYPE_MESSAGE | PIPE_READMODE_BYTE | PIPE_WAIT,
+                                            PIPE_UNLIMITED_INSTANCES,
+                                            0,
+                                            0,
+                                            0,
+                                            &readSA);
             // That's the exact value returned by the function call above if it fails.
             // NOLINTNEXTLINE(performance-no-int-to-ptr)
             if (handle != INVALID_HANDLE_VALUE) {
