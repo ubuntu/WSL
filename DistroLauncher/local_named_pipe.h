@@ -73,7 +73,7 @@ namespace Win32Utils
         // a child process, since the main usage of named pipes envolves inter process communication.
         template <typename... Args>
         explicit LocalNamedPipe(bool inheritRead, bool inheritWrite, Args&&... args) :
-            szPipeName{pipeNameFrom(std::forward<Args>(args)...)}, writeSA{sizeof(SECURITY_ATTRIBUTES), nullptr, true},
+            szPipeName{pipeNameFrom(std::forward<Args>(args)...)}, readSA{sizeof(SECURITY_ATTRIBUTES), nullptr, true},
             writeSA{sizeof(SECURITY_ATTRIBUTES), nullptr, true}, inheritWrite{inheritWrite}
         {
             HANDLE handle = CreateNamedPipe(szPipeName.c_str(),
