@@ -181,7 +181,7 @@ namespace Testing
         {
             command_log = {};
             interactive_command_log = {};
-            defaultUID_ = 1;
+            defaultUID_ = 0xabcdef;
             wslDistributionFlags_ = WSL_DISTRIBUTION_FLAGS{};
             MutexMockAPI::reset_back_end();
         }
@@ -205,5 +205,5 @@ inline HANDLE Testing::WslMockAPI::mock_process = static_cast<HANDLE>(&Testing::
 
 inline std::vector<Testing::WslMockAPI::Command> Testing::WslMockAPI::command_log{};
 inline std::vector<Testing::WslMockAPI::InteractiveCommand> Testing::WslMockAPI::interactive_command_log{};
-inline ULONG Testing::WslMockAPI::defaultUID_ = 1;
+inline ULONG Testing::WslMockAPI::defaultUID_ = 0xabcdef;
 inline WSL_DISTRIBUTION_FLAGS Testing::WslMockAPI::wslDistributionFlags_ = WSL_DISTRIBUTION_FLAGS{};
