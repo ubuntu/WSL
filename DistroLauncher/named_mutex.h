@@ -90,10 +90,12 @@ template <typename MutexAPI> class NamedMutexWrapper
     {
       public:
         constexpr Lock() noexcept : parent_(nullptr), response_(0)
-        { }
+        {
+        }
 
         Lock(NamedMutexWrapper& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
-        { }
+        {
+        }
 
         Lock(Lock& other) = delete;
         Lock(Lock&& other) noexcept : Lock()
@@ -136,7 +138,7 @@ template <typename MutexAPI> class NamedMutexWrapper
         template <typename Callable> Lock&& and_then(Callable&& f)
         {
             if (ok()) {
-                safe_execute(std::forward<Callable>(f), [&] () noexcept { release(); });
+                safe_execute(std::forward<Callable>(f), [&]() noexcept { release(); });
             }
             return std::move(*this);
         }
@@ -189,7 +191,8 @@ template <typename MutexAPI> class NamedMutexWrapper
     };
 };
 
-template <typename CallableExec, typename CallablePanic> void safe_execute(CallableExec&& f, [[maybe_unused]] CallablePanic&& panic)
+template <typename CallableExec, typename CallablePanic>
+void safe_execute(CallableExec&& f, [[maybe_unused]] CallablePanic&& panic)
 {
     if constexpr (std::is_nothrow_invocable_v<CallableExec, void>) {
         f();
