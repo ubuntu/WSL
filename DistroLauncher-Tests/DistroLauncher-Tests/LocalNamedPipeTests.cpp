@@ -79,7 +79,8 @@ namespace Win32Utils
                 return nullptr;
             }
             explicit FakePipe(bool inheritRead, bool inheritWrite, const wchar_t* name)
-            { }
+            {
+            }
         };
 
         auto failure = makeNamedPipe<FakePipe>(false, false, L"GoodPipe");
