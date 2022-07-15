@@ -74,7 +74,7 @@ namespace Win32Utils
         template <typename... Args>
         explicit LocalNamedPipe(bool inheritRead, bool inheritWrite, Args&&... args) :
             szPipeName{pipeNameFrom(std::forward<Args>(args)...)}, writeSA{sizeof(SECURITY_ATTRIBUTES), nullptr, true},
-            szPipeName{pipeNameFrom(std::forward<Args>(args)...)}, inheritWrite{inheritWrite}
+            writeSA{sizeof(SECURITY_ATTRIBUTES), nullptr, true}, inheritWrite{inheritWrite}
         {
             HANDLE handle = CreateNamedPipe(szPipeName.c_str(),
                                             PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
