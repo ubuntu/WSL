@@ -55,7 +55,7 @@
 #include "ApplicationStrategy.h"
 #include "Application.h"
 #include "Patches.h"
-#include "RootUser.h"
+#include "sudo.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"
