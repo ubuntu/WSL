@@ -246,7 +246,7 @@ namespace SudoInternals
         }
 
         static HRESULT Launch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                                 HANDLE stdErr, HANDLE* process) noexcept
+                              HANDLE stdErr, HANDLE* process) noexcept
         {
             return g_wslApi.WslLaunch(command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr, process);
         }

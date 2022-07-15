@@ -56,7 +56,8 @@ namespace Testing
         {
             // Removes all entries added (except for a selected set which is kept)
             std::array keep = {L"WSL_UbuntuDev.WslID.Dev_sudo-test-mutex"};
-            dummy_back_end.remove_if([&](auto mutex) { return std::find(keep.cbegin(), keep.cend(), mutex) == keep.cend(); });
+            dummy_back_end.remove_if(
+              [&](auto mutex) { return std::find(keep.cbegin(), keep.cend(), mutex) == keep.cend(); });
         }
 
         // Overriding back-end API
@@ -109,7 +110,8 @@ namespace Testing
     {
       public:
         NamedMutex(std::wstring name, bool lazy_init = false) : NamedMutexWrapper(name, lazy_init)
-        { }
+        {
+        }
 
         // Exposing internal state for testing
         HANDLE& get_mutex_handle()
@@ -161,12 +163,12 @@ namespace Testing
                 return S_OK;
             } catch (...) {
                 *exitCode = 1;
-                return -1;  // Failed: hr<0
+                return -1; // Failed: hr<0
             }
         }
 
         static HRESULT Launch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                                 HANDLE stdErr, HANDLE* process) noexcept
+                              HANDLE stdErr, HANDLE* process) noexcept
         {
             try {
                 *process = mock_process;
