@@ -205,9 +205,9 @@
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\patches\0001-init-log.diff">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
       <FileType>Document</FileType>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/patches</DestinationFolders>
+      <DestinationFolders>$(OutDir)/patches</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
