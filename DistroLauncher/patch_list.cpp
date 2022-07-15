@@ -1,4 +1,4 @@
-#include "patches.h"
+#include "stdafx.h"
 
 [[nodiscard]] std::vector<std::wstring> GetPatchList()
 {
