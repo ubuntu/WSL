@@ -177,7 +177,6 @@
     <ClCompile Include="named_mutex.cpp" />
     <ClCompile Include="OOBE.cpp" />
     <ClCompile Include="patches.cpp" />
-    <ClCompile Include="patch_list.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="ini_find_value.cpp" />
