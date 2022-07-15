@@ -80,7 +80,7 @@ TEST(SudoTests, WslInterface)
         ASSERT_EQ(Testing::WslMockAPI::command_log.back().stdErr, stdErr);
         ASSERT_EQ(process, Testing::WslMockAPI::mock_process);
     }
-    
+
     // Testing failure (fails because it's locked already)
     {
         Testing::WslMockAPI::reset_mock_distro();

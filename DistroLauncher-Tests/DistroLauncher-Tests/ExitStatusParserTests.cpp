@@ -10,7 +10,7 @@ namespace Oobe
         TEST(ExitStatusParserTests, GoodFileShouldPass)
         {
             std::string buffer{
-R"(# That's the shape of the file left by the OOBE (with some errors introduced just for testing).
+              R"(# That's the shape of the file left by the OOBE (with some errors introduced just for testing).
 key1=Value1
 action = reboot
   # Comment here

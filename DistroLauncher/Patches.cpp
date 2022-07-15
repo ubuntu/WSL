@@ -17,7 +17,6 @@
 
 #include "stdafx.h"
 
-
 std::wstring& trim(std::wstring& str)
 {
     constexpr std::wstring_view wspace = L"\n\t ";
@@ -28,11 +27,13 @@ std::wstring& trim(std::wstring& str)
 }
 
 PatchLog::PatchLog(std::wstring_view linuxpath) : linux_path(linuxpath), windows_path(Oobe::WindowsPath(linuxpath))
-{ }
+{
+}
 
 PatchLog::PatchLog(std::filesystem::path linuxpath) :
     linux_path(std::move(linuxpath)), windows_path(Oobe::WindowsPath(linux_path))
-{ }
+{
+}
 
 bool PatchLog::exists() const
 {
