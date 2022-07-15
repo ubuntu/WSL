@@ -151,6 +151,7 @@
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
+    <ClInclude Include="Patches.h" />
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="splash_controller.h" />
@@ -175,6 +176,7 @@
     <ClCompile Include="local_named_pipe.cpp" />
     <ClCompile Include="named_mutex.cpp" />
     <ClCompile Include="OOBE.cpp" />
+    <ClCompile Include="Patches.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="ini_find_value.cpp" />
@@ -200,6 +202,13 @@
       <Message>Compiling Messages...</Message>
       <Outputs>%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\patches\0001-init-log.diff">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/patches</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
