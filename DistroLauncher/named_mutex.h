@@ -129,18 +129,18 @@ template <typename MutexAPI> class NamedMutexWrapper
             return parent_ ? 0 : response_;
         }
 
-        template <typename Callable> Lock& and_then(Callable&& f)
+        template <typename Callable> Lock& and_then(Callable&& func)
         {
             if (ok()) {
-                safe_execute(std::forward<Callable>(f), [&]() noexcept { release(); });
+                safe_execute(std::forward<Callable>(func), [&]() noexcept { release(); });
             }
             return std::move(*this);
         }
 
-        template <typename Callable> Lock& or_else(Callable&& f)
+        template <typename Callable> Lock& or_else(Callable&& func)
         {
             if (!ok()) {
-                f();
+                func();
             }
             return std::move(*this);
         }
@@ -196,15 +196,15 @@ template <typename MutexAPI> class NamedMutexWrapper
 };
 
 template <typename CallableExec, typename CallablePanic>
-void safe_execute(CallableExec&& f, [[maybe_unused]] CallablePanic&& on_error)
+void safe_execute(CallableExec&& func, [[maybe_unused]] CallablePanic&& on_error)
 {
-    if constexpr (noexcept(f())) {
-        f();
+    if constexpr (noexcept(func())) {
+        func();
         return;
     }
 
     try {
-        f();
+        func();
     } catch (...) {
         on_error();
         throw;
