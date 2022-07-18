@@ -129,7 +129,7 @@ template <typename MutexAPI> class NamedMutexWrapper
             return parent_ ? 0 : response_;
         }
 
-        template <typename Callable> Lock&& and_then(Callable&& f)
+        template <typename Callable> Lock& and_then(Callable&& f)
         {
             if (ok()) {
                 safe_execute(std::forward<Callable>(f), [&]() noexcept { release(); });
@@ -137,7 +137,7 @@ template <typename MutexAPI> class NamedMutexWrapper
             return std::move(*this);
         }
 
-        template <typename Callable> Lock&& or_else(Callable&& f)
+        template <typename Callable> Lock& or_else(Callable&& f)
         {
             if (!ok()) {
                 f();
