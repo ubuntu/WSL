@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "stdafx.h"
-
 /*
  *  Abstract
  *  --------
@@ -158,31 +156,31 @@ namespace SudoInternals
         }
 
         // Monadic interface
-        template <typename Callable> SudoInterface&& and_then(Callable&& f)
+        template <typename Callable> SudoInterface& and_then(Callable&& func)
         {
             if (ok()) {
-                safe_execute(std::forward<Callable>(f), [&]() noexcept { reset_user(); });
+                safe_execute(std::forward<Callable>(func), [&]() noexcept { reset_user(); });
             }
-            return std::move(*this);
+            return *this;
         }
 
-        template <typename Callable> SudoInterface&& or_else(Callable&& f)
+        template <typename Callable> SudoInterface& or_else(Callable&& func)
         {
             // Choosing overload
             constexpr bool f_status = std::is_invocable_v<Callable, Status>;
             constexpr bool f_void = !f_status && std::is_invocable_v<Callable>;
 
-            static_assert(f_void || f_status, "Callable must be ether 'T function()' or 'T function(Sudo::Status)'");
+            static_assert(f_void || f_status, "func must be ether 'func()' or 'func(Sudo::Status)'");
 
             if (!ok()) {
                 if constexpr (f_void) {
-                    f();
+                    func();
                 }
                 if constexpr (f_status) {
-                    f(why());
+                    func(why());
                 }
             }
-            return std::move(*this);
+            return *this;
         }
 
         // wsl API interface

@@ -30,7 +30,7 @@ DWORD Win32MutexApi::create(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
 
 DWORD Win32MutexApi::destroy(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
 {
-    if (static_cast<bool>(mutex_handle)) {
+    if (mutex_handle != nullptr) {
         return CloseHandle(mutex_handle);
         mutex_handle = nullptr;
     }

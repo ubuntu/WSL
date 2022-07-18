@@ -14,9 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#pragma once
 
-#include "stdafx.h"
+#pragma once
 
 /*
  *  Abstract
@@ -73,8 +72,8 @@ template <typename MutexAPI> class NamedMutexWrapper
     NamedMutexWrapper(NamedMutexWrapper&&) = delete;
 
     /// Some mutexes are almost never used. This makes for an easy optimization by not initializing them unless needed.
-    NamedMutexWrapper(std::wstring name, bool lazy_init = false) :
-        mutex_handle(nullptr), mutex_name(L"WSL_" + DistributionInfo::Name + L"_" + name)
+    NamedMutexWrapper(std::wstring_view name, bool lazy_init = false) :
+        mutex_handle{nullptr}, mutex_name{mangle_name(name)}
     {
         if (!lazy_init) {
             create();
@@ -90,12 +89,7 @@ template <typename MutexAPI> class NamedMutexWrapper
     {
       public:
         constexpr Lock() noexcept : parent_(nullptr), response_(0)
-        {
-        }
-
-        Lock(NamedMutexWrapper& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
-        {
-        }
+        { }
 
         Lock(Lock& other) = delete;
         Lock(Lock&& other) noexcept : Lock()
@@ -135,23 +129,26 @@ template <typename MutexAPI> class NamedMutexWrapper
             return parent_ ? 0 : response_;
         }
 
-        template <typename Callable> Lock&& and_then(Callable&& f)
+        template <typename Callable> Lock& and_then(Callable&& func)
         {
             if (ok()) {
-                safe_execute(std::forward<Callable>(f), [&]() noexcept { release(); });
+                safe_execute(std::forward<Callable>(func), [&]() noexcept { release(); });
             }
-            return std::move(*this);
+            return *this;
         }
 
-        template <typename Callable> Lock&& or_else(Callable&& f)
+        template <typename Callable> Lock& or_else(Callable&& func)
         {
             if (!ok()) {
-                f();
+                func();
             }
-            return std::move(*this);
+            return *this;
         }
 
       private:
+        explicit Lock(NamedMutexWrapper& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
+        { }
+
         NamedMutexWrapper* parent_;
         DWORD response_;
 
@@ -161,6 +158,13 @@ template <typename MutexAPI> class NamedMutexWrapper
     Lock lock() noexcept
     {
         return Lock(*this);
+    }
+
+    // Adds a prefix to the name to avoid name collisions with other processes
+    static std::wstring mangle_name(std::wstring_view lock_name)
+    {
+        std::wstring prefix{L"WSL_" + DistributionInfo::Name + L"_"};
+        return prefix += lock_name;
     }
 
   protected:
@@ -192,17 +196,17 @@ template <typename MutexAPI> class NamedMutexWrapper
 };
 
 template <typename CallableExec, typename CallablePanic>
-void safe_execute(CallableExec&& f, [[maybe_unused]] CallablePanic&& panic)
+void safe_execute(CallableExec&& func, [[maybe_unused]] CallablePanic&& on_error)
 {
-    if constexpr (std::is_nothrow_invocable_v<CallableExec, void>) {
-        f();
+    if constexpr (noexcept(func())) {
+        func();
         return;
     }
 
     try {
-        f();
+        func();
     } catch (...) {
-        panic();
+        on_error();
         throw;
     }
 }
