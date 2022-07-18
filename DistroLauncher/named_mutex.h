@@ -91,9 +91,6 @@ template <typename MutexAPI> class NamedMutexWrapper
         constexpr Lock() noexcept : parent_(nullptr), response_(0)
         { }
 
-        Lock(NamedMutexWrapper& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
-        { }
-
         Lock(Lock& other) = delete;
         Lock(Lock&& other) noexcept : Lock()
         {
@@ -149,6 +146,9 @@ template <typename MutexAPI> class NamedMutexWrapper
         }
 
       private:
+        explicit Lock(NamedMutexWrapper& parent) noexcept : parent_(&parent), response_(parent.wait_and_acquire())
+        { }
+
         NamedMutexWrapper* parent_;
         DWORD response_;
 
