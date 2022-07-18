@@ -108,7 +108,7 @@ namespace SudoInternals
 
         SudoInterface() noexcept
         {
-            auto lock = sudo_mutex.lock();
+            auto lock = GetMutex().lock();
             if (!lock.ok()) {
                 status = Status::FAILED_MUTEX;
                 return;
@@ -207,8 +207,13 @@ namespace SudoInternals
             return hr;
         }
 
+        static MutexType& GetMutex()
+        {
+            static MutexType sudo_mutex(L"root-user", true);
+            return sudo_mutex;
+        }
+
       private:
-        static MutexType sudo_mutex;
         typename MutexType::Lock mutex_lock{};
 
         Status status = Status::INACTIVE;
@@ -253,4 +258,3 @@ namespace SudoInternals
 }
 
 using Sudo = SudoInternals::SudoInterface<NamedMutex, SudoInternals::WslWindowsAPI>;
-inline NamedMutex Sudo::sudo_mutex(L"root-user", true);

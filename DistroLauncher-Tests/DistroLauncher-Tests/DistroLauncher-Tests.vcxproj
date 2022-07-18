@@ -89,6 +89,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="ExitStatusParserTests.cpp" />
     <ClCompile Include="LocalNamedPipeTests.cpp" />
     <ClCompile Include="IniFindValueTests.cpp" />
+    <ClCompile Include="mock_api.cpp" />
     <ClCompile Include="named_mutex_tests.cpp" />
     <ClCompile Include="SplashControllerTests.cpp" />
     <ClCompile Include="StateMachineTests.cpp" />

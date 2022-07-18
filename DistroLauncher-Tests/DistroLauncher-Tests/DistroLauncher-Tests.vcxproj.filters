@@ -85,6 +85,9 @@
     <ClCompile Include="..\..\DistroLauncher\named_mutex.cpp">
       <Filter>DistroSources</Filter>
     </ClCompile>
+    <ClCompile Include="mock_api.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />

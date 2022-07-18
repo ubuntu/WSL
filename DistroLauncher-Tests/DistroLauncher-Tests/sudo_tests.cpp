@@ -17,7 +17,7 @@
 
 #include "stdafx.h"
 #include "gtest/gtest.h"
-#include "dummy_apis.h"
+#include "mock_api.h"
 
 TEST(SudoTests, MonadicInterface)
 {
