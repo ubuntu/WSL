@@ -161,7 +161,7 @@ namespace Oobe::internal
             ExpectedState maybe = std::visit(
               overloaded{
                 [&](auto& st) -> std::enable_if_t<std::is_convertible_v<decltype(st.on_event(event)), ExpectedState>,
-                                                 ExpectedState> { return st.on_event(event); },
+                                                  ExpectedState> { return st.on_event(event); },
                 [&](auto&&...) -> ExpectedState {
                     return nonstd::make_unexpected(InvalidTransition{state_, event});
                 },
