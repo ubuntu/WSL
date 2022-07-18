@@ -134,7 +134,7 @@ template <typename MutexAPI> class NamedMutexWrapper
             if (ok()) {
                 safe_execute(std::forward<Callable>(func), [&]() noexcept { release(); });
             }
-            return std::move(*this);
+            return *this;
         }
 
         template <typename Callable> Lock& or_else(Callable&& func)
@@ -142,7 +142,7 @@ template <typename MutexAPI> class NamedMutexWrapper
             if (!ok()) {
                 func();
             }
-            return std::move(*this);
+            return *this;
         }
 
       private:
