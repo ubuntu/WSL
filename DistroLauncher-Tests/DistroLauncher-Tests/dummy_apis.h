@@ -14,9 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#pragma once
 
-#include "stdafx.h"
+#pragma once
 
 /*
  * This file contains a few of dummy API used for testing
@@ -110,8 +109,7 @@ namespace Testing
     {
       public:
         NamedMutex(std::wstring name, bool lazy_init = false) : NamedMutexWrapper(name, lazy_init)
-        {
-        }
+        { }
 
         // Exposing internal state for testing
         HANDLE& get_mutex_handle()
