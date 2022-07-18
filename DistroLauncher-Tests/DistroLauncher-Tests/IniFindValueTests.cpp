@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
 
-#include "ini_find_value.cpp"
-
 // The assertions below derive from real life experiments in WSL.
 namespace Oobe
 {

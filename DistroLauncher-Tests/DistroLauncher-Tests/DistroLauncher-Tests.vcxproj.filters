@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\DistroLauncher\ApplicationStrategy.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\DistributionInfo.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\exit_status_parser.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\ExitStatus.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\extended_cli_parser.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\find_main_thread_window.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\Helpers.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\ini_find_value.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\local_named_pipe.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\ProcessRunner.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\OOBE.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\stdafx.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\Win32Utils.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\WindowsUserInfo.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\WslApiLoader.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\WSLInfo.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleServiceTests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="ExitStatusParserTests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtendedCliParserTests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="IniFindValueTests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="InstallerControllerTests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalNamedPipeTests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="SplashControllerTests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="StateMachineTests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InstallerControllerTestPolicies.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="TestSources">
+      <UniqueIdentifier>{f981c0b6-1b19-4d9b-aa3c-cd3684d8af88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DistroSources">
+      <UniqueIdentifier>{c6954f59-9f21-4dd8-a33d-693e8797d882}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

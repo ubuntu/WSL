@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
 #include "local_named_pipe.h"
-#include "local_named_pipe.cpp"
 
 namespace Win32Utils
 {
@@ -80,7 +79,8 @@ namespace Win32Utils
                 return nullptr;
             }
             explicit FakePipe(bool inheritRead, bool inheritWrite, const wchar_t* name)
-            { }
+            {
+            }
         };
 
         auto failure = makeNamedPipe<FakePipe>(false, false, L"GoodPipe");

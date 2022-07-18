@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
-#include "exit_status_parser.cpp"
 
 namespace Oobe
 {
@@ -11,7 +10,7 @@ namespace Oobe
         TEST(ExitStatusParserTests, GoodFileShouldPass)
         {
             std::string buffer{
-R"(# That's the shape of the file left by the OOBE (with some errors introduced just for testing).
+              R"(# That's the shape of the file left by the OOBE (with some errors introduced just for testing).
 key1=Value1
 action = reboot
   # Comment here
