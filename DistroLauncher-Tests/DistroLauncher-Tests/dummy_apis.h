@@ -109,8 +109,7 @@ namespace Testing
     {
       public:
         NamedMutex(std::wstring name, bool lazy_init = false) : NamedMutexWrapper(name, lazy_init)
-        {
-        }
+        { }
 
         // Exposing internal state for testing
         HANDLE& get_mutex_handle()
