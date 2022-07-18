@@ -72,7 +72,7 @@ template <typename MutexAPI> class NamedMutexWrapper
     NamedMutexWrapper(NamedMutexWrapper&&) = delete;
 
     /// Some mutexes are almost never used. This makes for an easy optimization by not initializing them unless needed.
-    NamedMutexWrapper(std::wstring name, bool lazy_init = false) :
+    NamedMutexWrapper(std::wstring_view name, bool lazy_init = false) :
         mutex_handle(nullptr), mutex_name(L"WSL_" + DistributionInfo::Name + L"_" + name)
     {
         if (!lazy_init) {
