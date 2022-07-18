@@ -29,13 +29,13 @@ namespace Oobe
             ExitStatusHandling();
         }
 
-        static bool copy_file_into_distro(const std::filesystem::path& from, const std::wstring& to)
+        static bool copy_file_into_distro(const std::filesystem::path& source, const std::wstring& destination)
         {
             std::wstring wslPrefixedDest = WslPathPrefix() + DistributionInfo::Name;
-            wslPrefixedDest.append(to);
+            wslPrefixedDest.append(destination);
             std::filesystem::path realDest{wslPrefixedDest};
-            std::error_code ec;
-            return std::filesystem::copy_file(from, realDest, ec);
+            std::error_code errorCode;
+            return std::filesystem::copy_file(source, realDest, errorCode);
         }
 
         /// Attempts to find and hide the installer GUI window.
@@ -95,8 +95,8 @@ namespace Oobe
             DWORD sslxExitCode;
             HRESULT sslxHr;
 
-            auto delaysGenerator = [cur = initialDelay, q = delayRatio]() mutable {
-                cur *= q;
+            auto delaysGenerator = [cur = initialDelay, ratio = delayRatio]() mutable {
+                cur *= ratio;
                 return cur;
             };
 

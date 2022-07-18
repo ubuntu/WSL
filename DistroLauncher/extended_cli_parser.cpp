@@ -117,10 +117,10 @@ namespace Oobe::internal
         Opts options{parse(arguments)};
 
         // Erasing the extended command line options to avoid confusion in the upstream code.
-        auto it = std::remove_if(arguments.begin(), arguments.end(), [](auto arg) {
+        auto new_end = std::remove_if(arguments.begin(), arguments.end(), [](auto arg) {
             return std::find(allExtendedArgs.begin(), allExtendedArgs.end(), arg) != allExtendedArgs.end();
         });
-        arguments.erase(it, arguments.end());
+        arguments.erase(new_end, arguments.end());
 
 #ifdef UNSUPPORTED_EXTENDED_CLI
         if (shouldWarnUnsupported(options)) {

@@ -28,14 +28,14 @@ namespace Oobe::internal
                                                 ARG_EXT_INSTALLER_TUI, ARG_EXT_UAP10_PARAMETERS};
     // compile-time array concatenation.
     template <typename T, std::size_t SizeA, std::size_t SizeB>
-    constexpr std::array<T, SizeA + SizeB> join(const std::array<T, SizeA>& a, const std::array<T, SizeB>& b)
+    constexpr std::array<T, SizeA + SizeB> join(const std::array<T, SizeA>& left, const std::array<T, SizeB>& right)
     {
         std::array<T, SizeA + SizeB> result;
         for (int i = 0; i < SizeA; ++i) {
-            result[i] = a[i];
+            result[i] = left[i];
         }
         for (int i = 0; i < SizeB; ++i) {
-            result[i + SizeA] = b[i];
+            result[i + SizeA] = right[i];
         }
         return result;
     }

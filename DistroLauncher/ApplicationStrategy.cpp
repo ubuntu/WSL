@@ -41,14 +41,15 @@ namespace Oobe
                 // States::UpstreamDefaultInstall on failure;
                 // States::Closed -> States::Success (for text mode) or
                 // States::Closed -> States::PreparedGui -> States::Ready -> States::Success (for GUI)
-                hr = std::visit(internal::overloaded{
-                                  [&](InstallerController<>::States::Success& s) { return S_OK; },
-                                  [&](InstallerController<>::States::PreparedGui& s) { return S_CONTINUE; },
-                                  [&](InstallerController<>::States::Ready& s) { return S_CONTINUE; },
-                                  [&](InstallerController<>::States::UpstreamDefaultInstall& s) { return s.hr; },
-                                  [&](auto&&... s) { return E_UNEXPECTED; },
-                                },
-                                ok.value());
+                hr =
+                  std::visit(internal::overloaded{
+                               [&](InstallerController<>::States::Success&) { return S_OK; },
+                               [&](InstallerController<>::States::PreparedGui&) { return S_CONTINUE; },
+                               [&](InstallerController<>::States::Ready&) { return S_CONTINUE; },
+                               [&](InstallerController<>::States::UpstreamDefaultInstall& state) { return state.hr; },
+                               [&](auto&&...) { return E_UNEXPECTED; },
+                             },
+                             ok.value());
             }
             return hr;
         }
@@ -178,14 +179,14 @@ namespace Oobe
         }
     }
 
-    HRESULT SplashEnabledStrategy::do_install(Mode ui)
+    HRESULT SplashEnabledStrategy::do_install(Mode ui_mode)
     {
-        std::array<InstallerController<>::Event, 3> eventSequence{InstallerController<>::Events::InteractiveInstall{ui},
-                                                                  InstallerController<>::Events::StartInstaller{},
-                                                                  InstallerController<>::Events::BlockOnInstaller{}};
+        std::array<InstallerController<>::Event, 3> eventSequence{
+          InstallerController<>::Events::InteractiveInstall{ui_mode}, InstallerController<>::Events::StartInstaller{},
+          InstallerController<>::Events::BlockOnInstaller{}};
         HRESULT hr = E_NOTIMPL;
-        for (auto& ev : eventSequence) {
-            auto ok = installer.sm.addEvent(ev);
+        for (auto& event : eventSequence) {
+            auto ok = installer.sm.addEvent(event);
 
             // unexpected transition occurred here?
             if (!ok.has_value()) {
@@ -194,17 +195,17 @@ namespace Oobe
             }
 
             std::visit(internal::overloaded{
-                         [&](InstallerController<>::States::PreparedTui& s) { do_show_console(); },
-                         [&](InstallerController<>::States::Ready& s) { do_toggle_splash(); },
-                         [&](InstallerController<>::States::Success& s) {
+                         [&](InstallerController<>::States::PreparedTui&) { do_show_console(); },
+                         [&](InstallerController<>::States::Ready&) { do_toggle_splash(); },
+                         [&](InstallerController<>::States::Success&) {
                              do_close_splash();
                              hr = S_OK;
                          },
-                         [&](InstallerController<>::States::UpstreamDefaultInstall& s) {
+                         [&](InstallerController<>::States::UpstreamDefaultInstall& state) {
                              do_show_console();
-                             hr = s.hr;
+                             hr = state.hr;
                          },
-                         [&](auto&&... s) { hr = E_UNEXPECTED; },
+                         [&](auto&&...) { hr = E_UNEXPECTED; },
                        },
                        ok.value());
         }

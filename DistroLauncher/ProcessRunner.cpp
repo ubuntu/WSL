@@ -17,14 +17,16 @@
 
 #include "stdafx.h"
 
-namespace Helpers {
+namespace Helpers
+{
 
-    ProcessRunner::ProcessRunner(std::wstring_view commandLine) {
+    ProcessRunner::ProcessRunner(std::wstring_view commandLine)
+    {
         ZeroMemory(&_piProcInfo, sizeof(PROCESS_INFORMATION));
         ZeroMemory(&_siStartInfo, sizeof(STARTUPINFO));
         _sa.nLength = sizeof(SECURITY_ATTRIBUTES);
         _sa.bInheritHandle = TRUE;
-        _sa.lpSecurityDescriptor = NULL;
+        _sa.lpSecurityDescriptor = nullptr;
         cmd = commandLine;
         defunct = false;
         alreadyRun = false;
@@ -42,10 +44,10 @@ namespace Helpers {
             _siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
             _siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
         }
-
     }
 
-    bool ProcessRunner::isDefunct() const {
+    bool ProcessRunner::isDefunct() const
+    {
         return defunct;
     }
 
@@ -55,35 +57,39 @@ namespace Helpers {
         exit_code = ERROR_PROCESS_ABORTED;
     }
 
-    std::wstring_view ProcessRunner::getStdErr() const {
+    std::wstring_view ProcessRunner::getStdErr() const
+    {
         return stdErr;
     }
 
-    std::wstring_view ProcessRunner::getStdOut() const {
+    std::wstring_view ProcessRunner::getStdOut() const
+    {
         return stdOut;
     }
 
-    DWORD ProcessRunner::getExitCode() const {
+    DWORD ProcessRunner::getExitCode() const
+    {
         return exit_code;
     }
 
-    DWORD ProcessRunner::run() {
+    DWORD ProcessRunner::run()
+    {
         if (alreadyRun || defunct) {
             return exit_code;
         }
 
         TCHAR szCmdline[80];
         wcsncpy_s(szCmdline, cmd.data(), cmd.length());
-        exit_code = CreateProcess(NULL,     // command line 
-            szCmdline,                      // non-const CLI
-            NULL,                           // process security attributes 
-            NULL,                           // primary thread security attributes 
-            TRUE,                           // handles are inherited 
-            0,                              // creation flags 
-            NULL,                           // use parent's environment 
-            NULL,                           // use parent's current directory 
-            &_siStartInfo,                  // STARTUPINFO pointer 
-            &_piProcInfo);                  // output: PROCESS_INFORMATION 
+        exit_code = CreateProcess(nullptr,       // command line
+                                  szCmdline,     // non-const CLI
+                                  nullptr,       // process security attributes
+                                  nullptr,       // primary thread security attributes
+                                  TRUE,          // handles are inherited
+                                  0,             // creation flags
+                                  nullptr,       // use parent's environment
+                                  nullptr,       // use parent's current directory
+                                  &_siStartInfo, // STARTUPINFO pointer
+                                  &_piProcInfo); // output: PROCESS_INFORMATION
         CloseHandle(g_hChildStd_ERR_Wr);
         CloseHandle(g_hChildStd_OUT_Wr);
         if (exit_code == 0) {
@@ -98,7 +104,8 @@ namespace Helpers {
         return exit_code;
     }
 
-    ProcessRunner::~ProcessRunner() {
+    ProcessRunner::~ProcessRunner()
+    {
         if (!defunct) {
             CloseHandle(g_hChildStd_OUT_Rd);
             CloseHandle(g_hChildStd_ERR_Rd);
@@ -107,14 +114,15 @@ namespace Helpers {
         }
     }
 
-    void ProcessRunner::read_pipes() {
+    void ProcessRunner::read_pipes()
+    {
         DWORD dwRead;
         const size_t BUFSIZE = 80;
         TCHAR chBuf[BUFSIZE];
         BOOL bSuccess = FALSE;
         for (;;) {
-            bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
-            if (!bSuccess || dwRead == 0) {
+            bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, nullptr);
+            if (bSuccess == FALSE || dwRead == 0) {
                 break;
             }
 
@@ -123,7 +131,7 @@ namespace Helpers {
 
         dwRead = 0;
         for (;;) {
-            bSuccess = ReadFile(g_hChildStd_ERR_Rd, chBuf, BUFSIZE, &dwRead, NULL);
+            bSuccess = ReadFile(g_hChildStd_ERR_Rd, chBuf, BUFSIZE, &dwRead, nullptr);
             if (!bSuccess || dwRead == 0) {
                 break;
             }
