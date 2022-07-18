@@ -196,9 +196,9 @@ template <typename MutexAPI> class NamedMutexWrapper
 };
 
 template <typename CallableExec, typename CallablePanic>
-void safe_execute(CallableExec&& f, [[maybe_unused]] CallablePanic&& panic)
+void safe_execute(CallableExec&& f, [[maybe_unused]] CallablePanic&& on_error)
 {
-    if constexpr (std::is_nothrow_invocable_v<CallableExec, void>) {
+    if constexpr (noexcept(f())) {
         f();
         return;
     }
@@ -206,7 +206,7 @@ void safe_execute(CallableExec&& f, [[maybe_unused]] CallablePanic&& panic)
     try {
         f();
     } catch (...) {
-        panic();
+        on_error();
         throw;
     }
 }

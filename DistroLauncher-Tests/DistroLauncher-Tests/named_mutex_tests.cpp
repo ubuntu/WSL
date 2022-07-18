@@ -242,3 +242,42 @@ TEST(NamedMutexTests, Exceptions)
         ASSERT_TRUE(previous_mutex_released.value());
     }
 }
+
+TEST(NamedMutexTests, SafeExecute)
+{
+    bool on_error_called = false;
+    try {
+        safe_execute([] { throw 1; }, [&] { on_error_called = true; });
+    } catch (std::runtime_error&) {
+        FAIL();
+    } catch (int& err) {
+        ASSERT_EQ(err, 1);
+    } catch (...) {
+        FAIL();
+    }
+    ASSERT_TRUE(on_error_called);
+
+    on_error_called = false;
+    try {
+        safe_execute([](){}, [&] { on_error_called = true; });
+    } catch (std::runtime_error&) {
+        FAIL();
+    } catch (int&) {
+        FAIL();
+    } catch (...) {
+        FAIL();
+    }
+    ASSERT_FALSE(on_error_called);
+
+    on_error_called = false;
+    try {
+        safe_execute([]() noexcept {}, [&] { on_error_called = true; });
+    } catch (std::runtime_error&) {
+        FAIL();
+    } catch (int&) {
+        FAIL();
+    } catch (...) {
+        FAIL();
+    }
+    ASSERT_FALSE(on_error_called);
+}
