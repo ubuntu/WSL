@@ -101,7 +101,8 @@ namespace Win32Utils
             writeSA{std::exchange(other.writeSA, {sizeof(SECURITY_ATTRIBUTES), nullptr, TRUE})}, // zeroing everything.
             hRead{std::exchange(other.hRead, nullptr)}, hWrite{std::exchange(other.hWrite, nullptr)},
             writeFd{std::exchange(other.writeFd, -1)}, inheritWrite{std::exchange(other.inheritWrite, false)}
-        { }
+        {
+        }
 
         HANDLE readHandle() const
         {

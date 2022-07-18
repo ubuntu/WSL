@@ -26,10 +26,12 @@ namespace Oobe::internal
      * is_variant_v metafunction holds true if the type argument is a concrete instantiation of std::variant.
      */
     template <typename T> struct is_variant : std::false_type
-    { };
+    {
+    };
 
     template <typename... Args> struct is_variant<std::variant<Args...>> : std::true_type
-    { };
+    {
+    };
 
     template <typename T> inline constexpr bool is_variant_v = is_variant<T>::value;
 
@@ -37,11 +39,13 @@ namespace Oobe::internal
      * is_variant_of_v holds true if the type argument T is one of the alternative types of the variant V.
      */
     template <typename T, typename U> struct is_variant_of : std::false_type
-    { };
+    {
+    };
 
     template <typename T, typename... Ts>
     struct is_variant_of<T, std::variant<Ts...>> : public std::disjunction<std::is_same<T, Ts>...>
-    { };
+    {
+    };
 
     template <typename T, typename V> inline constexpr bool is_variant_of_v = is_variant_of<T, V>::value;
 
