@@ -124,7 +124,7 @@ TEST(NamedMutexTests, CreateAndDestroy)
 
         {
             TestNamedMutex mutex_2(L"test-lifetime");
-            it = std::find(dbe.cbegin(), dbe.cend(),TestNamedMutex::mangle_name(L"test-lifetime"));
+            it = std::find(dbe.cbegin(), dbe.cend(), TestNamedMutex::mangle_name(L"test-lifetime"));
             ASSERT_NE(it, dbe.cend());  // Name still in -> destroy not called
             ASSERT_EQ(it->refcount, 2); // create called twice
             ASSERT_FALSE(it->locked);   // Still not locked -> wait_and_acquire not called
@@ -259,7 +259,7 @@ TEST(NamedMutexTests, SafeExecute)
 
     on_error_called = false;
     try {
-        safe_execute([](){}, [&] { on_error_called = true; });
+        safe_execute([]() {}, [&] { on_error_called = true; });
     } catch (std::runtime_error&) {
         FAIL();
     } catch (int&) {
