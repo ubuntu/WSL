@@ -131,7 +131,7 @@ TEST(NamedMutexTests, CreateAndDestroy)
         }
 
         it = std::find(dbe.cbegin(), dbe.cend(), TestNamedMutex::mangle_name(L"test-lifetime"));
-        ASSERT_NE(it, dbe.cend());  // Name not in database -> destroy called once
+        ASSERT_NE(it, dbe.cend());  // Name still in database -> destroy called once
         ASSERT_EQ(it->refcount, 1); // destroy called once
     }
 
