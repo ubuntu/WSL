@@ -14,9 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#pragma once
 
-#include "stdafx.h"
+#pragma once
 
 /*
  * This file contains a few of dummy API used for testing
