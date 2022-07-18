@@ -40,12 +40,12 @@ TEST(NamedMutexTests, CreateAndDestroy)
             ASSERT_FALSE(it->locked);   // Still not locked -> wait_and_acquire not called
         }
 
-        it = std::find(dbe.cbegin(), dbe.cend(), TestNamedMutex::mangle_name(L"test-lifetime"));
+        it = std::find(dbe.cbegin(), dbe.cend(), Testing::NamedMutex::mangle_name(L"test-lifetime"));
         ASSERT_NE(it, dbe.cend());  // Name not in database -> destroy called once
         ASSERT_EQ(it->refcount, 1); // destroy called once
     }
 
-    it = std::find(dbe.cbegin(), dbe.cend(), TestNamedMutex::mangle_name(L"test-lifetime"));
+    it = std::find(dbe.cbegin(), dbe.cend(), Testing::NamedMutex::mangle_name(L"test-lifetime"));
     ASSERT_EQ(it, dbe.cend()); // Name not in database -> destroy called twice
 }
 
@@ -93,7 +93,7 @@ TEST(NamedMutexTests, MonadicInterface)
     // Testing success
     bool and_then = false;
     bool or_else = false;
-    Testing::NamedMutex::Lock scope_lock;
+    Testing::NamedMutex::Lock scope_lock = mutex.lock();
     scope_lock.and_then([&] { and_then = true; }).or_else([&] { or_else = true; });
     ASSERT_TRUE(and_then);
     ASSERT_FALSE(or_else);
