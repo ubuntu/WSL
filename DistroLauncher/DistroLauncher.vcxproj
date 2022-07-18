@@ -146,6 +146,7 @@
     <ClInclude Include="extended_messages.h" />
     <ClInclude Include="installer_controller.h" />
     <ClInclude Include="installer_policy.h" />
+    <ClInclude Include="named_mutex.h" />
     <ClInclude Include="not_null.h" />
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="DistroLauncher.cpp" />
     <ClCompile Include="local_named_pipe.cpp" />
+    <ClCompile Include="named_mutex.cpp" />
     <ClCompile Include="OOBE.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="find_main_thread_window.cpp" />
