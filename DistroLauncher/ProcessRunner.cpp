@@ -122,7 +122,7 @@ namespace Helpers
         BOOL bSuccess = FALSE;
         for (;;) {
             bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, nullptr);
-            if (!bSuccess || dwRead == 0) {
+            if (bSuccess==FALSE || dwRead == 0) {
                 break;
             }
 

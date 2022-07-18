@@ -162,7 +162,7 @@ namespace Oobe::internal
               overloaded{
                 [&](auto& s) -> std::enable_if_t<std::is_convertible_v<decltype(s.on_event(event)), ExpectedState>,
                                                  ExpectedState> { return s.on_event(event); },
-                [&](auto&&... arg) -> ExpectedState {
+                [&](auto&&...) -> ExpectedState {
                     return nonstd::make_unexpected(InvalidTransition{state_, event});
                 },
               },
