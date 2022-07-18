@@ -26,14 +26,18 @@ TEST(SudoTests, MonadicInterface)
         // Testing success
         bool and_then = false;
         bool or_else = false;
-        Testing::Sudo scope_lock = Testing::Sudo().and_then([&] { and_then = true; }).or_else([&] { or_else = true; });
+        Testing::Sudo().and_then([&] { and_then = true; }).or_else([&] { or_else = true; });
         ASSERT_TRUE(and_then);
         ASSERT_FALSE(or_else);
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0);
+        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef); // User restored
+    }
+    {
+        Testing::Sudo scope_lock;
+        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0); // User changed to root
 
         // Testing failure (fails because it's locked already)
-        and_then = false;
-        or_else = false;
+        bool and_then = false;
+        bool or_else = false;
 
         auto status = Testing::Sudo::Status ::OK;
         Testing::Sudo().and_then([&] { and_then = true; }).or_else([&] { or_else = true; }).or_else([&](auto why) {

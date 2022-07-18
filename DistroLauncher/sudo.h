@@ -156,15 +156,15 @@ namespace SudoInternals
         }
 
         // Monadic interface
-        template <typename Callable> SudoInterface&& and_then(Callable&& f)
+        template <typename Callable> SudoInterface& and_then(Callable&& f)
         {
             if (ok()) {
                 safe_execute(std::forward<Callable>(f), [&]() noexcept { reset_user(); });
             }
-            return std::move(*this);
+            return *this;
         }
 
-        template <typename Callable> SudoInterface&& or_else(Callable&& f)
+        template <typename Callable> SudoInterface& or_else(Callable&& f)
         {
             // Choosing overload
             constexpr bool f_status = std::is_invocable_v<Callable, Status>;
@@ -180,7 +180,7 @@ namespace SudoInternals
                     f(why());
                 }
             }
-            return std::move(*this);
+            return *this;
         }
 
         // wsl API interface
