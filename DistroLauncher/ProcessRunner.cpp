@@ -17,8 +17,7 @@
 
 #include "stdafx.h"
 
-namespace Helpers
-{
+namespace Helpers {
 
     ProcessRunner::ProcessRunner(std::wstring_view commandLine)
     {

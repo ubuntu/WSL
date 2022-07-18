@@ -22,10 +22,8 @@
 // Once created it cannot be reassigned, nor reused,
 // except for holding exit code and std out and err streams content
 // of the launched process.
-namespace Helpers
-{
-    class ProcessRunner
-    {
+namespace Helpers {
+    class ProcessRunner {
       private:
         // Exposed thru getters.
         std::wstring cmd;
