@@ -73,7 +73,7 @@ template <typename MutexAPI> class NamedMutexWrapper
 
     /// Some mutexes are almost never used. This makes for an easy optimization by not initializing them unless needed.
     NamedMutexWrapper(std::wstring_view name, bool lazy_init = false) :
-        mutex_handle(nullptr), mutex_name(L"WSL_" + DistributionInfo::Name + L"_" + name)
+        mutex_handle{nullptr}, mutex_name{mangle_name(name)}
     {
         if (!lazy_init) {
             create();
@@ -158,6 +158,13 @@ template <typename MutexAPI> class NamedMutexWrapper
     Lock lock() noexcept
     {
         return Lock(*this);
+    }
+
+    // Adds a prefix to the name to avoid name collisions with other processes
+    static std::wstring mangle_name(std::wstring_view lock_name)
+    {
+        std::wstring prefix{L"WSL_" + DistributionInfo::Name + L"_"};
+        return prefix += lock_name;
     }
 
   protected:

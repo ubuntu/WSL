@@ -110,11 +110,6 @@ DWORD TestMutexApi::release(HANDLE& mutex_handle, LPCWSTR mutex_name) noexcept
     return 0;
 }
 
-std::wstring mangle_name(std::wstring name)
-{
-    return L"WSL_" + DistributionInfo::Name + L"_" + name;
-}
-
 // Testing Create and Destroy
 TEST(NamedMutexTests, CreateAndDestroy)
 {
@@ -122,25 +117,25 @@ TEST(NamedMutexTests, CreateAndDestroy)
     std::list<TestMutexApi::dummy_mutex>::const_iterator it;
     {
         TestNamedMutex mutex(L"test-lifetime");
-        it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
+        it = std::find(dbe.cbegin(), dbe.cend(), TestNamedMutex::mangle_name(L"test-lifetime"));
         ASSERT_NE(it, dbe.cend());  // Added name to database -> Create called
         ASSERT_EQ(it->refcount, 1); // destroy called once -> Create called once
         ASSERT_FALSE(it->locked);   // Not locked -> wait_and_acquire not called
 
         {
             TestNamedMutex mutex_2(L"test-lifetime");
-            it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
+            it = std::find(dbe.cbegin(), dbe.cend(),TestNamedMutex::mangle_name(L"test-lifetime"));
             ASSERT_NE(it, dbe.cend());  // Name still in -> destroy not called
             ASSERT_EQ(it->refcount, 2); // create called twice
             ASSERT_FALSE(it->locked);   // Still not locked -> wait_and_acquire not called
         }
 
-        it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
+        it = std::find(dbe.cbegin(), dbe.cend(), TestNamedMutex::mangle_name(L"test-lifetime"));
         ASSERT_NE(it, dbe.cend());  // Name not in database -> destroy called once
         ASSERT_EQ(it->refcount, 1); // destroy called once
     }
 
-    it = std::find(dbe.cbegin(), dbe.cend(), mangle_name(L"test-lifetime"));
+    it = std::find(dbe.cbegin(), dbe.cend(), TestNamedMutex::mangle_name(L"test-lifetime"));
     ASSERT_EQ(it, dbe.cend()); // Name not in database -> destroy called twice
 }
 
@@ -186,7 +181,8 @@ TEST(NamedMutexTests, MonadicInterface)
     // Testing success
     bool and_then = false;
     bool or_else = false;
-    auto scope_lock = mutex.lock().and_then([&] { and_then = true; }).or_else([&] { or_else = true; });
+    auto scope_lock = mutex.lock();
+    scope_lock.and_then([&] { and_then = true; }).or_else([&] { or_else = true; });
     ASSERT_TRUE(and_then);
     ASSERT_FALSE(or_else);
 
@@ -230,7 +226,7 @@ TEST(NamedMutexTests, Exceptions)
             mutex.lock().and_then([]() { throw 42; });
         } catch (std::runtime_error&) {
             FAIL();
-        } catch(int& err) {
+        } catch (int& err) {
             ASSERT_EQ(err, 42);
         } catch (...) {
             FAIL();
