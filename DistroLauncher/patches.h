@@ -40,7 +40,8 @@ struct PatchLog
     void read();
     void write();
 
-    void push_back(std::wstring patchname);
+    void emplace_back(std::wstring&& patchname);
+
     [[nodiscard]] bool contains(std::wstring_view patchname) const;
 
   private:
