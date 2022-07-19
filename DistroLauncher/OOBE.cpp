@@ -27,10 +27,10 @@ namespace DistributionInfo
 
     bool shouldSkipInstaller(std::vector<std::wstring_view>& arguments, std::wstring_view value)
     {
-        auto it = std::remove(arguments.begin(), arguments.end(), value);
-        auto r = std::distance(it, arguments.end());
-        arguments.erase(it, arguments.end());
-        return r == 0;
+        const auto new_end = std::remove(arguments.begin(), arguments.end(), value);
+        const auto n_removed = std::distance(new_end, arguments.end());
+        arguments.erase(new_end, arguments.end());
+        return n_removed == 0;
     }
 
     bool isOOBEAvailable()

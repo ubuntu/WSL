@@ -35,10 +35,10 @@ namespace Helpers {
 
         // internals. Could be hidden by PIMPL, for instance,
         // but that's not necessary for now.
-        HANDLE g_hChildStd_OUT_Rd = NULL;
-        HANDLE g_hChildStd_OUT_Wr = NULL;
-        HANDLE g_hChildStd_ERR_Rd = NULL;
-        HANDLE g_hChildStd_ERR_Wr = NULL;
+        HANDLE g_hChildStd_OUT_Rd = nullptr;
+        HANDLE g_hChildStd_OUT_Wr = nullptr;
+        HANDLE g_hChildStd_ERR_Rd = nullptr;
+        HANDLE g_hChildStd_ERR_Wr = nullptr;
         SECURITY_ATTRIBUTES _sa;
         PROCESS_INFORMATION _piProcInfo;
         STARTUPINFO _siStartInfo;

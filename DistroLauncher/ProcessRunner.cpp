@@ -17,7 +17,8 @@
 
 #include "stdafx.h"
 
-namespace Helpers {
+namespace Helpers
+{
 
     ProcessRunner::ProcessRunner(std::wstring_view commandLine)
     {
@@ -25,7 +26,7 @@ namespace Helpers {
         ZeroMemory(&_siStartInfo, sizeof(STARTUPINFO));
         _sa.nLength = sizeof(SECURITY_ATTRIBUTES);
         _sa.bInheritHandle = TRUE;
-        _sa.lpSecurityDescriptor = NULL;
+        _sa.lpSecurityDescriptor = nullptr;
         cmd = commandLine;
         defunct = false;
         alreadyRun = false;
@@ -79,14 +80,14 @@ namespace Helpers {
 
         TCHAR szCmdline[80];
         wcsncpy_s(szCmdline, cmd.data(), cmd.length());
-        exit_code = CreateProcess(NULL,          // command line
+        exit_code = CreateProcess(nullptr,       // command line
                                   szCmdline,     // non-const CLI
-                                  NULL,          // process security attributes
-                                  NULL,          // primary thread security attributes
+                                  nullptr,       // process security attributes
+                                  nullptr,       // primary thread security attributes
                                   TRUE,          // handles are inherited
                                   0,             // creation flags
-                                  NULL,          // use parent's environment
-                                  NULL,          // use parent's current directory
+                                  nullptr,       // use parent's environment
+                                  nullptr,       // use parent's current directory
                                   &_siStartInfo, // STARTUPINFO pointer
                                   &_piProcInfo); // output: PROCESS_INFORMATION
         CloseHandle(g_hChildStd_ERR_Wr);
@@ -120,8 +121,8 @@ namespace Helpers {
         TCHAR chBuf[BUFSIZE];
         BOOL bSuccess = FALSE;
         for (;;) {
-            bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
-            if (!bSuccess || dwRead == 0) {
+            bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, nullptr);
+            if (bSuccess == FALSE || dwRead == 0) {
                 break;
             }
 
@@ -130,7 +131,7 @@ namespace Helpers {
 
         dwRead = 0;
         for (;;) {
-            bSuccess = ReadFile(g_hChildStd_ERR_Rd, chBuf, BUFSIZE, &dwRead, NULL);
+            bSuccess = ReadFile(g_hChildStd_ERR_Rd, chBuf, BUFSIZE, &dwRead, nullptr);
             if (!bSuccess || dwRead == 0) {
                 break;
             }
