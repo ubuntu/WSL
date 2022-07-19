@@ -24,7 +24,7 @@
 // of the launched process.
 namespace Helpers {
     class ProcessRunner {
-      private:
+    private:
         // Exposed thru getters.
         std::wstring cmd;
         DWORD exit_code;
@@ -46,7 +46,7 @@ namespace Helpers {
         void read_pipes();
         void setDefunctState();
 
-      public:
+    public:
         // Constructs a runner for a given CLI.
         // Once constructed, it cannot have its CLI argument changed.
         ProcessRunner(std::wstring_view commandLine);
