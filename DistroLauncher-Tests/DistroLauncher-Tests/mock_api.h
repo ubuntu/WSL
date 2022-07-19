@@ -62,7 +62,7 @@ namespace Testing
     struct WslMockAPI
     {
         // Instead of changing users, a pair of variables are changed
-        static HRESULT GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags);
+        static HRESULT GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags) noexcept;
         static HRESULT SetDefaultUserAndFlags(ULONG defaultUID, WSL_DISTRIBUTION_FLAGS wslDistributionFlags) noexcept;
 
         static ULONG defaultUID_;
