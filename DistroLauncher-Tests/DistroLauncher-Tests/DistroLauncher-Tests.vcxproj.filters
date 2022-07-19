@@ -91,7 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />
-    <ClInclude Include="dummy_apis.h" />
+    <ClInclude Include="mock_api.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
