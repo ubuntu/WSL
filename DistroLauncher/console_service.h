@@ -116,12 +116,12 @@ namespace Win32Utils
                 }
                 // The pipe class must guarantee that if the Handle is valid, the File descriptor is also valid. See
                 // LocalNamedPipe.h.
-                int fd = redirectTo.writeFileDescriptor();
+                int file_descriptor = redirectTo.writeFileDescriptor();
                 fflush(stderrStream);
                 fflush(stdoutStream);
                 // Saving the standard streams context before redirecting.
                 previousConsoleState = consoleState();
-                ConsoleState newConsoleState{fd, fd, handle, handle};
+                ConsoleState newConsoleState{file_descriptor, file_descriptor, handle, handle};
 
                 applyConsoleState(newConsoleState, stderrStream, nStderrHandle, stdoutStream, nStdoutHandle);
                 // No buffering seems mandatory for this situation. Tests with launching child apps reading from this

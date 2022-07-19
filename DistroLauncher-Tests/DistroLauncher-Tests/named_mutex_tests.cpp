@@ -17,14 +17,14 @@
 
 #include "stdafx.h"
 #include "gtest/gtest.h"
-#include "dummy_apis.h"
+#include "mock_api.h"
 
 // Testing Create and Destroy
 TEST(NamedMutexTests, CreateAndDestroy)
 {
-    Testing::MutexMockAPI::reset_back_end();
-    auto& dbe = Testing::MutexMockAPI::dummy_back_end;
-    std::list<Testing::MutexMockAPI::dummy_mutex>::const_iterator it;
+    Testing::MockMutexAPI::reset_back_end();
+    auto& dbe = Testing::MockMutexAPI::dummy_back_end;
+    std::list<Testing::MockMutexAPI::MockMutex>::const_iterator it;
     {
         Testing::NamedMutex mutex(L"test-lifetime");
         it = std::find(dbe.cbegin(), dbe.cend(), Testing::NamedMutex::mangle_name(L"test-lifetime"));
@@ -41,7 +41,7 @@ TEST(NamedMutexTests, CreateAndDestroy)
         }
 
         it = std::find(dbe.cbegin(), dbe.cend(), Testing::NamedMutex::mangle_name(L"test-lifetime"));
-        ASSERT_NE(it, dbe.cend());  // Name not in database -> destroy called once
+        ASSERT_NE(it, dbe.cend());  // Name still in database -> destroy called once
         ASSERT_EQ(it->refcount, 1); // destroy called once
     }
 
@@ -51,7 +51,7 @@ TEST(NamedMutexTests, CreateAndDestroy)
 
 TEST(NamedMutexTests, StateTransitions)
 {
-    Testing::MutexMockAPI::reset_back_end();
+    Testing::MockMutexAPI::reset_back_end();
     Testing::NamedMutex lazy_mutex(L"test-state-transitions", true);
 
     ASSERT_EQ(lazy_mutex.get_mutex_handle(), nullptr); // Initialization delayed
@@ -87,7 +87,7 @@ TEST(NamedMutexTests, StateTransitions)
 
 TEST(NamedMutexTests, MonadicInterface)
 {
-    Testing::MutexMockAPI::reset_back_end();
+    Testing::MockMutexAPI::reset_back_end();
     Testing::NamedMutex mutex(L"test-monadic-api");
 
     // Testing success
@@ -108,7 +108,7 @@ TEST(NamedMutexTests, MonadicInterface)
 
 TEST(NamedMutexTests, Exceptions)
 {
-    Testing::MutexMockAPI::reset_back_end();
+    Testing::MockMutexAPI::reset_back_end();
     Testing::NamedMutex mutex(L"test-exceptions");
 
     // derived from std::exception
