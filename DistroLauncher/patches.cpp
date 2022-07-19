@@ -136,7 +136,6 @@ bool ApplyPatch(std::wstring_view patchname)
 
 void ApplyPatchesImpl()
 {
-
     PatchLog patch_log{patches::patch_log};
 
     patch_log.read();
