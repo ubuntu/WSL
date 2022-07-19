@@ -87,7 +87,8 @@ namespace Testing
     }
 
     MockNamedMutex::MockNamedMutex(std::wstring name, bool lazy_init) : NamedMutexWrapper(name, lazy_init)
-    { }
+    {
+    }
 
     HANDLE& MockNamedMutex::get_mutex_handle()
     {

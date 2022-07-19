@@ -81,10 +81,10 @@ void PatchLog::write()
     g_wslApi.WslLaunchInteractive(command.str().c_str(), 1, &exitCode);
 }
 
-void PatchLog::push_back(std::wstring patchname)
+void PatchLog::emplace_back(std::wstring&& patchname)
 {
     any_changes = true;
-    patches.emplace_back(std::move(patchname));
+    patches.emplace_back(std::forward<std::wstring>(patchname));
 };
 
 bool PatchLog::contains(std::wstring_view patchname) const
@@ -136,9 +136,16 @@ bool ApplyPatch(std::wstring_view patchname)
     return SUCCEEDED(hr) && errorCode == 0;
 }
 
-[[nodiscard]] std::vector<std::wstring> PatchList()
+[[nodiscard]] std::optional<std::vector<std::wstring>> ReadPatchList()
 {
-    return {L"0001-init-log", L"0002-upgrader-policy"};
+    std::vector<std::wstring> patchnames;
+    auto directory = std::filesystem::directory_iterator(patches::windows_dir);
+
+    for (const auto& patchfile: directory) {
+        patchnames.push_back(patchfile.path().stem().wstring());
+    }
+
+    return patchnames;
 }
 
 void ApplyPatchesImpl()
@@ -152,13 +159,16 @@ void ApplyPatchesImpl()
     }
 
     patch_log.read();
-    const auto patchlist = PatchList();
+    auto patchlist = ReadPatchList();
+    if (!patchlist.has_value()) {
+        return;
+    }
 
     // Filter patches already applied
     const auto patches_begin =
-      std::find_if_not(patchlist.cbegin(), patchlist.cend(), [&](auto pname) { return patch_log.contains(pname); });
+      std::find_if_not(patchlist->begin(), patchlist->end(), [&](auto pname) { return patch_log.contains(pname); });
 
-    if (patches_begin == patchlist.cend()) {
+    if (patches_begin == patchlist->cend()) {
         return;
     }
 
@@ -168,12 +178,12 @@ void ApplyPatchesImpl()
           ShutdownDistro();
 
           // Import and apply patches
-          auto patches_end = std::find_if_not(patches_begin, patchlist.cend(), [](auto patchname) {
+          auto patches_end = std::find_if_not(patches_begin, patchlist->end(), [](auto patchname) {
               return ImportPatch(patchname) && ApplyPatch(patchname);
           });
 
           // Log applied patches
-          std::for_each(patches_begin, patches_end, [&](auto& pname) { patch_log.push_back(std::move(pname)); });
+          std::for_each(patches_begin, patches_end, [&](auto& pname) { patch_log.emplace_back(std::move(pname)); });
           patch_log.write();
       })
       .or_else([](auto why) {
