@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include "stdafx.h"
-
 namespace patches
 {
     using std::filesystem::path;
