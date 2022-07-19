@@ -182,4 +182,26 @@ namespace Oobe
 
         return prefix;
     }
+
+    HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags) noexcept
+    {
+        ULONG distributionVersion;
+        PSTR* defaultEnvironmentVariables = nullptr;
+        ULONG defaultEnvironmentVariableCount = 0;
+
+        const HRESULT hr =
+          g_wslApi.WslGetDistributionConfiguration(&distributionVersion, &defaultUID, &wslDistributionFlags,
+                                                   &defaultEnvironmentVariables, &defaultEnvironmentVariableCount);
+
+        if (FAILED(hr) || distributionVersion == 0) {
+            return hr;
+        }
+
+        // discarding the env variable string array otherwise they would leak.
+        for (ULONG i = 0; i < defaultEnvironmentVariableCount; ++i) {
+            CoTaskMemFree(static_cast<LPVOID>(defaultEnvironmentVariables[i]));
+        }
+
+        return hr;
+    }
 }

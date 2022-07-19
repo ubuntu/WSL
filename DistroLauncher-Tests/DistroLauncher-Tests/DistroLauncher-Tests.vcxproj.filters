@@ -76,9 +76,22 @@
     <ClCompile Include="StateMachineTests.cpp">
       <Filter>TestSources</Filter>
     </ClCompile>
+    <ClCompile Include="sudo_tests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="named_mutex_tests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\named_mutex.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="mock_api.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />
+    <ClInclude Include="mock_api.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

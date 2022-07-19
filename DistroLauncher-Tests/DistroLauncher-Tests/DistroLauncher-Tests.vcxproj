@@ -74,6 +74,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="..\..\DistroLauncher\Helpers.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ini_find_value.cpp" />
     <ClCompile Include="..\..\DistroLauncher\local_named_pipe.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\named_mutex.cpp" />
     <ClCompile Include="..\..\DistroLauncher\OOBE.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ProcessRunner.cpp" />
     <ClCompile Include="..\..\DistroLauncher\stdafx.cpp" />
@@ -88,9 +89,11 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="ExitStatusParserTests.cpp" />
     <ClCompile Include="LocalNamedPipeTests.cpp" />
     <ClCompile Include="IniFindValueTests.cpp" />
+    <ClCompile Include="mock_api.cpp" />
     <ClCompile Include="named_mutex_tests.cpp" />
     <ClCompile Include="SplashControllerTests.cpp" />
     <ClCompile Include="StateMachineTests.cpp" />
+    <ClCompile Include="sudo_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -101,6 +104,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mock_api.h" />
     <ClInclude Include="InstallerControllerTestPolicies.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
