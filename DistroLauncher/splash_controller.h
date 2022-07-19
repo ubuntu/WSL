@@ -26,7 +26,7 @@ namespace Oobe
         HWND find_main_thread_window(DWORD threadId, const wchar_t* windowClass);
     }
 
-    // Groups a set of functions of stateless functions that interact with the OS to create a process and manipulate
+    // Groups a set of functions of stateless functions that interact with the OS to manipulate
     // windows according to the needs of the SplashController.
     // Although those functions could be inside the body of the SplashController state transition methods, abstracting
     // out the strategy benefits separation of the OS interaction with the logic of the states, thus benefits
@@ -35,28 +35,6 @@ namespace Oobe
     // aiming to allow compiler see completely through it and ensure optimizing out function calls.
     struct SplashStrategy
     {
-        static bool do_create_process(const std::filesystem::path& exePath,
-                                      STARTUPINFO& startup,
-                                      PROCESS_INFORMATION& process)
-        {
-            if (!std::filesystem::exists(exePath)) {
-                std::wcerr << L"Executable <" << exePath << L"> doesn't exist.\n";
-                return false;
-            }
-            TCHAR szCmdline[MAX_PATH];
-            wcsncpy_s(szCmdline, exePath.wstring().c_str(), exePath.wstring().length());
-            BOOL res = CreateProcess(nullptr,               // command line
-                                     szCmdline,             // non-const CLI
-                                     nullptr,               // process security attributes
-                                     nullptr,               // primary thread security attributes
-                                     TRUE,                  // handles are inherited
-                                     0,                     // creation flags
-                                     nullptr,               // use parent's environment
-                                     nullptr,               // use parent's current directory
-                                     &startup,              // STARTUPINFO pointer
-                                     &process);             // output: PROCESS_INFORMATION
-            return res != 0 && process.hProcess != nullptr; // success
-        }
 
         static HWND do_read_window_from_ipc()
         {
@@ -176,30 +154,6 @@ namespace Oobe
             PostMessage(window, WM_CUSTOM_AUTO_CLOSE, 0, 0);
         }
 
-        static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
-        {
-            HANDLE handle{nullptr};
-            if (RegisterWaitForSingleObject(&handle, process, callback, data, INFINITE,
-                                            WT_EXECUTEDEFAULT | WT_EXECUTEONLYONCE) == FALSE) {
-                wprintf(L"Failed to register splash window monitoring callback\n");
-                return nullptr;
-            }
-            return handle;
-        }
-
-        static void do_unsubscribe(HANDLE& waiter)
-        {
-            if (UnregisterWait(waiter) != FALSE) {
-                waiter = nullptr;
-            }
-        }
-
-        static void do_cleanup_process(PROCESS_INFORMATION& procInfo)
-        {
-            TerminateProcess(procInfo.hProcess, 0);
-            CloseHandle(procInfo.hThread);
-            CloseHandle(procInfo.hProcess);
-        }
     }; // struct SplashStrategy
 
     /// Implements the states, events and control of the splash application. Most of the actual work that requires
@@ -232,52 +186,19 @@ namespace Oobe
     /// Also, since the Run event can only be handled by the initial state, that event is expected to succeed only once.
     template <typename Strategy = SplashStrategy> class SplashController
     {
-      public:
-        // Instead of facilitating the typing, the intention of this using clause is to let it explicit that this
-        // callable must not be called in this thread.
-        using CallInOtherThread = std::function<void()>;
-
       private:
-        const std::filesystem::path exePath;
-        STARTUPINFO startInfo;
-        // this is the only member that requires ownership/resource management since it contains handles to the process
-        // that will be created and its threads and that must be closed at some point.
-        PROCESS_INFORMATION procInfo;
-        HANDLE splashCloseNotifier = nullptr;
-        // This listener will be invoked if and only if the user closes the splash window before the launcher.
-        CallInOtherThread notifyListener;
-
-        // Call-once method which must be called only by the OS in reaction to the user closing the window.
-        // Since the notifyListener member is initialized before the splash runs and (must) never be touched since then,
-        // it's safe to assume no need for synchronization whatsoever in accessing it.
-        // Any need for synchronization must be taken care of by the callable itself.
-        static void onWindowClosedByUser(void* data, BOOLEAN /*unused*/)
-        {
-            auto* self = static_cast<SplashController<Strategy>*>(data);
-            self->notifyListener();
-        }
+        std::unique_ptr<ChildProcess> process;
 
       public:
-        /// Initializes the control structures to later run the splash application. Accepts the splash executable
-        /// file system path and the HANDLE to the device that will act as the splash standard input and a callable
-        /// object [onClose] to be invoked when the user closes the splash window, if that ever happens.
-        /// IMPORTANT NOTE ON MULTITHREADING: [onClose] will be invoked by another thread, thus any precaution required
-        /// to ensure safe concurrent call must be taken by the [onClose] callable implementation itself and any
-        /// functions it calls inside its body. That's the reason for the horrible type names.
+        SplashController(const SplashController& other) = delete;
+        SplashController(SplashController&& other) = default;
         template <typename CallableInOtherThread>
-        SplashController(std::filesystem::path exePath, not_null<HANDLE> stdIn, CallableInOtherThread&& onClose) :
-            exePath{std::move(exePath)}, notifyListener{std::forward<CallableInOtherThread>(onClose)}
+        SplashController(const std::filesystem::path& exePath,
+                         not_null<HANDLE> const stdIn,
+                         CallableInOtherThread&& onClose) :
+            process{std::make_unique<ChildProcess>(exePath, L"", nullptr, stdIn, nullptr)}
         {
-            static_assert(std::is_convertible_v<CallableInOtherThread, CallInOtherThread>,
-                          "CallableInOtherThread callback must be void with no arguments.");
-            // Most likely the exePath will be built on the fly from a string, so there is no sense in creating a
-            // temporary and copy it when we can move.
-            ZeroMemory(&procInfo, sizeof(PROCESS_INFORMATION));
-            ZeroMemory(&startInfo, sizeof(STARTUPINFO));
-            startInfo.cb = sizeof(STARTUPINFO);
-            startInfo.hStdInput = stdIn;
-            startInfo.dwFlags |= STARTF_USESTDHANDLES;
-            SetHandleInformation(stdIn, HANDLE_FLAG_INHERIT, 1);
+            process->setListener(std::move(onClose));
         }
         // controller events;
         struct Events
@@ -328,13 +249,11 @@ namespace Oobe
                 StateVariant on_event(typename Events::Run event)
                 {
                     auto controller = event.controller;
-                    if (!Strategy::do_create_process(controller->exePath, controller->startInfo,
-                                                     controller->procInfo)) {
+                    if (!controller->process->start()) {
                         std::wcerr << L"Failed to create the splash process\n";
                         return *this; // return the same (Closed) state.
                     }
-                    controller->splashCloseNotifier =
-                      Strategy::do_on_close(controller->procInfo.hProcess, onWindowClosedByUser, controller);
+
                     if (HWND window = Strategy::do_read_window_from_ipc(); window != nullptr) {
                         Strategy::do_show_window(window); // ensures always on top while visible.
                         return Visible{window};
@@ -342,12 +261,12 @@ namespace Oobe
 
                     // Fall back in case IPC fails. The Flutter app will be allowed to keep running if its wait for the
                     // pipe times out, assuming some fall back method will be in place.
-                    if (HWND window = Strategy::do_find_window_by_thread_id(controller->procInfo.dwThreadId);
+                    if (HWND window = Strategy::do_find_window_by_thread_id(controller->process->threadId());
                         window != nullptr) {
                         return Visible{window};
                     }
                     std::wcerr << L"Could not find the splash window for Process ID "
-                               << event.controller->procInfo.dwProcessId << L'\n';
+                               << event.controller->process->pid() << L'\n';
                     return *this;
                 }
             };
@@ -376,8 +295,8 @@ namespace Oobe
                 // If the window gets closed programmatically we need to unsubscribe the closing notification.
                 ShouldBeClosed on_event(typename Events::Close event) const
                 {
-                    Strategy::do_unsubscribe(event.controller->splashCloseNotifier);
-                    event.controller->splashCloseNotifier = nullptr;
+                    auto& process = event.controller->process;
+                    process->unsubscribe();
                     Strategy::do_gracefully_close(window);
                     return ShouldBeClosed{};
                 }
@@ -394,8 +313,8 @@ namespace Oobe
 
                 ShouldBeClosed on_event(typename Events::Close event) const
                 {
-                    Strategy::do_unsubscribe(event.controller->splashCloseNotifier);
-                    event.controller->splashCloseNotifier = nullptr;
+                    auto& process = event.controller->process;
+                    process->unsubscribe();
                     Strategy::do_gracefully_close(window);
                     return ShouldBeClosed{};
                 }
@@ -409,15 +328,6 @@ namespace Oobe
         using Event = typename Events::EventVariant;
         internal::state_machine<SplashController<Strategy>> sm;
 
-        ~SplashController()
-        {
-            if (splashCloseNotifier != nullptr) {
-                // This ensures that the OS will not call us back when there is no controller alive anymore.
-                Strategy::do_unsubscribe(splashCloseNotifier);
-            }
-            if (procInfo.hProcess != nullptr) {
-                Strategy::do_cleanup_process(procInfo);
-            }
-        }
+        ~SplashController() = default;
     };
 }
