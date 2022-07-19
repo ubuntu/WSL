@@ -17,7 +17,7 @@
 
 #include "stdafx.h"
 #include "gtest/gtest.h"
-#include "dummy_apis.h"
+#include "mock_api.h"
 
 TEST(SudoTests, MonadicInterface)
 {
@@ -39,7 +39,7 @@ TEST(SudoTests, MonadicInterface)
         bool and_then = false;
         bool or_else = false;
 
-        auto status = Testing::Sudo::Status ::OK;
+        auto status = Testing::Sudo::Status::OK;
         Testing::Sudo().and_then([&] { and_then = true; }).or_else([&] { or_else = true; }).or_else([&](auto why) {
             status = why;
         });
@@ -54,41 +54,41 @@ TEST(SudoTests, MonadicInterface)
 
 TEST(SudoTests, WslInterface)
 {
+    // Testing success
     {
         Testing::WslMockAPI::reset_mock_distro();
 
-        // Testing success
         DWORD exitCode = 0xBAD;
         const auto command1 = L"echo hello, world!";
         auto hr = Testing::Sudo::WslLaunchInteractive(command1, TRUE, &exitCode);
 
         ASSERT_TRUE(SUCCEEDED(hr));
         ASSERT_EQ(exitCode, 0);
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1);
-        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);
+        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);             // Default user restored
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1); // Interactive command launched
+        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);             // Regular command not launched
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.back().command, command1);
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.back().useCurrentWorkingDirectory, TRUE);
 
         const auto command2 = L"mkdir ${HOME}/desktop/important_stuff";
         int x = 0, y = 0, z = 0;
-        HANDLE stdIn = &x;
-        HANDLE stdOut = &y;
-        HANDLE stdErr = &z;
+        HANDLE stdIn = &x;  // Mock StdIn
+        HANDLE stdOut = &y; // Mock StdOut
+        HANDLE stdErr = &z; // Mock stdErr
         HANDLE process = nullptr;
         hr = Testing::Sudo::WslLaunch(command2, FALSE, stdIn, stdOut, stdErr, &process);
 
         ASSERT_TRUE(SUCCEEDED(hr));
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);
-        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 1);
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1);
+        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);             // Default user restored
+        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 1);             // Command launched
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1); // Interactive command not launched
 
         ASSERT_EQ(Testing::WslMockAPI::command_log.back().command, command2);
         ASSERT_EQ(Testing::WslMockAPI::command_log.back().useCurrentWorkingDirectory, FALSE);
         ASSERT_EQ(Testing::WslMockAPI::command_log.back().stdIn, stdIn);
         ASSERT_EQ(Testing::WslMockAPI::command_log.back().stdOut, stdOut);
         ASSERT_EQ(Testing::WslMockAPI::command_log.back().stdErr, stdErr);
-        ASSERT_EQ(process, Testing::WslMockAPI::mock_process);
+        ASSERT_EQ(process, Testing::WslMockAPI::mock_process); // Process out variable not ignored
     }
 
     // Testing failure (fails because it's locked already)
@@ -97,34 +97,33 @@ TEST(SudoTests, WslInterface)
         auto scope_guard = Testing::Sudo();
         ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0);
 
-        // Testing success
         DWORD exitCode = 0xBAD;
         const auto command1 = L"echo hello, world!";
         auto hr = Testing::Sudo::WslLaunchInteractive(command1, TRUE, &exitCode);
 
-        ASSERT_TRUE(FAILED(hr));
-        ASSERT_EQ(exitCode, 0xBAD);
+        ASSERT_TRUE(FAILED(hr));    // Failed to acquire Sudo lock
+        ASSERT_EQ(exitCode, 0xBAD); // Exit code not modified
 
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0);
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 0);
-        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);
+        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0);                    // Still sudo
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 0); // Command not lauched
+        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);             // Command not lauched
 
         const auto command2 = L"mkdir ${HOME}/desktop/important_stuff";
         int x = 0, y = 0, z = 0;
-        HANDLE stdIn = &x;
-        HANDLE stdOut = &y;
-        HANDLE stdErr = &z;
+        HANDLE stdIn = &x;  // Mock StdIn
+        HANDLE stdOut = &y; // Mock StdOut
+        HANDLE stdErr = &z; // Mock stdErr
         HANDLE process = nullptr;
         hr = Testing::Sudo::WslLaunch(command2, FALSE, stdIn, stdOut, stdErr, &process);
 
-        ASSERT_TRUE(FAILED(hr));
-        ASSERT_EQ(process, nullptr);
+        ASSERT_TRUE(FAILED(hr));     // Failed to acquire Sudo lock
+        ASSERT_EQ(process, nullptr); // Process not assigned
 
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0);
-        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 0);
+        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0);                    // Still sudo
+        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);             // Command not lauched
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 0); // Command not lauched
     }
-    ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);
+    ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef); // Scope lock released
 }
 
 TEST(SudoTests, Exceptions)
@@ -144,7 +143,7 @@ TEST(SudoTests, Exceptions)
             FAIL();
         }
 
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);
+        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef); // User restored after throwing
 
         std::optional<bool> previous_mutex_released = std::nullopt;
         Testing::Sudo().and_then([&] { previous_mutex_released = {true}; }).or_else([&]() noexcept {
@@ -168,7 +167,7 @@ TEST(SudoTests, Exceptions)
             FAIL();
         }
 
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);
+        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef); // User restored after throwing
 
         std::optional<bool> previous_mutex_released = std::nullopt;
         Testing::Sudo().and_then([&] { previous_mutex_released = {true}; }).or_else([&]() noexcept {

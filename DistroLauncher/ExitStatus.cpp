@@ -132,21 +132,21 @@ namespace Oobe
 
         VoidResult act(const KeyValuePairs& launcherCmds)
         {
-            auto actionIt = launcherCmds.find("action");
+            const auto actionIt = launcherCmds.find("action");
             if (actionIt == launcherCmds.end()) {
                 // nothing to do.
                 return VoidResult();
             }
 
             // I'm hardcoding that "action" expects strings.
-            auto action = std::any_cast<std::string>(actionIt->second);
+            const auto action = std::any_cast<std::string>(actionIt->second);
 
-            auto f = capabilities.find(action);
-            if (f == capabilities.end()) {
+            const auto found = capabilities.find(action);
+            if (found == capabilities.end()) {
                 return nonstd::make_unexpected(std::runtime_error(action));
             }
 
-            auto res = f->second();
+            auto res = found->second();
             if (!res.has_value()) {
                 return nonstd::make_unexpected(res.error());
             }

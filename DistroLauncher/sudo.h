@@ -108,7 +108,7 @@ namespace SudoInternals
 
         SudoInterface() noexcept
         {
-            auto lock = sudo_mutex.lock();
+            auto lock = GetMutex().lock();
             if (!lock.ok()) {
                 status = Status::FAILED_MUTEX;
                 return;
@@ -184,18 +184,19 @@ namespace SudoInternals
         }
 
         // wsl API interface
-        static HRESULT WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode)
+        static HRESULT WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode) noexcept
         {
             HRESULT hr = S_FALSE;
             SudoInterface()
-              .and_then([&]() { hr = WslAPI::LaunchInteractive(command, useCurrentWorkingDirectory, exitCode); })
+              .and_then(
+                [&]() noexcept { hr = WslAPI::LaunchInteractive(command, useCurrentWorkingDirectory, exitCode); })
               .or_else([&] { hr = WAIT_FAILED; });
 
             return hr;
         }
 
         static HRESULT WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                                 HANDLE stdErr, HANDLE* process)
+                                 HANDLE stdErr, HANDLE* process) noexcept
         {
             HRESULT hr = S_FALSE;
             SudoInterface()
@@ -207,8 +208,13 @@ namespace SudoInternals
             return hr;
         }
 
+        static MutexType& GetMutex()
+        {
+            static MutexType sudo_mutex(L"root-user", true);
+            return sudo_mutex;
+        }
+
       private:
-        static MutexType sudo_mutex;
         typename MutexType::Lock mutex_lock{};
 
         Status status = Status::INACTIVE;
@@ -228,7 +234,7 @@ namespace SudoInternals
 
     struct WslWindowsAPI
     {
-        static HRESULT GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags)
+        static HRESULT GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags) noexcept
         {
             return Oobe::WslGetDefaultUserAndFlags(defaultUID, wslDistributionFlags);
         }
@@ -253,4 +259,3 @@ namespace SudoInternals
 }
 
 using Sudo = SudoInternals::SudoInterface<NamedMutex, SudoInternals::WslWindowsAPI>;
-inline NamedMutex Sudo::sudo_mutex(L"root-user", true);
