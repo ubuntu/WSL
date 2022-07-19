@@ -88,6 +88,8 @@
     <ClCompile Include="mock_api.cpp">
       <Filter>TestSources</Filter>
     </ClCompile>
+    <ClCompile Include="ChildProcessTests.cpp" />
+    <ClCompile Include="FakeChildProcessImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />

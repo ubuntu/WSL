@@ -82,8 +82,10 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="..\..\DistroLauncher\WindowsUserInfo.cpp" />
     <ClCompile Include="..\..\DistroLauncher\WslApiLoader.cpp" />
     <ClCompile Include="..\..\DistroLauncher\WSLInfo.cpp" />
+    <ClCompile Include="ChildProcessTests.cpp" />
     <ClCompile Include="ConsoleServiceTests.cpp" />
     <ClCompile Include="ExtendedCliParserTests.cpp" />
+    <ClCompile Include="FakeChildProcessImpl.cpp" />
     <ClCompile Include="InstallerControllerTests.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ExitStatusParserTests.cpp" />
