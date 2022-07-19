@@ -140,8 +140,8 @@ bool ApplyPatch(std::wstring_view patchname)
 {
     std::vector<std::wstring> patchnames;
     auto directory = std::filesystem::directory_iterator(patches::windows_dir);
-    
-    for (const auto& patchfile: directory) {
+
+    for (const auto& patchfile : directory) {
         patchnames.push_back(patchfile.path().stem().wstring());
     }
 
