@@ -20,11 +20,11 @@ namespace patches
 {
     using std::filesystem::path;
 
-    const auto linux_dir = path{L"/var/log/"};
-    const auto install_log = path{linux_dir} += L"wsl-patches.log";       // What patches are installed
-    const auto output_log = path{linux_dir} += L"wsl-patches-output.log"; // Patch install stdout and stderr
-    const auto windows_dir = Win32Utils::thisAppRootdir() / L"patches/";  // Location of patches
-    const auto tmp_location = path{L"/tmp/patch.diff"};                   // Location where patch is imported
+    const auto log_dir = path{L"/var/log/"};                                   // Directory to store logs in
+    const auto patch_log = path{log_dir} += L"wsl-patches.log";                // Log containing installed patches
+    const auto patch_install_log = path{log_dir} += L"wsl-patches-output.log"; // Patch install process stdout and stderr
+    const auto appx_patches_dir = Win32Utils::thisAppRootdir() / L"patches/";  // Location of patches in appx
+    const auto tmp_patch = path{L"/tmp/patch.diff"};                           // Location where patch is imported
 }
 
 struct PatchLog
