@@ -184,18 +184,19 @@ namespace SudoInternals
         }
 
         // wsl API interface
-        static HRESULT WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode)
+        static HRESULT WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode) noexcept
         {
             HRESULT hr = S_FALSE;
             SudoInterface()
-              .and_then([&]() { hr = WslAPI::LaunchInteractive(command, useCurrentWorkingDirectory, exitCode); })
+              .and_then(
+                [&]() noexcept { hr = WslAPI::LaunchInteractive(command, useCurrentWorkingDirectory, exitCode); })
               .or_else([&] { hr = WAIT_FAILED; });
 
             return hr;
         }
 
         static HRESULT WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                                 HANDLE stdErr, HANDLE* process)
+                                 HANDLE stdErr, HANDLE* process) noexcept
         {
             HRESULT hr = S_FALSE;
             SudoInterface()
@@ -233,7 +234,7 @@ namespace SudoInternals
 
     struct WslWindowsAPI
     {
-        static HRESULT GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags)
+        static HRESULT GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags) noexcept
         {
             return Oobe::WslGetDefaultUserAndFlags(defaultUID, wslDistributionFlags);
         }

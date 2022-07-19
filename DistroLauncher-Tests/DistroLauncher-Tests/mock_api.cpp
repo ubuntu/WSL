@@ -99,7 +99,7 @@ namespace Testing
         return MockMutexAPI::locked(mutex_handle);
     }
 
-    HRESULT WslMockAPI::GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags)
+    HRESULT WslMockAPI::GetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags) noexcept
     {
         defaultUID = defaultUID_;
         wslDistributionFlags = wslDistributionFlags_;
