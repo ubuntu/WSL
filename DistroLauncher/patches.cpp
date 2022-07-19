@@ -90,18 +90,6 @@ bool PatchLog::contains(std::wstring_view patchname) const
     return std::find(patches.cbegin(), patches.cend(), patchname) != patches.cend();
 }
 
-bool CreateLogDirectory()
-{
-    DWORD exitCode;
-    if (std::filesystem::exists(Oobe::WindowsPath(patches::log_dir))) {
-        return true;
-    }
-
-    const auto command = L"mkdir -p " + patches::log_dir.wstring();
-    HRESULT hr = Sudo::WslLaunchInteractive(command.c_str(), 1, &exitCode);
-    return SUCCEEDED(hr) && exitCode == 0;
-}
-
 bool ShutdownDistro()
 {
     const std::wstring shutdown_command = L"wsl -t " + DistributionInfo::Name;
@@ -150,12 +138,6 @@ void ApplyPatchesImpl()
 {
 
     PatchLog patch_log{patches::patch_log};
-
-    if (!patch_log.exists()) {
-        if (const bool success = CreateLogDirectory(); !success) {
-            return;
-        }
-    }
 
     patch_log.read();
     auto patchlist = ReadPatchList();
