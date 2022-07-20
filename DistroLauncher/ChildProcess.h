@@ -95,6 +95,7 @@ namespace Oobe
         }
 
         constexpr ChildProcessInterface(const std::filesystem::path& exePath, const std::wstring& args,
+                                        // NOLINTNEXTLINE(bugprone-easily-swappable-parameters) - that's the Win32 way.
                                         HANDLE stdErr = nullptr, HANDLE stdIn = nullptr, HANDLE stdOut = nullptr) :
             executable{exePath},
             arguments{args}
@@ -107,11 +108,11 @@ namespace Oobe
         }
 
       protected:
-        HANDLE waiterHandle;
+        HANDLE waiterHandle{nullptr};
         // The ID of the process's main thread.
-        PROCESS_INFORMATION procInfo = {0};
-        STARTUPINFO startInfo = {0};
-        SECURITY_ATTRIBUTES sa = {0};
+        PROCESS_INFORMATION procInfo{};
+        STARTUPINFO startInfo{};
+        SECURITY_ATTRIBUTES sa{};
 
         // The program's path.
         std::filesystem::path executable;

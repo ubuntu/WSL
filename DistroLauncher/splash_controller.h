@@ -191,14 +191,14 @@ namespace Oobe
 
       public:
         SplashController(const SplashController& other) = delete;
-        SplashController(SplashController&& other) = default;
+        SplashController(SplashController&& other) noexcept = default;
         template <typename CallableInOtherThread>
         SplashController(const std::filesystem::path& exePath,
                          not_null<HANDLE> const stdIn,
                          CallableInOtherThread&& onClose) :
             process{std::make_unique<ChildProcess>(exePath, L"", nullptr, stdIn, nullptr)}
         {
-            process->setListener(std::move(onClose));
+            process->setListener(std::forward<CallableInOtherThread>(onClose));
         }
         // controller events;
         struct Events

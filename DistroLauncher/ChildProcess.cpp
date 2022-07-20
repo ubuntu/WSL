@@ -28,6 +28,7 @@ namespace Oobe
 
     void Win32ChildProcess::do_terminate()
     {
+        // NOLINTNEXTLINE(performance-no-int-to-ptr) - that's the Win32 way.
         if (procInfo.hProcess != nullptr && procInfo.hProcess != INVALID_HANDLE_VALUE) {
             TerminateProcess(procInfo.hProcess, 0);
             destroy();
