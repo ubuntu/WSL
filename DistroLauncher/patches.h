@@ -23,7 +23,7 @@ namespace patches
     const path patch_log{L"/var/log/wsl-patches.log"};                // Log listing installed patches
     const path patch_install_log{L"/var/log/wsl-patches-output.log"}; // stdout and stderr of patch install process
     const auto appx_patches_dir = Win32Utils::thisAppRootdir() / L"patches/"; // Location of patches in appx
-    const path tmp_patch{L"/tmp/patch.diff"}; // Location where patch is imported and applied from
+    const path tmp_patch{L"/tmp/patch"}; // Location where patch is imported and applied from
 }
 
 struct PatchLog

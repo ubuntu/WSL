@@ -83,7 +83,7 @@
     <CustomBuild Include="messages.mc" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\patches\0001-init-log.diff">
+    <CopyFileToFolders Include="..\patches\0001-init-log">
       <Filter>Patches</Filter>
     </CopyFileToFolders>
   </ItemGroup>
