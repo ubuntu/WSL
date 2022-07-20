@@ -20,7 +20,7 @@
 /*
  *  Abstract
  *  --------
- *  A interprocess-mutex-protected RAII class to perform commands as root user.
+ *  An interprocess-mutex-protected RAII class to perform commands as root user.
  *
  *  Tips
  *  --------

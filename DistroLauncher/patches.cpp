@@ -92,18 +92,6 @@ bool PatchLog::contains(std::wstring_view patchname) const
     return std::find(patches.cbegin(), patches.cend(), patchname) != patches.cend();
 }
 
-bool CreateLogDirectory()
-{
-    DWORD exitCode;
-    if (std::filesystem::exists(Oobe::WindowsPath(patches::linux_dir))) {
-        return true;
-    }
-
-    const auto command = L"mkdir -p " + patches::linux_dir.wstring();
-    HRESULT hr = Sudo::WslLaunchInteractive(command.c_str(), 1, &exitCode);
-    return SUCCEEDED(hr) && exitCode == 0;
-}
-
 bool ShutdownDistro()
 {
     const std::wstring shutdown_command = L"wsl -t " + DistributionInfo::Name;
@@ -112,8 +100,8 @@ bool ShutdownDistro()
 
 bool ImportPatch(std::wstring_view patchname)
 {
-    const auto patch_windows_path{(std::filesystem::path{patches::windows_dir} += patchname) += L".diff"};
-    const auto patch_wsl_tmp_path{Oobe::WindowsPath(patches::tmp_location)};
+    const auto patch_windows_path{(std::filesystem::path{patches::appx_patches_dir} += patchname) += L".diff"};
+    const auto patch_wsl_tmp_path{Oobe::WindowsPath(patches::tmp_patch)};
 
     std::error_code errcode;
     bool success = std::filesystem::copy_file(patch_windows_path, patch_wsl_tmp_path,
@@ -126,8 +114,8 @@ bool ApplyPatch(std::wstring_view patchname)
     DWORD errorCode;
     std::wstringstream command;
 
-    const auto patch_linux_path = patches::tmp_location.wstring();
-    const auto output_log_linux_path = patches::output_log.wstring();
+    const auto patch_linux_path = patches::tmp_patch.wstring();
+    const auto output_log_linux_path = patches::patch_install_log.wstring();
 
     command << L"patch -d/ -p0 < " << std::quoted(patch_linux_path) << L" >> " << std::quoted(output_log_linux_path)
             << " 2>&1";
@@ -139,7 +127,7 @@ bool ApplyPatch(std::wstring_view patchname)
 [[nodiscard]] std::optional<std::vector<std::wstring>> ReadPatchList()
 {
     std::vector<std::wstring> patchnames;
-    auto directory = std::filesystem::directory_iterator(patches::windows_dir);
+    auto directory = std::filesystem::directory_iterator(patches::appx_patches_dir);
 
     for (const auto& patchfile : directory) {
         patchnames.push_back(patchfile.path().stem().wstring());
@@ -150,13 +138,7 @@ bool ApplyPatch(std::wstring_view patchname)
 
 void ApplyPatchesImpl()
 {
-    PatchLog patch_log{patches::install_log};
-
-    if (!patch_log.exists()) {
-        if (const bool success = CreateLogDirectory(); !success) {
-            return;
-        }
-    }
+    PatchLog patch_log{patches::patch_log};
 
     patch_log.read();
     auto patchlist = ReadPatchList();
