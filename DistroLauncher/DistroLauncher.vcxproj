@@ -204,8 +204,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\patches\0001-init-log.diff">
-      <ExcludedFromBuild>false</ExcludedFromBuild>
+    <CopyFileToFolders Include="..\patches\0001-init-log">
       <FileType>Document</FileType>
       <DestinationFolders>$(OutDir)/patches</DestinationFolders>
     </CopyFileToFolders>

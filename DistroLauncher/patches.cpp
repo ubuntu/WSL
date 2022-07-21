@@ -29,13 +29,11 @@ std::wstring& trim(std::wstring& str)
 }
 
 PatchLog::PatchLog(std::wstring_view linuxpath) : linux_path(linuxpath), windows_path(Oobe::WindowsPath(linuxpath))
-{
-}
+{ }
 
 PatchLog::PatchLog(std::filesystem::path linuxpath) :
     linux_path(std::move(linuxpath)), windows_path(Oobe::WindowsPath(linux_path))
-{
-}
+{ }
 
 bool PatchLog::exists() const
 {
@@ -100,28 +98,45 @@ bool ShutdownDistro()
 
 bool ImportPatch(std::wstring_view patchname)
 {
-    const auto patch_windows_path{(std::filesystem::path{patches::appx_patches_dir} += patchname) += L".diff"};
-    const auto patch_wsl_tmp_path{Oobe::WindowsPath(patches::tmp_patch)};
+    const auto wd_patch_path{std::filesystem::path{patches::appx_patches_dir} += patchname};
+    const auto wd_patch_tmp_path{Oobe::WindowsPath(patches::tmp_patch)};
 
-    std::error_code errcode;
-    bool success = std::filesystem::copy_file(patch_windows_path, patch_wsl_tmp_path,
-                                              std::filesystem::copy_options::overwrite_existing, errcode);
-    return success && !errcode;
+    std::error_code errCode;
+    bool success = std::filesystem::copy_file(wd_patch_path, wd_patch_tmp_path,
+                                              std::filesystem::copy_options::overwrite_existing, errCode);
+    return success && !errCode;
 }
 
 bool ApplyPatch(std::wstring_view patchname)
 {
-    DWORD errorCode;
-    std::wstringstream command;
+    const auto lx_patch_path = patches::tmp_patch.wstring();
+    const auto lx_output_log = patches::patch_install_log.wstring();
 
-    const auto patch_linux_path = patches::tmp_patch.wstring();
-    const auto output_log_linux_path = patches::patch_install_log.wstring();
+    const std::wstring send_to_log = L" >> " + lx_output_log + L" 2>&1";
 
-    command << L"patch -d/ -p0 < " << std::quoted(patch_linux_path) << L" >> " << std::quoted(output_log_linux_path)
-            << " 2>&1";
-    const HRESULT hr = g_wslApi.WslLaunchInteractive(command.str().c_str(), 0, &errorCode);
+    // Setting as executable
+    {
+        std::wstringstream chmod;
+        chmod << L"chmod +x " << lx_patch_path << send_to_log;
+        DWORD exitCode = 1;
+        HRESULT hr = g_wslApi.WslLaunchInteractive(chmod.str().c_str(), FALSE, &exitCode);
+        if (FAILED(hr) || exitCode != 0) {
+            return false;
+        }
+    }
 
-    return SUCCEEDED(hr) && errorCode == 0;
+    // Executing
+    {
+        std::wstringstream exec;
+        exec << lx_patch_path << send_to_log;
+        DWORD exitCode = 1;
+        HRESULT hr = g_wslApi.WslLaunchInteractive(exec.str().c_str(), FALSE, &exitCode);
+        if (FAILED(hr) || exitCode != 0) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 [[nodiscard]] std::optional<std::vector<std::wstring>> ReadPatchList()
