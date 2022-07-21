@@ -100,6 +100,16 @@ template <typename... Args> std::wstring LoggedCommand(Args&&... args)
     ss << L") >> " << std::quoted(lx_output_log) << L" 2>&1";
     return ss.str();
 }
+
+bool CreateLogDirectory()
+{
+    std::wstringstream mkdir;
+    mkdir << L"mkdir -p " << std::quoted(patches::log_dir.wstring());
+    DWORD errCode;
+    const HRESULT hr = Sudo().WslLaunchInteractive(mkdir.str().c_str(), FALSE, &errCode);
+    return SUCCEEDED(hr) && errCode == 0;
+}
+
 bool ShutdownDistro()
 {
     const std::wstring shutdown_command = L"wsl -t " + DistributionInfo::Name;
@@ -161,6 +171,10 @@ void ApplyPatchesImpl()
     PatchLog patch_log{patches::patch_log};
 
     patch_log.read();
+    if (!patch_log.exists() && !CreateLogDirectory()) {
+        return;
+    }
+
     auto patchlist = ReadPatchList();
     if (!patchlist.has_value()) {
         return;
