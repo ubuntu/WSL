@@ -124,7 +124,6 @@ bool ApplyPatch(std::wstring_view patchname)
     // Setting as executable
     {
         std::wstring chmod = LoggedCommand(L"chmod +x ", std::quoted(lx_patch_path));
-        std::wcout << chmod << '\n';
         DWORD exitCode = 1;
         HRESULT hr = g_wslApi.WslLaunchInteractive(chmod.c_str(), FALSE, &exitCode);
         if (FAILED(hr) || exitCode != 0) {
