@@ -5,7 +5,7 @@
 namespace Testing
 {
     using ChildProcess = Oobe::ChildProcessInterface<FakeChildProcess>;
-    const auto* fake = L"./do_not_exists";
+    const auto* fake = L"./does_not_exist";
     TEST(ChildProcess, StartNTerminate)
     {
         ChildProcess process{fake, L""};

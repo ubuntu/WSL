@@ -22,7 +22,7 @@
 
 namespace Oobe
 {
-    const auto* fakeFileName = L"./do_not_exists";
+    const auto* fakeFileName = L"./does_not_exist";
     // I just need to compare to nullptr, I'll not do anything else with that pointer.
     HWND globalFakeWindow = reinterpret_cast<HWND>(const_cast<wchar_t*>(fakeFileName));
 
