@@ -210,7 +210,7 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\patches\0002-upgrader-policy.diff">
+    <CopyFileToFolders Include="..\patches\0002-upgrader-policy">
       <ExcludedFromBuild>false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <DestinationFolders>$(OutDir)/patches</DestinationFolders>

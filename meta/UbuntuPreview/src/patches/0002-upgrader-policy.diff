@@ -1,5 +1,0 @@
---- /etc/update-manager/release-upgrades
-+++ /etc/update-manager/release-upgrades
-@@ -16,1 +16,1 @@
--Prompt=lts
-+Prompt=normal

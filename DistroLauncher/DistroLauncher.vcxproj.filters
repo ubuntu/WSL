@@ -86,7 +86,7 @@
     <CopyFileToFolders Include="..\patches\0001-init-log">
       <Filter>Patches</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\patches\0002-upgrader-policy.diff">
+    <CopyFileToFolders Include="..\patches\0002-upgrader-policy">
       <Filter>Patches</Filter>
     </CopyFileToFolders>
   </ItemGroup>
