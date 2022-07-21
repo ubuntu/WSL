@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+# Update upgrade policy
+sed -i "s/^Prompt=lts$/Prompt=normal/" "/etc/update-manager/release-upgrades"
+
+# Non-blocking
+exit 0
+
