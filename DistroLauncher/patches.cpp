@@ -90,6 +90,26 @@ bool PatchLog::contains(std::wstring_view patchname) const
     return std::find(patches.cbegin(), patches.cend(), patchname) != patches.cend();
 }
 
+// (printf "\n[$(date --iso-8601=seconds)]: " && your command here ) >> $patch_install_log
+template <typename... Args> std::wstring LoggedCommand(Args&&... args)
+{
+    const auto lx_output_log = patches::patch_install_log.wstring();
+    std::wstringstream ss;
+    ss << L"(printf \"\\n[$(date --iso-8601=seconds)]: \" && ";
+    (ss << ... << std::forward<Args>(args));
+    ss << L") >> " << std::quoted(lx_output_log) << L" 2>&1";
+    return ss.str();
+}
+
+bool CreateLogDirectory()
+{
+    std::wstringstream mkdir;
+    mkdir << L"mkdir -p " << std::quoted(patches::log_dir.wstring());
+    DWORD errCode;
+    const HRESULT hr = Sudo().WslLaunchInteractive(mkdir.str().c_str(), FALSE, &errCode);
+    return SUCCEEDED(hr) && errCode == 0;
+}
+
 bool ShutdownDistro()
 {
     const std::wstring shutdown_command = L"wsl -t " + DistributionInfo::Name;
@@ -110,16 +130,12 @@ bool ImportPatch(std::wstring_view patchname)
 bool ApplyPatch(std::wstring_view patchname)
 {
     const auto lx_patch_path = patches::tmp_patch.wstring();
-    const auto lx_output_log = patches::patch_install_log.wstring();
-
-    const std::wstring send_to_log = L" >> " + lx_output_log + L" 2>&1";
 
     // Setting as executable
     {
-        std::wstringstream chmod;
-        chmod << L"chmod +x " << lx_patch_path << send_to_log;
+        std::wstring chmod = LoggedCommand(L"chmod +x ", std::quoted(lx_patch_path));
         DWORD exitCode = 1;
-        HRESULT hr = g_wslApi.WslLaunchInteractive(chmod.str().c_str(), FALSE, &exitCode);
+        HRESULT hr = g_wslApi.WslLaunchInteractive(chmod.c_str(), FALSE, &exitCode);
         if (FAILED(hr) || exitCode != 0) {
             return false;
         }
@@ -127,10 +143,9 @@ bool ApplyPatch(std::wstring_view patchname)
 
     // Executing
     {
-        std::wstringstream exec;
-        exec << lx_patch_path << send_to_log;
+        std::wstring exec = LoggedCommand(lx_patch_path);
         DWORD exitCode = 1;
-        HRESULT hr = g_wslApi.WslLaunchInteractive(exec.str().c_str(), FALSE, &exitCode);
+        HRESULT hr = g_wslApi.WslLaunchInteractive(exec.c_str(), FALSE, &exitCode);
         if (FAILED(hr) || exitCode != 0) {
             return false;
         }
@@ -156,6 +171,10 @@ void ApplyPatchesImpl()
     PatchLog patch_log{patches::patch_log};
 
     patch_log.read();
+    if (!patch_log.exists() && !CreateLogDirectory()) {
+        return;
+    }
+
     auto patchlist = ReadPatchList();
     if (!patchlist.has_value()) {
         return;

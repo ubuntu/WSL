@@ -1,3 +1,2 @@
 #!/usr/bin/sh
-echo "# WSL patches log. Do not modify this file." > "/var/log/wsl-patches.log"
-echo "# WSL patches stdOut and stdErr log." > "/var/log/wsl-patches-output.log"
+echo "# WSL patches log. Do not modify this file." > "/var/log/wsl/patches.log"
