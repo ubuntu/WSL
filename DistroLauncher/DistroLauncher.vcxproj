@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
+    <ClInclude Include="ChildProcess.h" />
     <ClInclude Include="console_service.h" />
     <ClInclude Include="ExitStatus.h" />
     <ClInclude Include="extended_cli_parser.h" />
@@ -166,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApplicationStrategy.cpp" />
+    <ClCompile Include="ChildProcess.cpp" />
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="ExitStatus.cpp" />
     <ClCompile Include="exit_status_parser.cpp" />

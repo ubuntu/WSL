@@ -17,22 +17,18 @@
 
 #include "stdafx.h"
 #include "gtest/gtest.h"
+#include "FakeChildProcessImpl.h"
 #include "splash_controller.h"
 
 namespace Oobe
 {
-    const auto* fakeFileName = L"./do_not_exists";
+    const auto* fakeFileName = L"./does_not_exist";
     // I just need to compare to nullptr, I'll not do anything else with that pointer.
     HWND globalFakeWindow = reinterpret_cast<HWND>(const_cast<wchar_t*>(fakeFileName));
+
     // Fake strategies to exercise the Splash controller state machine.
     struct NothingWorksStrategy
     {
-        static bool do_create_process(const std::filesystem::path& exePath,
-                                      STARTUPINFO& startup,
-                                      PROCESS_INFORMATION& process)
-        {
-            return false;
-        }
 
         static HWND do_read_window_from_ipc()
         {
@@ -49,27 +45,12 @@ namespace Oobe
             return false;
         }
 
-        static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
-        {
-            return nullptr;
-        }
-        static void do_cleanup_process(PROCESS_INFORMATION& h)
-        { }
-        static void do_unsubscribe(HANDLE h)
-        { }
         // The other methods will never be called, so there is no need to define them. Otherwise it would not even
         // compile.
     }; // struct NothingWorksStrategy
 
     struct EverythingWorksStrategy
     {
-        static bool do_create_process(const std::filesystem::path& exePath,
-                                      STARTUPINFO& startup,
-                                      PROCESS_INFORMATION& process)
-        {
-            return true;
-        }
-
         static HWND do_read_window_from_ipc()
         {
             // no risk because this handle will not be used for anything besides passing around.
@@ -97,16 +78,6 @@ namespace Oobe
         static void do_gracefully_close(HWND window)
         { }
 
-        static void do_cleanup_process(PROCESS_INFORMATION& h)
-        { }
-
-        static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
-        {
-            return static_cast<HANDLE>(globalFakeWindow);
-        }
-
-        static void do_unsubscribe(HANDLE h)
-        { }
         // The other methods will never be called, so there is no need to define them. Otherwise it would not even
         // compile.
     }; // struct EverythingWorksStrategy
@@ -116,7 +87,7 @@ namespace Oobe
     // The whole purpose of adding this state machine technique was to improve overall testability.
     TEST(SplashControllerTests, LaunchFailedShouldStayIdle)
     {
-        using Controller = SplashController<NothingWorksStrategy>;
+        using Controller = SplashController<NothingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         controller.sm.addEvent(Controller::Events::Run{&controller}); // This fails but it is a valid transition.
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
@@ -126,12 +97,6 @@ namespace Oobe
     {
         struct CantFindWindowStrategy
         {
-            static bool do_create_process(const std::filesystem::path& exePath,
-                                          STARTUPINFO& startup,
-                                          PROCESS_INFORMATION& process)
-            {
-                return true;
-            }
 
             static HWND do_read_window_from_ipc()
             {
@@ -148,11 +113,6 @@ namespace Oobe
                 return false;
             }
 
-            static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
-            {
-                return static_cast<HANDLE>(globalFakeWindow);
-            }
-
             static void do_gracefully_close(HWND window)
             { }
             static void do_cleanup_process(PROCESS_INFORMATION& h)
@@ -161,7 +121,7 @@ namespace Oobe
             { }
         }; // struct CantFindWindowStrategy
 
-        using Controller = SplashController<CantFindWindowStrategy>;
+        using Controller = SplashController<CantFindWindowStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
@@ -173,12 +133,6 @@ namespace Oobe
     {
         struct AlmostEverythingWorksStrategy
         {
-            static bool do_create_process(const std::filesystem::path& exePath,
-                                          STARTUPINFO& startup,
-                                          PROCESS_INFORMATION& process)
-            {
-                return true;
-            }
 
             static HWND do_read_window_from_ipc()
             {
@@ -203,10 +157,6 @@ namespace Oobe
             {
                 return true;
             }
-            static HANDLE do_on_close(HANDLE process, WAITORTIMERCALLBACK callback, void* data)
-            {
-                return static_cast<HANDLE>(globalFakeWindow);
-            }
 
             static void do_gracefully_close(HWND window)
             { }
@@ -216,7 +166,7 @@ namespace Oobe
             { }
         }; // struct AlmostEverythingWorksStrategy
 
-        using Controller = SplashController<AlmostEverythingWorksStrategy>;
+        using Controller = SplashController<AlmostEverythingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since almost everything works in this realm, all transitions below should be valid...
@@ -226,7 +176,7 @@ namespace Oobe
 
     TEST(SplashControllerTests, AHappySequenceOfEvents)
     {
-        using Controller = SplashController<EverythingWorksStrategy>;
+        using Controller = SplashController<EverythingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since everything works in this realm, all transitions below should be valid...
@@ -251,7 +201,7 @@ namespace Oobe
     // This proves to be impossible to run the splash application more than once after the first success.
     TEST(SplashControllerTests, OnlyIdleStateAcceptsRunEvent)
     {
-        using Controller = SplashController<EverythingWorksStrategy>;
+        using Controller = SplashController<EverythingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since everything works in this realm, all transitions below should be valid...
@@ -289,7 +239,7 @@ namespace Oobe
     TEST(SplashControllerTests, MustCloseOnlyOnce)
     {
         // Remember that in this realm everything just works...
-        using Controller = SplashController<EverythingWorksStrategy>;
+        using Controller = SplashController<EverythingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(transition.has_value());
