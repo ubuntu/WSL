@@ -90,10 +90,12 @@
     </ClCompile>
     <ClCompile Include="ChildProcessTests.cpp" />
     <ClCompile Include="FakeChildProcessImpl.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\ChildProcess.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />
     <ClInclude Include="mock_api.h" />
+    <ClInclude Include="FakeChildProcessImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

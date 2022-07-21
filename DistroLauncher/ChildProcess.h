@@ -11,6 +11,7 @@
  *  Define the process executable, CLI arguments and handles to the standard console devices:
  *
  *  ```
+ *  using ChildProcess = ChildProcessInterface<Win32ChildProcess>;
  *  ChildProcess child{L"notepad.exe",L"",nullptr,nullptr,nullptr}; //nullptr handles disable console interaction.
  *  ```
  *
@@ -160,6 +161,4 @@ namespace Oobe
 
         friend class ChildProcessInterface<Win32ChildProcess>;
     };
-
-    using ChildProcess = ChildProcessInterface<Win32ChildProcess>;
 }

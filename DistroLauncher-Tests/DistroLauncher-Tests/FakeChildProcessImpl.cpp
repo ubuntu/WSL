@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "ChildProcess.h"
+#include "FakeChildProcessImpl.h"
 
 // Fake the Win32 Child Process implementation
-namespace Oobe
+namespace Testing
 {
-    bool Win32ChildProcess::do_start()
+    bool FakeChildProcess::do_start()
     {
         // harmless because the value is never used other than for comparing to nullptr.
         procInfo.hProcess = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -14,18 +14,18 @@ namespace Oobe
         return true;
     }
 
-    void Win32ChildProcess::do_terminate()
+    void FakeChildProcess::do_terminate()
     {
         procInfo = PROCESS_INFORMATION{0};
         procInfo.hProcess = nullptr;
     }
 
-    void Win32ChildProcess::do_unsubscribe()
+    void FakeChildProcess::do_unsubscribe()
     {
         waiterHandle = nullptr;
     }
 
-    DWORD Win32ChildProcess::do_waitExitSync(DWORD timeoutMs)
+    DWORD FakeChildProcess::do_waitExitSync(DWORD timeoutMs)
     {
         return 0;
     }

@@ -66,6 +66,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\DistroLauncher\ApplicationStrategy.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\ChildProcess.cpp" />
     <ClCompile Include="..\..\DistroLauncher\DistributionInfo.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ExitStatus.cpp" />
     <ClCompile Include="..\..\DistroLauncher\exit_status_parser.cpp" />
@@ -106,6 +107,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FakeChildProcessImpl.h" />
     <ClInclude Include="mock_api.h" />
     <ClInclude Include="InstallerControllerTestPolicies.h" />
   </ItemGroup>

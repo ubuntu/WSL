@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
-#include "ChildProcess.h"
+#include "FakeChildProcessImpl.h"
 
-namespace Oobe
+namespace Testing
 {
+    using ChildProcess = Oobe::ChildProcessInterface<FakeChildProcess>;
     const auto* fake = L"./do_not_exists";
     TEST(ChildProcess, StartNTerminate)
     {

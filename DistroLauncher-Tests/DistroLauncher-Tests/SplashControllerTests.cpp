@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "gtest/gtest.h"
+#include "FakeChildProcessImpl.h"
 #include "splash_controller.h"
 
 namespace Oobe
@@ -86,7 +87,7 @@ namespace Oobe
     // The whole purpose of adding this state machine technique was to improve overall testability.
     TEST(SplashControllerTests, LaunchFailedShouldStayIdle)
     {
-        using Controller = SplashController<NothingWorksStrategy>;
+        using Controller = SplashController<NothingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         controller.sm.addEvent(Controller::Events::Run{&controller}); // This fails but it is a valid transition.
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
@@ -120,7 +121,7 @@ namespace Oobe
             { }
         }; // struct CantFindWindowStrategy
 
-        using Controller = SplashController<CantFindWindowStrategy>;
+        using Controller = SplashController<CantFindWindowStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(controller.sm.isCurrentStateA<Controller::States::Closed>());
@@ -165,7 +166,7 @@ namespace Oobe
             { }
         }; // struct AlmostEverythingWorksStrategy
 
-        using Controller = SplashController<AlmostEverythingWorksStrategy>;
+        using Controller = SplashController<AlmostEverythingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since almost everything works in this realm, all transitions below should be valid...
@@ -175,7 +176,7 @@ namespace Oobe
 
     TEST(SplashControllerTests, AHappySequenceOfEvents)
     {
-        using Controller = SplashController<EverythingWorksStrategy>;
+        using Controller = SplashController<EverythingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since everything works in this realm, all transitions below should be valid...
@@ -200,7 +201,7 @@ namespace Oobe
     // This proves to be impossible to run the splash application more than once after the first success.
     TEST(SplashControllerTests, OnlyIdleStateAcceptsRunEvent)
     {
-        using Controller = SplashController<EverythingWorksStrategy>;
+        using Controller = SplashController<EverythingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         // Since everything works in this realm, all transitions below should be valid...
@@ -238,7 +239,7 @@ namespace Oobe
     TEST(SplashControllerTests, MustCloseOnlyOnce)
     {
         // Remember that in this realm everything just works...
-        using Controller = SplashController<EverythingWorksStrategy>;
+        using Controller = SplashController<EverythingWorksStrategy, Testing::FakeChildProcess>;
         Controller controller{fakeFileName, GetStdHandle(STD_OUTPUT_HANDLE), callback};
         auto transition = controller.sm.addEvent(Controller::Events::Run{&controller});
         ASSERT_TRUE(transition.has_value());

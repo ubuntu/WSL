@@ -184,9 +184,10 @@ namespace Oobe
     ///
     /// Since ShouldBeClosed state cannot handle any event, it's expected that the Close event will happen only once.
     /// Also, since the Run event can only be handled by the initial state, that event is expected to succeed only once.
-    template <typename Strategy = SplashStrategy> class SplashController
+    template <typename Strategy = SplashStrategy, typename ProcessAPI = Win32ChildProcess> class SplashController
     {
       private:
+        using ChildProcess = ChildProcessInterface<ProcessAPI>;
         std::unique_ptr<ChildProcess> process;
 
       public:
@@ -212,7 +213,7 @@ namespace Oobe
             // controller's private members.
             struct Run
             {
-                not_null<SplashController<Strategy>*> controller;
+                not_null<SplashController<Strategy, ProcessAPI>*> controller;
             };
             struct ToggleVisibility
             { };
@@ -224,7 +225,7 @@ namespace Oobe
 
             struct Close
             {
-                not_null<SplashController<Strategy>*> controller;
+                not_null<SplashController<Strategy, ProcessAPI>*> controller;
             };
             using EventVariant = std::variant<ToggleVisibility, Run, PlaceBehind, Close>;
         };
@@ -326,7 +327,7 @@ namespace Oobe
         // and state types are now dependent and cannot be explicitly referred to without the templated type argument.
         using State = typename States::StateVariant;
         using Event = typename Events::EventVariant;
-        internal::state_machine<SplashController<Strategy>> sm;
+        internal::state_machine<SplashController<Strategy, ProcessAPI>> sm;
 
         ~SplashController() = default;
     };
