@@ -3,7 +3,9 @@ on:
   push:
     branches:
     - main
+    paths: [DistroLauncher/**, .github/workflows/**]
   pull_request:
+    paths: [DistroLauncher/**, .github/workflows/**]
 
 concurrency:
   group: QA-${{ github.head_ref || github.run_id }}
