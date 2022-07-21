@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/ubuntu/wsl/wsl-builder/common"
@@ -36,12 +37,11 @@ func buildGHMatrix(csvPath, metaPath string) error {
 				t = ""
 			}
 			// Currently only Kinetic (22.10) and later are published to "https://cloud-images.ubuntu.com/wsl/"
-			codeNameSubUri := func() string {
-				if strings.Compare(r.BuildVersion, "2210") >= 0 {
-					return "wsl/" + r.CodeName
-				}
-				return r.CodeName
-			}()
+			codeNameSubUri := r.CodeName
+			if strings.Compare(r.BuildVersion, "2210") >= 0 {
+				codeNameSubUri = filepath.Join("wsl", r.CodeName)
+			}
+
 			t += fmt.Sprintf("https://cloud-images.ubuntu.com/%s/current/%s-server-cloudimg-%s-wsl.rootfs.tar.gz::%s", codeNameSubUri, r.CodeName, arch, arch)
 			rootfses += t
 		}
