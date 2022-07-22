@@ -17,4 +17,4 @@
 
 #pragma once
 
-void SelectUpgradePolicy();
+void SetDefaultUpgradePolicy();
