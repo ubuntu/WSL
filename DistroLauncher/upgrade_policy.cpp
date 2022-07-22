@@ -61,15 +61,10 @@ void SetDefaultUpgradePolicyImpl()
     std::wstring regex = L"s/Prompt=lts/Prompt=" + GetUpgradePolicy() + L'/';
     std::wstringstream sed;
     sed << L"sed -i " << std::quoted(regex) << L' ' << std::quoted(policyfile.wstring());
+    sed << L" && date --iso-8601=seconds" << L" > " << std::quoted(log.wstring());
 
     DWORD errCode;
     auto hr = Sudo::WslLaunchInteractive(sed.str().c_str(), FALSE, &errCode);
-
-    if (SUCCEEDED(hr) && errCode == 0) {
-        std::wstringstream cmd;
-        cmd << L"date --iso-8601=seconds" << L" > " << std::quoted(log.wstring());
-        Sudo::WslLaunchInteractive(cmd.str().c_str(), FALSE, &errCode);
-    }
 }
 
 void SetDefaultUpgradePolicy()
