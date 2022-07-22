@@ -54,7 +54,7 @@ void SetDefaultUpgradePolicyImpl()
     const fs::path log{L"/var/log/upgrade-policy-changed.log"};
     const fs::path policyfile{L"/etc/update-manager/release-upgrades"};
 
-    if (fs::exists(log)) {
+    if (fs::exists(Oobe::WindowsPath(log))) {
         return;
     }
 
