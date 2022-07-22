@@ -72,7 +72,7 @@ void SetDefaultUpgradePolicyImpl()
     std::wstring command = concat(L"bash -ec ", std::quoted(concat(sed, L" && ", date)));
 
     DWORD errCode;
-    auto hr = Sudo::WslLaunchInteractive(command.c_str(), FALSE, &errCode);
+    Sudo::WslLaunchInteractive(command.c_str(), FALSE, &errCode);
 }
 
 void SetDefaultUpgradePolicy()
