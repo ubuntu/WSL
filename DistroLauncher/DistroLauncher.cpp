@@ -123,6 +123,9 @@ int wmain(int argc, wchar_t const *argv[])
 
     // Parse the command line arguments.
     if ((SUCCEEDED(hr)) && (!installOnly)) {
+
+        SelectUpgradePolicy();
+
         if (arguments.empty()) {
             hr = g_wslApi.WslLaunchInteractive(Oobe::WrapCommand(L"").c_str(), false, &exitCode);
 
