@@ -14,73 +14,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #include "stdafx.h"
+#include "ApplicationStrategyCommon.h"
+#include "SplashEnabledStrategy.h"
 
 namespace Oobe
 {
-    namespace
-    {
-        // Those functions would be complete duplicates if they were methods in both strategy classes.
-        HRESULT do_reconfigure(Oobe::InstallerController<>& controller)
-        {
-            std::array<InstallerController<>::Event, 3> eventSequence{
-              InstallerController<>::Events::Reconfig{}, InstallerController<>::Events::StartInstaller{},
-              InstallerController<>::Events::BlockOnInstaller{}};
-
-            // for better readability.
-            constexpr auto S_CONTINUE = E_NOTIMPL;
-            HRESULT hr = S_CONTINUE;
-
-            for (int i = 0; i < eventSequence.size() && hr == S_CONTINUE; ++i) {
-                auto ok = controller.sm.addEvent(eventSequence[i]);
-                if (!ok) {
-                    return hr;
-                }
-
-                // We can now have:
-                // States::UpstreamDefaultInstall on failure;
-                // States::Closed -> States::Success (for text mode) or
-                // States::Closed -> States::PreparedGui -> States::Ready -> States::Success (for GUI)
-                hr =
-                  std::visit(internal::overloaded{
-                               [&](InstallerController<>::States::Success&) { return S_OK; },
-                               [&](InstallerController<>::States::PreparedGui&) { return S_CONTINUE; },
-                               [&](InstallerController<>::States::Ready&) { return S_CONTINUE; },
-                               [&](InstallerController<>::States::UpstreamDefaultInstall& state) { return state.hr; },
-                               [&](auto&&...) { return E_UNEXPECTED; },
-                             },
-                             ok.value());
-            }
-            return hr;
-        }
-
-        HRESULT do_autoinstall(InstallerController<>& controller, const std::filesystem::path& autoinstall_file)
-        {
-            auto& stateMachine = controller.sm;
-
-            auto ok = stateMachine.addEvent(InstallerController<>::Events::AutoInstall{autoinstall_file});
-            if (!ok) {
-                return E_FAIL;
-            }
-            ok = stateMachine.addEvent(InstallerController<>::Events::BlockOnInstaller{});
-            if (!ok) {
-                return E_FAIL;
-            }
-            HRESULT hr = E_NOTIMPL;
-            std::visit(internal::overloaded{
-                         [&](InstallerController<>::States::Success& s) { hr = S_OK; },
-                         [&](InstallerController<>::States::UpstreamDefaultInstall& s) { hr = s.hr; },
-                         [&](auto&&... s) { hr = E_UNEXPECTED; },
-                       },
-                       ok.value());
-            return hr;
-        }
-    } // namespace.
-
-// The part of the code affected by the existence of the splash application in the package is excluded from compilation
-// for ARM64 due splash application being written in Dart/Flutter, which currently does not supported Windows ARM64
-// targets. See: https://github.com/flutter/flutter/issues/62597
-#ifndef _M_ARM64
     namespace
     {
         std::filesystem::path splashPath()
@@ -179,10 +119,10 @@ namespace Oobe
         }
     }
 
-    HRESULT SplashEnabledStrategy::do_install(Mode ui_mode)
+    HRESULT SplashEnabledStrategy::do_install(Mode uiMode)
     {
         std::array<InstallerController<>::Event, 3> eventSequence{
-          InstallerController<>::Events::InteractiveInstall{ui_mode}, InstallerController<>::Events::StartInstaller{},
+          InstallerController<>::Events::InteractiveInstall{uiMode}, InstallerController<>::Events::StartInstaller{},
           InstallerController<>::Events::BlockOnInstaller{}};
         HRESULT hr = E_NOTIMPL;
         for (auto& event : eventSequence) {
@@ -215,51 +155,12 @@ namespace Oobe
 
     HRESULT SplashEnabledStrategy::do_reconfigure()
     {
-        return Oobe::do_reconfigure(installer);
+        return Oobe::internal::reconfigure_linux_ui(installer);
     }
 
     HRESULT SplashEnabledStrategy::do_autoinstall(const std::filesystem::path& autoinstall_file)
     {
-        return Oobe::do_autoinstall(installer, autoinstall_file);
+        return Oobe::internal::do_autoinstall(installer, autoinstall_file);
     }
 
-#else // _M_ARM64
-
-    HRESULT NoSplashStrategy::do_install(Mode ui)
-    {
-        std::array<InstallerController<>::Event, 3> eventSequence{InstallerController<>::Events::InteractiveInstall{ui},
-                                                                  InstallerController<>::Events::StartInstaller{},
-                                                                  InstallerController<>::Events::BlockOnInstaller{}};
-        HRESULT hr = E_NOTIMPL;
-        for (auto& ev : eventSequence) {
-            auto ok = installer.sm.addEvent(ev);
-
-            // unexpected transition occurred here?
-            if (!ok.has_value()) {
-                return hr;
-            }
-
-            std::visit(internal::overloaded{
-                         [&](InstallerController<>::States::Success& s) { hr = S_OK; },
-                         [&](InstallerController<>::States::UpstreamDefaultInstall& s) { hr = s.hr; },
-                         [&](auto&&... s) { hr = E_UNEXPECTED; },
-                       },
-                       ok.value());
-        }
-
-        return hr;
-    }
-
-    HRESULT NoSplashStrategy::do_reconfigure()
-    {
-        return Oobe::do_reconfigure(installer);
-    }
-
-    HRESULT NoSplashStrategy::do_autoinstall(std::filesystem::path autoinstall_file)
-    {
-        return Oobe::do_autoinstall(installer, autoinstall_file);
-    }
-
-#endif // _M_ARM64
-
-} // namespace Oobe.
+}
