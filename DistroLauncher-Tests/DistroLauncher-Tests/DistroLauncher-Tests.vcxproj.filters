@@ -91,6 +91,8 @@
     <ClCompile Include="ChildProcessTests.cpp" />
     <ClCompile Include="FakeChildProcessImpl.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ChildProcess.cpp" />
+    <ClCompile Include="SetOnceNamedEventTests.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\SetOnceNamedEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />
