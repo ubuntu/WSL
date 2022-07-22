@@ -47,7 +47,7 @@ std::wstring GetUpgradePolicy()
     return L"normal";
 }
 
-template<typename...Args> std::wstring concat(Args&&...args)
+template <typename... Args> std::wstring concat(Args&&... args)
 {
     std::wstringstream ss;
     (ss << ... << std::forward<Args>(args));
