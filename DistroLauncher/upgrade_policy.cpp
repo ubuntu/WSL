@@ -47,6 +47,13 @@ std::wstring GetUpgradePolicy()
     return L"normal";
 }
 
+template<typename...Args> std::wstring concat(Args&&...args)
+{
+    std::wstringstream ss;
+    (ss << ... << std::forward<Args>(args));
+    return ss.str();
+}
+
 void SetDefaultUpgradePolicyImpl()
 {
     namespace fs = std::filesystem;
@@ -58,13 +65,14 @@ void SetDefaultUpgradePolicyImpl()
         return;
     }
 
-    std::wstring regex = L"s/Prompt=lts/Prompt=" + GetUpgradePolicy() + L'/';
-    std::wstringstream sed;
-    sed << L"sed -i " << std::quoted(regex) << L' ' << std::quoted(policyfile.wstring());
-    sed << L" && date --iso-8601=seconds" << L" > " << std::quoted(log.wstring());
+    std::wstring regex = concat(L"s/Prompt=lts/Prompt=", GetUpgradePolicy(), L'/');
+    std::wstring sed = concat(L"sed -i ", std::quoted(regex), L' ', std::quoted(policyfile.wstring()));
+    std::wstring date = concat(L"date --iso-8601=seconds > ", std::quoted(log.wstring()));
+
+    std::wstring command = concat(L"bash -ec ", std::quoted(concat(sed, L" && ", date)));
 
     DWORD errCode;
-    auto hr = Sudo::WslLaunchInteractive(sed.str().c_str(), FALSE, &errCode);
+    auto hr = Sudo::WslLaunchInteractive(command.c_str(), FALSE, &errCode);
 }
 
 void SetDefaultUpgradePolicy()
