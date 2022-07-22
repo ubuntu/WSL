@@ -66,29 +66,8 @@ TEST(SudoTests, WslInterface)
         ASSERT_EQ(exitCode, 0);
         ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);             // Default user restored
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1); // Interactive command launched
-        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);             // Regular command not launched
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.back().command, command1);
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.back().useCurrentWorkingDirectory, TRUE);
-
-        const auto command2 = L"mkdir ${HOME}/desktop/important_stuff";
-        int x = 0, y = 0, z = 0;
-        HANDLE stdIn = &x;  // Mock StdIn
-        HANDLE stdOut = &y; // Mock StdOut
-        HANDLE stdErr = &z; // Mock stdErr
-        HANDLE process = nullptr;
-        hr = Testing::Sudo::WslLaunch(command2, FALSE, stdIn, stdOut, stdErr, &process);
-
-        ASSERT_TRUE(SUCCEEDED(hr));
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef);             // Default user restored
-        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 1);             // Command launched
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1); // Interactive command not launched
-
-        ASSERT_EQ(Testing::WslMockAPI::command_log.back().command, command2);
-        ASSERT_EQ(Testing::WslMockAPI::command_log.back().useCurrentWorkingDirectory, FALSE);
-        ASSERT_EQ(Testing::WslMockAPI::command_log.back().stdIn, stdIn);
-        ASSERT_EQ(Testing::WslMockAPI::command_log.back().stdOut, stdOut);
-        ASSERT_EQ(Testing::WslMockAPI::command_log.back().stdErr, stdErr);
-        ASSERT_EQ(process, Testing::WslMockAPI::mock_process); // Process out variable not ignored
     }
 
     // Testing failure (fails because it's locked already)
@@ -105,22 +84,6 @@ TEST(SudoTests, WslInterface)
         ASSERT_EQ(exitCode, 0xBAD); // Exit code not modified
 
         ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0);                    // Still sudo
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 0); // Command not lauched
-        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);             // Command not lauched
-
-        const auto command2 = L"mkdir ${HOME}/desktop/important_stuff";
-        int x = 0, y = 0, z = 0;
-        HANDLE stdIn = &x;  // Mock StdIn
-        HANDLE stdOut = &y; // Mock StdOut
-        HANDLE stdErr = &z; // Mock stdErr
-        HANDLE process = nullptr;
-        hr = Testing::Sudo::WslLaunch(command2, FALSE, stdIn, stdOut, stdErr, &process);
-
-        ASSERT_TRUE(FAILED(hr));     // Failed to acquire Sudo lock
-        ASSERT_EQ(process, nullptr); // Process not assigned
-
-        ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0);                    // Still sudo
-        ASSERT_EQ(Testing::WslMockAPI::command_log.size(), 0);             // Command not lauched
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 0); // Command not lauched
     }
     ASSERT_EQ(Testing::WslMockAPI::defaultUID_, 0xabcdef); // Scope lock released
