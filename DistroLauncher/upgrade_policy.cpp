@@ -49,9 +49,9 @@ std::wstring GetUpgradePolicy()
 
 template <typename... Args> std::wstring concat(Args&&... args)
 {
-    std::wstringstream ss;
-    (ss << ... << std::forward<Args>(args));
-    return ss.str();
+    std::wstringstream buffer;
+    (buffer << ... << std::forward<Args>(args));
+    return buffer.str();
 }
 
 void SetDefaultUpgradePolicyImpl()
