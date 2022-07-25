@@ -99,13 +99,9 @@ namespace Oobe::internal
                     return true;
                 }
             }
-
-
-
-            
         }
 
-         return false;
+        return false;
     } // bool ini_find_value()
 
 } // Oobe::internal

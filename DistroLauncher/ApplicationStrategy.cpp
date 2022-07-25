@@ -90,7 +90,7 @@ namespace Oobe
     } // namespace.
 
     SplashEnabledStrategy::SplashEnabledStrategy() : splashExePath{splashPath()}
-    {  }
+    { }
 
     void SplashEnabledStrategy::do_run_splash(bool hideConsole)
     {
