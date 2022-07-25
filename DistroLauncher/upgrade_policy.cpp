@@ -66,8 +66,8 @@ void SetDefaultUpgradePolicyImpl()
     }
 
     std::wstring regex = concat(L"s/Prompt=lts/Prompt=", GetUpgradePolicy(), L'/');
-    std::wstring sed = concat(L"sed -i ", std::quoted(regex), L' ', std::quoted(policyfile.wstring()));
-    std::wstring date = concat(L"date --iso-8601=seconds > ", std::quoted(log.wstring()));
+    std::wstring sed = concat(L"sed -i ", std::quoted(regex), L' ', policyfile);
+    std::wstring date = concat(L"date --iso-8601=seconds > ", log);
 
     std::wstring command = concat(L"bash -ec ", std::quoted(concat(sed, L" && ", date)));
 
