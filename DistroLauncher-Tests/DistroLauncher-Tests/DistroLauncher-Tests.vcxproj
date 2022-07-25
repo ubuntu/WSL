@@ -79,6 +79,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="..\..\DistroLauncher\OOBE.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ProcessRunner.cpp" />
     <ClCompile Include="..\..\DistroLauncher\stdafx.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\upgrade_policy.cpp" />
     <ClCompile Include="..\..\DistroLauncher\Win32Utils.cpp" />
     <ClCompile Include="..\..\DistroLauncher\WindowsUserInfo.cpp" />
     <ClCompile Include="..\..\DistroLauncher\WslApiLoader.cpp" />
@@ -97,6 +98,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="SplashControllerTests.cpp" />
     <ClCompile Include="StateMachineTests.cpp" />
     <ClCompile Include="sudo_tests.cpp" />
+    <ClCompile Include="upgrade_policy_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -17,66 +17,64 @@
 
 #include "stdafx.h"
 
-bool starts_with(std::wstring_view tested, std::wstring_view start)
+namespace internal
 {
-    if (tested.size() < start.size()) {
-        return false;
-    }
-    auto mismatch = std::mismatch(start.cbegin(), start.cend(), tested.cbegin());
-    return mismatch.first == start.cend();
-}
 
-bool ends_with(std::wstring_view tested, std::wstring_view end)
-{
-    if (tested.size() < end.size()) {
-        return false;
-    }
-    auto mismatch = std::mismatch(end.crbegin(), end.crend(), tested.crbegin());
-    return mismatch.first == end.crend();
-}
-
-std::wstring GetUpgradePolicy()
-{
-    std::wstring_view name = DistributionInfo::Name;
-    if (name == L"Ubuntu") {
-        return L"lts";
-    }
-    if (starts_with(name, L"Ubuntu") && ends_with(name, L"LTS")) {
-        return L"never";
-    }
-    return L"normal";
-}
-
-template <typename... Args> std::wstring concat(Args&&... args)
-{
-    std::wstringstream buffer;
-    (buffer << ... << std::forward<Args>(args));
-    return buffer.str();
-}
-
-void SetDefaultUpgradePolicyImpl()
-{
-    namespace fs = std::filesystem;
-
-    const fs::path log{L"/var/log/upgrade-policy-changed.log"};
-    const fs::path policyfile{L"/etc/update-manager/release-upgrades"};
-
-    if (fs::exists(Oobe::WindowsPath(log))) {
-        return;
+    bool starts_with(const std::wstring_view tested, const std::wstring_view start)
+    {
+        if (tested.size() < start.size()) {
+            return false;
+        }
+        auto mismatch = std::mismatch(start.cbegin(), start.cend(), tested.cbegin());
+        return mismatch.first == start.cend();
     }
 
-    std::wstring regex = concat(L"s/Prompt=lts/Prompt=", GetUpgradePolicy(), L'/');
-    std::wstring sed = concat(L"sed -i ", std::quoted(regex), L' ', policyfile);
-    std::wstring date = concat(L"date --iso-8601=seconds > ", log);
+    bool ends_with(const std::wstring_view tested, const std::wstring_view end)
+    {
+        if (tested.size() < end.size()) {
+            return false;
+        }
+        auto mismatch = std::mismatch(end.crbegin(), end.crend(), tested.crbegin());
+        return mismatch.first == end.crend();
+    }
 
-    std::wstring command = concat(L"bash -ec ", std::quoted(concat(sed, L" && ", date)));
+    std::wstring GetUpgradePolicy()
+    {
+        std::wstring_view name = DistributionInfo::Name;
+        if (name == L"Ubuntu") {
+            return L"lts";
+        }
+        if (starts_with(name, L"Ubuntu") && ends_with(name, L"LTS")) {
+            return L"never";
+        }
+        return L"normal";
+    }
 
-    DWORD errCode;
-    Sudo::WslLaunchInteractive(command.c_str(), FALSE, &errCode);
+    void SetDefaultUpgradePolicyImpl()
+    {
+        namespace fs = std::filesystem;
+
+        const fs::path log{L"/var/log/upgrade-policy-changed.log"};
+        const fs::path policyfile{L"/etc/update-manager/release-upgrades"};
+
+        if (fs::exists(Oobe::WindowsPath(log))) {
+            return;
+        }
+
+        std::wstring regex = concat(L"s/Prompt=lts/Prompt=", GetUpgradePolicy(), L'/');
+        std::wstring sed = concat(L"sed -i ", std::quoted(regex), L' ', policyfile);
+        std::wstring date = concat(L"date --iso-8601=seconds > ", log);
+
+        std::wstring command = concat(L"bash -ec ", std::quoted(concat(sed, L" && ", date)));
+
+        DWORD errCode;
+        Sudo::WslLaunchInteractive(command.c_str(), FALSE, &errCode);
+    }
+
 }
 
 void SetDefaultUpgradePolicy()
 {
     auto mutex = NamedMutex(L"upgrade-policy");
-    mutex.lock().and_then(SetDefaultUpgradePolicyImpl);
+    mutex.lock().and_then(internal::SetDefaultUpgradePolicyImpl);
 }
