@@ -155,55 +155,27 @@ namespace CommandStreamInternals
         WSL_COMMAND_STREAM_IMPLEMENT_TAG(STRING)
 
         // Piping commands
-
-      public:
-        friend CommandStream& operator<<(CommandStream& cmd, CommandStream const& other)
+        friend std::wostream& operator<<(std::wostream& lhs, CommandStream const& rhs)
         {
-            cmd.data_ << other.string();
-            return cmd;
+            return lhs << rhs.string();
         }
 
-        friend CommandStream&& operator<<(CommandStream&& cmd, CommandStream const& other)
+        friend std::wostream&& operator<<(std::wostream& lhs, CommandStream&& rhs)
         {
-            cmd.data_ << other.string();
-            return std::forward<CommandStream>(cmd);
-        }
-
-        friend CommandStream& operator<<(CommandStream& cmd, CommandStream&& other)
-        {
-            cmd.data_ << std::move(other.data_).str();
-            return cmd;
-        }
-
-        friend CommandStream&& operator<<(CommandStream&& cmd, CommandStream&& other)
-        {
-            cmd.data_ << std::move(other.data_).str();
-            return std::forward<CommandStream>(cmd);
+            return lhs << std::move(rhs.data_).str();
         }
 
         // Piping string-like objects
-        template <typename WStringLike> friend CommandStream& operator<<(CommandStream& cmd, const WStringLike& str)
+        template <typename WStringLike> CommandStream& operator<<(WStringLike& str)
         {
-            cmd.data_ << str;
-            return cmd;
+            data_ << str;
+            return *this;
         }
 
-        template <typename WStringLike> friend CommandStream&& operator<<(CommandStream&& cmd, const WStringLike& str)
+        template <typename WStringLike> CommandStream& operator<<(WStringLike&& str)
         {
-            cmd.data_ << str;
-            return std::forward<CommandStream>(cmd);
-        }
-
-        template <typename WStringLike> friend CommandStream& operator<<(CommandStream& cmd, WStringLike&& str)
-        {
-            cmd.data_ << std::forward<WStringLike>(str);
-            return cmd;
-        }
-
-        template <typename WStringLike> friend CommandStream&& operator<<(CommandStream&& cmd, WStringLike&& str)
-        {
-            cmd.data_ << std::forward<WStringLike>(str);
-            return std::forward<CommandStream>(cmd);
+            data_ << std::forward<WStringLike>(str);
+            return *this;
         }
 
         BOOL use_cwd_ = FALSE;

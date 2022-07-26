@@ -125,6 +125,21 @@ TEST(CommandStreamTests, Nesting)
         ASSERT_EQ(combination.string(), LR"(echo Hello && date --iso-8601)");
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 2u);
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), LR"(echo Hello && date --iso-8601)");
+
+        ASSERT_EQ(first.string(), L"echo Hello");
+        ASSERT_EQ(second.string(), L"date --iso-8601");
+    }
+
+    // Raw nesting, non-const
+    {
+        auto first = Testing::WslStream{} << L"echo Hello";
+        auto second = Testing::WslStream{} << L"date --iso-8601";
+
+        auto combination = Testing::WslStream{} << first << L" && " << second << Testing::WslStream::String;
+
+        ASSERT_EQ(combination, LR"(echo Hello && date --iso-8601)");
+        ASSERT_EQ(first.string(), L"echo Hello");
+        ASSERT_EQ(second.string(), L"date --iso-8601");
     }
 
     // Move nesting
