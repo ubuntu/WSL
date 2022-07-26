@@ -57,8 +57,13 @@ namespace Oobe
         prefixedFilePath.append(DistributionInfo::Name);
         prefixedFilePath.append(launcherCommandFilePath);
         std::ifstream launcherCmdFile;
-        if (!std::filesystem::exists(prefixedFilePath)) {
+        std::error_code error;
+        if (!std::filesystem::exists(prefixedFilePath, error)) {
             // OOBE left nothing to do.
+            return;
+        }
+        if (error) {
+            Helpers::PrintFromUtf8(error.message().c_str());
             return;
         }
         launcherCmdFile.open(prefixedFilePath);
@@ -85,7 +90,8 @@ namespace Oobe
 
         launcherCmdFile.close();
         // We don't want that file existing after actions were taken.
-        std::filesystem::remove(prefixedFilePath);
+        // Errors at this point are irrelevant.
+        std::filesystem::remove(prefixedFilePath, error);
     }
 
     namespace

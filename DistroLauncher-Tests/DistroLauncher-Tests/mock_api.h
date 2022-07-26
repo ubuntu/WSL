@@ -69,15 +69,6 @@ namespace Testing
         static WSL_DISTRIBUTION_FLAGS wslDistributionFlags_;
 
         // Instead of executing commands, they are logged
-        struct Command
-        {
-            PCWSTR command;
-            BOOL useCurrentWorkingDirectory;
-            HANDLE stdIn;
-            HANDLE stdOut;
-            HANDLE stdErr;
-        };
-
         struct InteractiveCommand
         {
             PCWSTR command;
@@ -86,18 +77,10 @@ namespace Testing
 
         static HRESULT LaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode) noexcept;
 
-        static HRESULT Launch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                              HANDLE stdErr, HANDLE* process) noexcept;
-
         static void reset_mock_distro();
 
         // Log of commands
-        static std::vector<Command> command_log;
         static std::vector<InteractiveCommand> interactive_command_log;
-
-        // Mock process, and a mock variable for the HANDLE to point to
-        static HANDLE mock_process;
-        static int mock_process_impl;
     };
 
     // Aliases within the Testing namespace

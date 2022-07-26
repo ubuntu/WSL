@@ -159,9 +159,9 @@ namespace Win32Utils
             return ShowWindow(window_, SW_HIDE) != FALSE;
         }
 
-        bool showConsoleWindow(HWND topWindow) const
+        bool showConsoleWindow(HWND topWindow = nullptr) const
         {
-            if (IsWindowVisible(topWindow) == TRUE) {
+            if (topWindow != nullptr && IsWindowVisible(topWindow) == TRUE) {
                 if (auto res = Win32Utils::resize_to(window_, topWindow); res != 0) {
                     Helpers::PrintErrorMessage(HRESULT_FROM_WIN32(res));
                 }

@@ -126,21 +126,8 @@ namespace Testing
         }
     }
 
-    HRESULT WslMockAPI::Launch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                               HANDLE stdErr, HANDLE* process) noexcept
-    {
-        try {
-            *process = mock_process;
-            command_log.emplace_back<Command>({command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr});
-            return S_OK;
-        } catch (...) {
-            return -1; // Failed: hr<0
-        }
-    }
-
     void WslMockAPI::reset_mock_distro()
     {
-        command_log = {};
         interactive_command_log = {};
         defaultUID_ = 0xabcdef;
         wslDistributionFlags_ = WSL_DISTRIBUTION_FLAGS{};
@@ -150,10 +137,6 @@ namespace Testing
     // Initializing statics
     inline std::list<MockMutexAPI::MockMutex> MockMutexAPI::dummy_back_end{};
 
-    inline int WslMockAPI::mock_process_impl = 0;
-    inline HANDLE WslMockAPI::mock_process = static_cast<HANDLE>(&Testing::WslMockAPI::mock_process_impl);
-
-    inline std::vector<WslMockAPI::Command> Testing::WslMockAPI::command_log{};
     inline std::vector<WslMockAPI::InteractiveCommand> Testing::WslMockAPI::interactive_command_log{};
     inline ULONG WslMockAPI::defaultUID_ = 0xabcdef;
     inline WSL_DISTRIBUTION_FLAGS WslMockAPI::wslDistributionFlags_ = WSL_DISTRIBUTION_FLAGS{};

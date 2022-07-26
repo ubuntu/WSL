@@ -195,19 +195,6 @@ namespace SudoInternals
             return hr;
         }
 
-        static HRESULT WslLaunch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                                 HANDLE stdErr, HANDLE* process) noexcept
-        {
-            HRESULT hr = S_FALSE;
-            SudoInterface()
-              .and_then([&]() noexcept {
-                  hr = WslAPI::Launch(command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr, process);
-              })
-              .or_else([&] { hr = WAIT_FAILED; });
-
-            return hr;
-        }
-
         static MutexType& GetMutex()
         {
             static MutexType sudo_mutex(L"root-user", true);
@@ -247,12 +234,6 @@ namespace SudoInternals
         static HRESULT LaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode) noexcept
         {
             return g_wslApi.WslLaunchInteractive(command, useCurrentWorkingDirectory, exitCode);
-        }
-
-        static HRESULT Launch(PCWSTR command, BOOL useCurrentWorkingDirectory, HANDLE stdIn, HANDLE stdOut,
-                              HANDLE stdErr, HANDLE* process) noexcept
-        {
-            return g_wslApi.WslLaunch(command, useCurrentWorkingDirectory, stdIn, stdOut, stdErr, process);
         }
     };
 
