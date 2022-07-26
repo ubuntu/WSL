@@ -75,7 +75,6 @@ namespace Testing
             BOOL useCurrentWorkingDirectory;
         };
 
-
         static HRESULT LaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode) noexcept;
 
         static std::wstring_view latest_command();

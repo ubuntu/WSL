@@ -122,7 +122,7 @@ TEST(CommandStreamTests, Nesting)
     {
         auto combination = Testing::WslStream{} << L"echo Today is && " << (Testing::WslStream{} << L"date --iso-8601")
                                                 << Testing::WslStream::Call;
-        
+
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 3u);
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), LR"(echo Today is && date --iso-8601)");
     }
