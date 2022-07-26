@@ -109,11 +109,12 @@ TEST(CommandStreamTests, Nesting)
 
     // Raw nesting
     {
-        auto first = Testing::WslStream{} << L"echo Hello";
+        const auto first = Testing::WslStream{} << L"echo Hello";
         const auto second = Testing::WslStream{} << L"date --iso-8601";
 
         auto combination = Testing::WslStream{} << first << L" && " << second << Testing::WslStream::Call;
 
+        ASSERT_EQ(combination.string(), LR"(echo Hello && date --iso-8601)");
         ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 2u);
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), LR"(echo Hello && date --iso-8601)");
     }

@@ -154,6 +154,33 @@ namespace CommandStreamInternals
         WSL_COMMAND_STREAM_IMPLEMENT_TAG(CALL)
         WSL_COMMAND_STREAM_IMPLEMENT_TAG(STRING)
 
+        // Piping commands
+
+      public:
+        friend CommandStream& operator<<(CommandStream& cmd, CommandStream const& other)
+        {
+            cmd.data_ << other.string();
+            return cmd;
+        }
+
+        friend CommandStream&& operator<<(CommandStream&& cmd, CommandStream const& other)
+        {
+            cmd.data_ << other.string();
+            return std::forward<CommandStream>(cmd);
+        }
+
+        friend CommandStream& operator<<(CommandStream& cmd, CommandStream&& other)
+        {
+            cmd.data_ << std::move(other.data_).str();
+            return cmd;
+        }
+
+        friend CommandStream&& operator<<(CommandStream&& cmd, CommandStream&& other)
+        {
+            cmd.data_ << std::move(other.data_).str();
+            return std::forward<CommandStream>(cmd);
+        }
+
         // Piping string-like objects
         template <typename WStringLike> friend CommandStream& operator<<(CommandStream& cmd, const WStringLike& str)
         {
@@ -176,31 +203,6 @@ namespace CommandStreamInternals
         template <typename WStringLike> friend CommandStream&& operator<<(CommandStream&& cmd, WStringLike&& str)
         {
             cmd.data_ << std::forward<WStringLike>(str);
-            return std::forward<CommandStream>(cmd);
-        }
-
-        // Piping commands
-        friend CommandStream& operator<<(CommandStream& cmd, CommandStream const& other)
-        {
-            cmd.data_ << other.string();
-            return cmd;
-        }
-
-        friend CommandStream&& operator<<(CommandStream&& cmd, CommandStream const& other)
-        {
-            cmd.data_ << other.string();
-            return std::forward<CommandStream>(cmd);
-        }
-
-        friend CommandStream& operator<<(CommandStream& cmd, CommandStream&& other)
-        {
-            cmd.data_ << std::move(other.data_).str();
-            return cmd;
-        }
-
-        friend CommandStream&& operator<<(CommandStream&& cmd, CommandStream&& other)
-        {
-            cmd.data_ << std::move(other.data_).str();
             return std::forward<CommandStream>(cmd);
         }
 
