@@ -49,6 +49,15 @@ namespace Oobe::internal
     /// <https://docs.microsoft.com/en-us/windows/wsl/wsl-config#:~:text=WSL%202%20VM.-,localhostForwarding,-boolean>
     bool isLocalhostForwardingEnabled(const std::filesystem::path& wslConfig);
 
+    /// Returns true if the ubuntu-desktop-installer snap is found inside the rootfs.
+    /// It's possible that we have only Subiquity or none instead.
+    /// That's meant to be called during setup, where filesystem errors are less likely to happen.
+    bool hasUdiSnap();
+
+    /// Returns true if the subiquity snap is found inside the rootfs.
+    /// It's possible that we have the ubuntu-desktop-installer or none instead.
+    /// That's meant to be called during setup, where filesystem errors are less likely to happen.
+    bool hasSubiquitySnap();
 }
 
 namespace Oobe
