@@ -214,4 +214,22 @@ namespace Oobe
     {
         return Oobe::WslPathPrefix() + DistributionInfo::Name + distro_path.wstring();
     }
+
+    bool WslFileExists(std::filesystem::path distro_path)
+    {
+        std::error_code err;
+        const bool found = std::filesystem::exists(Oobe::WindowsPath(distro_path), err);
+        if (!err) {
+            return found;
+        }
+
+        // Fallback
+        const auto cmd = (std::wstringstream{} << L"test -f " << distro_path << L" > /dev/null 2>&1").str();
+        DWORD exitCode;
+        const HRESULT hr = g_wslApi.WslLaunchInteractive(cmd.c_str(), FALSE, &exitCode);
+        if (SUCCEEDED(hr)) {
+            return exitCode == 0;
+        }
+        return false;
+    }
 }

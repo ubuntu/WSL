@@ -50,24 +50,6 @@ namespace internal
         return L"normal";
     }
 
-    bool WslExists(std::filesystem::path linux_path)
-    {
-        std::error_code err;
-        const bool found = std::filesystem::exists(Oobe::WindowsPath(linux_path), err);
-        if (!err) {
-            return found;
-        }
-
-        // Fallback
-        const auto cmd = concat(L"test -f ", linux_path, L" > /dev/null 2>&1");
-        DWORD exitCode;
-        const HRESULT hr = g_wslApi.WslLaunchInteractive(cmd.c_str(), FALSE, &exitCode);
-        if (SUCCEEDED(hr)) {
-            return exitCode == 0;
-        }
-        return false;
-    }
-
     void SetDefaultUpgradePolicyImpl()
     {
         namespace fs = std::filesystem;
@@ -75,7 +57,7 @@ namespace internal
         const fs::path log{L"/var/log/upgrade-policy-changed.log"};
         const fs::path policyfile{L"/etc/update-manager/release-upgrades"};
 
-        if (WslExists(log)) {
+        if (Oobe::WslFileExists(log)) {
             return;
         }
 
