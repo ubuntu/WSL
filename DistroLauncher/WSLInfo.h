@@ -59,4 +59,10 @@ namespace Oobe
     const wchar_t* WslPathPrefix();
 
     HRESULT WslGetDefaultUserAndFlags(ULONG& defaultUID, WSL_DISTRIBUTION_FLAGS& wslDistributionFlags) noexcept;
+
+    // Returns the windows path to access files inside the Linux file system.
+    std::filesystem::path WindowsPath(std::wstring_view distro_path);
+    std::filesystem::path WindowsPath(const std::filesystem::path& distro_path);
+
+    bool WslFileExists(const std::filesystem::path& distro_path);
 }

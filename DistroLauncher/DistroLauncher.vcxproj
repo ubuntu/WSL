@@ -185,6 +185,7 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="upgrade_policy.cpp" />
     <ClCompile Include="Win32Utils.cpp" />
     <ClCompile Include="WindowsUserInfo.cpp" />
     <ClCompile Include="WslApiLoader.cpp" />

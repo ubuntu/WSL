@@ -93,6 +93,12 @@
     <ClCompile Include="..\..\DistroLauncher\ChildProcess.cpp" />
     <ClCompile Include="SetOnceNamedEventTests.cpp" />
     <ClCompile Include="..\..\DistroLauncher\SetOnceNamedEvent.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\upgrade_policy.cpp">
+      <Filter>DistroSources</Filter>
+    </ClCompile>
+    <ClCompile Include="upgrade_policy_tests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />

@@ -18,6 +18,7 @@
 #include <conio.h>
 #include <io.h>
 #include <string>
+#include <sstream>
 #include <memory>
 #include <assert.h>
 #include <locale>
@@ -56,6 +57,7 @@
 #include "Application.h"
 #include "named_mutex.h"
 #include "sudo.h"
+#include "upgrade_policy.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"
