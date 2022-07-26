@@ -154,6 +154,7 @@
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SetOnceNamedEvent.h" />
     <ClInclude Include="splash_controller.h" />
     <ClInclude Include="state_machine.h" />
     <ClInclude Include="stdafx.h" />
@@ -180,6 +181,7 @@
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="ini_find_value.cpp" />
+    <ClCompile Include="SetOnceNamedEvent.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
