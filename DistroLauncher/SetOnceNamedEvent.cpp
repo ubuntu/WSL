@@ -52,7 +52,8 @@ namespace Win32Utils
 
     SetOnceNamedEvent::SetOnceNamedEvent(SetOnceNamedEvent&& other) noexcept :
         event{std::exchange(other.event, nullptr)}
-    { }
+    {
+    }
 
     bool SetOnceNamedEvent::isValid() const noexcept
     {
