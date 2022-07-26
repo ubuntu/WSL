@@ -1,12 +1,83 @@
+/*
+ * Copyright (C) 2022 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #pragma once
-// Dependency
+
 #include <sstream>
 #include <utility>
 #include <cassert>
 
 // WSL API
-#include <Windows.h>
-#include <wslapi.h>
+#include "sudo.h"
+
+/**
+ * Abstract
+ * --------
+ * Syntax sugar to succintly launch WSL commands.
+ *
+ * Motivation
+ * ----------
+ * In many parts of the code you can find the following snippet, or similar:
+ * ```c++
+ * std::wstring_stream cmd;
+ * cmd << "Assembling " << the::command << std::quoted(here);
+ * DWORD errCode;
+ * const HRESULT hr = g_wslApi.LaunchInteractive(cmd.string().c_str(), FALSE, &errCode);
+ * if(SUCCEEDED(hr) && errCode == 0) {
+ *      return std::nullopt;                        // Or whatever;
+ * }
+ * ```
+ * This is seven lines of code for what should take much fewer. This class proposes the
+ * following syntax:
+ * ```c++
+ * if(WslStream{} << << "Assembling " << the::command << here << WslStream::Call << WslStream::Ok)
+ * {
+ *      return std::nullopt;                        // Or whatever;
+ * }
+ * ```
+ *
+ * Usage
+ * -----
+ * You can chain any objects that have a `ostream& operator<<(ostream&, object const&) implemented.
+ * ```c++
+ * WslStream{} << "echo My favourite number is " << 11;
+ * ```
+ * No spaces are inserted inbetween, so ensure that you add them in. This is useful to chain strings
+ * that you want to keep toghether:
+ * ```
+ * WslStream{} << "ls /usr/bin/" << app_name;
+ * ```
+ *
+ * In order to perform certain actions you can use tags. (Similar to using std::endl or std::flush with std::cout).
+ * For instance, tag Call is the most useful; as it executes the command:
+ * ```
+ * WslStream{} << "echo My favourite number is " << 11 << WslStream::Call;
+ * ```
+ * The other tags are used to return certain values:
+ * - WslStream::String  Returns the command as a wstring.
+ * - WslStream::Call    Executes the command. Returns the command as it was. Enables and updates the next four.
+ * - WslStream::HResult Returns the HRESULT of the last call. Result undefined if used before Call.
+ * - WslStream::ErrCode Returns the linux exit code of the last call. Result undefined if used before Call.
+ * - WslStream::Status  Returns the previous two in a tuple. Result undefined if used before Call.
+ * - WslStream::Ok      Returns true if both HRESULT and exitCode are succesful. Result undefined if used before Call.
+ *
+ * See examples in the unit tests.
+ *
+ */
 
 namespace CommandStreamInternals
 {
@@ -57,7 +128,7 @@ namespace CommandStreamInternals
          *
          * They are passed via operator<< to signal certain actions or to return certain values.
          * They must have a static private member function template called impl.
-         * Their name is in ALL_CAPS. Their instance is named with CamelCase.
+         * Their type name is in ALL_CAPS. Their instance is named with CamelCase.
          *
          * ```
          * template<typename Self>
@@ -188,4 +259,4 @@ namespace CommandStreamInternals
 
 } // CmdInterfaceInternals
 
-using cmd = CommandStreamInternals::CommandStream<SudoInternals::WslWindowsAPI>;
+using WslStream = CommandStreamInternals::CommandStream<SudoInternals::WslWindowsAPI>;
