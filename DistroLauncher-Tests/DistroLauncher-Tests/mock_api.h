@@ -71,12 +71,14 @@ namespace Testing
         // Instead of executing commands, they are logged
         struct InteractiveCommand
         {
-            PCWSTR command;
+            std::wstring command;
             BOOL useCurrentWorkingDirectory;
         };
 
+
         static HRESULT LaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD* exitCode) noexcept;
 
+        static std::wstring_view latest_command();
         static void reset_mock_distro();
 
         // Log of commands
@@ -86,4 +88,5 @@ namespace Testing
     // Aliases within the Testing namespace
     using NamedMutex = MockNamedMutex;
     using Sudo = SudoInternals::SudoInterface<NamedMutex, Testing::WslMockAPI>;
+    using WslStream = CommandStreamInternals::CommandStream<Testing::WslMockAPI>;
 }

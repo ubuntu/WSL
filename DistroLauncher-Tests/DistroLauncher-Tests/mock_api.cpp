@@ -134,6 +134,14 @@ namespace Testing
         MockMutexAPI::reset_back_end();
     }
 
+    std::wstring_view WslMockAPI::latest_command()
+    {
+        if (interactive_command_log.empty()) {
+            return L"";
+        }
+        return interactive_command_log.back().command;
+    }
+
     // Initializing statics
     inline std::list<MockMutexAPI::MockMutex> MockMutexAPI::dummy_back_end{};
 

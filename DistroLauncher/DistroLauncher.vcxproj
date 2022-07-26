@@ -141,6 +141,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
     <ClInclude Include="ChildProcess.h" />
+    <ClInclude Include="command_stream.h" />
     <ClInclude Include="console_service.h" />
     <ClInclude Include="ExitStatus.h" />
     <ClInclude Include="extended_cli_parser.h" />

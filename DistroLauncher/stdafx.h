@@ -35,6 +35,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <filesystem>
 #include <optional>
 #include <variant>
@@ -56,6 +57,7 @@
 #include "Application.h"
 #include "named_mutex.h"
 #include "sudo.h"
+#include "command_stream.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"
