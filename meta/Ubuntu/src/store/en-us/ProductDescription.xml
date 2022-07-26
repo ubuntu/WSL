@@ -28,7 +28,7 @@ Installation tips:
 
 For more information about Ubuntu WSL and how Canonical supports developers please visit:
 
-https://wiki.ubuntu.com/WSL
+https://ubuntu.com/wsl
 </Description>
   <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver={{.ShortVersion}}</ReleaseNotes>
   <DevStudio>Canonical Ltd. and the OpenSource community</DevStudio>
