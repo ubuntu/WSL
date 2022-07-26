@@ -58,8 +58,8 @@ namespace Win32Utils
         SetOnceNamedEvent& operator=(const SetOnceNamedEvent& other) = delete;
         // Sets the event and subsequently closes its handle. From this moment on the object becomes useless.
         // Returns false on failure. NOTE: Subsequent calls are no-op.
-        [[nodiscard]] bool set();
-        [[nodiscard]] bool isValid() const;
+        [[nodiscard]] bool set() noexcept;
+        [[nodiscard]] bool isValid() const noexcept;
 
       private:
         HANDLE event = nullptr;

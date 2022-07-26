@@ -37,7 +37,7 @@ namespace Win32Utils
         }
     }
 
-    bool SetOnceNamedEvent::set()
+    bool SetOnceNamedEvent::set() noexcept
     {
         if (event == nullptr) {
             return false;
@@ -52,10 +52,9 @@ namespace Win32Utils
 
     SetOnceNamedEvent::SetOnceNamedEvent(SetOnceNamedEvent&& other) noexcept :
         event{std::exchange(other.event, nullptr)}
-    {
-    }
+    { }
 
-    bool SetOnceNamedEvent::isValid() const
+    bool SetOnceNamedEvent::isValid() const noexcept
     {
         return event != nullptr;
     }
