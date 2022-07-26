@@ -57,11 +57,19 @@ TEST(CommandStreamTests, StatusTags)
 {
     Testing::WslMockAPI::reset_mock_distro();
 
+    // Getting String
+    {
+        auto str = Testing::WslStream{} << L"echo 'Hello!'" << Testing::WslStream::Call << Testing::WslStream::String;
+        ASSERT_EQ(str, L"echo 'Hello!'");
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1u);
+        ASSERT_EQ(Testing::WslMockAPI::latest_command(), L"echo 'Hello!'");
+    }
+
     // Getting HRESULT
     {
         HRESULT hr = Testing::WslStream{} << L"echo 'Hello!'" << Testing::WslStream::Call
                                           << Testing::WslStream::HResult;
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1u);
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 2u);
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), L"echo 'Hello!'");
         ASSERT_EQ(hr, S_OK);
     }
@@ -70,7 +78,7 @@ TEST(CommandStreamTests, StatusTags)
     {
         DWORD errCode = Testing::WslStream{} << L"echo 'Hi!'" << Testing::WslStream::Call
                                              << Testing::WslStream::ErrCode;
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 2u);
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 3u);
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), L"echo 'Hi!'");
         ASSERT_EQ(errCode, 0);
     }
@@ -79,7 +87,7 @@ TEST(CommandStreamTests, StatusTags)
     {
         auto [hr, errCode] = Testing::WslStream{} << L"echo 'Hi!'" << Testing::WslStream::Call
                                                   << Testing::WslStream::Status;
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 3u);
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 4u);
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), L"echo 'Hi!'");
         ASSERT_EQ(hr, S_OK);
         ASSERT_EQ(errCode, 0);
@@ -88,7 +96,7 @@ TEST(CommandStreamTests, StatusTags)
     // Getting boolean
     {
         bool ok = Testing::WslStream{} << L"echo 'Hi!'" << Testing::WslStream::Call << Testing::WslStream::Ok;
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 4u);
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 5u);
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), L"echo 'Hi!'");
         ASSERT_TRUE(ok);
     }
