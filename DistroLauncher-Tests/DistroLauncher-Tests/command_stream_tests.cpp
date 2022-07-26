@@ -146,7 +146,7 @@ TEST(CommandStreamTests, Paths)
         const std::filesystem::path path = L"/tmp/remove-me/";
 
         Testing::WslStream{} << L"rmdir " << path << Testing::WslStream::Call;
-        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1u);
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 2u);
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), LR"(rmdir "/tmp/remove-me/")");
     }
 }
