@@ -41,21 +41,23 @@ def diff_to_review(repo_root: str, diff: str, review_msg_body: str,
             start_line = hunk.source_start
             line_number = hunk.source_start + hunk.source_length - 1
             target_lines = [
-                tl.value for tl in hunk.target_lines()
+                tl.value if tl.value.endswith('\n') else tl.value + '\n'
+                for tl in hunk.target_lines()
             ]
 
             review_comment_body = "{}\n\n```suggestion\n{}```".format(
                 inline_msg, "".join(target_lines)
             )
-            review_comments.append(
-                {
+            commentObj = {
                     "path": file_path,
-                    "start_line": start_line,
                     "line": line_number,
                     "side": "RIGHT",
                     "body": review_comment_body,
                 }
-            )
+            if start_line < line_number:
+                commentObj.update({"start_line": start_line})
+
+            review_comments.append(commentObj)
 
     return {
         "body": review_msg_body,
