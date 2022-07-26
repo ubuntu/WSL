@@ -215,7 +215,7 @@ namespace Oobe
         return Oobe::WslPathPrefix() + DistributionInfo::Name + distro_path.wstring();
     }
 
-    bool WslFileExists(std::filesystem::path distro_path)
+    bool WslFileExists(const std::filesystem::path& distro_path)
     {
         std::error_code err;
         const bool found = std::filesystem::exists(Oobe::WindowsPath(distro_path), err);
