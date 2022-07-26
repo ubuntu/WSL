@@ -190,3 +190,26 @@ TEST(CommandStreamTests, Paths)
         ASSERT_EQ(Testing::WslMockAPI::latest_command(), LR"(rmdir "/tmp/remove-me/")");
     }
 }
+
+TEST(CommandStreamTests, Numbers)
+{
+    Testing::WslMockAPI::reset_mock_distro();
+
+    {
+        Testing::WslStream{} << L"echo " << 42 << Testing::WslStream::Call;
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 1u);
+        ASSERT_EQ(Testing::WslMockAPI::latest_command(), LR"(echo 42)");
+    }
+
+    {
+        Testing::WslStream{} << L"I had lunch in a " << std::hex << 51966 << Testing::WslStream::Call;
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 2u);
+        ASSERT_EQ(Testing::WslMockAPI::latest_command(), LR"(I had lunch in a cafe)");
+    }
+
+    {
+        Testing::WslStream{} << L"echo " << 6.023 << Testing::WslStream::Call;
+        ASSERT_EQ(Testing::WslMockAPI::interactive_command_log.size(), 3u);
+        ASSERT_EQ(Testing::WslMockAPI::latest_command(), LR"(echo 6.023)");
+    }
+}
