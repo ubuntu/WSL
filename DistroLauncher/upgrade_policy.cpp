@@ -20,31 +20,13 @@
 namespace internal
 {
 
-    bool starts_with(const std::wstring_view tested, const std::wstring_view start)
-    {
-        if (tested.size() < start.size()) {
-            return false;
-        }
-        auto mismatch = std::mismatch(start.cbegin(), start.cend(), tested.cbegin());
-        return mismatch.first == start.cend();
-    }
-
-    bool ends_with(const std::wstring_view tested, const std::wstring_view end)
-    {
-        if (tested.size() < end.size()) {
-            return false;
-        }
-        auto mismatch = std::mismatch(end.crbegin(), end.crend(), tested.crbegin());
-        return mismatch.first == end.crend();
-    }
-
     std::wstring GetUpgradePolicy()
     {
         std::wstring_view name = DistributionInfo::Name;
         if (name == L"Ubuntu") {
             return L"lts";
         }
-        if (starts_with(name, L"Ubuntu") && ends_with(name, L"LTS")) {
+        if (starts_with(name, {L"Ubuntu"}) && ends_with(name, {L"LTS"})) {
             return L"never";
         }
         return L"normal";

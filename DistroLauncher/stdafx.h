@@ -41,6 +41,7 @@
 #include <variant>
 #include <type_traits>
 #include <utility>
+#include "algorithms.h"
 #include "expected.hpp"
 #include "not_null.h"
 #include "WslApiLoader.h"
