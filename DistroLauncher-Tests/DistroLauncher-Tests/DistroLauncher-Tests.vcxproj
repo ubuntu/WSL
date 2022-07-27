@@ -111,6 +111,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\DistroLauncher\algorithms.h" />
     <ClInclude Include="FakeChildProcessImpl.h" />
     <ClInclude Include="mock_api.h" />
     <ClInclude Include="InstallerControllerTestPolicies.h" />
