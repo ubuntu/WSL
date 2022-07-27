@@ -57,7 +57,7 @@ template <typename... Args> std::wstring concat(Args&&... args)
     return buffer.str();
 }
 
-template <typename Pred> bool find_file_if(std::filesystem::path directory, Pred&& pred)
+template <typename Pred> bool find_file_if(const std::filesystem::path& directory, Pred&& pred)
 {
     namespace fs = std::filesystem;
     std::error_code error;
