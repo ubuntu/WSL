@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="algorithms.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
     <ClInclude Include="ChildProcess.h" />

@@ -19,17 +19,7 @@
 
 namespace internal
 {
-    bool starts_with(std::wstring_view tested, std::wstring_view start);
-    bool ends_with(std::wstring_view tested, std::wstring_view end);
-
     std::wstring GetUpgradePolicy();
-
-    template <typename... Args> std::wstring concat(Args&&... args)
-    {
-        std::wstringstream buffer;
-        (buffer << ... << std::forward<Args>(args));
-        return buffer.str();
-    }
 
     void SetDefaultUpgradePolicyImpl();
 

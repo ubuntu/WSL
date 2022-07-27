@@ -137,6 +137,28 @@ namespace Oobe::internal
         return ini_find_value(wslConf, L"boot", L"command", L"/usr/libexec/wsl-systemd");
     }
 
+    bool hasSnap(std::wstring_view name)
+    {
+        namespace fs = std::filesystem;
+        const auto path = Oobe::WindowsPath(fs::path{L"/var/lib/snapd/snaps/"});
+        return find_file_if(path, [name](const auto& entry) {
+            return fs::is_regular_file(entry) && starts_with({entry.path().filename().wstring()}, name);
+        });
+    }
+
+    bool hasUdiSnap()
+    {
+        static bool hasUdi = hasSnap(L"ubuntu-desktop-installer");
+
+        return hasUdi;
+    }
+
+    bool hasSubiquitySnap()
+    {
+        static bool hasSubiquity = hasSnap(L"subiquity");
+        return hasSubiquity;
+    }
+
 } // namespace Oobe::internal
 
 // This was kept under Helpers namespace to avoid touching OOBE.cpp/h files.
@@ -145,8 +167,17 @@ namespace Helpers
 {
     bool WslGraphicsSupported()
     {
+        // It's possible that we have only Subiquity instead of the Ubuntu-Desktop-Installer snap.
+        if (!Oobe::internal::hasUdiSnap()) {
+            return false;
+        }
+
+        if (!Oobe::internal::isWslgEnabled()) {
+            return false;
+        }
+
         // Could WSL 3 or greater exist in the future?
-        return (Oobe::internal::isWslgEnabled() && Oobe::internal::WslGetDistroSubsystemVersion() > 1);
+        return Oobe::internal::WslGetDistroSubsystemVersion() > 1;
     }
 
 } // namespace Helpers.
