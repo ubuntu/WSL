@@ -31,6 +31,7 @@ namespace Oobe
             case LauncherForceMode::GuiForced:
                 return false;
             }
+            return false;
         }
 
         // Detect and act upon the launcher command file left by the OOBE.
