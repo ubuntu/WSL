@@ -20,7 +20,17 @@ namespace Oobe
         // Returns true if the OOBE must be launched in text mode.
         static bool must_run_in_text_mode()
         {
-            return DistributionInfo::mustRunOOBEinTextMode();
+            LauncherForceMode forced = environmentForceMode();
+            switch (forced) {
+            case LauncherForceMode::Invalid:
+                [[fallthrough]];
+            case LauncherForceMode::Unset:
+                return !internal::WslGraphicsSupported();
+            case LauncherForceMode::TextForced:
+                return true;
+            case LauncherForceMode::GuiForced:
+                return false;
+            }
         }
 
         // Detect and act upon the launcher command file left by the OOBE.
