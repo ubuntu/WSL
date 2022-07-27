@@ -17,16 +17,13 @@
 
 #pragma once
 
-namespace Helpers
-{
-    // Returns true if WSLg is enabled and distro subsystem version is > 1.
-    bool WslGraphicsSupported();
-}
-
 namespace Oobe::internal
 {
     // Returns true if user system has WSLg enabled.
     inline bool isWslgEnabled();
+
+    // Returns true if WSLg is enabled and distro subsystem version is > 1.
+    bool WslGraphicsSupported();
 
     // Returns the subsystem version for this specific distro or 0 if failed.
     DWORD WslGetDistroSubsystemVersion();
