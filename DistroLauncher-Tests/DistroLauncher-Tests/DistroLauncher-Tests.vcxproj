@@ -66,6 +66,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\DistroLauncher\ApplicationStrategy.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\AppStrategyCommon.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ChildProcess.cpp" />
     <ClCompile Include="..\..\DistroLauncher\DistributionInfo.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ExitStatus.cpp" />
