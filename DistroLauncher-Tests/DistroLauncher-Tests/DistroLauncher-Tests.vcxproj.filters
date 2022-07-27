@@ -99,6 +99,8 @@
     <ClCompile Include="upgrade_policy_tests.cpp">
       <Filter>TestSources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\LauncherForceMode.cpp" />
+    <ClCompile Include="LauncherForceModeTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />

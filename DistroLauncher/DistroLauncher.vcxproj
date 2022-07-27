@@ -148,6 +148,7 @@
     <ClInclude Include="extended_messages.h" />
     <ClInclude Include="installer_controller.h" />
     <ClInclude Include="installer_policy.h" />
+    <ClInclude Include="LauncherForceMode.h" />
     <ClInclude Include="named_mutex.h" />
     <ClInclude Include="not_null.h" />
     <ClInclude Include="OOBE.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="extended_cli_parser.cpp" />
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="DistroLauncher.cpp" />
+    <ClCompile Include="LauncherForceMode.cpp" />
     <ClCompile Include="local_named_pipe.cpp" />
     <ClCompile Include="named_mutex.cpp" />
     <ClCompile Include="OOBE.cpp" />

@@ -74,6 +74,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="..\..\DistroLauncher\find_main_thread_window.cpp" />
     <ClCompile Include="..\..\DistroLauncher\Helpers.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ini_find_value.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\LauncherForceMode.cpp" />
     <ClCompile Include="..\..\DistroLauncher\local_named_pipe.cpp" />
     <ClCompile Include="..\..\DistroLauncher\named_mutex.cpp" />
     <ClCompile Include="..\..\DistroLauncher\OOBE.cpp" />
@@ -90,6 +91,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="ExtendedCliParserTests.cpp" />
     <ClCompile Include="FakeChildProcessImpl.cpp" />
     <ClCompile Include="InstallerControllerTests.cpp" />
+    <ClCompile Include="LauncherForceModeTests.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ExitStatusParserTests.cpp" />
     <ClCompile Include="LocalNamedPipeTests.cpp" />
