@@ -330,7 +330,7 @@ func checksumMatches(path, origName, checksumPath string) (err error) {
 
 	var found bool
 	for _, l := range text {
-		e := strings.Split(l, " ")
+		e := strings.Fields(l)
 		if len(e) != 2 {
 			continue
 		}
