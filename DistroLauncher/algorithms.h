@@ -56,3 +56,15 @@ template <typename... Args> std::wstring concat(Args&&... args)
     (buffer << ... << std::forward<Args>(args));
     return buffer.str();
 }
+
+template <typename Pred> bool find_file_if(std::filesystem::path directory, Pred&& pred)
+{
+    namespace fs = std::filesystem;
+    std::error_code error;
+    assert(fs::is_directory(directory));
+    auto listing = fs::directory_iterator{directory, error};
+    if (error) {
+        return false;
+    }
+    return std::find_if(begin(listing), end(listing), std::forward<Pred>(pred)) != end(listing);
+}
