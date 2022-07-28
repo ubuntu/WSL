@@ -28,7 +28,7 @@ namespace Oobe::internal
     // Given an [installer], places the sequence of events to execute the setup in the required [ui] Mode.
     // Either GUI or TUI will run on Linux, thus WSLg is required for GUI.
     // This is meant for situations which don't require interlocking with other processes, such as a splash window.
-    HRESULT install_linux_ui(Oobe::InstallerController<>& installer, Mode ui);
+    HRESULT install_linux_ui(Oobe::InstallerController<>& installer, Mode uiMode);
 
     // Given an [installer], places the sequence of events to execute the reconfiguration workflow.
     // The UI mode is autodetected. Either GUI or TUI will run on Linux, thus WSLg is required for GUI.
