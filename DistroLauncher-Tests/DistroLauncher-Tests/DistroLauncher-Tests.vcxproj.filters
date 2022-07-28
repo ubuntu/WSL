@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\DistroLauncher\ApplicationStrategy.cpp">
-      <Filter>DistroSources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\DistroLauncher\DistributionInfo.cpp">
       <Filter>DistroSources</Filter>
     </ClCompile>
@@ -101,6 +98,7 @@
     </ClCompile>
     <ClCompile Include="..\..\DistroLauncher\LauncherForceMode.cpp" />
     <ClCompile Include="LauncherForceModeTests.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\ApplicationStrategyCommon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />

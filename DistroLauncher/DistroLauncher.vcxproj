@@ -141,6 +141,7 @@
     <ClInclude Include="algorithms.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
+    <ClInclude Include="ApplicationStrategyCommon.h" />
     <ClInclude Include="ChildProcess.h" />
     <ClInclude Include="console_service.h" />
     <ClInclude Include="ExitStatus.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="installer_policy.h" />
     <ClInclude Include="LauncherForceMode.h" />
     <ClInclude Include="named_mutex.h" />
+    <ClInclude Include="NoSplashStrategy.h" />
     <ClInclude Include="not_null.h" />
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
@@ -157,6 +159,7 @@
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SetOnceNamedEvent.h" />
+    <ClInclude Include="SplashEnabledStrategy.h" />
     <ClInclude Include="splash_controller.h" />
     <ClInclude Include="state_machine.h" />
     <ClInclude Include="stdafx.h" />
@@ -169,7 +172,7 @@
     <ClInclude Include="local_named_pipe.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ApplicationStrategy.cpp" />
+    <ClCompile Include="ApplicationStrategyCommon.cpp" />
     <ClCompile Include="ChildProcess.cpp" />
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="ExitStatus.cpp" />
@@ -180,11 +183,13 @@
     <ClCompile Include="LauncherForceMode.cpp" />
     <ClCompile Include="local_named_pipe.cpp" />
     <ClCompile Include="named_mutex.cpp" />
+    <ClCompile Include="NoSplashStrategy.cpp" />
     <ClCompile Include="OOBE.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="ini_find_value.cpp" />
     <ClCompile Include="SetOnceNamedEvent.cpp" />
+    <ClCompile Include="SplashEnabledStrategy.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
