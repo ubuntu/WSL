@@ -159,12 +159,6 @@ namespace Oobe::internal
         return hasSubiquity;
     }
 
-} // namespace Oobe::internal
-
-// This was kept under Helpers namespace to avoid touching OOBE.cpp/h files.
-// TODO: move to Oobe namespace when its time to maintain OOBE.cpp/h
-namespace Helpers
-{
     bool WslGraphicsSupported()
     {
         // It's possible that we have only Subiquity instead of the Ubuntu-Desktop-Installer snap.

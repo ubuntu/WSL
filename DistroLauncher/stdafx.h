@@ -44,6 +44,7 @@
 #include "algorithms.h"
 #include "expected.hpp"
 #include "not_null.h"
+#include "LauncherForceMode.h"
 #include "WslApiLoader.h"
 #include "Helpers.h"
 #include "DistributionInfo.h"

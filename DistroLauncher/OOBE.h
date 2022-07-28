@@ -19,9 +19,6 @@
 
 namespace DistributionInfo
 {
-    // OOBE Experience.
-    HRESULT OOBESetup();
-
     // isOOBEAvailable returns true if OOBE executable is found inside rootfs.
     bool isOOBEAvailable();
 
@@ -33,15 +30,6 @@ namespace DistributionInfo
     // Returns empty string if we fail to generate the prefill file
     // or the postfix to be added to the OOBE command line.
     std::wstring PreparePrefillInfo();
-
-    // Returns true if OOBE has to be launched in text mode.
-    // That might be the case due lack of graphics support in WSL
-    // or user requirement, by setting the environment variable
-    // LAUNCHER_FORCE_MODE, which can only be:
-    //	0 or unset or invalid = autodetection
-    //	1 = text mode
-    //	2 = GUI mode.
-    bool mustRunOOBEinTextMode();
 
     // Returns true if the argument ARG_SKIP_INSTALLER is present.
     // Removes it from the argument vector if present to avoid interference with upstream code.
