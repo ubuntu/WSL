@@ -42,9 +42,11 @@ namespace Win32Utils
         if (event == nullptr) {
             return false;
         }
-        if (SetEvent(event) == FALSE) {
+
+        if (SignalObjectAndWait(event, event, INFINITE, FALSE) != WAIT_OBJECT_0) {
             return false;
         }
+
         CloseHandle(event);
         event = nullptr;
         return true;
