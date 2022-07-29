@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright (C) 2022 Canonical Ltd
  *
@@ -15,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
 namespace Oobe
 {
