@@ -15,7 +15,7 @@ namespace Oobe
         return Win32Utils::homedir() / L".wslconfig";
     }
 
-    std::wstring createEventName(const wchar_t const* suffix)
+    std::wstring createEventName(const wchar_t* const suffix)
     {
         return L"Local\\" + DistributionInfo::Name + L'-' + suffix;
     }
@@ -312,6 +312,7 @@ namespace Oobe
     WinOobeStrategy::WinOobeStrategy() :
         oobeExePath{getOobeExePath()}, hRegistrationEvent{createEventName(L"registered").c_str()},
         hCloseOobeEvent{createEventName(L"close-oobe").c_str()}, prefill{}
-    { }
+    {
+    }
 
 }
