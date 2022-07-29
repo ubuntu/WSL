@@ -9,9 +9,9 @@ namespace Oobe
         return internal::do_autoinstall(installer, autoinstall_file);
     }
 
-    HRESULT WinTuiStrategy::do_install(Mode ui)
+    HRESULT WinTuiStrategy::do_install(Mode uiMode)
     {
-        if (ui == Mode::Gui) {
+        if (uiMode == Mode::Gui) {
             wprintf(L"GUI mode is not supported on this platform.\n");
         }
         return internal::install_linux_ui(installer, Mode::Text);

@@ -30,7 +30,7 @@ namespace Oobe
 
         /// Performs an interactive installation.
         /// By default GUI support is checked before launching the OOBE.
-        HRESULT do_install(Mode ui);
+        HRESULT do_install(Mode uiMode);
 
         /// Runs the reconfiguration variant of the Flutter GUI.
         HRESULT do_reconfigure();
