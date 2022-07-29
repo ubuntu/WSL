@@ -141,7 +141,7 @@ namespace Oobe::internal
     {
         namespace fs = std::filesystem;
         const auto path = Oobe::WindowsPath(fs::path{L"/var/lib/snapd/snaps/"});
-        return find_file_if(path, [name](const auto& entry) {
+        return any_file_of(path, [name](const auto& entry) {
             return fs::is_regular_file(entry) && starts_with({entry.path().filename().wstring()}, name);
         });
     }

@@ -62,7 +62,7 @@ template <typename... Args> std::wstring concat(Args&&... args)
 /// Returns true for the first entry of [directory] for which [pred] returns true.
 /// Returns false if none of the entries match the predicate.
 /// Iteration order is not specified.
-template <typename Pred> bool find_file_if(const std::filesystem::path& directory, Pred&& pred)
+template <typename Pred> bool any_file_of(const std::filesystem::path& directory, Pred&& pred)
 {
     namespace fs = std::filesystem;
     std::error_code error;
