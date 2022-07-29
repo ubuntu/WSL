@@ -167,6 +167,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Win32Utils.h" />
     <ClInclude Include="WinTuiStrategy.h" />
+    <ClInclude Include="WinOobeStrategy.h" />
     <ClInclude Include="WslApiLoader.h" />
     <ClInclude Include="expected.hpp" />
     <ClInclude Include="WSLInfo.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="Win32Utils.cpp" />
     <ClCompile Include="WindowsUserInfo.cpp" />
     <ClCompile Include="WinTuiStrategy.cpp" />
+    <ClCompile Include="WinOobeStrategy.cpp" />
     <ClCompile Include="WslApiLoader.cpp" />
     <ClCompile Include="WSLInfo.cpp" />
   </ItemGroup>
