@@ -124,8 +124,8 @@ namespace Oobe
         if (!oobeProcess.has_value()) {
             return E_UNEXPECTED;
         }
-        auto& oobe = oobeProcess.value();
-        if (!oobe.start()) {
+
+        if (!oobeProcess->start()) {
             return E_APPLICATION_ACTIVATION_EXEC_FAILURE;
         }
 
@@ -133,7 +133,7 @@ namespace Oobe
             do_close_oobe();
             return EVENT_E_USER_EXCEPTION;
         }
-        if (oobe.waitExitSync() != 0) {
+        if (oobeProcess->waitExitSync() != 0) {
             return E_FAIL;
         }
         return S_OK;
@@ -272,7 +272,6 @@ namespace Oobe
             wprintf(L"Failed to prepare the console configuration.\n");
             return;
         }
-        auto& console = consoleService.value();
 
         std::unique_lock<std::timed_mutex> guard{consoleGuard, std::defer_lock};
         using namespace std::chrono_literals;
@@ -282,7 +281,7 @@ namespace Oobe
             return;
         }
 
-        console.redirectConsole();
+        consoleService->redirectConsole();
 
         prefill = WslFileBuf{DistributionInfo::GetPrefillInfoInYaml(), L"/var/log/prefill-system-setup.yaml"};
         const auto cli{prefill.isEmpty() ? makeCli() : makeCli(L" --prefill=", prefill.linuxPath)};
@@ -290,21 +289,21 @@ namespace Oobe
         oobeProcess.emplace(oobeExePath, cli.c_str(), nullptr, consoleReadHandle, nullptr);
         if (!oobeProcess.has_value()) {
             // rollback.
-            console.restoreConsole();
+            consoleService->restoreConsole();
             return;
         }
-        auto& process = oobeProcess.value();
+
         // The GUI consumes the messages printed to this process stdout.
         // If it dies without this process restoring its console, the next wprintf call would deadlock.
-        process.setListener([this]() { do_show_console(); });
-        if (!process.start()) {
+        oobeProcess->setListener([this]() { do_show_console(); });
+        if (!oobeProcess->start()) {
             // rollback.
-            console.restoreConsole();
+            consoleService->restoreConsole();
             return;
         }
 
         if (hideConsole) {
-            consoleIsVisible = !console.hideConsoleWindow();
+            consoleIsVisible = !consoleService->hideConsoleWindow();
         }
         splashIsRunning = true;
     }
