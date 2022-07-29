@@ -112,6 +112,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WinTuiStrategy.h">
+    <ClInclude Include="WinOobeStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -189,6 +190,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WinTuiStrategy.cpp">
+    <ClCompile Include="WinOobeStrategy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
