@@ -75,3 +75,11 @@ template <typename Pred> bool any_file_of(const std::filesystem::path& directory
     }
     return std::find_if(begin(listing), end(listing), std::forward<Pred>(pred)) != end(listing);
 }
+
+// Pushes back to the vector [v] as many elements to a vector as [args] count by folding subsequent calls to
+// v.push_back().
+template <typename T, typename... Args> void push_back_many(std::vector<T>& vec, Args&&... args)
+{
+    static_assert((std::is_constructible_v<T, Args&&> && ...));
+    (vec.push_back(std::forward<Args>(args)), ...);
+}

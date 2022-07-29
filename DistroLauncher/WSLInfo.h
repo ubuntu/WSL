@@ -55,6 +55,27 @@ namespace Oobe::internal
     /// It's possible that we have the ubuntu-desktop-installer or none instead.
     /// That's meant to be called during setup, where filesystem errors are less likely to happen.
     bool hasSubiquitySnap();
+
+    /// Returns true if the there is any snap matching of one the [names] inside the rootfs.
+    template <typename... StringLike> bool hasAnyOfSnaps(StringLike&&... names)
+    {
+        using namespace std::literals::string_view_literals;
+        std::vector<std::wstring_view> elements;
+        push_back_many(elements, std::forward<StringLike>(names)...);
+
+        namespace fs = std::filesystem;
+        const auto path = Oobe::WindowsPath(fs::path{L"/var/lib/snapd/snaps/"});
+
+        return any_file_of(path, [&elements](const auto& entry) {
+            if (!fs::is_regular_file(entry)) {
+                return false;
+            }
+            const std::wstring filename{entry.path().filename().wstring()};
+            return std::any_of(std::begin(elements), std::end(elements), [&filename](const auto& element) {
+                return starts_with({filename}, element) && ends_with({filename}, L".snap"sv);
+            });
+        });
+    }
 }
 
 namespace Oobe
