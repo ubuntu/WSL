@@ -20,6 +20,7 @@
 
 /// Returns true if [tested] starts with [end]. Null-termination is not required.
 template <typename CharT>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters) - Parameters must have the same type.
 bool starts_with(const std::basic_string_view<CharT> tested, const std::basic_string_view<CharT> start)
 {
     if (tested.size() < start.size()) {
@@ -37,6 +38,7 @@ bool starts_with(CharT const (&tested)[TestedSize], CharT const (&start)[StartSi
 
 /// Returns true if [tested] ends with [end]. Null-termination is not required.
 template <typename CharT>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters) - Parameters must have the same type.
 bool ends_with(const std::basic_string_view<CharT> tested, const std::basic_string_view<CharT> end)
 {
     if (tested.size() < end.size()) {
