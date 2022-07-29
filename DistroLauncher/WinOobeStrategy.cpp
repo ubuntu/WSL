@@ -129,10 +129,6 @@ namespace Oobe
             return E_APPLICATION_ACTIVATION_EXEC_FAILURE;
         }
 
-        if (!hRegistrationEvent.set()) {
-            do_close_oobe();
-            return EVENT_E_USER_EXCEPTION;
-        }
         if (oobeProcess->waitExitSync() != 0) {
             return E_FAIL;
         }
