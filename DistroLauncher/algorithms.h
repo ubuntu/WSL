@@ -16,8 +16,9 @@
  *
  */
 
-// Common algorithms to be used everywhere in the launcher project with style resembling the std ones.
+/// Common algorithms to be used everywhere in the launcher project with style resembling the std ones.
 
+/// Returns true if [tested] starts with [end]. Null-termination is not required.
 template <typename CharT>
 bool starts_with(const std::basic_string_view<CharT> tested, const std::basic_string_view<CharT> start)
 {
@@ -34,6 +35,7 @@ bool starts_with(CharT const (&tested)[TestedSize], CharT const (&start)[StartSi
     return starts_with<CharT>(std::basic_string_view<CharT>{tested}, std::basic_string_view<CharT>{start});
 }
 
+/// Returns true if [tested] ends with [end]. Null-termination is not required.
 template <typename CharT>
 bool ends_with(const std::basic_string_view<CharT> tested, const std::basic_string_view<CharT> end)
 {
@@ -57,6 +59,9 @@ template <typename... Args> std::wstring concat(Args&&... args)
     return buffer.str();
 }
 
+/// Returns true for the first entry of [directory] for which [pred] returns true.
+/// Returns false if none of the entries match the predicate.
+/// Iteration order is not specified.
 template <typename Pred> bool find_file_if(const std::filesystem::path& directory, Pred&& pred)
 {
     namespace fs = std::filesystem;
