@@ -16,7 +16,7 @@
  *
  */
 
-// Common algorithms to be used everywhere in the launcher project with style resembling the std ones.
+/// Common algorithms to be used everywhere in the launcher project with style resembling the std ones.
 
 namespace algo_internal
 {
@@ -85,6 +85,7 @@ namespace algo_internal
 
 }
 
+/// Returns true if [tested] starts with [start].
 template <typename RangeTested, typename RangeCompare>
 bool starts_with(RangeTested const& tested, RangeCompare const& start)
 {
@@ -94,6 +95,7 @@ bool starts_with(RangeTested const& tested, RangeCompare const& start)
                                            std::cend(compared_));
 }
 
+/// Returns true if [tested] ends with [end].
 template <typename RangeTested, typename RangeCompare>
 bool ends_with(RangeTested const& tested, RangeCompare const& end)
 {
@@ -110,7 +112,10 @@ template <typename... Args> std::wstring concat(Args&&... args)
     return buffer.str();
 }
 
-template <typename Pred> bool find_file_if(const std::filesystem::path& directory, Pred&& pred)
+/// Returns true for the first entry of [directory] for which [pred] returns true.
+/// Returns false if none of the entries match the predicate.
+/// Iteration order is not specified.
+template <typename Pred> bool any_file_of(const std::filesystem::path& directory, Pred&& pred)
 {
     namespace fs = std::filesystem;
     std::error_code error;
@@ -120,4 +125,13 @@ template <typename Pred> bool find_file_if(const std::filesystem::path& director
         return false;
     }
     return std::find_if(begin(listing), end(listing), std::forward<Pred>(pred)) != end(listing);
+}
+
+// Pushes back to the vector [v] as many elements to a vector as [args] count by folding subsequent calls to
+// v.push_back().
+template <typename T, typename... Args> void push_back_many(std::vector<T>& vec, Args&&... args)
+{
+    static_assert((std::is_constructible_v<T, Args&&> && ...));
+    vec.reserve(vec.size() + sizeof...(args));
+    (vec.push_back(std::forward<Args>(args)), ...);
 }
