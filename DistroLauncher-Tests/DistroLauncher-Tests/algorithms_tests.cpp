@@ -68,7 +68,7 @@ TEST(AlgorithmTests, StartsEndsWithExtra)
 
     char str_1[] = "Is";
     ASSERT_TRUE(starts_with("Is this the real life?", str_1));
-    
+
     char str_2[] = "Is this just fantasy?";
     ASSERT_TRUE(ends_with(str_2, "fantasy?"));
 }
