@@ -57,7 +57,7 @@ namespace algo_internal
                           IteratorCompare compare_end)
     {
         using tested_type = typename std::iterator_traits<IteratorTested>::value_type;
-        using compare_type = std::iterator_traits<IteratorCompare>::value_type;
+        using compare_type = typename std::iterator_traits<IteratorCompare>::value_type;
 
         if constexpr (is_character<tested_type>() || is_character<compare_type>()) {
             static_assert(std::is_same_v<tested_type, compare_type>,
