@@ -29,43 +29,23 @@ namespace algo_internal
     }
 
     /**
-     * This template converts c-strings into string_views, and
-     * leaves all other types untouched
+     * This template converts:
+     * - T[N] into basic_string_view<T> (works for non-chars too!)
+     * - CharT* into basic_string_view<CharT>
+     * - Anything else stays the same
      */
-    template <typename T> constexpr T&& string_adaptor(T&& value)
-    {
-        return std::forward<T>(value);
-    }
-
-    template <typename T> constexpr T const& string_adaptor(T const& value)
+    template <typename T> constexpr T const& view_adaptor(T const& value)
     {
         return value;
     }
 
-    template <typename T> constexpr T& string_adaptor(T& value)
+    template <std::size_t Size, typename T> constexpr auto view_adaptor(const T value[Size])
     {
-        return value;
+        // In c++20, switch to std::span
+        return std::basic_string_view<const T>(value, Size);
     }
 
-    template <typename T> constexpr std::enable_if_t<!is_character<T>(), T*> string_adaptor(T* value)
-    {
-        return value;
-    }
-
-    template <typename T> constexpr std::enable_if_t<!is_character<T>(), T const*> string_adaptor(T const* value)
-    {
-        return value;
-    }
-
-    template <typename Char>
-    constexpr std::enable_if_t<is_character<Char>(), std::basic_string_view<Char>> string_adaptor(Char* value)
-    {
-        return {value};
-    }
-
-    template <typename Char>
-    constexpr std::enable_if_t<is_character<Char>(), std::basic_string_view<const Char>> string_adaptor(
-      Char const* value)
+    template <typename CharT> constexpr std::enable_if_t < is_character<CharT>(), std::basic_string_view<CharT>> view_adaptor(const CharT* value)
     {
         return {value};
     }
@@ -74,6 +54,14 @@ namespace algo_internal
     bool starts_with_impl(IteratorTested tested_begin, IteratorTested tested_end, IteratorCompare compare_begin,
                           IteratorCompare compare_end)
     {
+        using tested_type = std::iterator_traits<IteratorTested>::value_type;
+        using compare_type = std::iterator_traits<IteratorCompare>::value_type;
+
+        if constexpr (is_character<tested_type>() || is_character<compare_type>()) {
+            static_assert(std::is_same_v<tested_type, compare_type>,
+                          "Comparison of diferent width characters is not allowed.");
+        }
+
         const auto tested_size = std::distance(tested_begin, tested_end);
         const auto compare_size = std::distance(compare_begin, compare_end);
         if (tested_size < compare_size) {
@@ -82,15 +70,14 @@ namespace algo_internal
         auto mismatch = std::mismatch(compare_begin, compare_end, tested_begin);
         return mismatch.first == compare_end;
     }
-
 }
 
 /// Returns true if [tested] starts with [start].
 template <typename RangeTested, typename RangeCompare>
 bool starts_with(RangeTested const& tested, RangeCompare const& start)
 {
-    auto const& tested_ = algo_internal::string_adaptor(tested);
-    auto const& compared_ = algo_internal::string_adaptor(start);
+    auto const& tested_ = algo_internal::view_adaptor(tested);
+    auto const& compared_ = algo_internal::view_adaptor(start);
     return algo_internal::starts_with_impl(std::cbegin(tested_), std::cend(tested_), std::cbegin(compared_),
                                            std::cend(compared_));
 }
@@ -99,8 +86,8 @@ bool starts_with(RangeTested const& tested, RangeCompare const& start)
 template <typename RangeTested, typename RangeCompare>
 bool ends_with(RangeTested const& tested, RangeCompare const& end)
 {
-    auto const& tested_ = algo_internal::string_adaptor(tested);
-    auto const& compared_ = algo_internal::string_adaptor(end);
+    auto const& tested_ = algo_internal::view_adaptor(tested);
+    auto const& compared_ = algo_internal::view_adaptor(end);
     return algo_internal::starts_with_impl(std::crbegin(tested_), std::crend(tested_), std::crbegin(compared_),
                                            std::crend(compared_));
 }

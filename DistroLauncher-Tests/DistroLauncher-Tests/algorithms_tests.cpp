@@ -66,19 +66,7 @@ TEST(AlgorithmTests, StartsEndsWithExtra)
     ASSERT_FALSE(starts_with(carray, arr_2));
     ASSERT_TRUE(ends_with(carray, arr_2));
 
-    int* cvector = carray;
-    ASSERT_TRUE(starts_with(cvector, arr_1));
-    ASSERT_FALSE(ends_with(cvector, arr_1));
-
-    ASSERT_FALSE(starts_with(cvector, arr_2));
-    ASSERT_TRUE(ends_with(cvector, arr_2));
-
-    const int* c_const_vector = carray;
-    ASSERT_TRUE(starts_with(c_const_vector, arr_1));
-    ASSERT_FALSE(ends_with(c_const_vector, arr_1));
-
-    ASSERT_FALSE(starts_with(c_const_vector, arr_2));
-    ASSERT_TRUE(ends_with(c_const_vector, arr_2));
+    starts_with(L"Hi! How are you?", "Hi!");
 }
 
 TEST(AlgorithmTests, Concat)

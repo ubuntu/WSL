@@ -86,6 +86,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="..\..\DistroLauncher\WindowsUserInfo.cpp" />
     <ClCompile Include="..\..\DistroLauncher\WslApiLoader.cpp" />
     <ClCompile Include="..\..\DistroLauncher\WSLInfo.cpp" />
+    <ClCompile Include="algorithms_tests.cpp" />
     <ClCompile Include="ChildProcessTests.cpp" />
     <ClCompile Include="ConsoleServiceTests.cpp" />
     <ClCompile Include="ExtendedCliParserTests.cpp" />

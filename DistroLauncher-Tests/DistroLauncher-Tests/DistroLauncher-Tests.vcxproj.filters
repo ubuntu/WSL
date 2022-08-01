@@ -96,6 +96,9 @@
     <ClCompile Include="..\..\DistroLauncher\LauncherForceMode.cpp" />
     <ClCompile Include="LauncherForceModeTests.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ApplicationStrategyCommon.cpp" />
+    <ClCompile Include="algorithms_tests.cpp">
+      <Filter>TestSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />
