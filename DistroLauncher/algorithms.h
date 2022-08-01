@@ -56,7 +56,7 @@ namespace algo_internal
     bool starts_with_impl(IteratorTested tested_begin, IteratorTested tested_end, IteratorCompare compare_begin,
                           IteratorCompare compare_end)
     {
-        using tested_type = std::iterator_traits<IteratorTested>::value_type;
+        using tested_type = typename std::iterator_traits<IteratorTested>::value_type;
         using compare_type = std::iterator_traits<IteratorCompare>::value_type;
 
         if constexpr (is_character<tested_type>() || is_character<compare_type>()) {
