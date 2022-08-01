@@ -65,6 +65,12 @@ TEST(AlgorithmTests, StartsEndsWithExtra)
 
     ASSERT_FALSE(starts_with(carray, arr_2));
     ASSERT_TRUE(ends_with(carray, arr_2));
+
+    char str_1[] = "Is";
+    ASSERT_TRUE(starts_with("Is this the real life?", str_1));
+    
+    char str_2[] = "Is this just fantasy?";
+    ASSERT_TRUE(ends_with(str_2, "fantasy?"));
 }
 
 TEST(AlgorithmTests, Concat)
