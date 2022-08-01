@@ -52,7 +52,7 @@ namespace algo_internal
         return value;
     }
 
-    template <typename T> constexpr std::enable_if_t<!is_character<T>(), T const*> string_adaptor(T* value)
+    template <typename T> constexpr std::enable_if_t<!is_character<T>(), T const*> string_adaptor(T const* value)
     {
         return value;
     }
