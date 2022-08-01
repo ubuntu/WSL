@@ -52,6 +52,7 @@ namespace algo_internal
     }
 
     template <typename IteratorTested, typename IteratorCompare>
+    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters) - Parameters must have the same type.
     bool starts_with_impl(IteratorTested tested_begin, IteratorTested tested_end, IteratorCompare compare_begin,
                           IteratorCompare compare_end)
     {
