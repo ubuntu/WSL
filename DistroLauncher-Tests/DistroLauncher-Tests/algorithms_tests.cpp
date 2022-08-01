@@ -17,8 +17,9 @@
 
 #include "stdafx.h"
 #include "gtest/gtest.h"
+#include "mock_api.h"
 
-TEST(UpgradePolicyTests, StringParsing)
+TEST(AlgorithmTests, StartsWith)
 {
     ASSERT_FALSE(starts_with(L"", L"hello"));
     ASSERT_FALSE(starts_with(L"he", L"hello"));
@@ -26,7 +27,14 @@ TEST(UpgradePolicyTests, StringParsing)
     ASSERT_TRUE(starts_with(L"hello, world!", L"hello"));
     ASSERT_FALSE(starts_with(L"cheers, world!", L"hello"));
     ASSERT_FALSE(starts_with(L"HELLO", L"hello"));
+    ASSERT_FALSE(starts_with(L"", L"Ubuntu"));
 
+    const std::wstring test_str{L"Ubuntu 22.04.1 LTS"};
+    ASSERT_TRUE(starts_with(test_str, L"Ubuntu"));
+}
+
+TEST(AlgorithmTests, EndsWith)
+{
     ASSERT_FALSE(ends_with(L"", L"world!"));
     ASSERT_FALSE(ends_with(L"d!", L"world!"));
     ASSERT_TRUE(ends_with(L"world!", L"world!"));
@@ -35,12 +43,24 @@ TEST(UpgradePolicyTests, StringParsing)
     ASSERT_FALSE(ends_with(L"this string is completely diferent", L"world!"));
     ASSERT_FALSE(ends_with(L"HELLO", L"hello"));
 
-    ASSERT_FALSE(starts_with(L"", L"Ubuntu"));
-    ASSERT_TRUE(starts_with(L"Ubuntu 22.04.1 LTS", L"Ubuntu"));
-    ASSERT_TRUE(ends_with(L"Ubuntu 22.04.1 LTS", L"LTS"));
+    const std::wstring test_str{L"Ubuntu 22.04.1 LTS"};
+    ASSERT_TRUE(ends_with(test_str, L"LTS"));
 }
 
-TEST(UpgradePolicyTests, Concat)
+TEST(AlgorithmTests, StartsEndsWithExtra)
+{
+    const std::vector<int> vec_1{1, 1, 2, 3, 5, 8, 13};
+    const std::array<int, 3> arr_1{1, 1, 2};
+    const std::array<int, 3> arr_2{5, 8, 13};
+
+    ASSERT_TRUE(starts_with(vec_1, arr_1));
+    ASSERT_FALSE(ends_with(vec_1, arr_1));
+
+    ASSERT_FALSE(starts_with(vec_1, arr_2));
+    ASSERT_TRUE(ends_with(vec_1, arr_2));
+}
+
+TEST(AlgorithmTests, Concat)
 {
     // Checking default functionality
     std::wstring dog = L"dog";

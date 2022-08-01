@@ -18,36 +18,89 @@
 
 // Common algorithms to be used everywhere in the launcher project with style resembling the std ones.
 
-template <typename CharT>
-bool starts_with(const std::basic_string_view<CharT> tested, const std::basic_string_view<CharT> start)
+namespace algo_internal
 {
-    if (tested.size() < start.size()) {
-        return false;
+    // Tells chars appart from other types
+    template <typename T> constexpr bool is_character() noexcept
+    {
+        return std::is_same_v<T, char> || std::is_same_v<T, wchar_t> || std::is_same_v<T, signed char> ||
+               std::is_same_v<T, unsigned char> || std::is_same_v<T, char16_t> || std::is_same_v<T, char32_t>;
+        // C++20 introduces char8_t
     }
-    auto mismatch = std::mismatch(start.cbegin(), start.cend(), tested.cbegin());
-    return mismatch.first == start.cend();
-}
 
-template <typename CharT, std::size_t TestedSize, std::size_t StartSize>
-bool starts_with(CharT const (&tested)[TestedSize], CharT const (&start)[StartSize])
-{
-    return starts_with<CharT>(std::basic_string_view<CharT>{tested}, std::basic_string_view<CharT>{start});
-}
-
-template <typename CharT>
-bool ends_with(const std::basic_string_view<CharT> tested, const std::basic_string_view<CharT> end)
-{
-    if (tested.size() < end.size()) {
-        return false;
+    /**
+     * This template converts c-strings into string_views, and
+     * leaves all other types untouched
+     */
+    template <typename T> constexpr T&& string_adaptor(T&& value)
+    {
+        return std::forward<T>(value);
     }
-    auto mismatch = std::mismatch(end.crbegin(), end.crend(), tested.crbegin());
-    return mismatch.first == end.crend();
+
+    template <typename T> constexpr T const& string_adaptor(T const& value)
+    {
+        return value;
+    }
+
+    template <typename T> constexpr T& string_adaptor(T& value)
+    {
+        return value;
+    }
+
+    template <typename T> constexpr std::enable_if_t<!is_character<T>(), T*> string_adaptor(T* value)
+    {
+        return value;
+    }
+
+    template <typename T> constexpr std::enable_if_t<!is_character<T>(), T const*> string_adaptor(T* value)
+    {
+        return value;
+    }
+
+    template <typename Char>
+    constexpr std::enable_if_t<is_character<Char>(), std::basic_string_view<Char>> string_adaptor(Char* value)
+    {
+        return {value};
+    }
+
+    template <typename Char>
+    constexpr std::enable_if_t<is_character<Char>(), std::basic_string_view<const Char>> string_adaptor(
+      Char const* value)
+    {
+        return {value};
+    }
+
+    template <typename IteratorTested, typename IteratorCompare>
+    bool starts_with_impl(IteratorTested tested_begin, IteratorTested tested_end, IteratorCompare compare_begin,
+                          IteratorCompare compare_end)
+    {
+        const auto tested_size = std::distance(tested_begin, tested_end);
+        const auto compare_size = std::distance(compare_begin, compare_end);
+        if (tested_size < compare_size) {
+            return false;
+        }
+        auto mismatch = std::mismatch(compare_begin, compare_end, tested_begin);
+        return mismatch.first == compare_end;
+    }
+
 }
 
-template <typename CharT, std::size_t TestedSize, std::size_t EndSize>
-bool ends_with(const CharT (&tested)[TestedSize], const CharT (&end)[EndSize])
+template <typename RangeTested, typename RangeCompare>
+bool starts_with(RangeTested const& tested, RangeCompare const& start)
 {
-    return ends_with<CharT>(std::basic_string_view<CharT>{tested}, std::basic_string_view<CharT>{end});
+    auto const& tested_ = algo_internal::string_adaptor(tested);
+    auto const& compared_ = algo_internal::string_adaptor(start);
+    return algo_internal::starts_with_impl(std::cbegin(tested_), std::cend(tested_), std::cbegin(compared_),
+                                           std::cend(compared_));
+}
+
+template <typename RangeTested, typename RangeCompare>
+bool ends_with(RangeTested const& tested, RangeCompare const& end)
+{
+    auto const& tested_ = algo_internal::string_adaptor(tested);
+    auto const& compared_ = algo_internal::string_adaptor(end);
+    return algo_internal::starts_with_impl(std::crbegin(tested_), std::crend(tested_), std::crbegin(compared_),
+                                           std::crend(compared_));
 }
 
 template <typename... Args> std::wstring concat(Args&&... args)
