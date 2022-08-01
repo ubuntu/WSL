@@ -47,6 +47,7 @@ namespace Oobe
     template <typename OnGui, typename OnTui, typename OnNone>
     HRESULT run_on_autodetect_ui(OnGui onGui, OnTui onTui, OnNone onNone)
     {
+        using namespace std::literals::string_view_literals;
         static_assert(std::is_convertible_v<OnGui, std::function<HRESULT()>>,
                       "onGui callback must be a callable returning HRESULT with no arguments");
         static_assert(std::is_convertible_v<OnTui, std::function<HRESULT()>>,
@@ -72,7 +73,7 @@ namespace Oobe
             return onNone();
         }
         // if none of the required snaps exist in the rootfs no UI will be available.
-        if (!internal::hasUdiSnap() && !internal::hasSubiquitySnap()) {
+        if (!internal::hasAnyOfSnaps(L"ubuntu-desktop-installer"sv, L"subiquity"sv)) {
             return onNone();
         }
 
