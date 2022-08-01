@@ -65,8 +65,6 @@ TEST(AlgorithmTests, StartsEndsWithExtra)
 
     ASSERT_FALSE(starts_with(carray, arr_2));
     ASSERT_TRUE(ends_with(carray, arr_2));
-
-    starts_with(L"Hi! How are you?", "Hi!");
 }
 
 TEST(AlgorithmTests, Concat)
