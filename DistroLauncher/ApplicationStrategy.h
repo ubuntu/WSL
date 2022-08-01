@@ -20,13 +20,26 @@
 #if defined _M_ARM64
 // The splash application is written in Dart/Flutter, which currently does not supported Windows ARM64 targets.
 // See: https://github.com/flutter/flutter/issues/62597
+#if defined WIN_OOBE_ENABLED
+#include "WinTuiStrategy.h"
+using DefaultAppStrategy = Oobe::WinTuiStrategy;
 
+#else // WIN_OOBE_ENABLED
 #include "NoSplashStrategy.h"
 using DefaultAppStrategy = Oobe::NoSplashStrategy;
 
+#endif // WIN_OOBE_ENABLED
+
 #else // _M_ARM64
 
+#if defined WIN_OOBE_ENABLED
+#include "WinOobeStrategy.h"
+using DefaultAppStrategy = Oobe::WinOobeStrategy;
+
+#else // WIN_OOBE_ENABLED
 #include "SplashEnabledStrategy.h"
 using DefaultAppStrategy = Oobe::SplashEnabledStrategy;
+
+#endif // WIN_OOBE_ENABLED
 
 #endif // _M_ARM64
