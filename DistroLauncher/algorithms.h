@@ -45,7 +45,8 @@ namespace algo_internal
         return std::basic_string_view<const T>(value, Size);
     }
 
-    template <typename CharT> constexpr std::enable_if_t < is_character<CharT>(), std::basic_string_view<CharT>> view_adaptor(const CharT* value)
+    template <typename CharT>
+    constexpr std::enable_if_t<is_character<CharT>(), std::basic_string_view<CharT>> view_adaptor(const CharT* value)
     {
         return {value};
     }
