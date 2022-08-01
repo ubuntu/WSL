@@ -81,5 +81,6 @@ template <typename Pred> bool any_file_of(const std::filesystem::path& directory
 template <typename T, typename... Args> void push_back_many(std::vector<T>& vec, Args&&... args)
 {
     static_assert((std::is_constructible_v<T, Args&&> && ...));
+    vec.reserve(vec.size() + sizeof...(args));
     (vec.push_back(std::forward<Args>(args)), ...);
 }
