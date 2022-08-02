@@ -176,7 +176,7 @@ jobs:
           # Launcher PDBs
 
           for arch in "x64" "ARM64"; do
-            collectTo="debug-database-${{ matrix.AppID }}/launcher/$arch"
+            collectTo="debug-database-${{ matrix.AppID }}/launcher/$arch/"
             mkdir -p "$collectTo"
 
             findDir="ARM64/Release/"
@@ -184,7 +184,7 @@ jobs:
               findDir="ARM64/Release/DistroLauncher-Appx/x64/"
             fi
 
-            find "$findDir" -maxdepth 0 -name "*.pdb" -exec cp '{}' "$collectTo" \;
+            find "$findDir" -maxdepth 1 -name "*.pdb" -exec cp '{}' "$collectTo" \;
             
           done
 
