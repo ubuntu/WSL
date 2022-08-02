@@ -167,6 +167,28 @@ jobs:
       - name: Build Bundle
         working-directory: ${{ env.workDir }}
         run:  msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="${{ env.AppxBundlePlatforms }}" /p:UapAppxPackageBuildMode=${{ env.UapAppxPackageBuildMode }} -verbosity:normal
+      - name: Collect the PDB files
+        working-directory: ${{ env.workDir }}
+        shell: bash
+        run: |
+          set -eu
+          
+          # Launcher PDBs
+
+          for arch in "x64" "ARM64"; do
+            collectTo="debug-database-${{ matrix.AppID }}/launcher/$arch"
+            mkdir -p "$collectTo"
+            find "$arch/Release/" -name "*.pdb" -exec cp '{}' "$collectTo" \;
+          done
+
+          # Flutter PDBs
+
+          # Move this to the loop once Flutter supports ARM64.
+          collectTo="debug-database-${{ matrix.AppID }}/oobe/x64/"
+          mkdir -p "$collectTo"
+          find . -name "flutter_windows.dll.pdb" -exec cp '{}' "$collectTo" \;
+          find . -wholename "*ubuntu-*Release*.pdb" -exec cp '{}' "$collectTo" \;
+
       - name: Allow downloading sideload appxbundle
         uses: actions/upload-artifact@v2
         with:
