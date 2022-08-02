@@ -178,7 +178,14 @@ jobs:
           for arch in "x64" "ARM64"; do
             collectTo="debug-database-${{ matrix.AppID }}/launcher/$arch"
             mkdir -p "$collectTo"
-            find "$arch/Release/" -name "*.pdb" -exec cp '{}' "$collectTo" \;
+
+            findDir="ARM64/Release/"
+            if [ $arch == "x64" ]; then
+              findDir="ARM64/Release/DistroLauncher-Appx/x64/"
+            fi
+
+            find "$findDir" -maxdepth 0 -name "*.pdb" -exec cp '{}' "$collectTo" \;
+            
           done
 
           # Flutter PDBs
