@@ -25,7 +25,7 @@ namespace algo_internal
     {
         return (std::is_same_v<T, Args> || ...);
     }
-    
+
     // Tells chars appart from other types
     template <typename T> constexpr bool is_character() noexcept
     {
