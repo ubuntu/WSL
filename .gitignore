@@ -305,3 +305,7 @@ wsl-builder/prepare-build/prepare-build
 # And dependencies
 **/vcpkg_installed/
 **/*fixes.yaml
+
+# That is meant to be set by the build system only.
+# Users should set the overrides in meta/
+DistroLauncher/Preprocessor.props

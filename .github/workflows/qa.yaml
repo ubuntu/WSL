@@ -32,7 +32,7 @@ jobs:
       - name: Run Clang-Tidy.
         shell: powershell
         run: | 
-          copy .github\workflows\clang_lint\msbuild\Directory.Build.props DistroLauncher\
+          copy .github\workflows\clang_lint\msbuild\Directory.Build.targets DistroLauncher\
           msbuild -p:Platform=x64 -p:Configuration=Debug -m:1 -t:ClangTidy DistroLauncher\DistroLauncher.vcxproj
       # Runs clang-format. At this point clang-tidy already ran and produced the fixes.yaml.
       # This piece is meant to be cross-platform to enable maximum future reuse. That's why bash.
