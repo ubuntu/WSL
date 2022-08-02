@@ -39,10 +39,11 @@ namespace algo_internal
         return value;
     }
 
-    template <std::size_t Size, typename T> constexpr auto view_adaptor(const T value[Size])
+    template <std::size_t Size, typename T>
+    constexpr std::enable_if_t<!is_character<T>(), std::basic_string_view<T>> view_adaptor(const T value[Size])
     {
         // In c++20, switch to std::span
-        return std::basic_string_view<const T>(value, Size);
+        return std::basic_string_view<T>(value, Size);
     }
 
     template <typename CharT>
