@@ -331,8 +331,12 @@ jobs:
         run: |
           set -eu
 
-          mkdir -p build-info/
-          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || exit 0
+          mkdir -p build-info/ debug-databases/
+
+          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || \
+           cp -a ${{ env.artifactsPath }}/debug-database-* debug-databases/ || \
+           exit 0
+
           echo "::set-output name=needs-wiki-update::true"
       - name: Sync wiki to repository documentation
         if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
