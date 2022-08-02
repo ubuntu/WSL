@@ -20,11 +20,16 @@
 
 namespace algo_internal
 {
+    // Checks if a type is in a specified list of types
+    template <typename T, typename... Args> constexpr bool is_same_as_any()
+    {
+        return (std::is_same_v<T, Args> || ...);
+    }
+    
     // Tells chars appart from other types
     template <typename T> constexpr bool is_character() noexcept
     {
-        return std::is_same_v<T, char> || std::is_same_v<T, wchar_t> || std::is_same_v<T, signed char> ||
-               std::is_same_v<T, unsigned char> || std::is_same_v<T, char16_t> || std::is_same_v<T, char32_t>;
+        return is_same_as_any<T, char, wchar_t, signed char, unsigned char, char16_t, char32_t>();
         // C++20 introduces char8_t
     }
 
