@@ -59,7 +59,6 @@ namespace Oobe::internal
     /// Returns true if the there is any snap matching of one the [names] inside the rootfs.
     template <typename... StringLike> bool hasAnyOfSnaps(StringLike&&... names)
     {
-        using namespace std::literals::string_view_literals;
         std::vector<std::wstring_view> elements;
         push_back_many(elements, std::forward<StringLike>(names)...);
 
@@ -72,7 +71,7 @@ namespace Oobe::internal
             }
             const std::wstring filename{entry.path().filename().wstring()};
             return std::any_of(std::begin(elements), std::end(elements), [&filename](const auto& element) {
-                return starts_with({filename}, element) && ends_with({filename}, L".snap"sv);
+                return starts_with(filename, element) && ends_with(filename, L".snap");
             });
         });
     }

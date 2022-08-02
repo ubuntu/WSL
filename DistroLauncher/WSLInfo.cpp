@@ -143,7 +143,7 @@ namespace Oobe::internal
         const auto path = Oobe::WindowsPath(fs::path{L"/var/lib/snapd/snaps/"});
         return any_file_of(path, [name](const auto& entry) {
             const std::wstring_view filename{entry.path().filename().wstring()};
-            return fs::is_regular_file(entry) && starts_with(filename, name) && ends_with(filename, {L"snap"});
+            return fs::is_regular_file(entry) && starts_with(filename, name) && ends_with(filename, L"snap");
         });
     }
 

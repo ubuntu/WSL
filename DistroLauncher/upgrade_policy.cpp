@@ -26,7 +26,7 @@ namespace internal
         if (name == L"Ubuntu") {
             return L"lts";
         }
-        if (starts_with(name, {L"Ubuntu"}) && ends_with(name, {L"LTS"})) {
+        if (starts_with(name, L"Ubuntu") && ends_with(name, L"LTS")) {
             return L"never";
         }
         return L"normal";

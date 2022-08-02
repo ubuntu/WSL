@@ -18,40 +18,86 @@
 
 /// Common algorithms to be used everywhere in the launcher project with style resembling the std ones.
 
-/// Returns true if [tested] starts with [end]. Null-termination is not required.
-template <typename CharT>
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters) - Parameters must have the same type.
-bool starts_with(const std::basic_string_view<CharT> tested, const std::basic_string_view<CharT> start)
+namespace algo_internal
 {
-    if (tested.size() < start.size()) {
-        return false;
+    // Checks if a type is in a specified list of types
+    template <typename T, typename... Args> constexpr bool is_same_as_any()
+    {
+        return (std::is_same_v<T, Args> || ...);
     }
-    auto mismatch = std::mismatch(start.cbegin(), start.cend(), tested.cbegin());
-    return mismatch.first == start.cend();
-}
 
-template <typename CharT, std::size_t TestedSize, std::size_t StartSize>
-bool starts_with(CharT const (&tested)[TestedSize], CharT const (&start)[StartSize])
-{
-    return starts_with<CharT>(std::basic_string_view<CharT>{tested}, std::basic_string_view<CharT>{start});
-}
-
-/// Returns true if [tested] ends with [end]. Null-termination is not required.
-template <typename CharT>
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters) - Parameters must have the same type.
-bool ends_with(const std::basic_string_view<CharT> tested, const std::basic_string_view<CharT> end)
-{
-    if (tested.size() < end.size()) {
-        return false;
+    // Tells chars appart from other types
+    template <typename T> constexpr bool is_character() noexcept
+    {
+        return is_same_as_any<T, char, wchar_t, signed char, unsigned char, char16_t, char32_t>();
+        // C++20 introduces char8_t
     }
-    auto mismatch = std::mismatch(end.crbegin(), end.crend(), tested.crbegin());
-    return mismatch.first == end.crend();
+
+    /**
+     * This template converts:
+     * - T[N] into basic_string_view<T> (works for non-chars too!)
+     * - CharT* into basic_string_view<CharT>
+     * - Anything else stays the same
+     */
+    template <typename T> constexpr T const& view_adaptor(const T& value)
+    {
+        return value;
+    }
+
+    template <std::size_t Size, typename T>
+    constexpr std::enable_if_t<!is_character<T>(), std::basic_string_view<T>> view_adaptor(const T value[Size])
+    {
+        // In c++20, switch to std::span
+        return std::basic_string_view<T>(value, Size);
+    }
+
+    template <typename CharT>
+    constexpr std::enable_if_t<is_character<CharT>(), std::basic_string_view<CharT>> view_adaptor(const CharT* value)
+    {
+        return {value};
+    }
+
+    template <typename IteratorTested, typename IteratorCompare>
+    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters) - Parameters must have the same type.
+    bool starts_with_impl(IteratorTested tested_begin, IteratorTested tested_end, IteratorCompare compare_begin,
+                          IteratorCompare compare_end)
+    {
+        using tested_type = typename std::iterator_traits<IteratorTested>::value_type;
+        using compare_type = typename std::iterator_traits<IteratorCompare>::value_type;
+
+        if constexpr (is_character<tested_type>() || is_character<compare_type>()) {
+            static_assert(std::is_same_v<tested_type, compare_type>,
+                          "Comparison of diferent width characters is not allowed.");
+        }
+
+        const auto tested_size = std::distance(tested_begin, tested_end);
+        const auto compare_size = std::distance(compare_begin, compare_end);
+        if (tested_size < compare_size) {
+            return false;
+        }
+        auto mismatch = std::mismatch(compare_begin, compare_end, tested_begin);
+        return mismatch.first == compare_end;
+    }
 }
 
-template <typename CharT, std::size_t TestedSize, std::size_t EndSize>
-bool ends_with(const CharT (&tested)[TestedSize], const CharT (&end)[EndSize])
+/// Returns true if [tested] starts with [start].
+template <typename RangeTested, typename RangeCompare>
+bool starts_with(const RangeTested& tested, const RangeCompare& start)
 {
-    return ends_with<CharT>(std::basic_string_view<CharT>{tested}, std::basic_string_view<CharT>{end});
+    auto const& tested_ = algo_internal::view_adaptor(tested);
+    auto const& compared_ = algo_internal::view_adaptor(start);
+    return algo_internal::starts_with_impl(std::cbegin(tested_), std::cend(tested_), std::cbegin(compared_),
+                                           std::cend(compared_));
+}
+
+/// Returns true if [tested] ends with [end].
+template <typename RangeTested, typename RangeCompare>
+bool ends_with(const RangeTested& tested, const RangeCompare& end)
+{
+    auto const& tested_ = algo_internal::view_adaptor(tested);
+    auto const& compared_ = algo_internal::view_adaptor(end);
+    return algo_internal::starts_with_impl(std::crbegin(tested_), std::crend(tested_), std::crbegin(compared_),
+                                           std::crend(compared_));
 }
 
 template <typename... Args> std::wstring concat(Args&&... args)
