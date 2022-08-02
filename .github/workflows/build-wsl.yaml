@@ -203,6 +203,13 @@ jobs:
           path: |
             ${{ env.workDir }}/AppPackages/Ubuntu/Ubuntu_*.appxupload
           retention-days: 7
+      - name: Allow downloading the program debug artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: debug-database-${{ matrix.AppID }}
+          path: |
+            ${{ env.workDir }}/debug-database-${{ matrix.AppID }}/
+          retention-days: 7
       - name: Check if we need to upload new build
         id: detect-upload-to-store
         if: ${{ matrix.Upload == 'yes' }}
