@@ -39,7 +39,7 @@ namespace algo_internal
      * - CharT* into basic_string_view<CharT>
      * - Anything else stays the same
      */
-    template <typename T> constexpr T const& view_adaptor(T const& value)
+    template <typename T> constexpr T const& view_adaptor(const T& value)
     {
         return value;
     }
@@ -82,7 +82,7 @@ namespace algo_internal
 
 /// Returns true if [tested] starts with [start].
 template <typename RangeTested, typename RangeCompare>
-bool starts_with(RangeTested const& tested, RangeCompare const& start)
+bool starts_with(const RangeTested& tested, const RangeCompare& start)
 {
     auto const& tested_ = algo_internal::view_adaptor(tested);
     auto const& compared_ = algo_internal::view_adaptor(start);
@@ -92,7 +92,7 @@ bool starts_with(RangeTested const& tested, RangeCompare const& start)
 
 /// Returns true if [tested] ends with [end].
 template <typename RangeTested, typename RangeCompare>
-bool ends_with(RangeTested const& tested, RangeCompare const& end)
+bool ends_with(const RangeTested& tested, const RangeCompare& end)
 {
     auto const& tested_ = algo_internal::view_adaptor(tested);
     auto const& compared_ = algo_internal::view_adaptor(end);
