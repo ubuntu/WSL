@@ -172,7 +172,7 @@ jobs:
         shell: bash
         run: |
           set -eu
-          
+
           # Launcher PDBs
 
           for arch in "x64" "ARM64"; do
@@ -185,7 +185,7 @@ jobs:
             fi
 
             find "$findDir" -maxdepth 1 -name "*.pdb" -exec cp '{}' "$collectTo" \;
-            
+
           done
 
           # Flutter PDBs
@@ -331,13 +331,25 @@ jobs:
         run: |
           set -eu
 
-          mkdir -p build-info/ debug-databases/
+          mkdir -p build-info/
 
-          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || \
-           tar -cavf debug-databases/debug-database-${{ matrix.AppID }}.tar.zst ${{ env.artifactsPath }}/debug-database-* || \
-           exit 0
+          cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || exit 0
+          echo "::set-output name=needs-wiki-update::true"
+
+      # Pushing PDB's to the wiki only makes sense if we uploaded new app versions to the store.
+      - name: Copy debug databases to base wiki
+        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        id: pdb-artifacts
+        run: |
+          set -eu
+
+          mkdir -p debug-databases/
+
+          find  ${{ env.artifactsPath }} -name "debug-database-*" -maxdepth 1 -exec sh -c 'tar -cavf debug-databases/"$(basename $1)".tar.zst' sh '{}' \; || \
+            exit 0
 
           echo "::set-output name=needs-wiki-update::true"
+
       - name: Sync wiki to repository documentation
         if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
         run: |
