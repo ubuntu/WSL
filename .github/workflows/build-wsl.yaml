@@ -334,7 +334,7 @@ jobs:
           mkdir -p build-info/ debug-databases/
 
           cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || \
-           cp -a ${{ env.artifactsPath }}/debug-database-* debug-databases/ || \
+           tar -cavf debug-databases/debug-database-${{ matrix.AppID }}.tar.zst ${{ env.artifactsPath }}/debug-database-* || \
            exit 0
 
           echo "::set-output name=needs-wiki-update::true"
