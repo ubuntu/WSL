@@ -22,7 +22,7 @@ namespace internal
 
     std::wstring GetUpgradePolicy()
     {
-        std::wstring_view name = DistributionInfo::Name;
+        std::wstring_view name = DistributionInfo::WindowTitle;
         if (name == L"Ubuntu") {
             return L"lts";
         }
