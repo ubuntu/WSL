@@ -21,7 +21,7 @@ name: Draft a new release
 on:
   push:
     tags:
-      - "Ubuntu*/*" # Preserving the existing naming convention.
+      - "Ubuntu**" # Preserving the existing naming convention.
 
 jobs:
   on_tag:
