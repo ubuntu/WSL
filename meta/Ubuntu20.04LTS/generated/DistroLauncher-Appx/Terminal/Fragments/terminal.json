@@ -7,10 +7,10 @@
         "hidden": true
       },
       {
-        "name": "Ubuntu 20.04.4 LTS",
+        "name": "Ubuntu 20.04.5 LTS",
         "colorScheme": "Ubuntu-20.04-ColorScheme",
         "commandline": "ubuntu2004.exe",
-        "tabTitle": "Ubuntu 20.04.4 LTS",
+        "tabTitle": "Ubuntu 20.04.5 LTS",
         // This would be the idea once https://github.com/microsoft/terminal/issues/10359 is fixed.
         // "icon": "ms-appx:///Assets/Square44x44Logo.targetsize-32.png",
         "icon": "https://assets.ubuntu.com/v1/49a1a858-favicon-32x32.png",
