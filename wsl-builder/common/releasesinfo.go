@@ -124,7 +124,7 @@ func buildWSLReleaseInfo(releases [][]string) (wslReleases []WslReleaseInfo, err
 		wslReleases = append(wslReleases, wsl)
 
 		// Pin latest supported (ie non in Active Development) LTS as the "Ubuntu" application
-		if release[9] > latestLTSReleasedDate && release[4] == "Supported" {
+		if release[9] > latestLTSReleasedDate && (release[4] == "Supported" || release[4] == "Current Stable Release") {
 			latestLTSReleasedDate = release[9]
 			ubuntuWSL = wsl
 		}
