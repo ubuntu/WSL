@@ -3,10 +3,18 @@
 	<PropertyGroup>
 		<FlutterAppRoot>..\ubuntu-wsl-splash</FlutterAppRoot>
 		<FlutterAppDir>$(FlutterAppRoot)\build\windows\runner\Release\</FlutterAppDir>
+        <FlutterAppIconPath>$(FlutterAppRoot)\windows\runner\resources\app_icon.ico</FlutterAppIconPath>
+        <ThisAppIconPath>..\DistroLauncher\images\icon.ico</ThisAppIconPath>
 	</PropertyGroup>
+    <ItemGroup>
+        <FlutterAppIcon Include="$(FlutterAppIconPath)" />
+        <ThisAppIcon Include="$(ThisAppIconPath)" />
+    </ItemGroup>
 	<Target Name="CustomFlutterBuild" BeforeTargets="ResolveProjectReferences" Condition="!Exists($(FlutterAppDir))">
 		<Message Text="Building Flutter artifacts" Importance="high"/>
-		<Exec Command="git submodule update --init --recursive" />
+		<Exec Command="git submodule update --init" />
+        <Copy SourceFiles="@(ThisAppIcon)" DestinationFiles="@(FlutterAppIcon)" />
+        <Exec Command="flutter gen-l10n" WorkingDirectory="$(FlutterAppRoot)" />
 		<Exec Command="flutter build windows --release" WorkingDirectory="$(FlutterAppRoot)" />
 	</Target>
 	<ItemGroup>
