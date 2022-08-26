@@ -3,26 +3,30 @@
 	<PropertyGroup>
 		<FlutterAppRoot>..\ubuntu-wsl-splash</FlutterAppRoot>
 		<FlutterAppDir>$(FlutterAppRoot)\build\windows\runner\Release\</FlutterAppDir>
-        <FlutterAppIconPath>$(FlutterAppRoot)\windows\runner\resources\app_icon.ico</FlutterAppIconPath>
-        <ThisAppIconPath>..\DistroLauncher\images\icon.ico</ThisAppIconPath>
+		<FlutterAppIconPath>$(FlutterAppRoot)\windows\runner\resources\app_icon.ico</FlutterAppIconPath>
+		<ThisAppIconPath>..\DistroLauncher\images\icon.ico</ThisAppIconPath>
 	</PropertyGroup>
-    <ItemGroup>
-        <FlutterAppIcon Include="$(FlutterAppIconPath)" />
-        <ThisAppIcon Include="$(ThisAppIconPath)" />
-    </ItemGroup>
+	<ItemGroup>
+		<FlutterAppIcon Include="$(FlutterAppIconPath)" />
+		<ThisAppIcon Include="$(ThisAppIconPath)" />
+	</ItemGroup>
+	<ItemGroup>
+		<FlutterAppFiles Include="$(FlutterAppDir)" />
+	</ItemGroup>
+	<Choose>
+		<When Condition=" '$(Platform)' == 'x64' ">
+			<ItemGroup>
+				<None Include="@(FlutterAppFiles)">
+					<DeploymentContent>true</DeploymentContent>
+				</None>
+			</ItemGroup>
+		</When>
+	</Choose>
 	<Target Name="CustomFlutterBuild" BeforeTargets="ResolveProjectReferences" Condition="!Exists($(FlutterAppDir))">
 		<Message Text="Building Flutter artifacts" Importance="high"/>
 		<Exec Command="git submodule update --init" />
-        <Copy SourceFiles="@(ThisAppIcon)" DestinationFiles="@(FlutterAppIcon)" />
-        <Exec Command="flutter gen-l10n" WorkingDirectory="$(FlutterAppRoot)" />
+		<Copy SourceFiles="@(ThisAppIcon)" DestinationFiles="@(FlutterAppIcon)" />
+		<Exec Command="flutter gen-l10n" WorkingDirectory="$(FlutterAppRoot)" />
 		<Exec Command="flutter build windows --release" WorkingDirectory="$(FlutterAppRoot)" />
 	</Target>
-	<ItemGroup>
-		<FlutterAppFiles Include="$(FlutterAppDir)" /> 
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="@(FlutterAppFiles)">
-			<DeploymentContent>true</DeploymentContent>
-		</None>
-	</ItemGroup>
 </Project>
