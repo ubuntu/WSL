@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
-		<FlutterSplashRoot>..\ubuntu-wsl-splash</FlutterSplashRoot>
-		<FlutterSplashDir>$(FlutterSplashRoot)\build\windows\runner\Release\</FlutterSplashDir>
+		<FlutterAppRoot>..\ubuntu-wsl-splash</FlutterAppRoot>
+		<FlutterAppDir>$(FlutterAppRoot)\build\windows\runner\Release\</FlutterAppDir>
 	</PropertyGroup>
-	<Target Name="CustomFlutterBuild" BeforeTargets="ResolveProjectReferences" Condition="!Exists($(FlutterSplashDir))">
+	<Target Name="CustomFlutterBuild" BeforeTargets="ResolveProjectReferences" Condition="!Exists($(FlutterAppDir))">
 		<Message Text="Building Flutter artifacts" Importance="high"/>
 		<Exec Command="git submodule update --init --recursive" />
-		<Exec Command="flutter build windows --release" WorkingDirectory="$(FlutterSplashRoot)" />
+		<Exec Command="flutter build windows --release" WorkingDirectory="$(FlutterAppRoot)" />
 	</Target>
 	<ItemGroup>
-		<FlutterSplashFiles Include="$(FlutterSplashDir)" /> 
+		<FlutterAppFiles Include="$(FlutterAppDir)" /> 
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="@(FlutterSplashFiles)">
+		<None Include="@(FlutterAppFiles)">
 			<DeploymentContent>true</DeploymentContent>
 		</None>
 	</ItemGroup>
