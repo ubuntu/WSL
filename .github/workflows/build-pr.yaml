@@ -50,25 +50,25 @@ jobs:
           $pwd = ConvertTo-SecureString  '${{ secrets.CERTIFICATE_PASSWORD }}' -AsPlainText -Force
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
-      - name: Check if packaging the splash app is necessary
+      - name: Check if packaging the Flutter app is necessary
         working-directory: ${{ env.workDir }}
         shell: bash
         run: |
           BUILD_TREE_HASH=$(sha256sum DistroLauncher-Appx/Directory.build.props | cut -f1 -d' ')
           META_TREE_HASH=$(sha256sum meta/Ubuntu18.04LTS/generated/DistroLauncher-Appx/Directory.build.props | cut -f1 -d' ')
           if [ ${BUILD_TREE_HASH} != ${META_TREE_HASH} ]; then
-            echo "withFlutterSplash=true" >> $GITHUB_ENV
+            echo "withFlutterApp=true" >> $GITHUB_ENV
           else
             echo "Skipping Flutter steps due hashes comparing equal:"
             echo "    Build tree:  ${BUILD_TREE_HASH}. Meta tree: ${META_TREE_HASH}"
           fi
       - uses: subosito/flutter-action@v2.5.0
-        if: ${{ env.withFlutterSplash == 'true' }}
+        if: ${{ env.withFlutterApp == 'true' }}
         with:
           channel: stable
       - name: Build the splash screen
         working-directory: ${{ env.workDir }}
-        if: ${{ env.withFlutterSplash == 'true' }}
+        if: ${{ env.withFlutterApp == 'true' }}
         run: |
           flutter config --enable-windows-desktop
           cp "DistroLauncher/images/icon.ico" "ubuntu-wsl-splash/windows/runner/resources/app_icon.ico"
