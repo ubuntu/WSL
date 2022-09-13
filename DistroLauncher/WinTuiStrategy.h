@@ -15,9 +15,13 @@
  *
  */
 #pragma once
+#include "state_machine.h"
+#include "installer_policy.h"
+#include "installer_controller.h"
 
 namespace Oobe
 {
+    using Mode = InstallerController<>::Mode;
     /// Concrete strategy implementation to fulfill the [Application] class for Windows platforms that don't support
     /// running the Flutter OOBE. In such platforms only TUI and the upstream default experiences are offered because
     /// the UDI snap has been replaced by Subiquity-only snap.
