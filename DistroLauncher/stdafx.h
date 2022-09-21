@@ -60,6 +60,7 @@
 #include "named_mutex.h"
 #include "sudo.h"
 #include "upgrade_policy.h"
+#include "systemd_config.h"
 // Message strings compiled from .MC file.
 #include "messages.h"
 #include "extended_messages.h"

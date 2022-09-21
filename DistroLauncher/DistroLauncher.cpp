@@ -37,6 +37,11 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
         return hr;
     }
 
+    // Enable systemd
+    if (DistributionInfo::Name == L"UbuntuDev.WslID.Dev" || DistributionInfo::Name == L"Ubuntu-Preview") {
+        Systemd::Enable(true);
+    }
+
     // Create a user account.
     if (createUser) {
         if (!app.shouldSkipInstaller()) {
@@ -50,6 +55,7 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
             userName = Helpers::GetUserInput(MSG_ENTER_USERNAME, 32);
 
         } while (!DistributionInfo::CreateUser(userName));
+        Oobe::ExitStatusHandling();
 
         // Set this user account as the default.
         hr = SetDefaultUser(userName);
