@@ -26,6 +26,7 @@ namespace Win32Utils
         HANDLE handle = CreateEvent(nullptr, TRUE, FALSE, name);
         if (handle != nullptr) {
             event = handle;
+            setOnce = false;
         }
     }
 
@@ -34,12 +35,13 @@ namespace Win32Utils
         if (event != nullptr) {
             CloseHandle(event);
             event = nullptr;
+            setOnce = false;
         }
     }
 
     bool SetOnceNamedEvent::set() noexcept
     {
-        if (event == nullptr) {
+        if (setOnce == true) {
             return false;
         }
 
@@ -47,18 +49,17 @@ namespace Win32Utils
             return false;
         }
 
-        CloseHandle(event);
-        event = nullptr;
+        setOnce = true;
         return true;
     }
 
     SetOnceNamedEvent::SetOnceNamedEvent(SetOnceNamedEvent&& other) noexcept :
-        event{std::exchange(other.event, nullptr)}
+        event{std::exchange(other.event, nullptr)}, setOnce{std::exchange(other.setOnce, false)}
     {
     }
 
     bool SetOnceNamedEvent::isValid() const noexcept
     {
-        return event != nullptr;
+        return event != nullptr && setOnce == false;
     }
 }
