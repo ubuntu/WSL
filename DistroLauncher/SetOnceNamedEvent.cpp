@@ -23,23 +23,19 @@ namespace Win32Utils
 
     SetOnceNamedEvent::SetOnceNamedEvent(const wchar_t* name) noexcept
     {
-        HANDLE handle = CreateEvent(nullptr, TRUE, FALSE, name);
-        if (handle != nullptr) {
-            event = handle;
-        }
+        event = CreateEvent(nullptr, TRUE, FALSE, name);
     }
 
     SetOnceNamedEvent::~SetOnceNamedEvent() noexcept
     {
         if (event != nullptr) {
             CloseHandle(event);
-            event = nullptr;
         }
     }
 
     bool SetOnceNamedEvent::set() noexcept
     {
-        if (event == nullptr) {
+        if (!isValid()) {
             return false;
         }
 
@@ -47,18 +43,17 @@ namespace Win32Utils
             return false;
         }
 
-        CloseHandle(event);
-        event = nullptr;
+        alreadySet = true;
         return true;
     }
 
     SetOnceNamedEvent::SetOnceNamedEvent(SetOnceNamedEvent&& other) noexcept :
-        event{std::exchange(other.event, nullptr)}
+        event{std::exchange(other.event, nullptr)}, alreadySet{std::exchange(other.alreadySet, false)}
     {
     }
 
     bool SetOnceNamedEvent::isValid() const noexcept
     {
-        return event != nullptr;
+        return event != nullptr && !alreadySet;
     }
 }

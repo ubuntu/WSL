@@ -63,5 +63,6 @@ namespace Win32Utils
 
       private:
         HANDLE event = nullptr;
+        bool alreadySet = false;
     };
 }
