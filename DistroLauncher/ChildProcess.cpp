@@ -60,6 +60,7 @@ namespace Oobe
                                  &procInfo);                // output: PROCESS_INFORMATION
         auto ok = res != 0 && procInfo.hProcess != nullptr; // success
         if (ok) {
+            WaitForInputIdle(procInfo.hProcess, INFINITE);
             RegisterWaitForSingleObject(&waiterHandle, procInfo.hProcess, onClose, this, INFINITE,
                                         WT_EXECUTEDEFAULT | WT_EXECUTEONLYONCE);
         }
