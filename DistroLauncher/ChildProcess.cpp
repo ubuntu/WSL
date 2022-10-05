@@ -48,12 +48,14 @@ namespace Oobe
             cli.append(arguments);
         }
 
+        const DWORD flags = appConfig().requiresNewConsole ? CREATE_NEW_CONSOLE : 0;
+
         BOOL res = CreateProcess(nullptr,                   // command line
                                  cli.data(),                // non-const CLI
                                  &sa,                       // process security attributes
                                  nullptr,                   // primary thread security attributes
                                  TRUE,                      // handles are inherited
-                                 0,                         // creation flags
+                                 flags,                     // creation flags
                                  nullptr,                   // use parent's environment
                                  nullptr,                   // use parent's current directory
                                  &startInfo,                // STARTUPINFO pointer
