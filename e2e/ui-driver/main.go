@@ -18,7 +18,7 @@ type DartTest struct {
 
 func testFileFromCommandLine() DartTest {
 	var isReconfig = flag.Bool("reconfigure", false, "Whether setup or reconfig")
-	var distroName = flag.String("distro-name", "Ubuntu-Preview", "The WSL distro name")
+	var distroName = flag.String("distro-name", "UbuntuDev.WslID.Dev", "The WSL distro name")
 	var prefill = flag.String("prefill", "", "Whether prefill info is set or not")
 	// this will always be true for e2e testing.
 	_ = flag.Bool("no-dry-run", true, "Whether live or dry-run")
