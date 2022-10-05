@@ -7,7 +7,7 @@ namespace Oobe
 
     std::filesystem::path getOobeExePath()
     {
-        return Win32Utils::thisAppRootdir() / L"ubuntu_wsl_setup.exe";
+        return Win32Utils::thisAppRootdir() / appConfig().appName;
     }
 
     std::filesystem::path getWslConfigPath()
