@@ -67,7 +67,8 @@ namespace Oobe
                                         WT_EXECUTEDEFAULT | WT_EXECUTEONLYONCE);
         }
 
-        return ok;
+        DWORD exitCode = 0;
+        return ok && TRUE == GetExitCodeProcess(procInfo.hProcess, &exitCode) && exitCode == STILL_ACTIVE; // success;
     }
 
     DWORD Win32ChildProcess::do_waitExitSync(DWORD timeout)
