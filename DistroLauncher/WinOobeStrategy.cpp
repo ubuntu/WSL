@@ -212,8 +212,9 @@ namespace Oobe
             do_close_oobe();
             return EVENT_E_USER_EXCEPTION;
         }
-
-        if (oobeProcess.value().waitExitSync() != 0) {
+        const auto exitCode = oobeProcess.value().waitExitSync();
+        do_show_console();
+        if (exitCode != 0) {
             return E_FAIL;
         }
 
