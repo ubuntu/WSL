@@ -48,8 +48,11 @@ func WslTester(t *testing.T) Tester {
 			}
 			tester.Logf("%s", clientLogContents)
 		}
-		// unregister the instance.
-		tester.AssertOsCommand("wsl.exe", "--unregister", *distroName)
+		// attempts to unregister the instance.
+		cmd := exec.Command("wsl.exe", "--shutdown")
+		_ = cmd.Run()
+		cmd = exec.Command("wsl.exe", "--unregister", *distroName)
+		_ = cmd.Run()
 	})
 	return tester
 }
