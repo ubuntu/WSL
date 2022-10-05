@@ -84,6 +84,9 @@ namespace Oobe
             if (FAILED(hr) && hr != E_NOTIMPL && hr != E_INVALIDARG) {
                 wprintf(L"Installer did not complete successfully.\n");
                 Helpers::PrintErrorMessage(hr);
+                if (appConfig().mustSkipFallback) {
+                    exit(123);
+                }
                 wprintf(L"Applying fallback method.\n");
             }
 
