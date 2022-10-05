@@ -62,7 +62,7 @@ jobs:
             echo "Skipping Flutter steps due hashes comparing equal:"
             echo "    Build tree:  ${BUILD_TREE_HASH}. Meta tree: ${META_TREE_HASH}"
           fi
-      - uses: subosito/flutter-action@v2.5.0
+      - uses: subosito/flutter-action@v2
         if: ${{ env.withFlutterApp == 'true' }}
         with:
           channel: stable
