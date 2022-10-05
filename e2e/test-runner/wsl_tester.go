@@ -7,17 +7,15 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
-)
 
-// Defaults choosen based on the default state of the repository on git-clone.
-const defaultLauncherName = "ubuntudev.launchername.dev.exe"
-const defaultDistroName = "UbuntuDev.WslId.Dev"
+	"github.com/ubuntu/wsl/e2e/constants"
+)
 
 const serverLogPath = "/var/log/installer/systemsetup-server-debug.log"
 const clientLogPath = "ubuntu-desktop-installer/packages/ubuntu_wsl_setup/build/windows/runner/Debug/.ubuntu_wsl_setup.exe/ubuntu_wsl_setup.exe.log"
 
-var launcherName = flag.String("launcher-name", defaultLauncherName, "WSL distro launcher under test.")
-var distroName = flag.String("distro-name", defaultDistroName, "WSL distro instance registered for testing.")
+var launcherName = flag.String("launcher-name", constants.DefaultLauncherName, "WSL distro launcher under test.")
+var distroName = flag.String("distro-name", constants.DefaultDistroName, "WSL distro instance registered for testing.")
 
 // A testing wrapper with functions simplifying composing and running commands through os.Exec and checking their outputs.
 type Tester struct {
@@ -25,9 +23,9 @@ type Tester struct {
 }
 
 func checkTestEnvMinRequirements(t *testing.T) {
-	rootDir := os.Getenv("GITHUB_WORKSPACE")
+	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
 	if len(rootDir) == 0 {
-		t.Fatalf("GITHUB_WORKSPACE not set. It should point to the launcher repo root directory.")
+		t.Fatalf("%s not set. It should point to the launcher repo root directory.", constants.LauncherRepoEnvVar)
 	}
 }
 
@@ -42,7 +40,7 @@ func WslTester(t *testing.T) Tester {
 			logContents := tester.AssertWslCommand("cat", serverLogPath)
 			tester.Logf("%s", logContents)
 			tester.Log("\n\n=== Client Debug Log ====")
-			rootDir := os.Getenv("GITHUB_WORKSPACE")
+			rootDir := os.Getenv(constants.LauncherRepoEnvVar)
 			path := filepath.Join(rootDir, clientLogPath)
 			clientLogContents, err := ioutil.ReadFile(path)
 			if err != nil {

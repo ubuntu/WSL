@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/ubuntu/wsl/e2e/constants"
 )
 
 type DartTest struct {
@@ -18,7 +20,7 @@ type DartTest struct {
 
 func testFileFromCommandLine() DartTest {
 	var isReconfig = flag.Bool("reconfigure", false, "Whether setup or reconfig")
-	var distroName = flag.String("distro-name", "UbuntuDev.WslID.Dev", "The WSL distro name")
+	var distroName = flag.String("distro-name", constants.DefaultDistroName, "The WSL distro name")
 	var prefill = flag.String("prefill", "", "Whether prefill info is set or not")
 	// this will always be true for e2e testing.
 	_ = flag.Bool("no-dry-run", true, "Whether live or dry-run")
@@ -46,7 +48,7 @@ func testFileFromCommandLine() DartTest {
 
 func main() {
 	const e2eBaseDir = "integration_test/e2e/"
-	rootDir := os.Getenv("GITHUB_WORKSPACE")
+	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
 	testDriver := testFileFromCommandLine()
 	args := append([]string{"test", filepath.Join(e2eBaseDir, testDriver.file)}, testDriver.args...)
 	cmd := exec.Command("flutter", args...)
