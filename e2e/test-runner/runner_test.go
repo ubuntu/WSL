@@ -12,7 +12,7 @@ func TestBasicSetup(t *testing.T) {
 	// Invoke the launcher as if the user did: `<launcher>.exe install --ui=gui`
 	outStr := tester.AssertLauncherCommand("install --ui=gui") // without install the launcher will run bash.
 	if len(outStr) == 0 {
-		tester.Fatal("Nothing happened.")
+		tester.Fatal("Failed to install the distro: No output produced.")
 	}
 
 	// After completing the setup, the OOBE must have created a new user and the distro launcher must have set it as the default.
