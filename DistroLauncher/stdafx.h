@@ -55,6 +55,7 @@
 #include "WSLInfo.h"
 #include "Win32Utils.h"
 #include "ChildProcess.h"
+#include "AppConfig.h"
 #include "ApplicationStrategy.h"
 #include "Application.h"
 #include "named_mutex.h"
