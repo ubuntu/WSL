@@ -204,6 +204,10 @@ namespace Oobe
             prefill.write();
         }
 
+        if (!oobeProcess) {
+            return E_NOT_VALID_STATE;
+        }
+
         if (!hRegistrationEvent.set()) {
             do_close_oobe();
             return EVENT_E_USER_EXCEPTION;
