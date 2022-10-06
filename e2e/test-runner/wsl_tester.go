@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/ubuntu/wsl/e2e/constants"
@@ -37,16 +38,21 @@ func WslTester(t *testing.T) Tester {
 		// print debug logs
 		if tester.Failed() {
 			tester.Log("\n\n=== Server Debug Log ====")
-			logContents := tester.AssertWslCommand("cat", serverLogPath)
-			tester.Logf("%s", logContents)
+			output, err := exec.Command("wsl.exe", "-d", *distroName, "cat", serverLogPath).CombinedOutput()
+			if err == nil {
+				tester.Logf("%s", output)
+			} else {
+				tester.Logf("Failed to retrieve server debug log:\n%s: %s", err, output)
+			}
 			tester.Log("\n\n=== Client Debug Log ====")
 			rootDir := os.Getenv(constants.LauncherRepoEnvVar)
 			path := filepath.Join(rootDir, clientLogPath)
 			clientLogContents, err := ioutil.ReadFile(path)
 			if err != nil {
-				tester.Fatalf("%s", err)
+				tester.Logf("Failed to retrieve client debug log:\n%s", err)
+			} else {
+				tester.Logf("%s", clientLogContents)
 			}
-			tester.Logf("%s", clientLogContents)
 		}
 		// attempts to unregister the instance.
 		cmd := exec.Command("wsl.exe", "--shutdown")
@@ -77,7 +83,8 @@ func (t *Tester) AssertOsCommand(name string, args ...string) string {
 	cmd := exec.Command(name, args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("Failed to run the command: %s. Error %s", name, err)
+		argsStr := strings.Join(args, " ")
+		t.Fatalf("Failed to run command:\n > %s %s\nError: %s", name, argsStr, err)
 	}
 	return string(output[:])
 }
