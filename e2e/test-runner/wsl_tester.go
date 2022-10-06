@@ -49,7 +49,7 @@ func WslTester(t *testing.T) Tester {
 			path := filepath.Join(rootDir, clientLogPath)
 			clientLogContents, err := ioutil.ReadFile(path)
 			if err != nil {
-				tester.Fatalf("Failed to retrieve client debug log: %s", err)
+				tester.Logf("Failed to retrieve client debug log: %s", err)
 			} else {
 				tester.Logf("%s", clientLogContents)
 			}
