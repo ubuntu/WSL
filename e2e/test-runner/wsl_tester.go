@@ -42,14 +42,14 @@ func WslTester(t *testing.T) Tester {
 			if err == nil {
 				tester.Logf("%s", output)
 			} else {
-				tester.Logf("Failed to retrieve server debug log: %s: %s", err, output)
+				tester.Logf("Failed to retrieve server debug log:\n%s: %s", err, output)
 			}
 			tester.Log("\n\n=== Client Debug Log ====")
 			rootDir := os.Getenv(constants.LauncherRepoEnvVar)
 			path := filepath.Join(rootDir, clientLogPath)
 			clientLogContents, err := ioutil.ReadFile(path)
 			if err != nil {
-				tester.Logf("Failed to retrieve client debug log: %s", err)
+				tester.Logf("Failed to retrieve client debug log:\n%s", err)
 			} else {
 				tester.Logf("%s", clientLogContents)
 			}
