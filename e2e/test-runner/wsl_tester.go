@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/ubuntu/wsl/e2e/constants"
@@ -77,7 +78,8 @@ func (t *Tester) AssertOsCommand(name string, args ...string) string {
 	cmd := exec.Command(name, args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("Failed to run the command: %s. Error %s", name, err)
+		argsStr := strings.Join(args, " ")
+		t.Fatalf("Failed to run command:\n > %s %s\nError: %s", name, argsStr, err)
 	}
 	return string(output[:])
 }
