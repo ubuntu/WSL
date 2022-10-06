@@ -38,16 +38,21 @@ func WslTester(t *testing.T) Tester {
 		// print debug logs
 		if tester.Failed() {
 			tester.Log("\n\n=== Server Debug Log ====")
-			logContents := tester.AssertWslCommand("cat", serverLogPath)
-			tester.Logf("%s", logContents)
+			output, err := exec.Command("wsl.exe", "-d", *distroName, "cat", serverLogPath).CombinedOutput()
+			if err == nil {
+				tester.Logf("%s", output)
+			} else {
+				tester.Logf("Failed to retrieve server debug log: %s: %s", err, output)
+			}
 			tester.Log("\n\n=== Client Debug Log ====")
 			rootDir := os.Getenv(constants.LauncherRepoEnvVar)
 			path := filepath.Join(rootDir, clientLogPath)
 			clientLogContents, err := ioutil.ReadFile(path)
 			if err != nil {
-				tester.Fatalf("%s", err)
+				tester.Fatalf("Failed to retrieve client debug log: %s", err)
+			} else {
+				tester.Logf("%s", clientLogContents)
 			}
-			tester.Logf("%s", clientLogContents)
 		}
 		// attempts to unregister the instance.
 		cmd := exec.Command("wsl.exe", "--shutdown")
