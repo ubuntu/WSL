@@ -21,7 +21,7 @@ namespace Oobe
     struct AppConfig
     {
         // The file name (including extension) of the executable that must be invoked as the OOBE.
-        const wchar_t* appName;
+        const wchar_t* oobeExecutableName;
 
         // Whether or not the fallback method should be skipped on OOBE failure.
         bool mustSkipFallback;

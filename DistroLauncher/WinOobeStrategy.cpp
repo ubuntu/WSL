@@ -7,7 +7,7 @@ namespace Oobe
 
     std::filesystem::path getOobeExePath()
     {
-        return Win32Utils::thisAppRootdir() / appConfig().appName;
+        return Win32Utils::thisAppRootdir() / appConfig().oobeExecutableName;
     }
 
     std::filesystem::path getWslConfigPath()
