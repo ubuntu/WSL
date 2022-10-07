@@ -99,6 +99,7 @@
     <ClCompile Include="algorithms_tests.cpp">
       <Filter>TestSources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\DistroLauncher\AppConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />

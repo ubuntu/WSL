@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="algorithms.h" />
+    <ClInclude Include="AppConfig.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationStrategy.h" />
     <ClInclude Include="ApplicationStrategyCommon.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="local_named_pipe.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AppConfig.cpp" />
     <ClCompile Include="ApplicationStrategyCommon.cpp" />
     <ClCompile Include="ChildProcess.cpp" />
     <ClCompile Include="DistributionInfo.cpp" />

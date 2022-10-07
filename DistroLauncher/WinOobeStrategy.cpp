@@ -7,7 +7,7 @@ namespace Oobe
 
     std::filesystem::path getOobeExePath()
     {
-        return Win32Utils::thisAppRootdir() / L"ubuntu_wsl_setup.exe";
+        return Win32Utils::thisAppRootdir() / appConfig().oobeExecutableName;
     }
 
     std::filesystem::path getWslConfigPath()
@@ -204,12 +204,17 @@ namespace Oobe
             prefill.write();
         }
 
+        if (!oobeProcess) {
+            return E_NOT_VALID_STATE;
+        }
+
         if (!hRegistrationEvent.set()) {
             do_close_oobe();
             return EVENT_E_USER_EXCEPTION;
         }
-
-        if (oobeProcess.value().waitExitSync() != 0) {
+        const auto exitCode = oobeProcess.value().waitExitSync();
+        do_show_console();
+        if (exitCode != 0) {
             return E_FAIL;
         }
 

@@ -21,6 +21,7 @@
 
 namespace Oobe
 {
+    static constexpr int EXIT_OOBE_NO_FALLBACK = 123;
     /// Provides the high level API through which the controllers and services are integrated to run (or not) the OOBE
     /// according to the hardware platform capabilities and the result of the command line parsing. Platform specific
     /// code is provided by the Strategy template type.
@@ -84,6 +85,9 @@ namespace Oobe
             if (FAILED(hr) && hr != E_NOTIMPL && hr != E_INVALIDARG) {
                 wprintf(L"Installer did not complete successfully.\n");
                 Helpers::PrintErrorMessage(hr);
+                if (appConfig().mustSkipFallback) {
+                    exit(EXIT_OOBE_NO_FALLBACK);
+                }
                 wprintf(L"Applying fallback method.\n");
             }
 
