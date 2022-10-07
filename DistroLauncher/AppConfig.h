@@ -31,5 +31,5 @@ namespace Oobe
     };
 
     // Returns the global constant instance of the AppConfig.
-    AppConfig appConfig();
+    const AppConfig& appConfig();
 }

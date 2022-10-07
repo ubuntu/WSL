@@ -19,7 +19,7 @@
 
 namespace Oobe
 {
-    AppConfig appConfig()
+    const AppConfig& appConfig()
     {
         // Initialized only once at compile-time and forever immutable.
         static constexpr AppConfig instance =
