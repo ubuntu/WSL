@@ -1,8 +1,13 @@
 package test_runner
 
 import (
+	"bytes"
+	"context"
+	"fmt"
+	"os/exec"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestBasicSetup(t *testing.T) {
@@ -32,4 +37,49 @@ func TestBasicSetup(t *testing.T) {
 	}
 
 	// TODO: Assert more. We have other expectations about the most basic setup.
+}
+
+// This tests the experience that most users have:
+// opening WSL from the store or from the Start menu
+func TestDefaultExperience(t *testing.T) {
+	tester := WslTester(t)
+	timeOut := 60 * time.Second
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
+	defer cancel()
+
+	shellCommand := []string{"-noninteractive", "-nologo", "-noprofile", "-command", *launcherName, "install --root --ui=none"}
+	cmd := exec.CommandContext(ctx, "powershell.exe", shellCommand...)
+	// cmd := exec.CommandContext(ctx, "echo", "Hello, world")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	cmd.Start()
+
+	start := time.Now()
+	for time.Since(start) < timeOut {
+		time.Sleep(2 * time.Second)
+		findDistroStatus := fmt.Sprintf("(wsl -l -v) -replace \"`0\" | Out-String -Stream | Select-String -Pattern '%s'", *distroName)
+		str := tester.AssertOsCommand("powershell.exe ", "-nologo", "-noprofile", "-command", findDistroStatus)
+		println(str)
+		if strings.Contains(str, "Running") {
+			break
+		}
+		if !strings.Contains(str, "Installing") {
+			tester.Logf("%s", out.String())
+			tester.Fatal("Failed to install")
+		}
+
+	}
+	if time.Since(start) >= timeOut {
+		tester.Logf("%s", out.String())
+		tester.Fatal("Failed to install: timeout")
+	}
+
+	time.Sleep(5 * time.Second) // TODO: Do something smarter
+
+	if !strings.Contains(out.String(), "Installation successful!") {
+		tester.Logf("%s", out.String())
+		tester.Fatal("Failed to finish install")
+	}
 }
