@@ -1,9 +1,21 @@
 package test_runner
 
 import (
+	"gopkg.in/ini.v1"
 	"strings"
 	"testing"
 )
+
+func expectedUpgradePolicy() string {
+	if *distroName == "Ubuntu" {
+		return "lts"
+	}
+	if strings.HasPrefix(*distroName, "Ubuntu") && strings.HasSuffix(*distroName, "LTS") {
+		return "never"
+	}
+	// Preview and Dev
+	return "normal"
+}
 
 func TestBasicSetup(t *testing.T) {
 	// Wrapping testing.T to get the friendly additions to its API as declared in `wsl_tester.go`.
@@ -45,4 +57,36 @@ func TestBasicSetup(t *testing.T) {
 
 	// Sysusers service fix
 	tester.AssertWslCommand("systemctl", "status", "systemd-sysusers.service")
+
+	// ---------------- Reboot with launcher -----------------
+	tester.AssertOsCommand("wsl.exe", "-t", *distroName)
+	tester.AssertLauncherCommand("run echo Hello")
+
+	// Upgrade policy
+	outputStr = tester.AssertWslCommand("cat", "/etc/update-manager/release-upgrades")
+	cfg, err := ini.Load([]byte(outputStr))
+	if err != nil {
+		tester.Logf("Contents of /etc/update-manager/release-upgrades:\n%s", outputStr)
+		tester.Fatal("Failed to parse ini file")
+	}
+
+	val := cfg.Section("DEFAULT").Key("Prompt").String()
+	if val != expectedUpgradePolicy() {
+		tester.Logf("Contents of /etc/update-manager/release-upgrades:\n%s", outputStr)
+		tester.Logf("Parsed policy: %s", val)
+		tester.Logf("Expected policy: %s", expectedUpgradePolicy())
+		tester.Fatal("Wrong upgrade policy")
+	}
+
+	release_upgrades_date := tester.AssertWslCommand("date", "-r", "/etc/update-manager/release-upgrades")
+
+	// ---------------- Reboot with launcher -----------------
+	tester.AssertOsCommand("wsl.exe", "-t", *distroName)
+	tester.AssertLauncherCommand("run echo Hello")
+
+	new_date := tester.AssertWslCommand("date", "-r", "/etc/update-manager/release-upgrades")
+	if release_upgrades_date != new_date {
+		tester.Logf("Launcher is modifying release upgrade file more than once")
+	}
+
 }
