@@ -84,7 +84,7 @@ func (t *Tester) AssertOsCommand(name string, args ...string) string {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		argsStr := strings.Join(args, " ")
-		t.Fatalf("Failed to run command:\n > %s %s\nError: %s", name, argsStr, err)
+		t.Fatalf("Failed to run command:\n > %s %s\nError: %s\nOutput: %s", name, argsStr, err, output)
 	}
 	return string(output[:])
 }
