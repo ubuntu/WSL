@@ -13,7 +13,8 @@
 #   e2e testing enabled appx is installed.
 
 param (
-    [Parameter(Mandatory=$true, HelpMessage="UbuntuPreview, Ubuntu22.04LTS etc etc.")]
+    [Parameter(Mandatory=$true, HelpMessage="UbuntuPreview, Ubuntu22.04LTS, etc.")]
+
     [string]$AppID,
     [Parameter(Mandatory=$true, HelpMessage="the URL to fetch the rootfs from used for this build")]
     [string]$RootFsX64,
