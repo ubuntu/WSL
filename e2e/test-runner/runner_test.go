@@ -3,12 +3,32 @@ package test_runner
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"os/exec"
 	"strings"
 	"testing"
 	"time"
 )
+
+func getDistroStatus(t *Tester) string {
+	str := t.AssertOsCommand("powershell.exe", "-noninteractive", "-nologo", "-noprofile", "-command",
+		"(wsl -l -v) -replace '\\x00'")
+
+	for _, line := range strings.Split(str, "\n")[1:] {
+		columns := strings.Fields(line)
+		// columns = {[*], distroName, status, WSL-version}
+		if len(columns) < 3 {
+			continue
+		}
+		idx := 0
+		if columns[idx] == "*" {
+			idx++
+		}
+		if columns[idx] == *distroName {
+			return columns[idx+1]
+		}
+	}
+	return "DistroNotFound"
+}
 
 func TestBasicSetup(t *testing.T) {
 	// Wrapping testing.T to get the friendly additions to its API as declared in `wsl_tester.go`.
@@ -43,43 +63,44 @@ func TestBasicSetup(t *testing.T) {
 // opening WSL from the store or from the Start menu
 func TestDefaultExperience(t *testing.T) {
 	tester := WslTester(t)
-	timeOut := 60 * time.Second
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	shellCommand := []string{"-noninteractive", "-nologo", "-noprofile", "-command", *launcherName, "install --root --ui=none"}
+	shellCommand := []string{"-noninteractive", "-nologo", "-noprofile", "-command",
+		*launcherName, "--hide-console"}
 	cmd := exec.CommandContext(ctx, "powershell.exe", shellCommand...)
-	// cmd := exec.CommandContext(ctx, "echo", "Hello, world")
+
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
+
 	cmd.Start()
+	time.Sleep(1 * time.Second)
 
-	start := time.Now()
-	for time.Since(start) < timeOut {
-		time.Sleep(2 * time.Second)
-		findDistroStatus := fmt.Sprintf("(wsl -l -v) -replace \"`0\" | Out-String -Stream | Select-String -Pattern '%s'", *distroName)
-		str := tester.AssertOsCommand("powershell.exe ", "-nologo", "-noprofile", "-command", findDistroStatus)
-		println(str)
-		if strings.Contains(str, "Running") {
-			break
-		}
-		if !strings.Contains(str, "Installing") {
-			tester.Logf("%s", out.String())
-			tester.Fatal("Failed to install")
-		}
-
-	}
-	if time.Since(start) >= timeOut {
-		tester.Logf("%s", out.String())
-		tester.Fatal("Failed to install: timeout")
+	// Polling until status is no longer Installing
+	status := getDistroStatus(&tester)
+	for status == "Installing" {
+		time.Sleep(1 * time.Second)
+		status = getDistroStatus(&tester)
 	}
 
-	time.Sleep(5 * time.Second) // TODO: Do something smarter
+	// Polling until status is no longer Running
+	for status == "Running" {
+		time.Sleep(1 * time.Second)
+		status = getDistroStatus(&tester)
 
-	if !strings.Contains(out.String(), "Installation successful!") {
-		tester.Logf("%s", out.String())
-		tester.Fatal("Failed to finish install")
+		// Success condition
+		if strings.Contains(out.String(), "Installation successful!") { // TODO: Change this to parse MOTD
+			return
+		}
+	}
+
+	tester.Logf("Status: %s", status)
+	tester.Logf("Output: %s", out.String())
+	if status == "Stopped" {
+		tester.Fatal("Distro was shut down without finishing install")
+	} else {
+		tester.Fatal("Distro reached an unexpected state before finishing install")
 	}
 }
