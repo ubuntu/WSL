@@ -130,10 +130,19 @@ func TestBasicSetup(t *testing.T) {
 			tester.Fatal("Failed to parse ini file")
 		}
 
-		val := cfg.Section("DEFAULT").Key("Prompt").String()
-		if val != expectedUpgradePolicy() {
+		section, err := cfg.GetSection("DEFAULT")
+		if err != nil {
 			tester.Logf("Contents of /etc/update-manager/release-upgrades:\n%s", outputStr)
-			tester.Logf("Parsed policy: %s", val)
+			tester.Fatal("Failed to find section DEFAULT in /etc/update-manager/release-upgrades")
+		}
+		value, err := section.GetKey("Prompt")
+		if err != nil {
+			tester.Logf("Contents of /etc/update-manager/release-upgrades:\n%s", outputStr)
+			tester.Fatal("Failed to find key 'Prompt' in DEFAULT section of /etc/update-manager/release-upgrades")
+		}
+		if value.String() != expectedUpgradePolicy() {
+			tester.Logf("Contents of /etc/update-manager/release-upgrades:\n%s", outputStr)
+			tester.Logf("Parsed policy: %s", value.String())
 			tester.Logf("Expected policy: %s", expectedUpgradePolicy())
 			tester.Fatal("Wrong upgrade policy")
 		}
