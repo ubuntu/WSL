@@ -4,6 +4,7 @@ import (
 	"gopkg.in/ini.v1"
 	"strings"
 	"testing"
+	"time"
 )
 
 func expectedUpgradePolicy() string {
@@ -92,15 +93,21 @@ func TestBasicSetup(t *testing.T) {
 		}
 	}
 
-	// Systemd enabled. AssertWslCommand failure is allowed because degraded status exits with code 3
+	// Systemd enabled.
 	{
-		outputStr := tester.AssertWslCommand("bash", "-ec", "systemctl is-system-running || exit 0")
-		lines := strings.Fields(outputStr)
-		if len(lines) == 0 {
-			tester.Fatal("systemctl is-system-running printed nothing")
+		getSystemdStatus := func() string {
+			outputStr := tester.AssertWslCommand("bash", "-ec", "systemctl is-system-running || exit 0")
+			return strings.TrimSpace(outputStr)
 		}
-		if lines[0] != "degraded" && lines[0] != "running" {
-			tester.Logf("%s", lines[0])
+
+		status := getSystemdStatus()
+		for status == "starting" {
+			time.Sleep(1 * time.Second)
+			status = getSystemdStatus()
+		}
+
+		if status != "degraded" && status != "running" {
+			tester.Logf("%s", status)
 			tester.Fatal("Systemd should have been enabled")
 		}
 	}
