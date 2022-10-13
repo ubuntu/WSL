@@ -72,22 +72,22 @@ func TestBasicSetup(t *testing.T) {
 			tester.Logf("Unknown Ubuntu release corresponding to distro name '%s'", *distroName)
 			tester.Fatal("Unexpected value provided via --distro-name")
 		}
-		outputStr := tester.AssertWslCommand("lsb_release", "-a")
-		release := string("")
-		prefix := "Description:"
-		for _, line := range strings.Split(outputStr, "\n") {
-			if strings.HasPrefix(line, prefix) {
-				release = strings.TrimSpace(line[len(prefix):])
-				break
-			}
+		outputStr := tester.AssertWslCommand("cat", "/etc/os-release")
+		cfg, err := ini.Load([]byte(outputStr))
+		if err != nil {
+			tester.Logf("Contents of /etc/os-release:\n%s", outputStr)
+			tester.Fatal("Failed to parse ini file")
 		}
-		if len(release) == 0 {
-			tester.Logf("Output from lsb_release -a:\n%s", outputStr)
-			tester.Fatal("Could not parse release")
+
+		release, err := cfg.Section(ini.DefaultSection).GetKey("PRETTY_NAME")
+		if err != nil {
+			tester.Logf("Contents of /etc/os-release:\n%s", outputStr)
+			tester.Fatal("Failed to find PRETTY_NAME")
 		}
-		if release != expectedRelease {
+
+		if release.String() != expectedRelease {
 			tester.Logf("Output from lsb_release -a:\n%s", outputStr)
-			tester.Logf("Parsed release:   %s", release)
+			tester.Logf("Parsed release:   %s", release.String())
 			tester.Logf("Expected release: %s", expectedRelease)
 			tester.Fatal("Unexpected release string")
 		}
