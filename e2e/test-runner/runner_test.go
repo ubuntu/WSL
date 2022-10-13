@@ -41,9 +41,49 @@ func TestBasicSetup(t *testing.T) {
 	tester.Logf("%s", outputStr) // I'd like to see what packs were installed in the end, just in case.
 	if len(packs) == 0 {
 		tester.Fatal("At least one language pack should have been installed or marked for installation, but apt-mark command output is empty.")
+	// Proper release. Ensures the right tarball was used as rootfs
+	expectedRelease := func() string {
+		if *distroName == "Ubuntu-Preview" || *distroName == "UbuntuDev.WslID.Dev" {
+			return "Ubuntu Kinetic Kudu (development branch)"
+		}
+		if *distroName == "Ubuntu" {
+			return "Ubuntu 22.04.1 LTS"
+		}
+		if *distroName == "Ubuntu22.04LTS" {
+			return "Ubuntu 22.04.1 LTS"
+		}
+		if *distroName == "Ubuntu20.04LTS" {
+			return "Ubuntu 20.04.5 LTS"
+		}
+		if *distroName == "Ubuntu18.04LTS" {
+			return "Ubuntu 18.04.6 LTS"
+		}
+		return ""
+	}()
+	if len(expectedRelease) == 0 {
+		tester.Logf("Unknown Ubuntu release corresponding to distro name '%s'", *distroName)
+		tester.Fatal("Unexpected value provided via --distro-name")
+	}
+	outputStr = tester.AssertWslCommand("lsb_release", "-a")
+	release := string("")
+	prefix := "Description:"
+	for _, line := range strings.Split(outputStr, "\n") {
+		if strings.HasPrefix(line, prefix) {
+			release = strings.TrimSpace(line[len(prefix):])
+			break
+		}
+	}
+	if len(release) == 0 {
+		tester.Logf("Output from lsb_release -a:\n%s", outputStr)
+		tester.Fatal("Could not parse release")
+	}
+	if release != expectedRelease {
+		tester.Logf("Output from lsb_release -a:\n%s", outputStr)
+		tester.Logf("Parsed release:   %s", release)
+		tester.Logf("Expected release: %s", expectedRelease)
+		tester.Fatal("Unexpected release string")
 	}
 
-	// TODO: Assert more. We have other expectations about the most basic setup.
 	// Systemd enabled. AssertWslCommand failure is allowed because degraded status exits with code 3
 	outputStr = tester.AssertWslCommand("bash", "-ec", "systemctl is-system-running || exit 0")
 	lines := strings.Fields(outputStr)
