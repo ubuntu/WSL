@@ -34,6 +34,11 @@ func checkTestEnvMinRequirements(t *testing.T) {
 func WslTester(t *testing.T) Tester {
 	checkTestEnvMinRequirements(t)
 	tester := Tester{t}
+
+	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
+	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
+	os.Remove(clientLogFullPath)
+
 	tester.Cleanup(func() {
 		// print debug logs
 		if tester.Failed() {
@@ -45,9 +50,7 @@ func WslTester(t *testing.T) Tester {
 				tester.Logf("Failed to retrieve server debug log:\n%s: %s", err, output)
 			}
 			tester.Log("\n\n=== Client Debug Log ====")
-			rootDir := os.Getenv(constants.LauncherRepoEnvVar)
-			path := filepath.Join(rootDir, clientLogPath)
-			clientLogContents, err := ioutil.ReadFile(path)
+			clientLogContents, err := ioutil.ReadFile(clientLogFullPath)
 			if err != nil {
 				tester.Logf("Failed to retrieve client debug log:\n%s", err)
 			} else {
