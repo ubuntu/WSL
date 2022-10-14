@@ -10,8 +10,10 @@ import (
 )
 
 func getDistroStatus(t *Tester) string {
+	// wsl -l -v outputs UTF-16 (See https://github.com/microsoft/WSL/issues/4607)
+	// We use $env:WSL_UTF8=1 to prevent this (Available from 0.64.0 onwards https://github.com/microsoft/WSL/releases/tag/0.64.0)
 	str := t.AssertOsCommand("powershell.exe", "-noninteractive", "-nologo", "-noprofile", "-command",
-		"(wsl -l -v) -replace '\\x00'")
+		"$env:WSL_UTF8=1 ; wsl -l -v")
 
 	for _, line := range strings.Split(str, "\n")[1:] {
 		columns := strings.Fields(line)
