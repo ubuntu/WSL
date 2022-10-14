@@ -93,7 +93,7 @@ func TestDefaultExperience(t *testing.T) {
 		return status
 	}
 
-	// Polling until registration starts
+	// Completing installation
 	assertStatusTransition("DistroNotFound", "Installing")
 	assertStatusTransition("Installing", "Running")
 	assertStatusTransition("Running", "Stopped")
