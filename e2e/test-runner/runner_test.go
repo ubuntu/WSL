@@ -23,7 +23,7 @@ func TestBasicSetup(t *testing.T) {
 	tester := WslTester(t)
 
 	// Invoke the launcher as if the user did: `<launcher>.exe install --ui=gui`
-	outStr := tester.AssertLauncherCommand("install --root --ui=none") // without install the launcher will run bash.
+	outStr := tester.AssertLauncherCommand("install --ui=gui") // without install the launcher will run bash.
 	if len(outStr) == 0 {
 		tester.Fatal("Failed to install the distro: No output produced.")
 	}
