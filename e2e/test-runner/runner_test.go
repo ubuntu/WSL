@@ -70,7 +70,7 @@ func TestDefaultExperience(t *testing.T) {
 	defer cancel()
 
 	shellCommand := []string{"-noninteractive", "-nologo", "-noprofile", "-command",
-		*launcherName, "--hide-console"}
+		*launcherName, "install --root --ui=none"} // TODO: Change to ...*launcherName, "--hide-console")
 	cmd := exec.CommandContext(ctx, "powershell.exe", shellCommand...)
 
 	var out bytes.Buffer
