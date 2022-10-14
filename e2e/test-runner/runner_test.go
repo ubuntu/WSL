@@ -86,7 +86,7 @@ func TestBasicSetup(t *testing.T) {
 		}
 
 		if release.String() != expectedRelease {
-			tester.Logf("Output from lsb_release -a:\n%s", outputStr)
+			tester.Logf("Contents of /etc/os-release:\n%s", outputStr)
 			tester.Logf("Parsed release:   %s", release.String())
 			tester.Logf("Expected release: %s", expectedRelease)
 			tester.Fatal("Unexpected release string")
