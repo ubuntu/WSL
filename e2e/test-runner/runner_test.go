@@ -78,31 +78,30 @@ func TestDefaultExperience(t *testing.T) {
 	cmd.Stderr = &out
 
 	cmd.Start()
-	time.Sleep(1 * time.Second)
 
-	// Polling until status is no longer Installing
-	status := getDistroStatus(&tester)
-	for status == "Installing" {
-		time.Sleep(1 * time.Second)
-		status = getDistroStatus(&tester)
-	}
-
-	// Polling until status is no longer Running
-	for status == "Running" {
-		time.Sleep(1 * time.Second)
-		status = getDistroStatus(&tester)
-
-		// Success condition
-		if strings.Contains(out.String(), "Installation successful!") { // TODO: Change this to parse MOTD
-			return
+	assertStatusTransition := func(fromStatus string, toStatus string) string {
+		status := getDistroStatus(&tester)
+		for status == fromStatus {
+			time.Sleep(1 * time.Second)
+			status = getDistroStatus(&tester)
 		}
+		if status != toStatus {
+			tester.Logf("In transition from '%s' to '%s': Unexpected state '%s'", fromStatus, toStatus, status)
+			tester.Logf("Output: %s", out.String())
+			tester.Fatal("Unexpected Distro state transition")
+		}
+		return status
 	}
 
-	tester.Logf("Status: %s", status)
-	tester.Logf("Output: %s", out.String())
-	if status == "Stopped" {
+	// Polling until registration starts
+	assertStatusTransition("DistroNotFound", "Installing")
+	assertStatusTransition("Installing", "Running")
+	assertStatusTransition("Running", "Stopped")
+
+	// Ensuring proper installation
+	if !strings.Contains(out.String(), "Installation successful!") { // TODO: Change this to parse MOTD
+		tester.Logf("Status: %s", getDistroStatus(&tester))
+		tester.Logf("Output: %s", out.String())
 		tester.Fatal("Distro was shut down without finishing install")
-	} else {
-		tester.Fatal("Distro reached an unexpected state before finishing install")
 	}
 }
