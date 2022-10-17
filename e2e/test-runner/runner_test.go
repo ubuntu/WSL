@@ -79,15 +79,17 @@ func assertCorrectReleaseRootfs(tester *Tester) {
 
 // Ensures systemd was enabled.
 func assertSystemdEnabled(tester *Tester) {
+	tester.AssertWslCommand("busctl", "list", "--no-pager")
+
 	getSystemdStatus := func() string {
-		outputStr := tester.AssertWslCommand("bash", "-ec", "systemctl is-system-running || exit 0")
+		outputStr := tester.AssertWslCommand("bash", "-ec", "systemctl is-system-running --wait || exit 0")
 		return strings.TrimSpace(outputStr)
 	}
 
 	status := getSystemdStatus()
-	if status != "starting" && status != "degraded" && status != "running" {
+	if status != "degraded" && status != "running" {
 		tester.Logf("%s", status)
-		tester.Fatal("Systemd was not enabled")
+		tester.Fatal("Systemd failed to start")
 	}
 }
 
