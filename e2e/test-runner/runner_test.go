@@ -40,40 +40,35 @@ func assertLanguagePacksMarked(tester *Tester) {
 // Proper release. Ensures the right tarball was used as rootfs.
 func assertCorrectReleaseRootfs(tester *Tester) {
 	expectedRelease := func() string {
-		if *distroName == "Ubuntu-Preview" || *distroName == "UbuntuDev.WslID.Dev" {
-			return "Ubuntu Kinetic Kudu (development branch)"
+		if *distroName == "Ubuntu-Preview" {
+			return "22.10"
 		}
 		if *distroName == "Ubuntu" {
-			return "Ubuntu 22.04.1 LTS"
+			return "22.04"
 		}
 		if *distroName == "Ubuntu22.04LTS" {
-			return "Ubuntu 22.04.1 LTS"
+			return "22.04"
 		}
 		if *distroName == "Ubuntu20.04LTS" {
-			return "Ubuntu 20.04.5 LTS"
+			return "20.04"
 		}
 		if *distroName == "Ubuntu18.04LTS" {
-			return "Ubuntu 18.04.6 LTS"
+			return "18.04"
 		}
-		return ""
+		return "22.10" // Development version
 	}()
 	if len(expectedRelease) == 0 {
 		tester.Logf("Unknown Ubuntu release corresponding to distro name '%s'", *distroName)
 		tester.Fatal("Unexpected value provided via --distro-name")
 	}
-	outputStr := tester.AssertWslCommand("cat", "/etc/os-release")
+	outputStr := tester.AssertWslCommand("lsb_release", "-r")
 	cfg, err := ini.Load([]byte(outputStr))
 	if err != nil {
 		tester.Logf("Contents of /etc/os-release:\n%s", outputStr)
 		tester.Fatal("Failed to parse ini file")
 	}
 
-	release, err := cfg.Section(ini.DefaultSection).GetKey("PRETTY_NAME")
-	if err != nil {
-		tester.Logf("Contents of /etc/os-release:\n%s", outputStr)
-		tester.Fatal("Failed to find PRETTY_NAME")
-	}
-
+	release := cfg.Section(ini.DefaultSection).Key("Release")
 	if release.String() != expectedRelease {
 		tester.Logf("Contents of /etc/os-release:\n%s", outputStr)
 		tester.Logf("Parsed release:   %s", release.String())
