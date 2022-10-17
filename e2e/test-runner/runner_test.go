@@ -158,7 +158,7 @@ func TestBasicSetup(t *testing.T) {
 	}
 
 	assertUserNotRoot(&tester)
-	// assertLanguagePacksMarked(&tester)
+	assertLanguagePacksMarked(&tester)
 	assertCorrectReleaseRootfs(&tester)
 	assertSystemdEnabled(&tester)
 	assertSysusersServiceWorks(&tester)
