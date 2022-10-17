@@ -1,0 +1,74 @@
+name: End-to-End Tests
+on:
+  workflow_dispatch:
+  pull_request:
+concurrency: build-wsl
+jobs:
+  start_vm:
+    strategy:
+      max-parallel: 1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_VM_CREDS }}
+      - name: Start the Runner
+        run: |
+          az vm start --name wsl-ci --resource-group wsl
+  rdp:
+    strategy:
+      max-parallel: 1
+    needs: start_vm
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          sudo apt install -y xvfb freerdp2-x11
+          xvfb-run -a xfreerdp /v:${{ secrets.AZURE_VM_AUTHORITY }} /u:${{ secrets.AZURE_VM_UN }} /p:'${{ secrets.AZURE_VM_UP }}' \
+            /cert:tofu || exit 0
+
+  e2e:
+    strategy:
+      max-parallel: 1
+    needs: start_vm
+    runs-on: self-hosted
+    steps:
+      - name: Hello World
+        shell: powershell
+        run: |
+          $higherSession=0
+          $count = 0
+          While ($higherSession -lt 2) {
+            Sleep 5
+            $count = $count + 1
+            If ($count -gt 19) {
+              Write-Error "RDP never connected"
+              Exit (-1)
+            }
+
+            $sessions=$(C:\SysinternalsSuite\logonsessions.exe -nobanner | Select-String Session: | Sort-Object -Descending | Get-Unique)
+            echo $sessions
+            If ( $sessions -ne $null -and $sessions.length -gt 0 ) {
+              $higherSession=$( $sessions )[0].ToString()[-1]
+            }
+
+          }
+          
+          c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command `
+            "&{ `$env:WSL_UTF8=1`; wsl.exe --version; wsl.exe --list --online;} 3>&1 2>&1 > .\test.log"
+
+          Get-Content ".\test.log"
+
+
+  deallocate_vm:
+    strategy:
+      max-parallel: 1
+    needs: e2e
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_VM_CREDS }}
+      - name: Deallocate the Runner
+        run: |
+          az vm deallocate --name wsl-ci --resource-group wsl
