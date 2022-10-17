@@ -56,7 +56,7 @@ If ( -Not [string]::IsNullOrEmpty($CertificateThumbprint)) {
 }
 
 # Copies the ui-driver.props file to force MSBuild to bundle that binary inside the appx.
-cp ./e2e/ui-driver/ui-driver.props DistroLauncher-Appx/
+Copy-Item ./e2e/ui-driver/ui-driver.props DistroLauncher-Appx/
 
 # Build the appx bundle for E2E testing
 msbuild ./DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Debug /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:UapAppxPackageBuildMode=SideloadOnly -verbosity:normal /p:OOBE_E2E_TESTING=True
