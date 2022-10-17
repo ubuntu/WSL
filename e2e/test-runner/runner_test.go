@@ -6,11 +6,11 @@ import (
 	"testing"
 )
 
-func expectedUpgradePolicy() string {
-	if *distroName == "Ubuntu" {
+func expectedUpgradePolicy(distro string) string {
+	if distro == "Ubuntu" {
 		return "lts"
 	}
-	if strings.HasPrefix(*distroName, "Ubuntu") && strings.HasSuffix(*distroName, "LTS") {
+	if strings.HasPrefix(distro, "Ubuntu") && strings.HasSuffix(distro, "LTS") {
 		return "never"
 	}
 	// Preview and Dev
@@ -120,10 +120,12 @@ func assertCorrectUpgradePolicy(tester *Tester) {
 		tester.Logf("Contents of /etc/update-manager/release-upgrades:\n%s", outputStr)
 		tester.Fatal("Failed to find key 'Prompt' in DEFAULT section of /etc/update-manager/release-upgrades")
 	}
-	if value.String() != expectedUpgradePolicy() {
+
+	expectedPolicy := expectedUpgradePolicy(*distroName)
+	if value.String() != expectedUpgradePolicy(expectedPolicy) {
 		tester.Logf("Contents of /etc/update-manager/release-upgrades:\n%s", outputStr)
 		tester.Logf("Parsed policy: %s", value.String())
-		tester.Logf("Expected policy: %s", expectedUpgradePolicy())
+		tester.Logf("Expected policy: %s", expectedUpgradePolicy(expectedPolicy))
 		tester.Fatal("Wrong upgrade policy")
 	}
 }
