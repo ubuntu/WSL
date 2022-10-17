@@ -64,13 +64,13 @@ func assertCorrectReleaseRootfs(tester *Tester) {
 	outputStr := tester.AssertWslCommand("lsb_release", "-r")
 	cfg, err := ini.Load([]byte(outputStr))
 	if err != nil {
-		tester.Logf("Contents of /etc/os-release:\n%s", outputStr)
+		tester.Logf("Output of lsb_release -r:\n%s", outputStr)
 		tester.Fatal("Failed to parse ini file")
 	}
 
 	release := cfg.Section(ini.DefaultSection).Key("Release")
 	if release.String() != expectedRelease {
-		tester.Logf("Contents of /etc/os-release:\n%s", outputStr)
+		tester.Logf("Output of lsb_release -r:\n%s", outputStr)
 		tester.Logf("Parsed release:   %s", release.String())
 		tester.Logf("Expected release: %s", expectedRelease)
 		tester.Fatal("Unexpected release string")
