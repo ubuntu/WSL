@@ -1,9 +1,6 @@
 package test_runner
 
 import (
-	"bytes"
-	"context"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -35,7 +32,8 @@ func assertGetDistroState(t *Tester, distro string) string {
 
 // Waits until the current state (fromState) transitions into toState.
 // Fails if any other state is reached
-func assertWaitStateTransition(tester *Tester, outbuff *bytes.Buffer, distro string, fromState string, toState string) string {
+func assertWaitStateTransition(tester *Tester, distro string, fromState string, toState string) string {
+	tester.Logf("Awaiting state transition: %s -> %s", fromState, toState)
 	state := assertGetDistroState(tester, distro)
 	for state == fromState {
 		time.Sleep(1 * time.Second)
@@ -43,7 +41,6 @@ func assertWaitStateTransition(tester *Tester, outbuff *bytes.Buffer, distro str
 	}
 	if state != toState {
 		tester.Logf("In transition from '%s' to '%s': Unexpected state '%s'", fromState, toState, state)
-		tester.Logf("Output: %s", outbuff.String())
 		tester.Fatal("Unexpected Distro state transition")
 	}
 	return state
@@ -54,28 +51,24 @@ func assertWaitStateTransition(tester *Tester, outbuff *bytes.Buffer, distro str
 func TestDefaultExperience(t *testing.T) {
 	tester := WslTester(t)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	shellCommand := []string{"-noninteractive", "-nologo", "-noprofile", "-command",
-		*launcherName, "--hide-console"}
-	cmd := exec.CommandContext(ctx, "powershell.exe", shellCommand...)
-
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &out
-
-	cmd.Start()
+	commandText := []string{"wt.exe", "--window", "0", "-d", ".",
+		"powershell.exe", "-noExit", *launcherName, "--hide-console"}
+	tester.AssertOsCommand("powershell.exe", commandText...)
 
 	// Completing installation
-	assertWaitStateTransition(&tester, &out, *distroName, "DistroNotFound", "Installing")
-	assertWaitStateTransition(&tester, &out, *distroName, "Installing", "Running")
-	assertWaitStateTransition(&tester, &out, *distroName, "Running", "Stopped")
+	assertWaitStateTransition(&tester, *distroName, "DistroNotFound", "Installing")
+	assertWaitStateTransition(&tester, *distroName, "Installing", "Running")
 
-	// Ensuring proper installation
-	if !strings.Contains(out.String(), "Installation successful!") {
-		tester.Logf("State: %s", assertGetDistroState(&tester, *distroName))
-		tester.Logf("Output: %s", out.String())
-		tester.Fatal("Distro was shut down without finishing install")
+	tester.Logf("Waiting for installer to finish")
+	time.Sleep(60 * time.Second)
+
+	state := assertGetDistroState(&tester, *distroName)
+	if state != "Running" {
+		tester.Logf("Unexpected state '%s' after installing", state)
+		tester.Fatal("Distro wasn't kept Running after install")
 	}
+
+	tester.Logf("Shutting down WSL")
+	tester.AssertOsCommand("wsl.exe", "--shutdown")
+	assertWaitStateTransition(&tester, *distroName, "Running", "Stopped")
 }
