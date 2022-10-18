@@ -1,6 +1,7 @@
 package test_runner
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -46,6 +47,28 @@ func assertWaitStateTransition(tester *Tester, distro string, fromState string, 
 	return state
 }
 
+// Waits until the subiquity server log indicates that the installation
+// has finsihed.
+// Considerations:
+// - It fails if the log cannot be accessed.
+// - That the server may still run for a small amount of time after the log
+//   says it has finished. Exeperimentally, it seems to be less than a second.
+// - The State of the ditro is assumed to be either Running or Stopped when called
+func assertWaitForInstaller(tester *Tester) {
+	tester.Logf("Waiting for installer to finish")
+
+	for {
+		linuxCmd := fmt.Sprintf("cat %s | tail -1", ServerLogPath)
+		output := tester.AssertWslCommand("-u", "root", "bash", "-ec", linuxCmd)
+
+		if strings.Contains(string(output), "finish: subiquity/SetupShutdown/shutdown: SUCCESS") {
+			return
+		}
+
+		time.Sleep(1 * time.Second)
+	}
+}
+
 // This tests the experience that most users have:
 // opening WSL from the store or from the Start menu
 func TestDefaultExperience(t *testing.T) {
@@ -58,17 +81,19 @@ func TestDefaultExperience(t *testing.T) {
 	// Completing installation
 	assertWaitStateTransition(&tester, *distroName, "DistroNotFound", "Installing")
 	assertWaitStateTransition(&tester, *distroName, "Installing", "Running")
+	assertWaitForInstaller(&tester)
 
-	tester.Logf("Waiting for installer to finish")
-	time.Sleep(60 * time.Second)
+	tester.Logf("Waiting for interactive session to start")
+	time.Sleep(30 * time.Second)
 
 	state := assertGetDistroState(&tester, *distroName)
 	if state != "Running" {
 		tester.Logf("Unexpected state '%s' after installing", state)
-		tester.Fatal("Distro wasn't kept Running after install")
+		tester.Fatal("Distro state wasn't kept 'Running' after install. Did the interactive session start?")
 	}
 
-	tester.Logf("Shutting down WSL")
-	tester.AssertOsCommand("wsl.exe", "--shutdown")
+	tester.Logf("Terminating interactive session")
+	tester.AssertOsCommand("wsl.exe", "-t", *distroName)
+
 	assertWaitStateTransition(&tester, *distroName, "Running", "Stopped")
 }
