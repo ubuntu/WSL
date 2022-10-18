@@ -86,16 +86,16 @@ func assertSystemdEnabled(tester *Tester) {
 		return strings.TrimSpace(outputStr)
 	}
 
-	state := getSystemdStatus()
-	if state != "degraded" && state != "running" {
-		tester.Logf("%s", state)
+	status := getSystemdStatus()
+	if status != "degraded" && status != "running" {
+		tester.Logf("%s", status)
 		tester.Fatal("Systemd failed to start")
 	}
 }
 
 // Sysusers service fix
 func assertSysusersServiceWorks(tester *Tester) {
-	tester.AssertWslCommand("systemctl", "state", "systemd-sysusers.service")
+	tester.AssertWslCommand("systemctl", "status", "systemd-sysusers.service")
 }
 
 // Upgrade policy matches launcher
