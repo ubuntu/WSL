@@ -12,7 +12,7 @@ import (
 	"github.com/ubuntu/wsl/e2e/constants"
 )
 
-const serverLogPath = "/var/log/installer/systemsetup-server-debug.log"
+const ServerLogPath = "/var/log/installer/systemsetup-server-debug.log"
 const clientLogPath = "ubuntu-desktop-installer/packages/ubuntu_wsl_setup/build/windows/runner/Debug/.ubuntu_wsl_setup.exe/ubuntu_wsl_setup.exe.log"
 
 var launcherName = flag.String("launcher-name", constants.DefaultLauncherName, "WSL distro launcher under test.")
@@ -43,7 +43,7 @@ func WslTester(t *testing.T) Tester {
 		// print debug logs
 		if tester.Failed() {
 			tester.Log("\n\n=== Server Debug Log ====")
-			output, err := exec.Command("wsl.exe", "-d", *distroName, "cat", serverLogPath).CombinedOutput()
+			output, err := exec.Command("wsl.exe", "-d", *distroName, "cat", ServerLogPath).CombinedOutput()
 			if err == nil {
 				tester.Logf("%s", output)
 			} else {
