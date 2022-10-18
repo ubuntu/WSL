@@ -53,7 +53,7 @@ func assertWaitStateTransition(tester *Tester, distro string, fromState string, 
 // has finsihed.
 // Considerations:
 // - It fails if the log cannot be accessed.
-// - That the server may still run for a small amount of time after the log
+// - The server may still run for a small amount of time after the log
 //   says it has finished. Exeperimentally, it seems to be less than a second.
 // - The State of the ditro is assumed to be either Running or Stopped when called
 func assertWaitForInstaller(tester *Tester) {
