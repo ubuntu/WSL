@@ -119,10 +119,10 @@ func assertCorrectUpgradePolicy(tester *Tester) {
 	}
 
 	expectedPolicy := expectedUpgradePolicy(*distroName)
-	if value.String() != expectedUpgradePolicy(expectedPolicy) {
+	if value.String() != expectedPolicy {
 		tester.Logf("Contents of /etc/update-manager/release-upgrades:\n%s", outputStr)
 		tester.Logf("Parsed policy: %s", value.String())
-		tester.Logf("Expected policy: %s", expectedUpgradePolicy(expectedPolicy))
+		tester.Logf("Expected policy: %s", expectedPolicy)
 		tester.Fatal("Wrong upgrade policy")
 	}
 }
