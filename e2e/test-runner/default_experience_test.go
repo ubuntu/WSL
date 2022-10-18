@@ -58,7 +58,7 @@ func TestDefaultExperience(t *testing.T) {
 	defer cancel()
 
 	shellCommand := []string{"-noninteractive", "-nologo", "-noprofile", "-command",
-		*launcherName, "install --root --ui=none"} // TODO: Change to ...*launcherName, "--hide-console")
+		*launcherName, "--hide-console"}
 	cmd := exec.CommandContext(ctx, "powershell.exe", shellCommand...)
 
 	var out bytes.Buffer
@@ -73,7 +73,7 @@ func TestDefaultExperience(t *testing.T) {
 	assertWaitStateTransition(&tester, &out, *distroName, "Running", "Stopped")
 
 	// Ensuring proper installation
-	if !strings.Contains(out.String(), "Installation successful!") { // TODO: Change this to parse MOTD
+	if !strings.Contains(out.String(), "Installation successful!") {
 		tester.Logf("State: %s", assertGetDistroState(&tester, *distroName))
 		tester.Logf("Output: %s", out.String())
 		tester.Fatal("Distro was shut down without finishing install")
