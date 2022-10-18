@@ -90,16 +90,16 @@ func assertSystemdEnabled(tester *Tester) {
 		return strings.TrimSpace(outputStr)
 	}
 
-	status := getSystemdStatus()
-	if status != "degraded" && status != "running" {
-		tester.Logf("%s", status)
+	state := getSystemdStatus()
+	if state != "degraded" && state != "running" {
+		tester.Logf("%s", state)
 		tester.Fatal("Systemd failed to start")
 	}
 }
 
 // Sysusers service fix
 func assertSysusersServiceWorks(tester *Tester) {
-	tester.AssertWslCommand("systemctl", "status", "systemd-sysusers.service")
+	tester.AssertWslCommand("systemctl", "state", "systemd-sysusers.service")
 }
 
 // Upgrade policy matches launcher
@@ -148,7 +148,7 @@ func assertRebootWithLauncher(tester *Tester) {
 	tester.AssertLauncherCommand("run echo Hello")
 }
 
-func assertGetDistroStatus(t *Tester) string {
+func assertGetDistroState(t *Tester) string {
 	// wsl -l -v outputs UTF-16 (See https://github.com/microsoft/WSL/issues/4607)
 	// We use $env:WSL_UTF8=1 to prevent this (Available from 0.64.0 onwards https://github.com/microsoft/WSL/releases/tag/0.64.0)
 	str := t.AssertOsCommand("powershell.exe", "-noninteractive", "-nologo", "-noprofile", "-command",
@@ -156,7 +156,7 @@ func assertGetDistroStatus(t *Tester) string {
 
 	for _, line := range strings.Split(str, "\n")[1:] {
 		columns := strings.Fields(line)
-		// columns = {[*], distroName, status, WSL-version}
+		// columns = {[*], distroName, state, WSL-version}
 		if len(columns) < 3 {
 			continue
 		}
@@ -195,6 +195,22 @@ func TestBasicSetup(t *testing.T) {
 	assertUpgradePolicyAppliedOnce(&tester, release_upgrades_date)
 }
 
+// Waits until the current state (fromState) transitions into toState.
+// Fails if any other state is reached
+func assertWaitStateTransition(tester *Tester, outbuff *bytes.Buffer, fromState string, toState string) string {
+	state := assertGetDistroState(tester)
+	for state == fromState {
+		time.Sleep(1 * time.Second)
+		state = assertGetDistroState(tester)
+	}
+	if state != toState {
+		tester.Logf("In transition from '%s' to '%s': Unexpected state '%s'", fromState, toState, state)
+		tester.Logf("Output: %s", outbuff.String())
+		tester.Fatal("Unexpected Distro state transition")
+	}
+	return state
+}
+
 // This tests the experience that most users have:
 // opening WSL from the store or from the Start menu
 func TestDefaultExperience(t *testing.T) {
@@ -213,28 +229,14 @@ func TestDefaultExperience(t *testing.T) {
 
 	cmd.Start()
 
-	assertStatusTransition := func(fromStatus string, toStatus string) string {
-		status := assertGetDistroStatus(&tester)
-		for status == fromStatus {
-			time.Sleep(1 * time.Second)
-			status = assertGetDistroStatus(&tester)
-		}
-		if status != toStatus {
-			tester.Logf("In transition from '%s' to '%s': Unexpected state '%s'", fromStatus, toStatus, status)
-			tester.Logf("Output: %s", out.String())
-			tester.Fatal("Unexpected Distro state transition")
-		}
-		return status
-	}
-
 	// Completing installation
-	assertStatusTransition("DistroNotFound", "Installing")
-	assertStatusTransition("Installing", "Running")
-	assertStatusTransition("Running", "Stopped")
+	assertWaitStateTransition(&tester, &out, "DistroNotFound", "Installing")
+	assertWaitStateTransition(&tester, &out, "Installing", "Running")
+	assertWaitStateTransition(&tester, &out, "Running", "Stopped")
 
 	// Ensuring proper installation
 	if !strings.Contains(out.String(), "Installation successful!") { // TODO: Change this to parse MOTD
-		tester.Logf("Status: %s", assertGetDistroStatus(&tester))
+		tester.Logf("Status: %s", assertGetDistroState(&tester))
 		tester.Logf("Output: %s", out.String())
 		tester.Fatal("Distro was shut down without finishing install")
 	}
