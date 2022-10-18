@@ -8,6 +8,7 @@ import (
 )
 
 // Parses the output of wsl -l -v to find the STATE of the current distro
+// Fails if the state cannot be parsed
 func assertGetDistroState(t *Tester, distro string) string {
 	// wsl -l -v outputs UTF-16 (See https://github.com/microsoft/WSL/issues/4607)
 	// We use $env:WSL_UTF8=1 to prevent this (Available from 0.64.0 onwards https://github.com/microsoft/WSL/releases/tag/0.64.0)
@@ -33,6 +34,7 @@ func assertGetDistroState(t *Tester, distro string) string {
 
 // Waits until the current state (fromState) transitions into toState.
 // Fails if any other state is reached
+// Fails if the state cannot be parsed
 func assertWaitStateTransition(tester *Tester, distro string, fromState string, toState string) string {
 	tester.Logf("Awaiting state transition: %s -> %s", fromState, toState)
 	state := assertGetDistroState(tester, distro)
