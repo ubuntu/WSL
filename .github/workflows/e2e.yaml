@@ -35,7 +35,7 @@ jobs:
       - name: Hello World
         shell: powershell
         run: |
-          $higherSession=0
+         <# $higherSession=0
           $count = 0
           While ($higherSession -lt 2) {
             Sleep 5
@@ -51,9 +51,9 @@ jobs:
               $higherSession=$( $sessions )[0].ToString()[-1]
             }
 
-          }
+          }#>
           
-          c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command `
+          c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i 1 powershell.exe -executionpolicy unrestricted -Command `
             "&{ `$env:WSL_UTF8=1`; wsl.exe --version; wsl.exe --list --online;} 3>&1 2>&1 > .\test.log"
 
           Get-Content ".\test.log"
