@@ -65,7 +65,7 @@ jobs:
       - name: Run tests
         shell: powershell
         run: |
-          $higherSession=0
+         <# $higherSession=0
           $count = 0
           While ($higherSession -lt 2) {
             Sleep 5
@@ -81,9 +81,9 @@ jobs:
               $higherSession=$( $sessions )[0].ToString()[-1]
             }
 
-          }
+          }#>
           
-          c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command `
+          c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -h -u ubuntu -i 1 powershell.exe -Command `
             "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT='$PWD.Path'`; wsl.exe --version; wsl.exe -l -v; cd .\e2e; Get-Item .\test-runner\*_test.go | ForEach-Object { go test -p 1 -cpu 1 .\test-runner\$($_.Name) --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher}} }  } 3>&1 2>&1 > .\test.log"
 
           Get-Content ".\test.log"
