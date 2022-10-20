@@ -31,8 +31,38 @@ jobs:
       max-parallel: 1
     needs: start_vm
     runs-on: self-hosted
+    env:
+      rootfs64: 'http://cloud-images.ubuntu.com/wsl/kinetic/current/ubuntu-kinetic-wsl-amd64-wsl.rootfs.tar.gz'
+      distroName: "Ubuntu-Preview"
+      appID: "UbuntuPreview"
+      launcher: "ubuntupreview.exe"
+      goversion: "1.18"
     steps:
-      - name: Hello World
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup MSBuild (PATH)
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Install certificate
+        shell: powershell
+        run: |
+          New-Item -ItemType directory -Path certificate
+          Set-Content -Path certificate\certificate.txt -Value '${{ secrets.CERTIFICATE }}'
+          certutil -decode certificate\certificate.txt certificate\certificate.pfx
+
+          $pwd = ConvertTo-SecureString  '${{ secrets.CERTIFICATE_PASSWORD }}' -AsPlainText -Force
+          Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
+          Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.goversion }}
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Build and install the appxbundle for testing
+        shell: powershell
+        run: |
+          .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 ${{ env.rootfs64 }}
+      - name: Run tests
         shell: powershell
         run: |
           $higherSession=0
@@ -54,9 +84,14 @@ jobs:
           }
           
           c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command `
-            "&{ `$env:WSL_UTF8=1`; wsl.exe --version; wsl.exe --list --online;} 3>&1 2>&1 > .\test.log"
+            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT='$PWD.Path'`; wsl.exe --version; wsl.exe -l -v; cd .\e2e; go test .\test-runner --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher}} } 3>&1 2>&1 > .\test.log"
 
           Get-Content ".\test.log"
+      - name: Remove the installed package
+        if: always()
+        shell: powershell
+        run: |
+          Remove-AppxPackage "$(Get-AppxPackage | Where-Object PackageFullName -like *${{ env.appID }}*)"
 
 
   deallocate_vm:
