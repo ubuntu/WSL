@@ -15,17 +15,6 @@ jobs:
       - name: Start the Runner
         run: |
           az vm start --name wsl-ci --resource-group wsl
-  rdp:
-    strategy:
-      max-parallel: 1
-    needs: start_vm
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          sudo apt install -y xvfb freerdp2-x11
-          xvfb-run -a xfreerdp /v:${{ secrets.AZURE_VM_AUTHORITY }} /u:${{ secrets.AZURE_VM_UN }} /p:'${{ secrets.AZURE_VM_UP }}' \
-            /cert:tofu || exit 0
-
   e2e:
     strategy:
       max-parallel: 1
@@ -70,27 +59,9 @@ jobs:
       - name: Run tests
         shell: powershell
         run: |
-          $higherSession=0
-          $count = 0
-          While ($higherSession -lt 2) {
-            Sleep 5
-            $count = $count + 1
-            If ($count -gt 19) {
-              Write-Error "RDP never connected"
-              Exit (-1)
-            }
-
-            $sessions=$(C:\SysinternalsSuite\logonsessions.exe -nobanner | Select-String Session: | Sort-Object -Descending | Get-Unique)
-            echo $sessions
-            If ( $sessions -ne $null -and $sessions.length -gt 0 ) {
-              $higherSession=$( $sessions )[0].ToString()[-1]
-            }
-
-          }
-          
           # Only 'TestBasicSetup()' seems mature enough to run in the CI so far.
-          c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command `
-            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT=`$PWD `; wsl.exe --version`; wsl.exe -l -v`; cd .\e2e`; go test .\test-runner -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher}} `; If (`$LastExitCode) { exit `$LastExitCode } } 3>&1 2>&1 > .\test.log"
+          c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -h -u ubuntu -i 1 powershell.exe -Command `
+            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT=`$PWD `; wsl.exe --version`; wsl.exe -l -v`
 
           Get-Content ".\test.log"
       - name: Remove the installed package
