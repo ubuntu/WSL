@@ -61,7 +61,7 @@ jobs:
         run: |
           # Only 'TestBasicSetup()' seems mature enough to run in the CI so far.
           c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -h -u ubuntu -i 1 powershell.exe -Command `
-            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT=`$PWD `; wsl.exe --version`; wsl.exe -l -v`
+            "&{ `$env:WSL_UTF8=1`; wsl.exe --version; wsl.exe --list --online;} 3>&1 2>&1 > .\test.log"		  
 
           Get-Content ".\test.log"
       - name: Remove the installed package
