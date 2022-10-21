@@ -18,6 +18,7 @@
 #pragma once
 
 #include "extended_cli_parser.h"
+#include "snapd.h"
 
 namespace Oobe
 {
@@ -68,6 +69,8 @@ namespace Oobe
         {
             using namespace internal;
             wprintf(L"Unpacking is complete!\n");
+            // any required clean-up action will be taken by this guard.
+            auto scopeGuard = TempDisableSnapd(g_wslApi, DistributionInfo::Name);
             HRESULT hr =
               std::visit(internal::overloaded{
                            [&](AutoInstall& option) { return impl_.do_autoinstall(option.autoInstallFile); },
@@ -102,6 +105,8 @@ namespace Oobe
         HRESULT reconfigure()
         {
             if (isReconfig()) {
+                // any required clean-up action will be taken by this guard.
+                auto scopeGuard = TempDisableSnapd(g_wslApi, DistributionInfo::Name);
                 return impl_.do_reconfigure();
             }
 
