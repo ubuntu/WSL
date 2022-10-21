@@ -40,14 +40,14 @@ namespace Oobe
         /// Executes a script to check and disable the correct version of snapd conflicting with the OOBE.
         /// Returns the clean-up command that must run in the end of the calling scope.
         /// Warning: the distro instance may shut down.
-        const std::wstring TempDisableSnapdImpl(WslApiLoader& api, const std::wstring& distroName);
+        std::wstring TempDisableSnapdImpl(WslApiLoader& api, const std::wstring& distroName);
     }
 
     /// Checks and temporarily disables the correct version of snapd conflicting with the OOBE.
     /// Returns an object that runs the matching clean up command when the caller scope exits.
     auto TempDisableSnapd(WslApiLoader& api, const std::wstring& distroName)
     {
-        auto command = internal::TempDisableSnapdImpl(api, distroName);
+        const auto command = internal::TempDisableSnapdImpl(api, distroName);
         // api is a global and command is captured by copy.
         return ScopeGuard([&api, command]() {
             [[maybe_unused]] DWORD unused;

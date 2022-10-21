@@ -20,7 +20,7 @@
 
 namespace Oobe::internal
 {
-    const std::wstring TempDisableSnapdImpl(WslApiLoader& api, const std::wstring& distroName)
+    std::wstring TempDisableSnapdImpl(WslApiLoader& api, const std::wstring& distroName)
     {
         // Disables snapd.service and patches wsl-setup to find the snaps inside the seed directory
         // since most likely snap will have messed with the hard links.
