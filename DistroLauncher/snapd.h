@@ -22,12 +22,14 @@ namespace Oobe
     /// Be careful when passing lambdas with reference-captures since it will be called during destruction,
     /// thus the referenced objects may have been already destroyed.
     /// Please capture only objects outliving this one!!! Otherwise, make copies.
+    /// Also because destructors must be noexcept, so must the callable be as well.
     template <typename OnScopeExit> class ScopeGuard
     {
       public:
         ScopeGuard(OnScopeExit&& callable) : callable{std::forward<OnScopeExit>(callable)} {};
-        ~ScopeGuard()
+        ~ScopeGuard() noexcept
         {
+            static_assert(noexcept(callable()), "Callable must explicitely not throw exceptions.");
             callable();
         }
 
@@ -47,11 +49,11 @@ namespace Oobe
     /// Returns an object that runs the matching clean up command when the caller scope exits.
     auto TempDisableSnapd(WslApiLoader& api, const std::wstring& distroName)
     {
-        const auto command = internal::TempDisableSnapdImpl(api, distroName);
-        // api is a global and command is captured by copy.
-        return ScopeGuard([&api, command]() {
+        auto command = internal::TempDisableSnapdImpl(api, distroName);
+        // api is a global and command is moved into the lambda.
+        return ScopeGuard([&api, cmd = std::move(command)]() noexcept {
             [[maybe_unused]] DWORD unused;
-            api.WslLaunchInteractive(command.c_str(), FALSE, &unused);
+            api.WslLaunchInteractive(cmd.c_str(), FALSE, &unused);
         });
     }
 }
