@@ -22,9 +22,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
+          set -o pipefail
           sudo apt install -y xvfb freerdp2-x11
-          xvfb-run -a xfreerdp /v:${{ secrets.AZURE_VM_AUTHORITY }} /u:${{ secrets.AZURE_VM_UN }} /p:'${{ secrets.AZURE_VM_UP }}' \
-            /cert:tofu || exit 0
+          # detected empirically and confirmed here: https://github.com/FreeRDP/FreeRDP/blob/68ad8d5a1c8d52828095c2293acea1c76fa7fcb5/client/X11/xfreerdp.h#L350
+          vmOfflineErrorCode=141 
+          lastExitCode=$vmOfflineErrorCode
+          maxAttemptsCount=10;
+          while [[ $lastExitCode == $vmOfflineErrorCode && $maxAttemptsCount != 0 ]]; do
+            sleep 20 # seconds
+            xvfb-run -a xfreerdp /v:${{ secrets.AZURE_VM_AUTHORITY }} /u:${{ secrets.AZURE_VM_UN }} /p:'${{ secrets.AZURE_VM_UP }}' \
+              /cert:tofu | grep -v ${{ secrets.AZURE_VM_AUTHORITY }} || lastExitCode=$?
+            ((--maxAttemptsCount))
+          done
+            
 
   e2e:
     strategy:
