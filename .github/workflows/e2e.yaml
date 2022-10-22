@@ -100,7 +100,7 @@ jobs:
           
           # Only 'TestBasicSetup()' seems mature enough to run in the CI so far.
           c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command `
-            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT=`$PWD `; wsl.exe --version`; wsl.exe -l -v`; cd .\e2e`; go test .\test-runner -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher}} `; If (`$LastExitCode) { exit `$LastExitCode } } 3>&1 2>&1 > .\test.log"
+            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT=`$PWD `; wsl.exe --version`; wsl.exe -l -v`; cd .\e2e`; go test .\test-runner -timeout 15m -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher}} `; If (`$LastExitCode) { exit `$LastExitCode } } 3>&1 2>&1 > .\test.log"
 
           Get-Content ".\test.log"
       - name: Remove the installed package
