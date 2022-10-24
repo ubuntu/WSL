@@ -31,7 +31,7 @@ namespace Oobe
             static_assert(noexcept(callable()), "Callable must explicitely not throw exceptions.");
         }
 
-        ScopeGuard(ScopeGuard&& other) = default;
+        ScopeGuard(ScopeGuard&& other)  noexcept = default;
         ScopeGuard(ScopeGuard& other) = delete;
         ScopeGuard operator=(ScopeGuard& other) = delete;
 
