@@ -62,7 +62,11 @@ namespace Oobe
                                  &procInfo);                // output: PROCESS_INFORMATION
         auto ok = res != 0 && procInfo.hProcess != nullptr; // success
         if (ok) {
-            WaitForInputIdle(procInfo.hProcess, INFINITE);
+            if (appConfig().requiresNewConsole) {
+                // This doesn't seem useful if the child is a window application. But showed useful when dealing with
+                // the PoC e2e test. See https://github.com/ubuntu/WSL/pull/278
+                WaitForInputIdle(procInfo.hProcess, INFINITE);
+            }
             RegisterWaitForSingleObject(&waiterHandle, procInfo.hProcess, onClose, this, INFINITE,
                                         WT_EXECUTEDEFAULT | WT_EXECUTEONLYONCE);
         }
