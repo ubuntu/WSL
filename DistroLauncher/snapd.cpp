@@ -33,7 +33,7 @@ namespace Oobe::internal
         api.WslLaunchInteractive(script.c_str(), FALSE, &exitCode);
 
         if (exitCode == 0) {
-            const std::wstring cmd = concat(L"wsl -t", distroName);
+            const std::wstring cmd = concat(L"wsl -t ", distroName);
             _wsystem(cmd.c_str());
         }
 
