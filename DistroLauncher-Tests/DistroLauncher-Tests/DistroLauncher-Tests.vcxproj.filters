@@ -100,6 +100,7 @@
       <Filter>TestSources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\DistroLauncher\AppConfig.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\snapd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstallerControllerTestPolicies.h" />
