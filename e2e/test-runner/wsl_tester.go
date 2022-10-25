@@ -42,12 +42,19 @@ func WslTester(t *testing.T) Tester {
 	tester.Cleanup(func() {
 		// print debug logs
 		if tester.Failed() {
-			tester.Log("\n\n=== Server Debug Log ====")
-			output, err := exec.Command("wsl.exe", "-d", *distroName, "cat", ServerLogPath).CombinedOutput()
+			tester.Log("\n\n=== Prefill file  ====")
+			output, err := exec.Command("wsl.exe", "-d", *distroName, "cat", "/var/log/prefill-system-setup.yaml").CombinedOutput()
 			if err == nil {
 				tester.Logf("%s", output)
 			} else {
-				tester.Logf("Failed to retrieve server debug log:\n%s: %s", err, output)
+				tester.Logf("Failed to retrieve the prefill file:\n%s: %s", err, output)
+			}
+			tester.Log("\n\n=== Server Debug Log ====")
+			serverLogContents, err := exec.Command("wsl.exe", "-d", *distroName, "cat", ServerLogPath).CombinedOutput()
+			if err == nil {
+				tester.Logf("%s", serverLogContents)
+			} else {
+				tester.Logf("Failed to retrieve server debug log:\n%s: %s", err, serverLogContents)
 			}
 			tester.Log("\n\n=== Client Debug Log ====")
 			clientLogContents, err := ioutil.ReadFile(clientLogFullPath)
