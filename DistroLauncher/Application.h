@@ -50,7 +50,15 @@ namespace Oobe
         /// That implies partial command line parsing, with the required actions deferred to the upstream code.
         bool shouldSkipInstaller()
         {
-            return std::holds_alternative<std::monostate>(arg);
+            using namespace internal;
+            if (DistributionInfo::Name == L"Ubuntu-Preview") {
+                return std::holds_alternative<std::monostate>(arg);
+            }
+            // `wsl --install` precaution: I don't know yet whether it follows the appxmanifest entry point CLI args
+            // or if it invokes the distro launcher with no command line parameters. So, OOBE will only be available if
+            // user commands `--ui=[gui/tui]`.
+            return std::holds_alternative<std::monostate>(arg) || std::holds_alternative<InstallDefault>(arg) ||
+                   std::holds_alternative<InstallOnlyDefault>(arg) || std::holds_alternative<ManifestMatchedInstall>(arg);
         }
 
         /// Constructs the initial state of the application. The [arguments] vector is assumed not to hold the argv[0]
