@@ -18,7 +18,7 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="ubuntu2204" Executable="ubuntu2204.exe" EntryPoint="Windows.FullTrustApplication" uap10:Parameters="--hide-console">
+    <Application Id="ubuntu2204" Executable="ubuntu2204.exe" EntryPoint="Windows.FullTrustApplication" uap10:Parameters="--ui=none">
       <uap:VisualElements DisplayName="Ubuntu 22.04.1 LTS" Description="Ubuntu 22.04.1 LTS on Windows" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\LargeTile.png" Square71x71Logo="Assets\SmallTile.png">
         </uap:DefaultTile>
