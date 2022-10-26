@@ -13,16 +13,10 @@
 	</ItemGroup>
 	<ItemGroup>
 		<FlutterAppFiles Include="$(FlutterAppDir)" />
-	</ItemGroup>
-	<Choose>
-		<When Condition=" '$(Platform)' == 'x64' ">
-			<ItemGroup>
-				<None Include="@(FlutterAppFiles)">
-					<DeploymentContent>true</DeploymentContent>
-				</None>
-			</ItemGroup>
-		</When>
-	</Choose>
+        <None Include="@(FlutterAppFiles)">
+            <DeploymentContent>true</DeploymentContent>
+        </None>
+    </ItemGroup>
 	<Target Name="CustomFlutterBuild" BeforeTargets="ResolveProjectReferences" Condition="!Exists($(FlutterAppDir))">
 		<Message Text="Building Flutter artifacts" Importance="high"/>
 		<Exec Command="git submodule update --init" />
