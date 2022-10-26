@@ -201,6 +201,9 @@ namespace Oobe
     HRESULT WinOobeStrategy::do_gui_install()
     {
         if (!prefill.isEmpty()) {
+            // make sure the distro is awaken before attempting to write a file into it:
+            DWORD exitCode = 0;
+            g_wslApi.WslLaunchInteractive(concat(L"touch ", prefill.linuxPath).c_str(), FALSE, &exitCode);
             prefill.write();
         }
 
