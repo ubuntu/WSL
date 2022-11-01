@@ -19,5 +19,5 @@
 
 namespace Systemd
 {
-    bool Configure(bool enable);
+    void Configure(bool enable);
 }
