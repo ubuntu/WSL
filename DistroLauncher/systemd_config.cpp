@@ -44,17 +44,15 @@ namespace Systemd
         return AppendToFile(L"\n[Service]\nLoadCredential=\n", sysusers_override);
     }
 
-    bool Enable(const bool enable)
+    bool Configure(const bool enable)
     {
+        SysUsersDisableLoadCredential();
         if (!ConfigureSystemd(enable)) {
             return false;
         }
-
-        if (!SysUsersDisableLoadCredential()) {
+        if (enable && !AppendToFile(L"\naction=reboot\n", L"/run/launcher-command")) {
             return false;
         }
-
-        return AppendToFile(L"\naction=reboot\n", L"/run/launcher-command");
+        return true;
     }
-
 }
