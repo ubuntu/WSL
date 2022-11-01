@@ -22,11 +22,10 @@ namespace Systemd
     }
 
     // Enables or disables systemd in config file
-    bool ConfigureSystemd(const bool enable)
+    bool EnableSystemd()
     {
         const std::filesystem::path wsl_conf{L"/etc/wsl.conf"};
-        const std::wstring config = concat(L"\n[boot]\nsystemd=", std::boolalpha, enable, L'\n');
-        return AppendToFile(config, wsl_conf);
+        return AppendToFile(L"\n[boot]\nsystemd=true\n", wsl_conf);
     }
 
     /**
@@ -44,17 +43,18 @@ namespace Systemd
         return AppendToFile(L"\n[Service]\nLoadCredential=\n", sysusers_override);
     }
 
-    bool Enable(const bool enable)
+    void Configure(const bool enable)
     {
-        if (!ConfigureSystemd(enable)) {
-            return false;
+        SysUsersDisableLoadCredential();
+
+        if (!enable) {
+            return;
         }
 
-        if (!SysUsersDisableLoadCredential()) {
-            return false;
+        if (!EnableSystemd()) {
+            return;
         }
 
-        return AppendToFile(L"\naction=reboot\n", L"/run/launcher-command");
+        AppendToFile(L"\naction=reboot\n", L"/run/launcher-command");
     }
-
 }

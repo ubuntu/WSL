@@ -37,10 +37,10 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
         return hr;
     }
 
-    // Enable systemd
-    if (DistributionInfo::Name == L"UbuntuDev.WslID.Dev" || DistributionInfo::Name == L"Ubuntu-Preview") {
-        Systemd::Enable(true);
-    }
+    // Prepare distro for systemd enablement, and conditionally enable it
+    const bool enable_systemd =
+      DistributionInfo::Name == L"UbuntuDev.WslID.Dev" || DistributionInfo::Name == L"Ubuntu-Preview";
+    Systemd::Configure(enable_systemd);
 
     // Create a user account.
     if (createUser) {
