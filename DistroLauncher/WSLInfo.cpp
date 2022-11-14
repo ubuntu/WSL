@@ -70,6 +70,7 @@ namespace Oobe::internal
         for (int64_t i = defaultEnvironmentVariableCount - 1; i >= 0; --i) {
             CoTaskMemFree(static_cast<LPVOID>(defaultEnvironmentVariables[i]));
         }
+        CoTaskMemFree(static_cast<LPVOID>(defaultEnvironmentVariables));
 
         // Per conversation at https://github.com/microsoft/WSL-DistroLauncher/issues/96
         // the information about version 1 or 2 is on the 4th bit of the distro flags, which is not
@@ -227,6 +228,7 @@ namespace Oobe
         for (ULONG i = 0; i < defaultEnvironmentVariableCount; ++i) {
             CoTaskMemFree(static_cast<LPVOID>(defaultEnvironmentVariables[i]));
         }
+        CoTaskMemFree(static_cast<LPVOID>(defaultEnvironmentVariables));
 
         return hr;
     }
