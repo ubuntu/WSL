@@ -23,6 +23,7 @@ jobs:
     steps:
       - run: |
           set -o pipefail
+          sudo apt update
           sudo apt install -y xvfb freerdp2-x11
           # detected empirically and confirmed here: https://github.com/FreeRDP/FreeRDP/blob/68ad8d5a1c8d52828095c2293acea1c76fa7fcb5/client/X11/xfreerdp.h#L350
           vmOfflineErrorCode=141 
