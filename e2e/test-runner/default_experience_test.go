@@ -15,11 +15,12 @@ import (
 // opening WSL from the store or from the Start menu.
 func TestDefaultExperience(t *testing.T) {
 	t.Skip("Skipped: fails in Azure") // TODO: Fix
-	WSLSetup(t)
+	wslSetup(t)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// TODO: redirect powershell.exe output to a file and read from it.
 	commandText := []string{"-Command", "wt.exe", "--window", "0", "-d", ".",
 		"powershell.exe", "-noExit", *launcherName, "--hide-console"}
 	cmd := exec.CommandContext(ctx, "powershell", commandText...)
@@ -31,11 +32,11 @@ func TestDefaultExperience(t *testing.T) {
 	waitStateTransition(t, *distroName, "Installing", "Running")
 	waitForInstaller(t)
 
-	state := DistroState(t)
+	state := distroState(t)
 	require.Equal(t, "Running", state, "Unexpected state for after installation")
 
-	time.Sleep(15 * time.Second)
-	state = DistroState(t)
+	time.Sleep(15 * time.Second) // If tty did not start, it should stop after 8 seconds
+	state = distroState(t)
 	require.Equal(t, "Running", state, "Distro should still be running after 15 seconds, because a shell should still be open")
 
 	cancel()
@@ -43,13 +44,13 @@ func TestDefaultExperience(t *testing.T) {
 	require.NoError(t, err, "Unexpected error after finishing command")
 
 	testCases := map[string]func(t *testing.T){
-		"UserNotRoot":             tcUserNotRoot,
-		"LanguagePacksMarked":     tcLanguagePacksMarked,
-		"CorrectReleaseRootfs":    tcCorrectReleaseRootfs,
-		"SystemdEnabled":          tcSystemdEnabled,
-		"SysusersServiceWorks":    tcSysusersServiceWorks,
-		"CorrectUpgradePolicy":    tcCorrectUpgradePolicy,
-		"UpgradePolicyIdempotent": tcUpgradePolicyIdempotent,
+		"UserNotRoot":             testUserNotRoot,
+		"LanguagePacksMarked":     testLanguagePacksMarked,
+		"CorrectReleaseRootfs":    testCorrectReleaseRootfs,
+		"SystemdEnabled":          testSystemdEnabled,
+		"SysusersServiceWorks":    testSysusersServiceWorks,
+		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
+		"UpgradePolicyIdempotent": testUpgradePolicyIdempotent,
 	}
 
 	for name, tc := range testCases {
@@ -61,29 +62,28 @@ func TestDefaultExperience(t *testing.T) {
 // Fails if any other state is reached
 // Fails if the state cannot be parsed
 func waitStateTransition(t *testing.T, distro string, fromState string, toState string) {
+	t.Helper()
+
 	t.Logf("Awaiting state transition: %s -> %s", fromState, toState)
-	state := DistroState(t)
+	state := distroState(t)
 	require.Containsf(t, []string{fromState, toState}, state, "In transition from '%s' to '%s': Unexpected state '%s'", fromState, toState, state)
 
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
-	timeout := time.NewTimer(60 * time.Second)
-	defer timeout.Stop()
+	timeout := time.After(60 * time.Second)
 
-loop:
 	for {
 		select {
+		case <-timeout:
+			t.Fatalf("Didn't reach expected state in time. Last state: %s", state)
 		case <-ticker.C:
-			state = DistroState(t)
-			if state != fromState {
-				break loop
+			state = distroState(t)
+			if state == fromState {
+				continue
 			}
-		case <-timeout.C:
-			state = DistroState(t)
-			t.Logf("Timed out")
-			break loop
 		}
+		break
 	}
 
 	require.Equalf(t, toState, state, "After transition '%s' -> '%s': Unexpected final state '%s'", fromState, toState, state)
@@ -93,24 +93,26 @@ loop:
 // has finsihed.
 // Considerations:
 // - The server may still run for a small amount of time after the log
-//   says it has finished. Exeperimentally, it seems to be less than a second.
-// - The State of the ditro must be either Running or Stopped when called (i.e. installation must have been started)
+//   says it has finished. Experimentally, it seems to be less than a second.
+// - The State of the distro must be either Running or Stopped when called (i.e. installation must have been started)
 func waitForInstaller(t *testing.T) {
-	require.Contains(t, []string{"Running", "Stopped"}, DistroState(t))
+	t.Helper()
+
+	require.Contains(t, []string{"Running", "Stopped"}, distroState(t))
 	t.Logf("Waiting for installer to finish")
 	defer t.Logf("Installation finished")
 
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
-	timeout := time.NewTimer(2 * time.Minute)
-	defer timeout.Stop()
+	timeout := time.After(2 * time.Minute)
 
 	for {
 		select {
+		case <-timeout:
+			t.Fatal("Timed out waiting for installer to finish")
 		case <-ticker.C:
-			// linuxCmd := fmt.Sprintf("whoami && cat %s | tail -1", ServerLogPath)
-			out, err := WslCommand(context.Background(), "cat", ServerLogPath).CombinedOutput()
+			out, err := wslCommand(context.Background(), "cat", ServerLogPath).CombinedOutput()
 
 			var target *exec.ExitError
 			if errors.As(err, &target) {
@@ -123,8 +125,6 @@ func waitForInstaller(t *testing.T) {
 				time.Sleep(time.Second) // Offering the server some time to finish
 				return
 			}
-		case <-timeout.C:
-			require.Fail(t, "Timed out waiting for installer to finish")
 		}
 	}
 }
