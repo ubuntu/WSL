@@ -126,14 +126,12 @@ func testCorrectUpgradePolicy(t *testing.T) {
 
 // testUpgradePolicyIdempotent enures /etc/update-manager/release-upgrades is not modified every boot
 func testUpgradePolicyIdempotent(t *testing.T) {
-	out, err := exec.Command("wsl.exe", "--terminate", *distroName).CombinedOutput()
-	require.NoError(t, err, "Failed to shut down WLS: %s", out)
+	terminateDistro(t)
 
 	wantsDate, err := launcherCommand(context.Background(), "run", "date", "-r", "/etc/update-manager/release-upgrades").CombinedOutput()
 	require.NoError(t, err, "Failed to execute date: %s", wantsDate)
 
-	out, err = exec.Command("wsl.exe", "--terminate", *distroName).CombinedOutput()
-	require.NoError(t, err, "Failed to shut down WLS: %s", out)
+	terminateDistro(t)
 
 	time.Sleep(5 * time.Second) // Allowing time to pass so it'll show up in the last modification date
 

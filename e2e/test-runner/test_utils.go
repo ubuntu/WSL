@@ -104,6 +104,12 @@ func checkValidTestbed(t *testing.T) {
 	require.Equal(t, "DistroNotFound", status, "Setup: the tested distro is registered. Make a backup and unregister it before running the tests.")
 }
 
+func terminateDistro(t *testing.T) {
+	t.Helper()
+	out, err := exec.Command("wsl.exe", "--terminate", *distroName).CombinedOutput()
+	require.NoError(t, err, "Failed to shut down WLS: %s", out)
+}
+
 // distroState parses the output of "wsl -l -v" to find the state of the current distro.
 // Fails if the state cannot be parsed
 func distroState(t *testing.T) string {
