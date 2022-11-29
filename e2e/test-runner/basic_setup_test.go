@@ -12,7 +12,7 @@ import (
 func TestBasicSetupGUI(t *testing.T) {
 	wslSetup(t)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 	out, err := launcherCommand(ctx, "install", "--ui=gui").CombinedOutput()
 	require.NoErrorf(t, err, "Unexpected error installing: %s", out)
@@ -38,7 +38,7 @@ func TestBasicSetupGUI(t *testing.T) {
 func TestBasicSetupFallbackUI(t *testing.T) {
 	wslSetup(t)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 	// TODO: try to inject user/password to stdin to avoid --root arg.
 	out, err := launcherCommand(ctx, "install", "--root", "--ui=none").CombinedOutput() // Installing as root to avoid Stdin

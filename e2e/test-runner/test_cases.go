@@ -70,7 +70,7 @@ func testSystemdEnabled(t *testing.T) {
 	}
 	t.Parallel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute) // Long time because it needs to boot
 	defer cancel()
 
 	out, err := wslCommand(ctx, "systemctl", "is-system-running", "--wait").CombinedOutput()
