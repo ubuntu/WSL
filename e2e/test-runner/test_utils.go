@@ -87,6 +87,12 @@ func wslCommand(ctx context.Context, linuxCmd ...string) *exec.Cmd {
 	return exec.CommandContext(ctx, "wsl.exe", args...)
 }
 
+// wslCommand mocks exec.CommandContext with WSL commands.
+func wslCommandAsUser(ctx context.Context, user string, linuxCmd ...string) *exec.Cmd {
+	args := append([]string{"-d", *distroName, "-u", user, "--"}, linuxCmd...)
+	return exec.CommandContext(ctx, "wsl.exe", args...)
+}
+
 // launcherCommand mocks exec.CommandContext with Launcher commands.
 func launcherCommand(ctx context.Context, verb string, args ...string) *exec.Cmd {
 	args = append([]string{*launcherName, verb}, args...)

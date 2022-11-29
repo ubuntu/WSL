@@ -24,7 +24,7 @@ func TestBasicSetupGUI(t *testing.T) {
 		"LanguagePacksMarked":     testLanguagePacksMarked,
 		"CorrectReleaseRootfs":    testCorrectReleaseRootfs,
 		"SystemdEnabled":          testSystemdEnabled,
-		"SysusersServiceWorks":    testSysusersServiceWorks,
+		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
 		"UpgradePolicyIdempotent": testUpgradePolicyIdempotent,
 	}
@@ -51,7 +51,7 @@ func TestBasicSetupFallbackUI(t *testing.T) {
 		"LanguagePacksMarked":     testLanguagePacksMarked,
 		"CorrectReleaseRootfs":    testCorrectReleaseRootfs,
 		"SystemdEnabled":          testSystemdEnabled,
-		"SysusersServiceWorks":    testSysusersServiceWorks,
+		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
 		"UpgradePolicyIdempotent": testUpgradePolicyIdempotent,
 	}

@@ -1,12 +1,15 @@
 package test_runner
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"os/exec"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/ini.v1"
 )
@@ -62,37 +65,70 @@ func testCorrectReleaseRootfs(t *testing.T) {
 
 // testSystemdEnabled ensures systemd was enabled.
 func testSystemdEnabled(t *testing.T) {
-	t.Parallel()
-
-	distroNameToAllowDegraded := map[string]bool{
-		"Ubuntu":         true,
-		"Ubuntu22.04LTS": true,
-		"Ubuntu20.04LTS": true,
-		"Ubuntu18.04LTS": true,
-		"UbuntuPreview":  false,
+	if !systemdExpected() {
+		t.Skipf("Skipping systemd checks on %s", *distroName)
 	}
+	t.Parallel()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	out, err := wslCommand(ctx, "systemctl", "is-system-running", "--wait").CombinedOutput()
 
-	if distroNameToAllowDegraded[*distroName] {
-		var target *exec.ExitError
-		require.ErrorAs(t, err, &target, "systemctl is-system-running: Only acceptable error is ExitError (caused by systemd being degraded)")
-		require.Equal(t, target.ExitCode(), 1, "systemctl is-system-running: Only acceptable non-zero exit code is 1 (degraded)")
-		require.Contains(t, string(out), "degraded", "systemd output should be degraded")
-		return
+	out, err := wslCommand(ctx, "systemctl", "is-system-running", "--wait").CombinedOutput()
+	if err == nil {
+		return // Success: Non-deterministic
 	}
 
-	require.NoErrorf(t, err, "Unexpected failure after systemctl is-system-running. Output: %s", out)
+	// Only acceptable alternative is "degraded"
+	var target *exec.ExitError
+	require.ErrorAs(t, err, &target, "systemctl is-system-running: Only acceptable error is ExitError (caused by systemd being degraded)")
+	require.Equal(t, target.ExitCode(), 1, "systemctl is-system-running: Only acceptable non-zero exit code is 1 (degraded)")
+	require.Contains(t, string(out), "degraded", "systemd output should be degraded")
 }
 
-// testSysusersServiceWorks ensures the sysusers service is fixed
-func testSysusersServiceWorks(t *testing.T) {
-	t.Parallel()
+// testSystemdUnits ensures the list of failed units does not regress
+func testSystemdUnits(t *testing.T) {
+	if !systemdExpected() {
+		// Enable systemd in config file
+		wslCommandAsUser(context.Background(), "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`)
+		// Restore config file
+		defer wslCommandAsUser(context.Background(), "root", "bash", "-c", `head -n -2 "/etc/wsl.conf" > "/etc/wsl.conf"`)
+	}
 
-	out, err := wslCommand(context.Background(), "systemctl", "status", "systemd-sysusers.service").CombinedOutput()
-	require.NoError(t, err, "Unexpected failure checking for status of systemd-sysusers.service: %s", out)
+	// Terminating to starts systemd, and to ensure no services from previous tests are running
+	terminateDistro(t)
+
+	distroNameToFailedUnits := map[string][]string{
+		"Ubuntu18.04LTS": {"user@0.service", "atd.service", "systemd-modules-load.service"},
+		"Ubuntu20.04LTS": {"user@0.service", "atd.service", "ssh.service", "systemd-remount-fs.service", "multipathd.socket"},
+		"Ubuntu22.04LTS": {"user@0.service", "systemd-sysusers.service"},
+		"Ubuntu":         {"user@0.service", "systemd-sysusers.service"},
+		"UbuntuPreview":  {"user@0.service"},
+	}
+
+	expectedFailure, ok := distroNameToFailedUnits[*distroName]
+	if !ok { // Development version
+		expectedFailure = distroNameToFailedUnits["UbuntuPreview"]
+	}
+
+	// Reading failed units
+	out, err := wslCommand(context.Background(), "systemctl", "list-units", "--state=failed", "--plain", "--no-legend", "--no-pager").CombinedOutput()
+	require.NoError(t, err)
+
+	s := bufio.NewScanner(bytes.NewReader(out))
+	var failedUnits []string
+	for s.Scan() {
+		data := strings.Fields(s.Text())
+		if len(data) == 0 {
+			continue
+		}
+		unit := strings.TrimSpace(data[0])
+		failedUnits = append(failedUnits, unit)
+	}
+	require.NoError(t, s.Err(), "Error scanning output of systemctl")
+
+	for _, u := range failedUnits {
+		assert.Contains(t, expectedFailure, u, "Unexpected failing unit")
+	}
 }
 
 // testCorrectUpgradePolicy ensures upgrade policy matches the one expected for the app
@@ -139,4 +175,21 @@ func testUpgradePolicyIdempotent(t *testing.T) {
 	require.NoError(t, err, "Failed to execute date: %s", gotDate)
 
 	require.Equal(t, string(wantsDate), string(gotDate), "Launcher is modifying release upgrade every boot")
+}
+
+// systemdExpected returns true if systemd is expected to be enabled by default on this distro
+func systemdExpected() bool {
+	distroNameToExpectSystemd := map[string]bool{
+		"Ubuntu":         false,
+		"Ubuntu22.04LTS": false,
+		"Ubuntu20.04LTS": false,
+		"Ubuntu18.04LTS": false,
+		"UbuntuPreview":  true,
+	}
+
+	expectSystemd, ok := distroNameToExpectSystemd[*distroName]
+	if !ok { // Development version
+		return distroNameToExpectSystemd["UbuntuPreview"]
+	}
+	return expectSystemd
 }
