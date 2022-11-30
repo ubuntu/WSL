@@ -73,7 +73,6 @@ jobs:
         shell: powershell
         run: |
           Write-Output "::group::Clearing leftovers from previous runs"
-          wsl --unregister ${{ env.distroName }}
           $package=$(Get-AppxPackage | Where-Object PackageFullName -like *${{ env.appID }}*)
           If ( $package -ne $null -And $package -ne '' ) {
             Remove-AppxPackage $package
@@ -106,7 +105,7 @@ jobs:
           }
           
           c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command `
-            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT=`$PWD `; wsl.exe --version`; wsl.exe -l -v`; cd .\e2e`; go test .\launchertester -timeout 15m --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher}} `; If (`$LastExitCode) { exit `$LastExitCode } } 3>&1 2>&1 > .\test.log"
+            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT=`$PWD `; wsl --unregister ${{ env.distroName }}; wsl.exe --version`; wsl.exe -l -v`; cd .\e2e`; go test .\launchertester -timeout 15m --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher}} `; If (`$LastExitCode) { exit `$LastExitCode } } 3>&1 2>&1 > .\test.log"
 
           Get-Content ".\test.log"
       - name: Remove the installed package
