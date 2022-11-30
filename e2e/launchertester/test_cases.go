@@ -40,15 +40,15 @@ func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper
 
 	distroNameToRelease := map[string]string{
 		"Ubuntu":         "22.04",
-		"Ubuntu22.04LTS": "22.04",
-		"Ubuntu20.04LTS": "20.04",
-		"Ubuntu18.04LTS": "18.04",
-		"UbuntuPreview":  "23.04",
+		"Ubuntu-22.04":   "22.04",
+		"Ubuntu-20.04":   "20.04",
+		"Ubuntu-18.04":   "18.04",
+		"Ubuntu-Preview": "23.04",
 	}
 
 	expectedRelease, ok := distroNameToRelease[*distroName]
 	if !ok {
-		expectedRelease = distroNameToRelease["UbuntuPreview"]
+		expectedRelease = distroNameToRelease["Ubuntu-Preview"]
 	}
 
 	out, err := wslCommand(context.Background(), "lsb_release", "-r").CombinedOutput()
@@ -102,16 +102,16 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper
 	terminateDistro(t)
 
 	distroNameToFailedUnits := map[string][]string{
-		"Ubuntu18.04LTS": {"user@0.service", "atd.service", "systemd-modules-load.service"},
-		"Ubuntu20.04LTS": {"user@0.service", "atd.service", "ssh.service", "systemd-remount-fs.service", "multipathd.socket"},
-		"Ubuntu22.04LTS": {"user@0.service", "systemd-sysusers.service"},
+		"Ubuntu-18.04":   {"user@0.service", "atd.service", "systemd-modules-load.service"},
+		"Ubuntu-20.04":   {"user@0.service", "atd.service", "ssh.service", "systemd-remount-fs.service", "multipathd.socket"},
+		"Ubuntu-22.04":   {"user@0.service", "systemd-sysusers.service"},
 		"Ubuntu":         {"user@0.service", "systemd-sysusers.service"},
-		"UbuntuPreview":  {"user@0.service"},
+		"Ubuntu-Preview": {"user@0.service"},
 	}
 
 	expectedFailure, ok := distroNameToFailedUnits[*distroName]
 	if !ok { // Development version
-		expectedFailure = distroNameToFailedUnits["UbuntuPreview"]
+		expectedFailure = distroNameToFailedUnits["Ubuntu-Preview"]
 	}
 
 	// Reading failed units
@@ -185,15 +185,15 @@ func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper
 func systemdExpected() bool {
 	distroNameToExpectSystemd := map[string]bool{
 		"Ubuntu":         false,
-		"Ubuntu22.04LTS": false,
-		"Ubuntu20.04LTS": false,
-		"Ubuntu18.04LTS": false,
-		"UbuntuPreview":  true,
+		"Ubuntu-22.04":   false,
+		"Ubuntu-20.04":   false,
+		"Ubuntu-18.04":   false,
+		"Ubuntu-Preview": true,
 	}
 
 	expectSystemd, ok := distroNameToExpectSystemd[*distroName]
 	if !ok { // Development version
-		return distroNameToExpectSystemd["UbuntuPreview"]
+		return distroNameToExpectSystemd["Ubuntu-Preview"]
 	}
 	return expectSystemd
 }
