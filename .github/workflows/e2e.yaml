@@ -72,12 +72,18 @@ jobs:
       - name: Build and install the appxbundle for testing
         shell: powershell
         run: |
-          # If there is any leftovers from a previous run.
+          Write-Output "::group::Clearing leftovers from previous runs"
+          wsl --unregister ${{ env.distroName }}
           $package=$(Get-AppxPackage | Where-Object PackageFullName -like *${{ env.appID }}*)
           If ( $package -ne $null -And $package -ne '' ) {
             Remove-AppxPackage $package
           }
+          Write-Output "::endgroup::"
+
+          Write-Output "::group::Building and installing appbundle"
           .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 ${{ env.rootfs64 }}
+          Write-Output "::endgroup::"
+
       - name: Run tests
         shell: powershell
         run: |
