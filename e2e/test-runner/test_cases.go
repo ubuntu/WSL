@@ -43,7 +43,7 @@ func testCorrectReleaseRootfs(t *testing.T) {
 		"Ubuntu22.04LTS": "22.04",
 		"Ubuntu20.04LTS": "20.04",
 		"Ubuntu18.04LTS": "18.04",
-		"UbuntuPreview":  "22.10",
+		"UbuntuPreview":  "23.04",
 	}
 
 	expectedRelease, ok := distroNameToRelease[*distroName]
