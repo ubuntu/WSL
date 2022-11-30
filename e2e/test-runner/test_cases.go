@@ -15,7 +15,7 @@ import (
 )
 
 // testUserNotRoot ensures the default user is not root.
-func testUserNotRoot(t *testing.T) {
+func testUserNotRoot(t *testing.T) { //nolint: thelper
 	t.Parallel()
 	out, err := wslCommand(context.Background(), "whoami").CombinedOutput()
 	require.NoErrorf(t, err, "Unexpected failure executing whoami: %s", out)
@@ -24,7 +24,7 @@ func testUserNotRoot(t *testing.T) {
 }
 
 // testLanguagePacksMarked ensures the subiquity either installs or marks for installation the relevant language packs for the chosen language.
-func testLanguagePacksMarked(t *testing.T) {
+func testLanguagePacksMarked(t *testing.T) { //nolint: thelper
 	t.Skip("Skipping: This is a known bug") // TODO: Investigate and fix
 	t.Parallel()
 
@@ -34,7 +34,7 @@ func testLanguagePacksMarked(t *testing.T) {
 }
 
 // Proper release. Ensures the right tarball was used as rootfs.
-func testCorrectReleaseRootfs(t *testing.T) {
+func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper
 	t.Parallel()
 	var expectedRelease string
 
@@ -64,7 +64,7 @@ func testCorrectReleaseRootfs(t *testing.T) {
 }
 
 // testSystemdEnabled ensures systemd was enabled.
-func testSystemdEnabled(t *testing.T) {
+func testSystemdEnabled(t *testing.T) { //nolint: thelper
 	if !systemdExpected() {
 		t.Skipf("Skipping systemd checks on %s", *distroName)
 	}
@@ -85,13 +85,17 @@ func testSystemdEnabled(t *testing.T) {
 	require.Contains(t, string(out), "degraded", "systemd output should be degraded")
 }
 
-// testSystemdUnits ensures the list of failed units does not regress
-func testSystemdUnits(t *testing.T) {
+// testSystemdUnits ensures the list of failed units does not regress.
+func testSystemdUnits(t *testing.T) { //nolint: thelper
 	if !systemdExpected() {
 		// Enable systemd in config file
-		wslCommandAsUser(context.Background(), "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`)
+		out, err := wslCommandAsUser(context.Background(), "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`).CombinedOutput()
+		require.NoError(t, err, "Failed to enable systemd: %s", out)
 		// Restore config file
-		defer wslCommandAsUser(context.Background(), "root", "bash", "-c", `head -n -2 "/etc/wsl.conf" > "/etc/wsl.conf"`)
+		t.Cleanup(func() {
+			out, err := wslCommandAsUser(context.Background(), "root", "bash", "-c", `head -n -2 "/etc/wsl.conf" > "/etc/wsl.conf"`).CombinedOutput()
+			require.NoError(t, err, "Failed to revert systemd enablement: %s", out)
+		})
 	}
 
 	// Terminating to starts systemd, and to ensure no services from previous tests are running
@@ -131,8 +135,8 @@ func testSystemdUnits(t *testing.T) {
 	}
 }
 
-// testCorrectUpgradePolicy ensures upgrade policy matches the one expected for the app
-func testCorrectUpgradePolicy(t *testing.T) {
+// testCorrectUpgradePolicy ensures upgrade policy matches the one expected for the app.
+func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper
 	t.Parallel()
 
 	/* Ubuntu always upgrade to next lts */
@@ -160,8 +164,8 @@ func testCorrectUpgradePolicy(t *testing.T) {
 	require.Equal(t, wantPolicy, gotPolicy.String(), "Wrong upgrade policy")
 }
 
-// testUpgradePolicyIdempotent enures /etc/update-manager/release-upgrades is not modified every boot
-func testUpgradePolicyIdempotent(t *testing.T) {
+// testUpgradePolicyIdempotent enures /etc/update-manager/release-upgrades is not modified every boot.
+func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper
 	terminateDistro(t)
 
 	wantsDate, err := launcherCommand(context.Background(), "run", "date", "-r", "/etc/update-manager/release-upgrades").CombinedOutput()
@@ -177,7 +181,7 @@ func testUpgradePolicyIdempotent(t *testing.T) {
 	require.Equal(t, string(wantsDate), string(gotDate), "Launcher is modifying release upgrade every boot")
 }
 
-// systemdExpected returns true if systemd is expected to be enabled by default on this distro
+// systemdExpected returns true if systemd is expected to be enabled by default on this distro.
 func systemdExpected() bool {
 	distroNameToExpectSystemd := map[string]bool{
 		"Ubuntu":         false,

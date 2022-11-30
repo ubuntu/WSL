@@ -39,8 +39,8 @@ func TestDefaultExperience(t *testing.T) {
 	err := cmd.Start()
 	require.NoErrorf(t, err, "Failed to start new WSL command")
 
-	waitStateTransition(t, *distroName, "DistroNotFound", "Installing")
-	waitStateTransition(t, *distroName, "Installing", "Running")
+	waitStateTransition(t, "DistroNotFound", "Installing")
+	waitStateTransition(t, "Installing", "Running")
 	waitForInstaller(t)
 
 	state := distroState(t)
@@ -72,9 +72,9 @@ func TestDefaultExperience(t *testing.T) {
 }
 
 // waitStateTransition waits until the current state (fromState) transitions into toState.
-// Fails if any other state is reached
-// Fails if the state cannot be parsed
-func waitStateTransition(t *testing.T, distro string, fromState string, toState string) {
+// Fails if any other state is reached.
+// Fails if the state cannot be parsed.
+func waitStateTransition(t *testing.T, fromState string, toState string) {
 	t.Helper()
 
 	t.Logf("Awaiting state transition: %s -> %s", fromState, toState)
@@ -107,7 +107,7 @@ func waitStateTransition(t *testing.T, distro string, fromState string, toState 
 // Considerations:
 // - The server may still run for a small amount of time after the log
 //   says it has finished. Experimentally, it seems to be less than a second.
-// - The State of the distro must be either Running or Stopped when called (i.e. installation must have been started)
+// - The State of the distro must be either Running or Stopped when called (i.e. installation must have been started).
 func waitForInstaller(t *testing.T) {
 	t.Helper()
 
@@ -125,7 +125,7 @@ func waitForInstaller(t *testing.T) {
 		case <-timeout:
 			t.Fatal("Timed out waiting for installer to finish")
 		case <-ticker.C:
-			out, err := wslCommand(context.Background(), "cat", ServerLogPath).CombinedOutput()
+			out, err := wslCommand(context.Background(), "cat", serverLogPath).CombinedOutput()
 
 			var target *exec.ExitError
 			if errors.As(err, &target) {

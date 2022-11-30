@@ -7,7 +7,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,7 +19,7 @@ import (
 	"github.com/ubuntu/wsl/e2e/constants"
 )
 
-const ServerLogPath = "/var/log/installer/systemsetup-server-debug.log"
+const serverLogPath = "/var/log/installer/systemsetup-server-debug.log"
 const clientLogPath = "ubuntu-desktop-installer/packages/ubuntu_wsl_setup/build/windows/runner/Debug/.ubuntu_wsl_setup.exe/ubuntu_wsl_setup.exe.log"
 const subiquityAnswerFile = "/var/log/prefill-system-setup.yaml"
 
@@ -43,11 +42,12 @@ func wslSetup(t *testing.T) {
 			t.Logf("Failed to unregister distro after test: %v", err)
 		}
 	})
-
 }
 
-// subiquityLogs prints the logs if a test fails
+// subiquityLogs prints the logs if a test fails.
 func subiquityLogs(t *testing.T) string {
+	t.Helper()
+
 	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
 	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
 
@@ -65,14 +65,14 @@ func subiquityLogs(t *testing.T) string {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	out, err = wslCommand(ctx, "cat", ServerLogPath).CombinedOutput()
+	out, err = wslCommand(ctx, "cat", serverLogPath).CombinedOutput()
 	if err != nil {
 		t.Logf("Failed to retrieve server debug log: %v\n%s", err, out)
 	} else {
 		s = s + fmt.Sprintf("\n==== Server Debug Log ====\n%s\n", out)
 	}
 
-	out, err = ioutil.ReadFile(clientLogFullPath)
+	out, err = os.ReadFile(clientLogFullPath)
 	if err != nil {
 		t.Logf("Failed to retrieve client debug log: %v\n%s", err, out)
 	} else {
@@ -82,8 +82,10 @@ func subiquityLogs(t *testing.T) string {
 	return s
 }
 
-// removeOldLogs removes subiquity logs from previous tests
+// removeOldLogs removes subiquity logs from previous tests.
 func removeOldLogs(t *testing.T) {
+	t.Helper()
+
 	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
 	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
 	err := os.Remove(clientLogFullPath)
@@ -98,7 +100,7 @@ func wslCommand(ctx context.Context, linuxCmd ...string) *exec.Cmd {
 	return exec.CommandContext(ctx, "wsl.exe", args...)
 }
 
-// wslCommand mocks exec.CommandContext with WSL commands.
+// wslCommandAsUser mocks exec.CommandContext with WSL commands, executed as the specified user.
 func wslCommandAsUser(ctx context.Context, user string, linuxCmd ...string) *exec.Cmd {
 	args := append([]string{"-d", *distroName, "-u", user, "--"}, linuxCmd...)
 	return exec.CommandContext(ctx, "wsl.exe", args...)
@@ -128,9 +130,11 @@ func terminateDistro(t *testing.T) {
 }
 
 // distroState parses the output of "wsl -l -v" to find the state of the current distro.
-// Fails if the state cannot be parsed
+// Fails if the state cannot be parsed.
 func distroState(t *testing.T) string {
-	const DISTRO_NOT_FOUND = "DistroNotFound"
+	t.Helper()
+
+	const distroNotFoundMsg = "DistroNotFound"
 
 	// wsl -l -v outputs UTF-16 (See https://github.com/microsoft/WSL/issues/4607)
 	// We use $env:WSL_UTF8=1 to prevent this (Available from 0.64.0 onwards https://github.com/microsoft/WSL/releases/tag/0.64.0)
@@ -138,7 +142,7 @@ func distroState(t *testing.T) string {
 	if err != nil {
 		// This error shows up when there is no distro installed
 		require.Containsf(t, string(out), "WSL_E_DEFAULT_DISTRO_NOT_FOUND", "Unexpected error calling 'wsl -l -v'. Error: %v\nOutput: %s", err, out)
-		return DISTRO_NOT_FOUND
+		return distroNotFoundMsg
 	}
 
 	// Example line:
@@ -147,8 +151,8 @@ func distroState(t *testing.T) string {
 	// | 2: Distro name                    3: Status
 	// 1: Default[*| ] (ignored)
 	pattern := regexp.MustCompile(`^(\*| ) ([a-zA-Z-_0-9.]+)\s+([a-zA-Z]+)\s+[0-9]$`)
-	const DISTRO_NAME = 2
-	const DISTRO_STATE = 3
+	const DistroNameIdx = 2
+	const DistroStateIdx = 3
 
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
@@ -157,13 +161,13 @@ func distroState(t *testing.T) string {
 		if len(m) != 4 {
 			continue
 		}
-		if m[DISTRO_NAME] != *distroName {
+		if m[DistroNameIdx] != *distroName {
 			continue
 		}
-		return m[DISTRO_STATE]
+		return m[DistroStateIdx]
 	}
 
 	require.NoErrorf(t, scanner.Err(), "Unexpected error in scanner: %v", err)
 
-	return DISTRO_NOT_FOUND
+	return distroNotFoundMsg
 }
