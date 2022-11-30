@@ -43,7 +43,7 @@ jobs:
     needs: start_vm
     runs-on: self-hosted
     env:
-      rootfs64: 'http://cloud-images.ubuntu.com/wsl/kinetic/current/ubuntu-kinetic-wsl-amd64-wsl.rootfs.tar.gz'
+      rootfs64: 'http://cloud-images.ubuntu.com/wsl/lunar/current/ubuntu-lunar-wsl-amd64-wsl.rootfs.tar.gz'
       distroName: "Ubuntu-Preview"
       appID: "UbuntuPreview"
       launcher: "ubuntupreview.exe"

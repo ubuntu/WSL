@@ -43,7 +43,7 @@ func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper
 		"Ubuntu-22.04":   "22.04",
 		"Ubuntu-20.04":   "20.04",
 		"Ubuntu-18.04":   "18.04",
-		"Ubuntu-Preview": "22.10",
+		"Ubuntu-Preview": "23.04",
 	}
 
 	expectedRelease, ok := distroNameToRelease[*distroName]
