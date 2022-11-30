@@ -15,9 +15,9 @@ func TestBasicSetupGUI(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 	out, err := launcherCommand(ctx, "install", "--ui=gui").CombinedOutput()
-	require.NoErrorf(t, err, "Unexpected error installing: %s", out)
+	require.NoErrorf(t, err, "Unexpected error installing: %s\nLogs:%s", out, subiquityLogs(t))
 	// TODO: check with Carlos if this is necessary
-	require.NotEmpty(t, out, "Failed to install the distro: No output produced.")
+	require.NotEmpty(t, out, "Failed to install the distro: No output produced. Logs:%s", subiquityLogs(t))
 
 	testCases := map[string]func(t *testing.T){
 		"UserNotRoot":             testUserNotRoot,

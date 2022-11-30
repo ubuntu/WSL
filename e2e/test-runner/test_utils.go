@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -30,15 +32,8 @@ func wslSetup(t *testing.T) {
 	t.Helper()
 
 	checkValidTestbed(t)
+	removeOldLogs(t)
 
-	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
-	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
-	err := os.Remove(clientLogFullPath)
-	if err != nil {
-		require.ErrorIs(t, err, os.ErrNotExist, "Failed to remove old install log at %q.", clientLogFullPath)
-	}
-
-	// Attempts to unregister the instance.
 	t.Cleanup(func() {
 		if err := exec.Command("wsl.exe", "--shutdown").Run(); err != nil {
 			t.Logf("Failed to shut distro down after test: %v", err)
@@ -49,36 +44,52 @@ func wslSetup(t *testing.T) {
 		}
 	})
 
+}
+
+// subiquityLogs prints the logs if a test fails
+func subiquityLogs(t *testing.T) string {
+	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
+	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
+
 	// Prints debug logs
-	t.Cleanup(func() {
-		if !t.Failed() {
-			return
-		}
-		t.Log("\n\n==== Subiquity answer file  ====")
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
-		out, err := wslCommand(ctx, "cat", subiquityAnswerFile).CombinedOutput()
-		t.Logf("%s", out)
-		if err != nil {
-			t.Logf("Failed to retrieve subiquity answer file: %v", err)
-		}
+	var s string
 
-		t.Log("\n\n==== Server Debug Log ====")
-		ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
-		out, err = wslCommand(ctx, "cat", ServerLogPath).CombinedOutput()
-		t.Logf("%s", out)
-		if err != nil {
-			t.Logf("Failed to retrieve server debug log: %v", err)
-		}
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	out, err := wslCommand(ctx, "cat", subiquityAnswerFile).CombinedOutput()
+	if err != nil {
+		t.Logf("Failed to retrieve subiquity answer file: %v\n%s", err, out)
+	} else {
+		s = s + fmt.Sprintf("\n==== Subiquity answer file  ====\n%s\n", out)
+	}
 
-		t.Log("\n\n==== Client Debug Log ====")
-		out, err = ioutil.ReadFile(clientLogFullPath)
-		t.Logf("%s", out)
-		if err != nil {
-			t.Logf("Failed to retrieve client debug log: %v", err)
-		}
-	})
+	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	out, err = wslCommand(ctx, "cat", ServerLogPath).CombinedOutput()
+	if err != nil {
+		t.Logf("Failed to retrieve server debug log: %v\n%s", err, out)
+	} else {
+		s = s + fmt.Sprintf("\n==== Server Debug Log ====\n%s\n", out)
+	}
+
+	out, err = ioutil.ReadFile(clientLogFullPath)
+	if err != nil {
+		t.Logf("Failed to retrieve client debug log: %v\n%s", err, out)
+	} else {
+		s = s + fmt.Sprintf("\n==== Client Debug Log ====\n%s\n", out)
+	}
+
+	return s
+}
+
+// removeOldLogs removes subiquity logs from previous tests
+func removeOldLogs(t *testing.T) {
+	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
+	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
+	err := os.Remove(clientLogFullPath)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		t.Log(t, "Failed to remove old install log at %q: %v", clientLogFullPath, err)
+	}
 }
 
 // wslCommand mocks exec.CommandContext with WSL commands.
