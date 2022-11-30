@@ -1,4 +1,4 @@
-module github.com/ubuntu/wsl/e2e/test-runner
+module github.com/ubuntu/wsl/e2e/launchertester
 
 go 1.18
 

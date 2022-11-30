@@ -4,7 +4,7 @@ This subdirectory contains the infrastructure to allow a CI workflow (or develop
 
 Two key components to allow that happening are materialized in the form of Go packages:
 
-- `test-runner` is the high level testing code, where we invoke the distro launcher with certain command line parameters and asserts that the registered instance fulfills our expectations.
+- `launchertester` is the high level testing code, where we invoke the distro launcher with certain command line parameters and asserts that the registered instance fulfills our expectations.
 - `ui-driver` is a replacement for the `ubuntu_wsl_setup` Flutter binary, invoked by the distro launcher as if it was the OOBE GUI itself and responsible for translating the distro launcher's intention into a suitable `flutter test` command able to run the GUI in an automated way.
 
 This testing infrastructure requires the OOBE to be a single Windows application. Currently only Ubuntu-Preview supports it, but soon we expect to port that feature to 22.04 as well.
@@ -18,7 +18,7 @@ Then one can:
 ```powershell
 $env:LAUNCHER_REPO_ROOT=<path_where_you_checked_out_ubuntu_wsl>
 cd .\e2e\
-go test .\test-runner --distro-name Ubuntu-Preview --launcher-name ubuntupreview.exe
+go test .\launchertester --distro-name Ubuntu-Preview --launcher-name ubuntupreview.exe
 ```
 
 The test cases will drive the distro launcher, run the OOBE in integration testing mode, register the distro, perform the proper setup, restart the distro and perform relevant assertions according to the prescriptions of the test case. In the end, successfully or not, the instance is unregistered, so we can avoid dependencies between different test cases.

@@ -1,4 +1,4 @@
-package test_runner
+package launchertester
 
 import (
 	"bufio"

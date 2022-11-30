@@ -1,4 +1,5 @@
-package test_runner
+// package launchertester runs end-to-end tests on Ubuntu's WSL launcher
+package launchertester
 
 import (
 	"context"
