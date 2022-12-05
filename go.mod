@@ -1,3 +1,3 @@
-module test-runner
+module launchertester
 
 go 1.18

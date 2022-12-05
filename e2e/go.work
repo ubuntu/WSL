@@ -2,6 +2,6 @@ go 1.18
 
 use (
     ./constants
-    ./test-runner
+    ./launchertester
     ./ui-driver
 )
