@@ -17,7 +17,11 @@ import (
 // testUserNotRoot ensures the default user is not root.
 func testUserNotRoot(t *testing.T) { //nolint: thelper
 	t.Parallel()
-	out, err := wslCommand(context.Background(), "whoami").CombinedOutput()
+
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	out, err := wslCommand(ctx, "whoami").CombinedOutput()
 	require.NoErrorf(t, err, "Unexpected failure executing whoami: %s", out)
 
 	require.NotContains(t, string(out), "root", "Default user should not be root.")
@@ -28,7 +32,10 @@ func testLanguagePacksMarked(t *testing.T) { //nolint: thelper
 	t.Skip("Skipping: This is a known bug") // TODO: Investigate and fix
 	t.Parallel()
 
-	out, err := wslCommand(context.Background(), "apt-mark", "showinstall", "language-pack\\*").CombinedOutput()
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	out, err := wslCommand(ctx, "apt-mark", "showinstall", "language-pack\\*").CombinedOutput()
 	require.NoErrorf(t, err, "Unexpected failure executing apt-mark: %s", out)
 	require.NotEmpty(t, string(out), "At least one language pack should have been installed or marked for installation, but apt-mark command output is empty.")
 }
@@ -51,7 +58,10 @@ func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper
 		expectedRelease = distroNameToRelease["Ubuntu-Preview"]
 	}
 
-	out, err := wslCommand(context.Background(), "lsb_release", "-r").CombinedOutput()
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	out, err := wslCommand(ctx, "lsb_release", "-r").CombinedOutput()
 	require.NoErrorf(t, err, "Unexpected failure executing lsb_release: %s", out)
 
 	// Example 'out': "Release:        22.04"
@@ -70,7 +80,7 @@ func testSystemdEnabled(t *testing.T) { //nolint: thelper
 	}
 	t.Parallel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute) // Long time because it needs to boot
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
 	out, err := wslCommand(ctx, "systemctl", "is-system-running", "--wait").CombinedOutput()
@@ -88,8 +98,11 @@ func testSystemdEnabled(t *testing.T) { //nolint: thelper
 // testSystemdUnits ensures the list of failed units does not regress.
 func testSystemdUnits(t *testing.T) { //nolint: thelper
 	if !systemdIsExpected() {
+		ctx, cancel := context.WithTimeout(context.Background(), commandTimeout)
+		defer cancel()
+
 		// Enable systemd in config file
-		out, err := wslCommandAsUser(context.Background(), "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`).CombinedOutput()
+		out, err := wslCommandAsUser(ctx, "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`).CombinedOutput()
 		require.NoError(t, err, "Failed to enable systemd: %s", out)
 		// Restore config file
 		t.Cleanup(func() {
@@ -114,8 +127,11 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper
 		expectedFailure = distroNameToFailedUnits["Ubuntu-Preview"]
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
 	// Reading failed units
-	out, err := wslCommand(context.Background(), "systemctl", "list-units", "--state=failed", "--plain", "--no-legend", "--no-pager").CombinedOutput()
+	out, err := wslCommand(ctx, "systemctl", "list-units", "--state=failed", "--plain", "--no-legend", "--no-pager").CombinedOutput()
 	require.NoError(t, err)
 
 	s := bufio.NewScanner(bytes.NewReader(out))
@@ -148,7 +164,10 @@ func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper
 		wantPolicy = "normal"
 	}
 
-	out, err := launcherCommand(context.Background(), "run", "cat", "/etc/update-manager/release-upgrades").CombinedOutput()
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	out, err := launcherCommand(ctx, "run", "cat", "/etc/update-manager/release-upgrades").CombinedOutput()
 	require.NoError(t, err, "Unexpected failure executing cat: %s", out)
 	require.NotEmpty(t, out, "Release upgrades file is empty")
 
@@ -168,14 +187,20 @@ func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper
 func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper
 	terminateDistro(t)
 
-	wantsDate, err := launcherCommand(context.Background(), "run", "date", "-r", "/etc/update-manager/release-upgrades").CombinedOutput()
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	wantsDate, err := launcherCommand(ctx, "run", "date", "-r", "/etc/update-manager/release-upgrades").CombinedOutput()
 	require.NoError(t, err, "Failed to execute date: %s", wantsDate)
 
 	terminateDistro(t)
 
 	time.Sleep(5 * time.Second) // Allowing time to pass so it'll show up in the last modification date
 
-	gotDate, err := launcherCommand(context.Background(), "run", "date", "-r", "/etc/update-manager/release-upgrades").CombinedOutput()
+	ctx, cancel = context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	gotDate, err := launcherCommand(ctx, "run", "date", "-r", "/etc/update-manager/release-upgrades").CombinedOutput()
 	require.NoError(t, err, "Failed to execute date: %s", gotDate)
 
 	require.Equal(t, string(wantsDate), string(gotDate), "Launcher is modifying release upgrade every boot")

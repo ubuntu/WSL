@@ -13,7 +13,7 @@ import (
 func TestBasicSetupGUI(t *testing.T) {
 	wslSetup(t)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
 	defer cancel()
 	out, err := launcherCommand(ctx, "install", "--ui=gui").CombinedOutput()
 	require.NoErrorf(t, err, "Unexpected error installing: %s\nLogs:%s", out, subiquityLogs(t))

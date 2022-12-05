@@ -19,9 +19,19 @@ import (
 	"github.com/ubuntu/wsl/e2e/constants"
 )
 
-const serverLogPath = "/var/log/installer/systemsetup-server-debug.log"
-const clientLogPath = "ubuntu-desktop-installer/packages/ubuntu_wsl_setup/build/windows/runner/Debug/.ubuntu_wsl_setup.exe/ubuntu_wsl_setup.exe.log"
-const subiquityAnswerFile = "/var/log/prefill-system-setup.yaml"
+const (
+	serverLogPath       = "/var/log/installer/systemsetup-server-debug.log"
+	clientLogPath       = "ubuntu-desktop-installer/packages/ubuntu_wsl_setup/build/windows/runner/Debug/.ubuntu_wsl_setup.exe/ubuntu_wsl_setup.exe.log"
+	subiquityAnswerFile = "/var/log/prefill-system-setup.yaml"
+)
+
+// These timeouts have been decided on experimentally, according to the time each action
+// could reasonably need on an Azure runner.
+const (
+	installTimeout     = 10 * time.Minute // Timeout to use for registering a new distro
+	systemdBootTimeout = 2 * time.Minute  // Timeout to use for booting up a distro using systemd
+	commandTimeout     = 10 * time.Second // Timeout to use for "instantaneous" commands such as "echo" or "exit"
+)
 
 var launcherName = flag.String("launcher-name", constants.DefaultLauncherName, "WSL distro launcher under test.")
 var distroName = flag.String("distro-name", constants.DefaultDistroName, "WSL distro instance registered for testing.")
