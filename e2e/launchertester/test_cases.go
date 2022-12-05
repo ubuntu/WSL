@@ -65,7 +65,7 @@ func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper
 
 // testSystemdEnabled ensures systemd was enabled.
 func testSystemdEnabled(t *testing.T) { //nolint: thelper
-	if !systemdExpected() {
+	if !systemdIsExpected() {
 		t.Skipf("Skipping systemd checks on %s", *distroName)
 	}
 	t.Parallel()
@@ -87,7 +87,7 @@ func testSystemdEnabled(t *testing.T) { //nolint: thelper
 
 // testSystemdUnits ensures the list of failed units does not regress.
 func testSystemdUnits(t *testing.T) { //nolint: thelper
-	if !systemdExpected() {
+	if !systemdIsExpected() {
 		// Enable systemd in config file
 		out, err := wslCommandAsUser(context.Background(), "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`).CombinedOutput()
 		require.NoError(t, err, "Failed to enable systemd: %s", out)
@@ -181,8 +181,8 @@ func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper
 	require.Equal(t, string(wantsDate), string(gotDate), "Launcher is modifying release upgrade every boot")
 }
 
-// systemdExpected returns true if systemd is expected to be enabled by default on this distro.
-func systemdExpected() bool {
+// systemdIsExpected returns true if systemd is expected to be enabled by default on this distro.
+func systemdIsExpected() bool {
 	distroNameToExpectSystemd := map[string]bool{
 		"Ubuntu":         false,
 		"Ubuntu-22.04":   false,
