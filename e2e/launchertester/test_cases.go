@@ -98,20 +98,35 @@ func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
 // testSystemdUnits ensures the list of failed units does not regress.
 func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
 	if !systemdIsExpected() {
+		// Making a backup for /etc/wsl.conf file
+		// We touch it first because it may or may not not exist. An empty
+		// file is the same as no file as far as WSL is concerned.
 		ctx, cancel := context.WithTimeout(context.Background(), commandTimeout)
 		defer cancel()
 
-		// Enable systemd in config file
-		out, err := wslCommandAsUser(ctx, "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`).CombinedOutput()
+		out, err := wslCommandAsUser(ctx, "root", "bash", "-c", `touch /etc/wsl.conf && cp /etc/wsl.conf /etc/wsl.conf.backup`).CombinedOutput()
 		require.NoError(t, err, "Failed to enable systemd: %s", out)
-		// Restore config file
+
+		// Enable systemd in config file
+		ctx, cancel = context.WithTimeout(context.Background(), commandTimeout)
+		defer cancel()
+
+		out, err = wslCommandAsUser(ctx, "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`).CombinedOutput()
+		require.NoError(t, err, "Failed to enable systemd: %s", out)
+
+		// Restore backup after test finishes
 		t.Cleanup(func() {
-			out, err := wslCommandAsUser(context.Background(), "root", "bash", "-c", `head -n -2 "/etc/wsl.conf" > "/etc/wsl.conf"`).CombinedOutput()
+			ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+			defer cancel()
+
+			out, err := wslCommandAsUser(ctx, "root", "bash", "-c", `mv /etc/wsl.conf.backup /etc/wsl.conf`).CombinedOutput()
 			require.NoError(t, err, "Failed to revert systemd enablement: %s", out)
+
+			terminateDistro(t) // To disable systemd
 		})
 	}
 
-	// Terminating to starts systemd, and to ensure no services from previous tests are running
+	// Terminating to start systemd, and to ensure no services from previous tests are running
 	terminateDistro(t)
 
 	distroNameToFailedUnits := map[string][]string{
