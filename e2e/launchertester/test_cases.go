@@ -15,7 +15,7 @@ import (
 )
 
 // testUserNotRoot ensures the default user is not root.
-func testUserNotRoot(t *testing.T) { //nolint: thelper
+func testUserNotRoot(t *testing.T) { //nolint: thelper, this is a test
 	t.Parallel()
 
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
@@ -28,7 +28,7 @@ func testUserNotRoot(t *testing.T) { //nolint: thelper
 }
 
 // testLanguagePacksMarked ensures the subiquity either installs or marks for installation the relevant language packs for the chosen language.
-func testLanguagePacksMarked(t *testing.T) { //nolint: thelper
+func testLanguagePacksMarked(t *testing.T) { //nolint: thelper, this is a test
 	t.Skip("Skipping: This is a known bug") // TODO: Investigate and fix
 	t.Parallel()
 
@@ -41,7 +41,7 @@ func testLanguagePacksMarked(t *testing.T) { //nolint: thelper
 }
 
 // Proper release. Ensures the right tarball was used as rootfs.
-func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper
+func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper, this is a test
 	t.Parallel()
 	var expectedRelease string
 
@@ -74,7 +74,7 @@ func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper
 }
 
 // testSystemdEnabled ensures systemd was enabled.
-func testSystemdEnabled(t *testing.T) { //nolint: thelper
+func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
 	if !systemdIsExpected() {
 		t.Skipf("Skipping systemd checks on %s", *distroName)
 	}
@@ -96,7 +96,7 @@ func testSystemdEnabled(t *testing.T) { //nolint: thelper
 }
 
 // testSystemdUnits ensures the list of failed units does not regress.
-func testSystemdUnits(t *testing.T) { //nolint: thelper
+func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
 	if !systemdIsExpected() {
 		ctx, cancel := context.WithTimeout(context.Background(), commandTimeout)
 		defer cancel()
@@ -152,7 +152,7 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper
 }
 
 // testCorrectUpgradePolicy ensures upgrade policy matches the one expected for the app.
-func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper
+func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper, this is a test
 	t.Parallel()
 
 	/* Ubuntu always upgrade to next lts */
@@ -184,7 +184,7 @@ func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper
 }
 
 // testUpgradePolicyIdempotent enures /etc/update-manager/release-upgrades is not modified every boot.
-func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper
+func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper, this is a test
 	terminateDistro(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
