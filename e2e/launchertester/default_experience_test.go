@@ -19,10 +19,7 @@ func TestDefaultExperience(t *testing.T) {
 
 	var installCompleted bool
 	t.Cleanup(func() {
-		if installCompleted {
-			return
-		}
-		if !t.Failed() {
+		if installCompleted || !t.Failed() {
 			return
 		}
 		t.Log(subiquityLogs(t))
