@@ -221,6 +221,18 @@ func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper, this is a te
 	require.Equal(t, string(wantsDate), string(gotDate), "Launcher is modifying release upgrade every boot")
 }
 
+// testInteropIsEnabled ensures interop works fine.
+// See related issue: https://github.com/ubuntu/WSL/issues/334
+func testInteropIsEnabled(t *testing.T) { //nolint: thelper, this is a test
+	t.Parallel()
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	got, err := wslCommand(ctx, "powershell.exe", "-Command", `Write-Output "Hello, world!"`).CombinedOutput()
+	require.NoError(t, err, "Failed to launch powershell from WSL. Does interop work? %s", got)
+	require.Equal(t, "Hello, world!\r\n", string(got), "Unexpected output from powershell")
+}
+
 // systemdIsExpected returns true if systemd is expected to be enabled by default on this distro.
 func systemdIsExpected() bool {
 	distroNameToExpectSystemd := map[string]bool{

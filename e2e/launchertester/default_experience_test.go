@@ -61,6 +61,7 @@ func TestDefaultExperience(t *testing.T) {
 		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
 		"UpgradePolicyIdempotent": testUpgradePolicyIdempotent,
+		"InteropIsEnabled":        testInteropIsEnabled,
 	}
 
 	for name, tc := range testCases {
