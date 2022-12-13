@@ -17,12 +17,6 @@ on:
       az_vm_password:
         description: Password for "xfreerdp /p:az_vm_password"
         required: true
-      certificate:
-        description: Certificate used to enable connecting to Azure
-        required: true
-      certificate_password:
-        description: Pasword to the secret certificate
-        required: true
     inputs:
       exec:
         description: Script to run on WSL
@@ -90,16 +84,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install the certificate
-        shell: powershell
-        run: |
-          New-Item -ItemType directory -Path certificate
-          Set-Content -Path certificate\certificate.txt -Value '${{ secrets.certificate }}'
-          certutil -decode certificate\certificate.txt certificate\certificate.pfx
-
-          $pwd = ConvertTo-SecureString  '${{ secrets.certificate_password }}' -AsPlainText -Force
-          Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
-          Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
       - name: Install WSL
         uses: ./.github/actions/wsl_enabled_powershell/
         with:

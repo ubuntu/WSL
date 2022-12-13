@@ -12,8 +12,6 @@ jobs:
       az_vm_hostname: ${{ secrets.AZURE_VM_AUTHORITY }}
       az_vm_username: ${{ secrets.AZURE_VM_UN }}
       az_vm_password: ${{ secrets.AZURE_VM_UP }}
-      certificate: ${{ secrets.CERTIFICATE }}
-      certificate_password: ${{ secrets.CERTIFICATE_PASSWORD }}
     with:
       az_name: wsl-ci
       az_resource_group: wsl
