@@ -22,15 +22,6 @@ on:
         description: Script to run on WSL
         required: true
         type: string
-      repo:
-        description: The url to clone the repo from
-        required: false
-        default: "REPO_NOT_PROVIDED"
-        type: string
-      checkout:
-        description: The commit, branch, etc to checkout, if a repo was provided.
-        required: false
-        type: string
       az_resource_group:
         description: Name of the Azure resource group to run on
         required: true
