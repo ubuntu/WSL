@@ -167,15 +167,10 @@ jobs:
         with:
           max-attempts: 5
           exec: |
-            Write-Output '::group::WSL script'
             $env:WSL_UTF8=1
-
             # Redirecting to stdout to prevent PsExec from showing stderr as an exception
             wsl.exe -d ${{ env.DISTRO }} --cd '~/action_workspace' -- bash -c "bash ${{ env.TMPDIR }}/script.sh 2>&1"
-
-            $exit=$LASTEXITCODE
-            Write-Output '::endgroup::'
-            Exit($exit)
+            Exit($LASTEXITCODE)
       - name: Cleanup
         uses: ./.github/actions/wsl_enabled_powershell/
         if: always()

@@ -18,6 +18,14 @@ jobs:
       az_name: wsl-ci
       az_resource_group: wsl
       exec: |
+        echo "::group::Echoing"
         echo "Hello, world!"
+        echo "::endgroup::"
+
+        echo "::group::Distro info"
         lsb_release -a
+        echo "::endgroup::"
+
+        echo "::group::Current directory contents"
         ls -lAh
+        echo "::endgroup::"
