@@ -2,45 +2,42 @@ name: End-to-End Tests
 on:
   workflow_dispatch:
   pull_request:
-concurrency: build-wsl
-jobs:
-  start_vm:
-    strategy:
-      max-parallel: 1
-    runs-on: ubuntu-latest
-    steps:
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_VM_CREDS }}
-      - name: Start the Runner
-        run: |
-          az vm start --name wsl-ci --resource-group wsl
-  rdp:
-    strategy:
-      max-parallel: 1
-    needs: start_vm
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          set -o pipefail
-          sudo apt update
-          sudo apt install -y xvfb freerdp2-x11
-          # detected empirically and confirmed here: https://github.com/FreeRDP/FreeRDP/blob/68ad8d5a1c8d52828095c2293acea1c76fa7fcb5/client/X11/xfreerdp.h#L350
-          vmOfflineErrorCode=141 
-          lastExitCode=$vmOfflineErrorCode
-          maxAttemptsCount=10;
-          while [[ $lastExitCode == $vmOfflineErrorCode && $maxAttemptsCount != 0 ]]; do
-            sleep 20 # seconds
-            xvfb-run -a xfreerdp /v:${{ secrets.AZURE_VM_AUTHORITY }} /u:${{ secrets.AZURE_VM_UN }} /p:'${{ secrets.AZURE_VM_UP }}' \
-              /cert:tofu | grep -v ${{ secrets.AZURE_VM_AUTHORITY }} || lastExitCode=$?
-            ((--maxAttemptsCount))
-          done
-            
+concurrency: azure-vm
 
-  e2e:
+jobs:
+  start-vm:
     strategy:
       max-parallel: 1
-    needs: start_vm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Start Azure VM
+        uses: ./.github/actions/setup_vm/
+        with:
+          az_name: wsl-ci
+          az_resource_group: wsl
+          az_creds: ${{ secrets.AZURE_VM_CREDS }}
+  
+  remote-desktop:
+    strategy:
+      max-parallel: 1
+    needs: start-vm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Connect via RDP
+        uses: ./.github/actions/rdp/
+        with:
+          az_vm_hostname: ${{ secrets.AZURE_VM_AUTHORITY }}
+          az_vm_username: ${{ secrets.AZURE_VM_UN }}
+          az_vm_password: ${{ secrets.AZURE_VM_UP }}
+
+  end-to-end-tests:
+    strategy:
+      max-parallel: 1
+    needs: start-vm
     runs-on: self-hosted
     env:
       rootfs64: 'http://cloud-images.ubuntu.com/wsl/lunar/current/ubuntu-lunar-wsl-amd64-wsl.rootfs.tar.gz'
@@ -51,7 +48,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup MSBuild (PATH)
+      - name: Set up MSBuild (PATH)
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Install certificate
         shell: powershell
@@ -63,10 +60,12 @@ jobs:
           $pwd = ConvertTo-SecureString  '${{ secrets.CERTIFICATE_PASSWORD }}' -AsPlainText -Force
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
-      - uses: actions/setup-go@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.goversion }}
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
       - name: Build and install the appxbundle for testing
@@ -82,49 +81,42 @@ jobs:
           Write-Output "::group::Building and installing appbundle"
           .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 ${{ env.rootfs64 }}
           Write-Output "::endgroup::"
-
       - name: Run tests
-        shell: powershell
-        run: |
-          $higherSession=0
-          $count = 0
-          While ($higherSession -lt 2) {
-            Sleep 5
-            $count = $count + 1
-            If ($count -gt 19) {
-              Write-Error "RDP never connected"
-              Exit (-1)
-            }
+        uses: ./.github/actions/wsl_enabled_powershell/
+        with:
+          exec: |
+            Write-Output "::group::Environment setup"
+            $env:WSL_UTF8=1
+            $env:LAUNCHER_REPO_ROOT=$PWD
+            wsl.exe --version
+            wsl --unregister ${{ env.distroName }} 2>&1 | Out-Null
+            cd .\e2e
+            Write-Output "::endgroup::"
 
-            $sessions=$(C:\SysinternalsSuite\logonsessions.exe -nobanner | Select-String Session: | Sort-Object -Descending | Get-Unique)
-            echo $sessions
-            If ( $sessions -ne $null -and $sessions.length -gt 0 ) {
-              $higherSession=$( $sessions )[0].ToString()[-1]
-            }
-
-          }
-          
-          c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command `
-            "&{ `$env:WSL_UTF8=1`; `$env:LAUNCHER_REPO_ROOT=`$PWD `; wsl --unregister ${{ env.distroName }}; wsl.exe --version`; wsl.exe -l -v`; cd .\e2e`; go test .\launchertester -timeout 15m --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher}} `; If (`$LastExitCode) { exit `$LastExitCode } } 3>&1 2>&1 > .\test.log"
-
-          Get-Content ".\test.log"
+            Write-Output "::group::Tests"
+            go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher }}
+            $r=$LastExitCode
+            Write-Output "::endgroup::"
+            
+            exit $r
       - name: Remove the installed package
         if: always()
         shell: powershell
         run: |
           Remove-AppxPackage "$(Get-AppxPackage | Where-Object PackageFullName -like *${{ env.appID }}*)"
 
-
-  deallocate_vm:
+  stop-vm:
     strategy:
       max-parallel: 1
-    needs: e2e
-    if: always()
     runs-on: ubuntu-latest
+    needs: end-to-end-tests
+    if: always()
     steps:
-      - uses: azure/login@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Stop Azure VM
+        uses: ./.github/actions/stop_vm/
         with:
-          creds: ${{ secrets.AZURE_VM_CREDS }}
-      - name: Deallocate the Runner
-        run: |
-          az vm deallocate --name wsl-ci --resource-group wsl
+          az_name: wsl-ci
+          az_resource_group: wsl
+          az_creds: ${{ secrets.AZURE_VM_CREDS }}
