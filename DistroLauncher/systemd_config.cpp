@@ -43,9 +43,22 @@ namespace Systemd
         return AppendToFile(L"\n[Service]\nLoadCredential=\n", sysusers_override);
     }
 
+    /**
+     * Disables systemd-binfmt.service to avoid breaking interop.
+     * See related bug report: https://github.com/ubuntu/WSL/issues/334
+     */
+    bool MaskSystemdBinfmtService() noexcept
+    {
+        DWORD exitCode;
+        auto hr =
+          Sudo::WslLaunchInteractive(L"ln -s /dev/null /etc/systemd/system/systemd-binfmt.service", FALSE, &exitCode);
+        return SUCCEEDED(hr) && exitCode == 0;
+    }
+
     void Configure(const bool enable)
     {
         SysUsersDisableLoadCredential();
+        MaskSystemdBinfmtService();
 
         if (!enable) {
             return;
