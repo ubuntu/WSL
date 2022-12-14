@@ -1,11 +1,4 @@
-<style>
-    table {
-        width: 100%;
-    }
-</style>
-
-|![image](meta/Ubuntu/generated/DistroLauncher-Appx/Assets/Square44x44Logo.altform-unplated_targetsize-48.png) | <font size=5> Ubuntu WSL </font> |
-|:--- | :--- |
+# Ubuntu WSL
 
 Install a complete Ubuntu terminal environment in minutes with Windows Subsystem for Linux (WSL). Develop cross-platform applications, improve your data science or web development workflows and manage IT infrastructure without leaving Windows.
 
