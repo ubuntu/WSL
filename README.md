@@ -20,7 +20,7 @@ These are the applications we develop and mantain:
 - [Ubuntu (Preview)](https://apps.microsoft.com/store/detail/ubuntu-preview/9P7BDVKVNXZ6) is a daily build of the latest development version of Ubuntu previewing new features as they are developed. It does not receive the same level of QA as stable releases and should not be used for production workloads.
 
 # This repository
-This repository contains the code relevant to the Ubuntu applications. It builds on top of [Microsoft's reference implementation](https://github.com/microsoft/WSL-DistroLauncher). Head there for any documentation needs.
+This repository contains code relevant to Ubuntu on WSL. It builds on top of [Microsoft's reference implementation](https://github.com/microsoft/WSL-DistroLauncher). Head there for any documentation needs.
 
 # Issues & Contact
-If your issue happened in one of Ubuntu's WSL applications, browse the issues in this repository; submit a [new issue](https://github.com/ubuntu/WSL/issues/new/choose) if none describes your problem.
+Any bugs or problems discovered with the Launcher should be filed in this project's Issues list. You may alternatively submit them to [Microsoft's repository](https://github.com/microsoft/WSL-DistroLauncher/issues) if you belive the issue is not particular to Ubuntu. We also have a page on Launchpad 
