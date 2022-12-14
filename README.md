@@ -14,7 +14,7 @@ For more information about Ubuntu WSL and how Canonical supports developers plea
 https://ubuntu.com/wsl
 
 # Ubuntu's applications on WSL
-These are the applications we develop and mantain:
+These are the applications we develop and maintain:
 - [Ubuntu](https://apps.microsoft.com/store/detail/ubuntu/9PDXGNCFSCZV) ships the latest stable LTS release of Ubuntu. When new LTS versions are released, Ubuntu can be upgraded once the first point release is available
 - [Ubuntu 18.04.5 LTS](https://apps.microsoft.com/store/detail/ubuntu-18045-lts/9PNKSF5ZN4SW), [Ubuntu 20.04.5 LTS](https://apps.microsoft.com/store/detail/ubuntu-20045-lts/9MTTCL66CPXJ), [Ubuntu 22.04.1 LTS](https://apps.microsoft.com/store/detail/ubuntu-22041-lts/9PN20MSR04DW) are the LTS versions of Ubuntu and receive updates for five years. Upgrades to future LTS releases will not be proposed.
 - [Ubuntu (Preview)](https://apps.microsoft.com/store/detail/ubuntu-preview/9P7BDVKVNXZ6) is a daily build of the latest development version of Ubuntu previewing new features as they are developed. It does not receive the same level of QA as stable releases and should not be used for production workloads.
@@ -23,4 +23,4 @@ These are the applications we develop and mantain:
 This repository contains code relevant to Ubuntu on WSL. It builds on top of [Microsoft's reference implementation](https://github.com/microsoft/WSL-DistroLauncher). Head there for any documentation needs.
 
 # Issues & Contact
-Any bugs or problems discovered with the Launcher should be filed in this project's Issues list. You may alternatively submit them to [Microsoft's repository](https://github.com/microsoft/WSL-DistroLauncher/issues) if you belive the issue is not particular to Ubuntu. We also have a page on Launchpad 
+Any bugs or problems discovered with the Launcher should be filed in this project's Issues list. You may alternatively submit them to [Microsoft's repository](https://github.com/microsoft/WSL-DistroLauncher/issues) if you believe the issue is not particular to Ubuntu. We also have a page on Launchpad 
