@@ -23,4 +23,8 @@ These are the applications we develop and maintain:
 This repository contains code relevant to Ubuntu on WSL. It builds on top of [Microsoft's reference implementation](https://github.com/microsoft/WSL-DistroLauncher). Head there for any documentation needs.
 
 # Issues & Contact
-Any bugs or problems discovered with the Launcher should be filed in this project's Issues list. You may alternatively submit them to [Microsoft's repository](https://github.com/microsoft/WSL-DistroLauncher/issues) if you believe the issue is not particular to Ubuntu. We also have a [page on Launchpad](https://launchpad.net/ubuntuwsl); we check it less often but you may find part of the community there.
+You are welcome to [create a new issue](https://github.com/ubuntu/WSL/issues/new/choose) on this repository if you find bugs you believe are particular to Ubuntu running on WSL.
+
+You may otherwise head over to [Microsoft's WSL page](https://github.com/microsoft/WSL/issues/) on GitHub if your report is not specific to Ubuntu but rather more general to WSL.
+
+We also have a [page on Launchpad](https://launchpad.net/ubuntuwsl); we check it less often but you may find part of the community there. [Ubuntu's Discourse page](https://discourse.ubuntu.com/c/wsl2/27) has news and interesting discussions about Ubuntu on WSL.
