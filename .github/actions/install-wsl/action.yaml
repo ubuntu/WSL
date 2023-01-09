@@ -19,7 +19,7 @@ runs:
   using: 'composite'
   steps:
     - name: Install or update WSL
-      uses: ubuntu/WSL/.github/actions/wsl_enabled_powershell/@main
+      uses: ./.github/actions/wsl_enabled_powershell
       with:
         exec: |
           Write-Output '::group::Install WSL'

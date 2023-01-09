@@ -23,6 +23,12 @@ runs:
         if( $(Test-Path -Path ".\output.log") ) {
           Remove-Item -Path ".\output.log" -Force | Out-Null
         }
+        if( $(Test-Path -Path ".\path.txt") ) {
+          Remove-Item -Path ".\path.txt" -Force | Out-Null
+        }
+        if( $(Test-Path -Path ".\script.txt") ) {
+          Remove-Item -Path ".\script.ps1" -Force | Out-Null
+        }
         Write-Output "::endgroup::"
         Exit(0)
 
@@ -54,13 +60,19 @@ runs:
 
         Write-Output "::group::Running script"
         Write-Output "Running script. Output will be shown after execution has finished."
-        $script="script.ps1"
-        New-Item -Force -Path "${script}" | Out-Null
-        $script=( Write-Output "${script}" | Resolve-Path )
-        [IO.File]::WriteAllLines( "${script}" , "${env:exec}")
+        
+        # Creating script file
+        New-Item -Force -Path "script.ps1" | Out-Null
+        $script=( Write-Output "script.ps1" | Resolve-Path )
+        [IO.File]::WriteAllLines( "script.ps1" , "${env:exec}")
+
+        # Storing path
+        New-Item -Force -Path "path.txt" | Out-Null
+        [IO.File]::WriteAllLines( 'path.txt' , "${env:Path}")
 
         c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
-        powershell.exe -File ${script} 3>&1 2>&1 | Out-File -File .\output.log
+        `${env:Path}="`${env:Path};`$(Get-Content path.txt)"
+        powershell.exe -File script.ps1 3>&1 2>&1 | Out-File -File .\output.log
         Write-Output `$LASTEXITCODE > .\exitCode.log
         "@
 

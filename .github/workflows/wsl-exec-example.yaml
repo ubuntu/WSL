@@ -47,6 +47,10 @@ jobs:
           distro_name: Ubuntu-Preview
           distro_launcher: ubuntupreview.exe
           distro_store_name: Ubuntu (Preview)
+      
+      - name: Install Python on Windows
+        # These convenience actions work windows-side only
+        uses: actions/setup-python@v4
 
       - name: Run powershell on Windows
         # You'll probably use this action if you program runs on Windows and uses WSL
@@ -54,7 +58,7 @@ jobs:
         with:
           exec: |
             # Your code here
-            Write-Output "Hello, World!"
+            python.exe -c "print('Hello, world')"
 
       - name: Run bash inside WSL
         # You'll probably use this action if you program runs entirely inside WSL
