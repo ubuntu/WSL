@@ -61,8 +61,8 @@ runs:
         [IO.File]::WriteAllLines( 'path.txt' , "${env:Path}")
 
         c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
-        `${env:Path}="`${env:Path};`$(Get-Content path.txt)" 3>&1 2>&1 > .\output.log
-        powershell.exe -File script.ps1 3>&1 2>&1 >> .\output.log
+        `${env:Path}="`${env:Path};`$(Get-Content path.txt)" 3>&1 2>&1
+        powershell.exe -File script.ps1 3>&1 2>&1 > ".\output.log"
         Write-Output `$LASTEXITCODE > .\exitCode.log
         "@
 
