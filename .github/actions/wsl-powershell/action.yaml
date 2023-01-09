@@ -13,10 +13,12 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Clean up workdir
+    - name: Execute the script
       shell: powershell
+      env:
+        exec: ${{ inputs.exec }}
       run: |
-        Write-Output "::group::Cleaning up workdir"
+        # Cleaning up previous runs
         if( $(Test-Path -Path ".\exitCode.log") ) {
           Remove-Item -Path ".\exitCode.log" -Force | Out-Null
         }
@@ -29,15 +31,8 @@ runs:
         if( $(Test-Path -Path ".\script.txt") ) {
           Remove-Item -Path ".\script.ps1" -Force | Out-Null
         }
-        Write-Output "::endgroup::"
-        Exit(0)
 
-    - name: Execute the script
-      shell: powershell
-      env:  
-        exec: ${{ inputs.exec }}
-      run: |
-        Write-Output "::group::Connecting via RDP"
+        # Connecting via RDP
         $higherSession=0
         $count=0
         While (${higherSession} -lt "2") {
@@ -55,11 +50,6 @@ runs:
             $higherSession=$( $sessions )[0].ToString()[-1]
           }
         }
-        Write-Output "Connection succeeded"
-        Write-Output "::endgroup::"
-
-        Write-Output "::group::Running script"
-        Write-Output "Running script. Output will be shown after execution has finished."
         
         # Creating script file
         New-Item -Force -Path "script.ps1" | Out-Null
@@ -71,19 +61,17 @@ runs:
         [IO.File]::WriteAllLines( 'path.txt' , "${env:Path}")
 
         c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
-        `${env:Path}="`${env:Path};`$(Get-Content path.txt)"
-        powershell.exe -File script.ps1 3>&1 2>&1 | Out-File -File .\output.log
+        `${env:Path}="`${env:Path};`$(Get-Content path.txt)" 3>&1 2>&1 > .\output.log
+        powershell.exe -File script.ps1 3>&1 2>&1 >> .\output.log
         Write-Output `$LASTEXITCODE > .\exitCode.log
         "@
 
         $exit=$(Get-Content ".\exitCode.log")
         Write-Output "::endgroup::"
-        Exit ($exit)
 
-    - name: Retrieve logs
-      if: always()
-      shell: powershell
-      run: Get-Content ".\output.log"
+        Get-Content ".\output.log"
+
+        Exit ($exit)
 
 branding:
   icon: 'monitor'

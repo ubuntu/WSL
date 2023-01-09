@@ -1,0 +1,30 @@
+name: Azure WSL repo clone
+description: 'Clones your repo into WSL.'
+
+inputs:
+  distro:
+    description: Which (installed) distro to use
+    required: true
+  working-dir:
+    description: Where the repo should be cloned
+    required: false
+    default: "."
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Clone repo
+      uses: ./.github/actions/wsl-powershell
+      with:
+        max-attempts: 5
+        exec: |
+          $env:WSL_UTF8=1
+
+          wsl.exe -d ${{ inputs.distro }} --cd "~" -- bash -ec @'
+          mkdir -p ${{ inputs.workdir }}
+          git clone https://github.com/${{ github.repository }}.git ${{ inputs.workdir }}
+          cd ${{ inputs.workdir }}
+          git fetch --no-tags --prune --progress origin +${{ github.sha }}:${{ github.ref }}
+          git checkout ${{ github.sha }}
+          '@
+          Exit($LASTEXITCODE)

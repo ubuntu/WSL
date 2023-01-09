@@ -1,0 +1,44 @@
+name: Install Ubuntu WSL
+description: 'Install WSL from the store'
+
+inputs:
+  distro:
+    description: Distro name as shown in 'wsl -l -v'. Leave blank to install no distro.
+    required: true
+    default: Ubuntu
+  launcher:
+    description: The chosen distro's launcher executable.
+    required: true
+    default: ubuntu.exe
+  store-name:
+    description: The chosen distro's name in the Windows Store.
+    required: true
+    default: Ubuntu
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install or update WSL
+      uses: ./.github/actions/wsl-powershell
+      with:
+        exec: |
+          # Install or update WSL
+          $env:WSL_UTF8=1
+          winget install --name 'Windows Subsystem for Linux' --accept-source-agreements --accept-package-agreements --silent
+          $exit=$LASTEXITCODE
+
+          if ( "${{ inputs.distro }}" -eq "$null" ) {
+            Exit($exit)
+          }
+
+          # Install distro Appx
+          wsl.exe --unregister ${{ inputs.distro }}
+          Remove-AppxPackage "$(Get-AppxPackage | Where-Object PackageFullName -like '*${{ inputs.distro_appx_name }}*')"
+          winget install --name '${{ inputs.store-name }}'  --accept-source-agreements  --accept-package-agreements --silent
+
+          # Register a new instance
+          ${{ inputs.launcher }} install --root --ui=none
+
+          # Testing succesful install
+          ${{ inputs.launcher }} run echo Created a new distro with user: '$(whoami)'
+          Exit($LASTEXITCODE)

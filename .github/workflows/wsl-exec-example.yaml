@@ -7,7 +7,7 @@ on:
      paths:
       # We run it when changing one if its dependencies
       - .github/workflows/wsl-exec-example.yaml
-      - .github/actions/wsl_enabled_powershell/action.yaml
+      - .github/actions/wsl-powershell/action.yaml
       - .github/actions/wsl-exec/action.yaml
   push:
     branches: [main]
@@ -26,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Start Azure VM
-        uses: ./.github/actions/setup_vm
+        uses: ./.github/actions/vm-setup
         with:
           az_name: ${{ env.az_name }}
           az_resource_group: ${{ env.az_resource_group }}
@@ -41,31 +41,43 @@ jobs:
     # won't be started until the VM is turned on. It'll run concurrently with
     # vm-setup.
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Install or update WSL
-        uses: ./.github/actions/install-wsl
+        uses: ./.github/actions/wsl-install
         with:
-          distro_name: Ubuntu-Preview
-          distro_launcher: ubuntupreview.exe
-          distro_store_name: Ubuntu (Preview)
+          distro: Ubuntu
+          launcher: ubuntu.exe
+          store-name: Ubuntu
+
+      - name: Checkout your repo into WSL
+        uses: ./.github/actions/wsl-checkout
+        with:
+          distro: ubuntu
+          working-dir: "~/myrepo"
+
+      # You'll probably use this action if you program runs entirely inside WSL
+      - name: Run bash inside WSL
+        uses: ./.github/actions/wsl-bash
+        with:
+          distro: ubuntu
+          working-dir: "~/myrepo"
+          exec: |
+            echo "Hello from $(lsb_release -ds)"
       
+      # These convenience actions work Windows-side only
       - name: Install Python on Windows
-        # These convenience actions work windows-side only
         uses: actions/setup-python@v4
 
+      # You'll probably use this action if you program runs on Windows and uses WSL
       - name: Run powershell on Windows
-        # You'll probably use this action if you program runs on Windows and uses WSL
-        uses: ./.github/actions/wsl_enabled_powershell
+        uses: ./.github/actions/wsl-powershell
         with:
           exec: |
-            # Your code here
-            python.exe -c "print('Hello, world')"
-
-      - name: Run bash inside WSL
-        # You'll probably use this action if you program runs entirely inside WSL
-        uses: ./.github/actions/wsl-exec
-        with:
-          exec: |
-            echo "Hello, world!"
+            $env:WSL_UT8=1 # Recommended otherwise it's hard to read on Github
+            python.exe -c "print('Here are your current distros:')"
+            wsl --list --verbose
 
   stop-vm:
     # This action stops your Azure VM, hence stopping the RDP hosting as well.
@@ -76,7 +88,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Stop Azure VM
-        uses: ./.github/actions/stop_vm
+        uses: ./.github/actions/vm-stop
         with:
           az_name: ${{ env.az_name }}
           az_resource_group: ${{ env.az_resource_group }}

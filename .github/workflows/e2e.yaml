@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Start Azure VM
-        uses: ./.github/actions/setup_vm/
+        uses: ./.github/actions/vm-setup
         with:
           az_name: wsl-ci
           az_resource_group: wsl
@@ -54,12 +54,12 @@ jobs:
         with:
           channel: stable
       - name: Install or update WSL
-        uses: ./.github/actions/install-wsl/
+        uses: ./.github/actions/wsl-install
         with:
           # Installs only WSL, no distros
-          distro_name: ""
-          distro_launcher: ""
-          distro_store_name: ""
+          distro: ""
+          launcher: ""
+          store-name: ""
       - name: Build and install the appxbundle for testing
         shell: powershell
         run: |
@@ -74,7 +74,7 @@ jobs:
           .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 ${{ env.rootfs64 }}
           Write-Output "::endgroup::"
       - name: Run tests
-        uses: ./.github/actions/wsl_enabled_powershell/
+        uses: ./.github/actions/wsl-powershell
         with:
           exec: |
             Write-Output "::group::Environment setup"
@@ -105,7 +105,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Stop Azure VM
-        uses: ./.github/actions/stop_vm/
+        uses: ./.github/actions/vm-stop
         with:
           az_name: wsl-ci
           az_resource_group: wsl
