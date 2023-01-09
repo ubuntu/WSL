@@ -13,9 +13,22 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Clean up workdir
+      shell: powershell
+      run: |
+        Write-Output "::group::Cleaning up workdir"
+        if( $(Test-Path -Path ".\exitCode.log") ) {
+          Remove-Item -Path ".\exitCode.log" -Force | Out-Null
+        }
+        if( $(Test-Path -Path ".\output.log") ) {
+          Remove-Item -Path ".\output.log" -Force | Out-Null
+        }
+        Write-Output "::endgroup::"
+        Exit(0)
+
     - name: Execute the script
       shell: powershell
-      env:
+      env:  
         exec: ${{ inputs.exec }}
       run: |
         Write-Output "::group::Connecting via RDP"
@@ -46,18 +59,19 @@ runs:
         $script=( Write-Output "${script}" | Resolve-Path )
         [IO.File]::WriteAllLines( "${script}" , "${env:exec}")
 
-        c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell -Command @"
-        powershell -File ${script} 3>&1 2>&1 | Out-File -File .\output.log
-        Exit(`$LASTEXITCODE)
+        c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
+        powershell.exe -File ${script} 3>&1 2>&1 | Out-File -File .\output.log
+        Write-Output `$LASTEXITCODE > .\exitCode.log
         "@
 
-        $exit=$LASTEXITCODE
+        $exit=$(Get-Content ".\exitCode.log")
         Write-Output "::endgroup::"
-
-        # The logs themselves should contain the ::group:: directives
-        Get-Content ".\output.log"
-
         Exit ($exit)
+
+    - name: Retrieve logs
+      if: always()
+      shell: powershell
+      run: Get-Content ".\output.log"
 
 branding:
   icon: 'monitor'
