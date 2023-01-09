@@ -48,8 +48,6 @@ jobs:
         uses: ./.github/actions/wsl-install
         with:
           distro: Ubuntu
-          launcher: ubuntu.exe
-          store-name: Ubuntu
 
       - name: Checkout your repo into WSL
         uses: ./.github/actions/wsl-checkout
