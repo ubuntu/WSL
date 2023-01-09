@@ -68,6 +68,13 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Install or update WSL
+        uses: ./.github/actions/install-wsl/
+        with:
+          # Installs only WSL, no distros
+          distro_name: ""
+          distro_launcher: ""
+          distro_store_name: ""
       - name: Build and install the appxbundle for testing
         shell: powershell
         run: |
