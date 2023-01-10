@@ -21,9 +21,9 @@ runs:
           $env:WSL_UTF8=1
 
           wsl.exe -d ${{ inputs.distro }} --cd "~" -- bash -ec @'
-          mkdir -p ${{ inputs.workdir }}
-          git clone https://github.com/${{ github.repository }}.git ${{ inputs.workdir }}
-          cd ${{ inputs.workdir }}
+          mkdir -p ${{ inputs.working-dir }}
+          git clone https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
+          cd ${{ inputs.working-dir }}
           git fetch --no-tags --prune --progress origin +${{ github.sha }}:${{ github.ref }}
           git checkout ${{ github.sha }}
           '@
