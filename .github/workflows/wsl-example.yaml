@@ -62,20 +62,13 @@ jobs:
           working-dir: "~/myrepo"
           exec: |
             echo "Hello from $(lsb_release -ds)"
-      
-      # These convenience actions work Windows-side only
-      - name: Install Python on Windows
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10' 
 
       # You'll probably use this action if you program runs on Windows and uses WSL
       - name: Run powershell on Windows
         uses: ./.github/actions/wsl-powershell
         with:
           exec: |
-            $env:WSL_UT8=1 # Recommended otherwise it's hard to read on Github
-            python.exe -c "print('Here are your current distros:')"
+            $env:WSL_UTF8=1 # Recommended otherwise it's hard to read on Github
             wsl --list --verbose
 
   stop-vm:
