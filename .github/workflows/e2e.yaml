@@ -82,10 +82,10 @@ jobs:
 
             Write-Output "::group::Tests"
             go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher }}
-            $r=$LastExitCode
+            $exitStatus=$?
             Write-Output "::endgroup::"
+            if ( ! $exitStatus ) { Exit(1) }
 
-            exit $r
       - name: Remove the installed package
         if: always()
         shell: powershell

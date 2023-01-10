@@ -21,8 +21,8 @@ runs:
         # Executing a script outside session 0
 
         # Cleaning up previous runs
-        if( $(Test-Path -Path ".\exitCode.log") ) {
-          Remove-Item -Path ".\exitCode.log" -Force | Out-Null
+        if( $(Test-Path -Path ".\exitStatus.log") ) {
+          Remove-Item -Path ".\exitStatus.log" -Force | Out-Null
         }
         if( $(Test-Path -Path ".\output.log") ) {
           Remove-Item -Path ".\output.log" -Force | Out-Null
@@ -65,15 +65,15 @@ runs:
         c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
         `${env:Path}="`${env:Path};`$(Get-Content path.txt)" 3>&1 2>&1
         powershell.exe -File script.ps1 3>&1 2>&1 > ".\output.log"
-        Write-Output `$LASTEXITCODE > .\exitCode.log
+        Write-Output `$? > .\exitStatus.log
         "@
 
-        $exit=$(Get-Content ".\exitCode.log")
+        $exit=$(Get-Content ".\exitStatus.log")
         Write-Output "::endgroup::"
 
         Get-Content ".\output.log"
 
-        Exit ($exit)
+        if ( ! $exit ) { Exit(1) }
 
 branding:
   icon: 'monitor'

@@ -34,10 +34,10 @@ runs:
         # - It does not write the BOM (0xff 0xfe at file start)
         # - It does not write \r at line ends
         [IO.File]::WriteAllText( "${dirWindows}\script.sh" , "${env:exec}")
-        $exit=$LASTEXITCODE
+        $exit=$?
 
         Write-Output '::endgroup::'
-        Exit($exit)  
+        if ( ! $exit ) { Exit(1) }
 
     - name: Run linux script
       uses: ./.github/actions/wsl-powershell
@@ -48,4 +48,4 @@ runs:
           # Redirecting to stdout to prevent PsExec from showing stderr as an exception
           $tmpDir="/tmp/github_${{github.run_number}}_${{github.run_attempt}}"
           wsl.exe -d ${{ inputs.distro }} --cd '${{ inputs.working-dir }}' -- bash -c "bash ${tmpDir}/script.sh 2>&1"
-          Exit($LASTEXITCODE)
+          if ( ! $? ) { Exit(1) }

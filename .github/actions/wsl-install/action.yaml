@@ -16,7 +16,7 @@ runs:
         # Install or update WSL
         $env:WSL_UTF8=1
         winget install --name 'Windows Subsystem for Linux' --accept-source-agreements --accept-package-agreements --silent
-        $exit=$LASTEXITCODE
+        if ( ! $? ) { Exit(1) }
 
     - name: Install the new distro
       if: ${{ inputs.distro != '' }}
@@ -47,6 +47,4 @@ runs:
           # Testing succesful install
           & ${launcher} run echo Created a new distro with user: '$(whoami)'
 
-          if ( ! $? ) {
-            Exit(1)
-          }
+          if ( ! $? ) { Exit(1) }

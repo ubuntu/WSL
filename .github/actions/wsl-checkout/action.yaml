@@ -27,4 +27,5 @@ runs:
           git fetch --no-tags --prune --progress origin +${{ github.sha }}:${{ github.ref }}
           git checkout ${{ github.sha }}
           '@
-          Exit($LASTEXITCODE)
+
+          if ( ! $? ) { Exit(1) }
