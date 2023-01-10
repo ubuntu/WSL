@@ -48,4 +48,4 @@ You'll need the following secrets:
 
 # 5. Create a github action
 It'll allow you to run arbitrary bash code on a fresh WSL instance.
-For an example, check out ./workflows/wsl-exec-example.yaml
+For an example, check out [wsl-example.yaml](../workflows/wsl-example.yaml)
