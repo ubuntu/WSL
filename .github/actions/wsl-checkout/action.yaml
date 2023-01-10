@@ -22,10 +22,10 @@ runs:
 
           wsl.exe -d ${{ inputs.distro }} --cd "~" -- bash -ec @'
           mkdir -p ${{ inputs.working-dir }}
-          git clone https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
+          git clone -q https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
           cd ${{ inputs.working-dir }}
-          git fetch --no-tags --prune --progress origin +${{ github.sha }}:${{ github.ref }}
-          git checkout ${{ github.sha }}
+          git fetch -q --no-tags --prune origin +${{ github.sha }}:${{ github.ref }}
+          git checkout -q ${{ github.sha }}
           '@
 
           if ( ! $? ) { Exit(1) }

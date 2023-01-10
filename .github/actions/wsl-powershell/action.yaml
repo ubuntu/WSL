@@ -22,8 +22,8 @@ runs:
         Write-Output "::group::WSL-enabled powershell setup"
 
         # Cleaning up previous runs
-        if( $(Test-Path -Path ".\exitStatus.log") ) {
-          Remove-Item -Path ".\exitStatus.log" -Force | Out-Null
+        if( $(Test-Path -Path ".\exitCode.log") ) {
+          Remove-Item -Path ".\exitCode.log" -Force | Out-Null
         }
         if( $(Test-Path -Path ".\output.log") ) {
           Remove-Item -Path ".\output.log" -Force | Out-Null
@@ -64,15 +64,9 @@ runs:
 
         c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
         powershell.exe -File script.ps1 3>&1 2>&1 > ".\output.log"
-        Write-Output `$? > .\exitStatus.log
+        Write-Output "`${LastExitCode}" > ".\exitCode.log"
         "@
-
         Write-Output "::endgroup::"
-
-        $exit=$(Get-Content ".\exitStatus.log")
-
-        if ( ! $exit ) { Exit(1) }
-
     - name: Logs
       shell: powershell
       if: always()
@@ -85,6 +79,21 @@ runs:
         } else {
           Write-Output "No log"
         }
+
+        Write-Output "----------Exit status-----------"
+        if ( ! $(Test-Path -Path ".\exitCode.log") ) {
+          Write-Output "No exit status reported, assuming failure"
+          Exit(-1)
+        } 
+
+        $exitCode=$(Get-Content ".\exitCode.log")
+        if ( "$null" -eq "${exitCode}") {
+          Write-Output "Error: exit code is blank"
+          Exit(-2)
+        }
+
+        Write-Output "Exit code: ${exitCode}"
+        Exit(${exitCode})
 
 branding:
   icon: 'monitor'

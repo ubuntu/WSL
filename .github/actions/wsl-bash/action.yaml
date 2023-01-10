@@ -37,7 +37,7 @@ runs:
         $exit=$?
 
         Write-Output '::endgroup::'
-        if ( ! $exit ) { Exit(1) }
+        if ( "${exit}" -eq "$False" ) { Exit(1) }
 
     - name: Run linux script
       uses: ./.github/actions/wsl-powershell
