@@ -70,11 +70,21 @@ runs:
         Write-Output "::endgroup::"
 
         $exit=$(Get-Content ".\exitStatus.log")
-        Write-Output "::endgroup::"
-
-        Get-Content ".\output.log"
 
         if ( ! $exit ) { Exit(1) }
+
+    - name: Logs
+      shell: powershell
+      if: always()
+      run: |
+        # Printing script output
+        Write-Output "----------Script log----------"
+
+        if ( $(Test-Path -Path ".\output.log") ) {
+          Get-Content ".\output.log"
+        } else {
+          Write-Output "No log"
+        }
 
 branding:
   icon: 'monitor'
