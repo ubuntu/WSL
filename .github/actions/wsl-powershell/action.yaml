@@ -18,6 +18,8 @@ runs:
       env:
         exec: ${{ inputs.exec }}
       run: |
+        # Executing a script outside session 0
+
         # Cleaning up previous runs
         if( $(Test-Path -Path ".\exitCode.log") ) {
           Remove-Item -Path ".\exitCode.log" -Force | Out-Null
