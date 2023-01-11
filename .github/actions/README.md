@@ -11,8 +11,10 @@ latest (and recommended) version--.
 
 ## Our actions
 VM management:
-- `vm-setup`: Starts an Azure VM and connects to it via RDP to create session 2.
+- `vm-setup`: Starts an Azure VM and connects to it via RDP to create session 2. This action must run
+  on an ubuntu machine, for instance Github runner with `ubuntu-latest`. The Azure VM has to be prepared as indicated below.
 - `vm-stop`: Stops the Azure VM.
+
 Feel free to use your own setup and stop actions if your workflows are more complicated, all you
 need is the VM with a session greater than 1 active.
 
@@ -25,7 +27,7 @@ The following actions connect to this session greater than 1 to perform various 
 ## Setup
 Setting up your runner can be a bit complicated, so the rest of the document explains how to do so.
 
-### 1. Create a VM on Azure
+### 1. Create a Windows VM on Azure
 Just follow Azure's instructions. You'll need to allow Remote-Desktop connections. You can leave
 all other options  as defaults or customize at your leisure. Take note of:
 - The name of the VM
