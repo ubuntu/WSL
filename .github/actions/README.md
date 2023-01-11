@@ -56,7 +56,7 @@ Follow the instructions. Make sure you enable running as a service.
 To add a new secret, head to your repository's page on Github > Settings > Secrets > Actions > New repository secret.
 You'll need the following secrets:
 - AZURE_VM_CREDS: See the documentation [here](https://github.com/Azure/login#configure-deployment-credentials).
-- AZURE_VM_AUTHORITY: The public IP address for the runner, with the port to connect to via RDP.
+- AZURE_VM_AUTHORITY: The public IP address or DNS name, if set.
 - AZURE_VM_UN: The windows user's name.
 - AZURE_VM_UP: The user's password.
 
