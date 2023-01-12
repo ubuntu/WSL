@@ -39,7 +39,7 @@ runs:
         if ( "${exit}" -eq "$False" ) { Exit(1) }
 
     - name: Run linux script
-      uses: Ubuntu/WSL/.github/actions/wsl-powershell@HEAD
+      uses: ./.github/actions/wsl-powershell
       with:
         max-attempts: 5
         exec: |

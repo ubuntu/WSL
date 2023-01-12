@@ -20,7 +20,7 @@ runs:
 
     - name: Install the new distro
       if: ${{ inputs.distro != '' }}
-      uses: Ubuntu/WSL/.github/actions/wsl-powershell@HEAD
+      uses: ./.github/actions/wsl-powershell
       with:
         exec: |
           # Install the new distro
