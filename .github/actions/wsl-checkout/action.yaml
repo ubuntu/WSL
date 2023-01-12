@@ -9,23 +9,25 @@ inputs:
     description: Where the repo should be cloned
     required: false
     default: "."
+  submodules:
+    description: Whether to fetch submodules or not
+    required: false
+    default: "false"
 
 runs:
   using: 'composite'
   steps:
     - name: Clone repo
-      uses: ./.github/actions/wsl-powershell
+      uses: ./.github/actions/wsl-bash
       with:
         max-attempts: 5
         exec: |
-          $env:WSL_UTF8=1
-
-          wsl.exe -d ${{ inputs.distro }} --cd "~" -- bash -ec @'
           mkdir -p ${{ inputs.working-dir }}
-          git clone -q https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
+          git clone --quiet --depth 1 https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
           cd ${{ inputs.working-dir }}
-          git fetch -q --no-tags --prune origin +${{ github.sha }}:${{ github.ref }}
-          git checkout -q ${{ github.sha }}
-          '@
+          git fetch --quiet --depth 1 --no-tags --prune origin +${{ github.sha }}:${{ github.ref }}
+          git checkout --quiet ${{ github.sha }}
 
-          if ( ! $? ) { Exit(1) }
+          if [ "${{ inputs.submodules }}" = true ] ; then
+              git submodule --quiet update --init --recursive --depth 1
+          fi
