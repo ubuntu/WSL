@@ -14,7 +14,7 @@ runs:
   using: 'composite'
   steps:
     - name: Clone repo
-      uses: ./.github/actions/wsl-powershell
+      uses: Ubuntu/WSL/.github/actions/wsl-powershell@HEAD
       with:
         max-attempts: 5
         exec: |
