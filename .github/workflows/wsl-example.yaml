@@ -36,8 +36,9 @@ jobs:
 
   run-script:
     # This job has an implicit dependency on start-vm, because the runner
-    # won't be started until the VM is turned on. It'll run concurrently with
-    # vm-setup.
+    # won't be started until the VM is turned on. It must run concurrently with
+    # vm-setup, so don't add an explicit depenendency.
+    # Don't do this: needs: vm-setup
     runs-on: self-hosted
     steps:
       - name: Checkout

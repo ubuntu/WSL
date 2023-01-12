@@ -27,7 +27,7 @@ The following actions connect to this session greater than 1 to perform various 
 ## Setup
 Setting up your runner can be a bit complicated, so the rest of the document explains how to do so.
 
-### 1. Create a Windows VM on Azure
+### 1. Create a Windows 11 VM on Azure
 Just follow Azure's instructions. You'll need to allow Remote-Desktop connections. You can leave
 all other options  as defaults or customize at your leisure. Take note of:
 - The name of the VM

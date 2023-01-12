@@ -12,7 +12,6 @@ inputs:
   distro:
     description: |
       Distro name as shown in 'wsl -l -v'. 
-      Don't override unless you have a good reason to
     required: false
     default: Ubuntu
 
