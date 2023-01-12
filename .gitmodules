@@ -1,7 +1,3 @@
-[submodule "ubuntu-wsl-splash"]
-	path = ubuntu-wsl-splash
-	url = https://github.com/ubuntu/ubuntu-wsl-splash
-	branch = main
 [submodule "ubuntu-desktop-installer"]
 	path = ubuntu-desktop-installer
 	url = https://github.com/canonical/ubuntu-desktop-installer
