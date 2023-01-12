@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<FlutterAppRoot>..\ubuntu-wsl-splash</FlutterAppRoot>
+	<Import Project="$(MSBuildThisFileDirectory)\ui-driver.props" Condition="Exists('$(MSBuildThisFileDirectory)\ui-driver.props')" />
+    <PropertyGroup>
+		<FlutterAppRoot>..\ubuntu-desktop-installer\packages\ubuntu_wsl_setup</FlutterAppRoot>
 		<FlutterAppDir>$(FlutterAppRoot)\build\windows\runner\Release\</FlutterAppDir>
 		<FlutterAppIconPath>$(FlutterAppRoot)\windows\runner\resources\app_icon.ico</FlutterAppIconPath>
 		<ThisAppIconPath>..\DistroLauncher\images\icon.ico</ThisAppIconPath>
@@ -12,15 +13,15 @@
 	</ItemGroup>
 	<ItemGroup>
 		<FlutterAppFiles Include="$(FlutterAppDir)" />
-		<None Include="@(FlutterAppFiles)">
-			<DeploymentContent>true</DeploymentContent>
-		</None>
-	</ItemGroup>
+        <None Include="@(FlutterAppFiles)">
+            <DeploymentContent>true</DeploymentContent>
+        </None>
+    </ItemGroup>
 	<Target Name="CustomFlutterBuild" BeforeTargets="ResolveProjectReferences" Condition="!Exists($(FlutterAppDir))">
 		<Message Text="Building Flutter artifacts" Importance="high"/>
 		<Exec Command="git submodule update --init" />
 		<Copy SourceFiles="@(ThisAppIcon)" DestinationFiles="@(FlutterAppIcon)" />
 		<Exec Command="flutter gen-l10n" WorkingDirectory="$(FlutterAppRoot)" />
-		<Exec Command="flutter build windows --release" WorkingDirectory="$(FlutterAppRoot)" />
+		<Exec Command="flutter build windows --release -t lib\main_win.dart" WorkingDirectory="$(FlutterAppRoot)" />
 	</Target>
 </Project>
