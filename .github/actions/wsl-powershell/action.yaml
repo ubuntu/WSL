@@ -59,7 +59,7 @@ runs:
         [IO.File]::WriteAllLines( 'path.txt' , "${env:Path}")
 
         # Creating script file
-        '${env:Path}="${env:Path};$(Get-Content path.txt)"' > script.ps1
+        '${env:Path}="$(Get-Content path.txt);${env:Path}"' > script.ps1
         "${env:exec}" >> script.ps1
 
         c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
