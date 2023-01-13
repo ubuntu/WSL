@@ -2,7 +2,6 @@
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ItemDefinitionGroup>
         <ClCompile>
-            <PreprocessorDefinitions>WIN_OOBE_ENABLED</PreprocessorDefinitions>
             <PreprocessorDefinitions Condition=" '$(OOBE_E2E_TESTING)' != '' ">%(PreprocessorDefinitions);OOBE_E2E_TESTING</PreprocessorDefinitions>
         </ClCompile>
     </ItemDefinitionGroup>
