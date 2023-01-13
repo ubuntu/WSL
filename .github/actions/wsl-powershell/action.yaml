@@ -1,0 +1,100 @@
+name: WSL-enabled powershell
+description: 'Execute a script in powershell as session >= 2.'
+
+inputs:
+  exec:
+    description: Script to execute
+    required: true
+  max-attempts:
+    description: Maximum number of connection attempts 
+    default: "20"
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Execute the script
+      shell: powershell
+      env:
+        exec: ${{ inputs.exec }}
+      run: |
+        # Executing a script outside session 0
+        Write-Output "::group::WSL-enabled powershell setup"
+
+        # Cleaning up previous runs
+        if( $(Test-Path -Path ".\exitCode.log") ) {
+          Remove-Item -Path ".\exitCode.log" -Force | Out-Null
+        }
+        if( $(Test-Path -Path ".\output.log") ) {
+          Remove-Item -Path ".\output.log" -Force | Out-Null
+        }
+        if( $(Test-Path -Path ".\path.txt") ) {
+          Remove-Item -Path ".\path.txt" -Force | Out-Null
+        }
+        if( $(Test-Path -Path ".\script.txt") ) {
+          Remove-Item -Path ".\script.ps1" -Force | Out-Null
+        }
+
+        # Connecting via RDP
+        $higherSession=0
+        $count=0
+        While (${higherSession} -lt "2") {
+          Start-Sleep 5
+          $count = $count + 1
+          If ($count -gt ${{ inputs.max-attempts }}) {
+            Write-Output "::endgroup::"
+            Write-Output "Error: RDP never connected"
+            Exit (-1)
+          }
+          Write-Output "Attempting to connect via RDP. Attempt ${count} out of ${{ inputs.max-attempts }}."
+
+          $sessions=$(C:\SysinternalsSuite\logonsessions.exe -nobanner | Select-String Session: | Sort-Object -Descending | Get-Unique)
+          If ( $null -ne $sessions -and $sessions.length -gt 0 ) {
+            $higherSession=$( $sessions )[0].ToString()[-1]
+          }
+        }
+        
+        # Storing path
+        New-Item -Force -Path "path.txt" | Out-Null
+        [IO.File]::WriteAllLines( 'path.txt' , "${env:Path}")
+
+        # Creating script file
+        '${env:Path}="$(Get-Content path.txt);${env:Path}"' > script.ps1
+        "${env:exec}" >> script.ps1
+
+        c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
+        powershell.exe -File script.ps1 3>&1 2>&1 > ".\output.log"
+        Write-Output "`${LastExitCode}" > ".\exitCode.log"
+        "@
+        Write-Output "::endgroup::"
+    - name: Logs
+      shell: powershell
+      if: always()
+      run: |
+        # Printing script output
+        Write-Output "----------Script log----------"
+
+        if ( $(Test-Path -Path ".\output.log") ) {
+          Get-Content ".\output.log"
+        } else {
+          Write-Output "No log"
+        }
+
+        Write-Output "----------Exit status-----------"
+        if ( ! $(Test-Path -Path ".\exitCode.log") ) {
+          Write-Output "No exit status reported, assuming failure"
+          Exit(-1)
+        } 
+
+        $exitCode=$(Get-Content ".\exitCode.log")
+        if ( "$null" -eq "${exitCode}") {
+          Write-Output "Error: exit code is blank"
+          Exit(-2)
+        }
+
+        Write-Output "Exit code: ${exitCode}"
+        Exit(${exitCode})
+
+branding:
+  icon: 'monitor'
+  color: 'purple'

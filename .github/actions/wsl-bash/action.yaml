@@ -1,0 +1,49 @@
+name: Azure WSL script runner
+description: 'Runs scripts on WSL in Azure machines.'
+
+inputs:
+  exec:
+    description: Script to run on WSL
+    required: true
+  working-dir:
+    description: The WSL directory to run the script in. Must be absolute, but ~ is allowed.
+    required: false
+    default: "~"
+  distro:
+    description: Which (installed) distro to run the script on. Use the name as shown in 'wsl -l -v'. 
+    required: false
+    default: Ubuntu
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Copy script into WSL
+      shell: powershell
+      env:
+        exec: ${{ inputs.exec }}
+      run: |
+        Write-Output '::group::Storage of script into WSL'
+        $tmpDir="/tmp/github_${{github.run_number}}_${{github.run_attempt}}"
+        $dirWindows="\\wsl.localhost\${{ inputs.distro }}${tmpDir}"
+
+        New-Item -Force -Path "${dirWindows}\script.sh" -ItemType File | Out-Null
+
+        # The following function is used because:
+        # - It does not write the BOM (0xff 0xfe at file start)
+        # - It does not write \r at line ends
+        [IO.File]::WriteAllText( "${dirWindows}\script.sh" , "${env:exec}")
+        $exit=$?
+
+        Write-Output '::endgroup::'
+        if ( "${exit}" -eq "$False" ) { Exit(1) }
+
+    - name: Run linux script
+      uses: ./.github/actions/wsl-powershell
+      with:
+        max-attempts: 5
+        exec: |
+          $env:WSL_UTF8=1
+          # Redirecting to stdout to prevent PsExec from showing stderr as an exception
+          $tmpDir="/tmp/github_${{github.run_number}}_${{github.run_attempt}}"
+          wsl.exe -d ${{ inputs.distro }} --cd '${{ inputs.working-dir }}' -- bash -c "bash ${tmpDir}/script.sh 2>&1"
+          if ( ! $? ) { Exit(1) }

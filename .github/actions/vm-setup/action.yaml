@@ -1,7 +1,16 @@
-name: Azure RDP setup
-description: 'Connect via RDP in order to log in as session other than 0.'
+name: Azure WSL setup
+description: 'Allocate and connect to an Azure VM, and start RDP.'
 
 inputs:
+  az_name:
+    description: Name of the Azure VM to run on
+    required: true
+  az_resource_group:
+    description: Name of the Azure resource group to run on
+    required: true
+  az_creds:
+    description: Credentials to use for Azure
+    required: true
   az_vm_hostname:
     description: Hostname for "xfreerdp /v:az_vm_hostname"
     required: true
@@ -15,6 +24,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - uses: azure/login@v1
+      with:
+        creds: ${{ inputs.az_creds }}
+    - name: Start the Runner
+      shell: bash
+      run: |
+        az vm start --name ${{ inputs.az_name }} --resource-group ${{ inputs.az_resource_group }}
     - name: rdp
       shell: bash
       env:
@@ -65,5 +81,5 @@ runs:
         exit 1
 
 branding:
-  icon: 'cast'
+  icon: 'arrow-up-circle'
   color: 'purple'
