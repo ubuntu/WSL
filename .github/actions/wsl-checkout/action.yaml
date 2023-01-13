@@ -3,7 +3,7 @@ description: 'Clones your repo into WSL.'
 
 inputs:
   distro:
-    description: Which (installed) distro to use
+    description: Which (installed) distro to use. Use the name as shown in 'wsl -l -v'.
     required: true
   working-dir:
     description: Where the repo should be cloned

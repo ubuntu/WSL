@@ -10,8 +10,7 @@ inputs:
     required: false
     default: "~"
   distro:
-    description: |
-      Distro name as shown in 'wsl -l -v'. 
+    description: Which (installed) distro to run the script on. Use the name as shown in 'wsl -l -v'. 
     required: false
     default: Ubuntu
 
