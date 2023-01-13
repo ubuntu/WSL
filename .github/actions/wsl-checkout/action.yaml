@@ -18,7 +18,7 @@ runs:
   using: 'composite'
   steps:
     - name: Clone repo
-      uses: Ubuntu/WSL/.github/actions/wsl-bash
+      uses: Ubuntu/WSL/.github/actions/wsl-bash@main
       with:
         max-attempts: 5
         exec: |
