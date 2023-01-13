@@ -52,14 +52,14 @@ jobs:
       - name: Checkout your repo into WSL
         uses: ./.github/actions/wsl-checkout
         with:
-          distro: ubuntu
+          distro: Ubuntu
           working-dir: "~/myrepo"
 
       # You'll probably use this action if you program runs entirely inside WSL
       - name: Run bash inside WSL
         uses: ./.github/actions/wsl-bash
         with:
-          distro: ubuntu
+          distro: Ubuntu
           working-dir: "~/myrepo"
           exec: |
             echo "Hello from $(lsb_release -ds)"
