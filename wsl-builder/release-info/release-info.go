@@ -77,7 +77,7 @@ func writeHeader(w io.Writer, f columns) error {
 	if *f.codeName {
 		text = append(text, "CodeName")
 	}
-	if len(*f.rootfsArch) == 0 {
+	if len(*f.rootfsArch) != 0 {
 		text = append(text, "Rootfs")
 	}
 
@@ -100,8 +100,8 @@ func writeRow(w io.Writer, r common.WslReleaseInfo, f columns) error {
 	if *f.launcher {
 		text = append(text, r.LauncherName+".exe")
 	}
-	if len(*f.rootfsArch) == 0 {
-		text = append(text, common.RootfsUrl(r, *f.rootfsArch))
+	if len(*f.rootfsArch) != 0 {
+		text = append(text, r.RootfsUrl(*f.rootfsArch))
 	}
 
 	_, err := fmt.Fprintln(w, strings.Join(text, "\t"))
