@@ -140,11 +140,7 @@ func partition[T any](slice []T, predicate func(t T) bool) (p int) {
 	if len(slice) == 0 {
 		return 0
 	}
-	if predicate(slice[0]) {
-		p++
-	}
-
-	for i := 1; i < len(slice); i++ {
+	for i := range slice {
 		if !predicate(slice[i]) {
 			continue
 		}
