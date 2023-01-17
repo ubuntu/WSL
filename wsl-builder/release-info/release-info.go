@@ -77,7 +77,7 @@ func writeHeader(w io.Writer, f columns) error {
 }
 
 func writeRow(w io.Writer, r common.WslReleaseInfo, f columns) error {
-	text := []string{}
+	var text []string
 	text = append(text, r.WslID)
 	if *f.appId {
 		text = append(text, r.AppID)
