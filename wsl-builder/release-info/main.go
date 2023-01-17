@@ -20,11 +20,6 @@ Fields are always in the same order, regardless of the order the flags are passe
 				return errors.New("this command needs at least one argument (CSV_FILE)")
 			}
 
-			f.rootfs = new(bool)
-			if len(*f.rootfsArch) != 0 {
-				*f.rootfs = true
-			}
-
 			exitCode := writeReleaseInfo(args[0], args[1:], f)
 			os.Exit(exitCode)
 			return nil // Returning an error causes Cobrea to print its help
