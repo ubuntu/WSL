@@ -12,8 +12,8 @@ import (
 )
 
 type columns struct {
-	rootfsArch                                         *string
-	rootfs, appId, fullName, launcher, codeName, short *bool
+	rootfsArch                                 *string
+	appId, fullName, launcher, codeName, short *bool
 }
 
 func writeReleaseInfo(csvPath string, distros []string, cols columns) (exitCode int) {
@@ -77,7 +77,7 @@ func writeHeader(w io.Writer, f columns) error {
 	if *f.codeName {
 		text = append(text, "CodeName")
 	}
-	if *f.rootfs {
+	if len(*f.rootfsArch) == 0 {
 		text = append(text, "Rootfs")
 	}
 
@@ -100,7 +100,7 @@ func writeRow(w io.Writer, r common.WslReleaseInfo, f columns) error {
 	if *f.launcher {
 		text = append(text, r.LauncherName+".exe")
 	}
-	if *f.rootfs {
+	if len(*f.rootfsArch) == 0 {
 		text = append(text, common.RootfsUrl(r, *f.rootfsArch))
 	}
 
