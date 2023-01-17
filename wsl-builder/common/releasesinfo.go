@@ -235,10 +235,10 @@ func (w *WslReleaseInfo) refreshedTerminalProfileID() error {
 }
 
 func RootfsUrl(r WslReleaseInfo, arch string) string {
-	// Currently only Kinetic (22.10) and later are published to "https://cloud-images.ubuntu.com/wsl/"
+	// Currently only Jammy (22.04) and later are published to "https://cloud-images.ubuntu.com/wsl/"
 	codeNameSubUri := r.CodeName
 	imageBaseName := fmt.Sprintf("%s-server-cloudimg", r.CodeName)
-	if strings.Compare(r.BuildVersion, "2210") >= 0 {
+	if strings.Compare(r.BuildVersion, "2204") >= 0 {
 		codeNameSubUri = path.Join("wsl", r.CodeName)
 		// The image base name scheme also changed.
 		imageBaseName = fmt.Sprintf("ubuntu-%s-wsl", r.CodeName)
