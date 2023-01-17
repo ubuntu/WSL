@@ -1,0 +1,103 @@
+name: Download Ubuntu WSL Rootfs
+description: Download the latest Rootfs for a particular release of Ubuntu WSL 
+
+inputs:
+  distros:
+    description: Space-separated list of distros to download
+    required: true
+    default: "Ubuntu"
+  path:
+    description: Directory to store the rootfs in (${path}\${distro}.tar.gz)
+    required: true
+    default: "Ubuntu"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check out repo
+      uses: actions/checkout@v3
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    - name: Install dependencies
+      shell: powershell
+      run: python -m pip install launchpadlib
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: "1.18"
+    - name: Prepare environment
+      shell: powershell
+      run: |
+        # Prepare environment
+        Write-Output "::group::Build wsl release info generator"
+        go build .\wsl-builder\release-info\
+        if ( "${LastExitCode}" -ne "0" ) {
+          Exit(1)
+        }
+        Write-Output "::endgroup::"
+
+        Write-Output "::group::Fetch release info"
+        if ( ! $(Test-Path -Path "${{ inputs.path }}") ) {
+          New-Item -Type Directory -Path "${{ inputs.path }}" | Out-Null
+        }
+
+        python .\wsl-builder\lp-distro-info -o "${{ inputs.path }}\ubuntu-releases.csv"
+        Get-Content "${{ inputs.path }}\ubuntu-releases.csv"
+        Write-Output "::endgroup::"
+        Exit(${LastExitCode})
+
+    - name: Download Ubuntu rootfs
+      shell: powershell
+      run: |
+        # Download rootfs
+        .\release-info.exe "${{ inputs.path }}\ubuntu-releases.csv" ${{ inputs.distros }} --rootfs amd64 --short 1> "${{ inputs.path }}\wsl-releases.csv"
+        if ( "${LastExitCode}" -ne "0" ) {
+            Remove-Item "${{ inputs.path }}\ubuntu-releases.csv" 2>&1 | Out-Null
+            Remove-Item "${{ inputs.path }}\wsl-releases.csv" 2>&1    | Out-Null
+            Exit(1)
+        }
+
+        $releaseList = $(Get-Content "${{ inputs.path }}\wsl-releases.csv") -split "\n"
+        $allSuccess = $true
+
+        foreach ($release in $releaseList) {
+          $data = $release -split "\s+"
+
+          # $name is the one in inputs.distros
+          $name = $data[0]
+          $file = "${{ inputs.path }}\${name}.tar.gz"
+
+          $url = $data[1]
+
+          Write-Output "::group::Downloading ${name}"
+          Write-Output "Downloading from ${url}"
+          Invoke-WebRequest -Uri "$url" -OutFile "${file}.tmp"
+          if ( ! $? ) {
+            $allSuccess = $false
+            Write-Output "Error: Failed download"
+            Remove-Item -Force "$file.tmp" 2>&1 | Out-Null
+            Write-Output "::endgroup::"
+            continue
+          }
+          Write-Output "Successful download"
+
+          Move-Item -Force "$file.tmp" "$file"
+          if ( ! $? ) {
+            $allSuccess = $false
+            Write-Output "Error: Failed to override old cache"
+            Remove-Item -Force "$file.tmp"  2>&1 | Out-Null
+            Write-Output "::endgroup::"
+            continue
+          }
+
+          Write-Output "Successfully overwritten old cache."
+          Write-Output "::endgroup::"
+        }
+
+        Remove-Item "${{ inputs.path }}\ubuntu-releases.csv" 2>&1 | Out-Null
+        Remove-Item "${{ inputs.path }}\wsl-releases.csv"    2>&1 | Out-Null
+        if ( "${allSuccess}" -eq "$false" ) {
+            Exit(1)
+        }
