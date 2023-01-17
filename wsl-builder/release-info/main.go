@@ -22,7 +22,7 @@ Fields are always in the same order, regardless of the order the flags are passe
 
 			exitCode := writeReleaseInfo(args[0], args[1:], f)
 			os.Exit(exitCode)
-			return nil // Returning an error causes Cobrea to print its help
+			return nil // Returning an error causes Cobra to print its help
 		},
 	}
 
