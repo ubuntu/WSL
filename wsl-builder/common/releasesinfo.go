@@ -9,6 +9,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -231,4 +232,17 @@ func (w *WslReleaseInfo) refreshedTerminalProfileID() error {
 	w.TerminalProfileGUID = fmt.Sprintf("{%s}", terminalProfileGUID.String())
 
 	return nil
+}
+
+func RootfsUrl(r WslReleaseInfo, arch string) string {
+	// Currently only Kinetic (22.10) and later are published to "https://cloud-images.ubuntu.com/wsl/"
+	codeNameSubUri := r.CodeName
+	imageBaseName := fmt.Sprintf("%s-server-cloudimg", r.CodeName)
+	if strings.Compare(r.BuildVersion, "2210") >= 0 {
+		codeNameSubUri = path.Join("wsl", r.CodeName)
+		// The image base name scheme also changed.
+		imageBaseName = fmt.Sprintf("ubuntu-%s-wsl", r.CodeName)
+	}
+
+	return fmt.Sprintf("https://cloud-images.ubuntu.com/%s/current/%s-%s-wsl.rootfs.tar.gz", codeNameSubUri, imageBaseName, arch)
 }
