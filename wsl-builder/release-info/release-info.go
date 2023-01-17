@@ -9,6 +9,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/ubuntu/wsl/wsl-builder/common"
+	"golang.org/x/exp/slices"
 )
 
 type columns struct {
@@ -16,46 +17,33 @@ type columns struct {
 	appId, fullName, launcher, codeName, short *bool
 }
 
-func writeReleaseInfo(csvPath string, distros []string, cols columns) (exitCode int) {
-	exitCode = 0
-
-	releases, ok, err := selectReleases(csvPath, distros)
+func writeReleaseInfo(csvPath string, distros []string, cols columns) error {
+	releases, err := selectReleases(csvPath, distros)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		return 1
-	}
-	if !ok {
-		exitCode = 2
+		return err
 	}
 
-	if ok := writeTable(releases, cols); !ok {
-		exitCode = 2
-	}
-
-	return exitCode
+	return writeTable(releases, cols)
 }
 
 // writeTable writes the information in a table into stdout.
 // Issues are reported to stderr.
 // Returns OK if there were no issues.
-func writeTable(releases []common.WslReleaseInfo, cols columns) (ok bool) {
+func writeTable(releases []common.WslReleaseInfo, cols columns) error {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 
-	ok = true
-	if e := writeHeader(w, cols); e != nil {
-		ok = false
-		fmt.Fprintf(os.Stderr, "Warning: could not write header: %v\n", e)
+	if err := writeHeader(w, cols); err != nil {
+		return err
 	}
 
 	for _, r := range releases {
-		if e := writeRow(w, r, cols); e != nil {
-			ok = false
-			fmt.Fprintf(os.Stderr, "Warning: could not write row for release %q: %v\n", r.AppID, e)
+		if err := writeRow(w, r, cols); err != nil {
+			return err
 		}
 	}
 
-	return ok
+	return nil
 }
 
 func writeHeader(w io.Writer, f columns) error {
@@ -82,7 +70,10 @@ func writeHeader(w io.Writer, f columns) error {
 	}
 
 	_, err := fmt.Fprintln(w, strings.Join(text, "\t"))
-	return err
+	if err != nil {
+		return fmt.Errorf("got an error writing header: %v", err)
+	}
+	return nil
 }
 
 func writeRow(w io.Writer, r common.WslReleaseInfo, f columns) error {
@@ -105,46 +96,41 @@ func writeRow(w io.Writer, r common.WslReleaseInfo, f columns) error {
 	}
 
 	_, err := fmt.Fprintln(w, strings.Join(text, "\t"))
-	return err
+	if err != nil {
+		return fmt.Errorf("got an error writing row for %q: %v", r.WslID, err)
+	}
+	return nil
 }
 
-// selectReleases returns:
-//  - releases: the intersection of releases in the CSV and in the list of targets.
-//              If the list of targets is empty, all the releases in the CSV are returned.
-//  - ok: whether all targets were found in the CSV
-//  - err: Critical problems.
-func selectReleases(csvPath string, targets []string) (releases []common.WslReleaseInfo, ok bool, err error) {
+func selectReleases(csvPath string, targets []string) (releases []common.WslReleaseInfo, err error) {
 	releases, err = common.ReleasesInfo(csvPath)
 	if err != nil {
-		return releases, true, fmt.Errorf("could not read release info: %v", err)
+		return releases, fmt.Errorf("could not read release info: %v", err)
 	}
 
 	end := len(releases)
 	if len(targets) != 0 {
-		end = partition(releases, func(r common.WslReleaseInfo) bool { return contains(targets, r.WslID) })
+		end = partition(releases, func(r common.WslReleaseInfo) bool {
+			idx := slices.Index(targets, r.WslID)
+			if idx == -1 {
+				return false
+			}
+			// Found targets are blanked so we're left with a
+			// slice of missing targets.
+			targets[idx] = ""
+			return true
+		})
 	}
 
 	if end == 0 {
-		return releases, false, errors.New("no releases were found")
+		return releases, errors.New("no releases were found")
 	}
 
 	if end < len(targets) {
-		fmt.Fprintln(os.Stderr, "Warning: not all releases were found")
-		return releases[:end], false, nil
+		end := partition(targets, func(t string) bool { return len(t) != 0 })
+		return nil, fmt.Errorf("the following releases were not found: %s", strings.Join(targets[:end], ", "))
 	}
-
-	return releases[:end], true, nil
-}
-
-// contains searches for a matching string and returns its index.
-// If no string matches, -1 is returned.
-func contains(arr []string, target string) bool {
-	for _, a := range arr {
-		if a == target {
-			return true
-		}
-	}
-	return false
+	return releases[:end], nil
 }
 
 // partition returns an index J and rearranges the slice such that all
