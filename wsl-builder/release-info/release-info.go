@@ -133,28 +133,27 @@ func selectReleases(csvPath string, targets []string) (releases []common.WslRele
 	return releases[:end], nil
 }
 
-// partition returns an index J and rearranges the slice such that all
-// elements with index less than J fulfil the predicate.
-func partition[T any](slice []T, predicate func(t T) bool) int {
+// partition returns a partition index "p" and rearranges the slice such that
+// all elements that fulfil the predicate have index strictly less than "p".
+// Stable only for items that fulfil the predicate.
+func partition[T any](slice []T, predicate func(t T) bool) (p int) {
 	if len(slice) == 0 {
 		return 0
 	}
-	var i int
-	var j int
 	if predicate(slice[0]) {
-		j++
+		p++
 	}
 
-	for i = 1; i < len(slice); i++ {
+	for i := 1; i < len(slice); i++ {
 		if !predicate(slice[i]) {
 			continue
 		}
-		if i == j {
-			j++
+		if i == p {
+			p++
 			continue
 		}
-		slice[i], slice[j] = slice[j], slice[i]
-		j++
+		slice[i], slice[p] = slice[p], slice[i]
+		p++
 	}
-	return j
+	return p
 }
