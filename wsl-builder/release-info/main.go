@@ -19,10 +19,8 @@ Fields are always in the same order, regardless of the order the flags are passe
 			if len(args) == 0 {
 				return errors.New("this command needs at least one argument (CSV_FILE)")
 			}
-
-			exitCode := writeReleaseInfo(args[0], args[1:], f)
-			os.Exit(exitCode)
-			return nil // Returning an error causes Cobra to print its help
+			cmd.SilenceUsage = true
+			return writeReleaseInfo(args[0], args[1:], f) // Returning an error causes Cobra to print its help
 		},
 	}
 
