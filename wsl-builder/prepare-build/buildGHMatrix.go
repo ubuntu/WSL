@@ -31,7 +31,7 @@ func buildGHMatrix(csvPath, metaPath string) error {
 
 		rootfsUrls := []string{}
 		for _, arch := range []string{"amd64", "arm64"} {
-			urlAndArch := fmt.Sprintf("%s::%s", r.RootfsUrl(arch), arch)
+			urlAndArch := fmt.Sprintf("%s::%s", r.RootfsURL(arch), arch)
 			rootfsUrls = append(rootfsUrls, urlAndArch)
 		}
 

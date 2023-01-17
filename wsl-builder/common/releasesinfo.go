@@ -234,7 +234,7 @@ func (w *WslReleaseInfo) refreshedTerminalProfileID() error {
 	return nil
 }
 
-func (w *WslReleaseInfo) RootfsUrl(arch string) string {
+func (w *WslReleaseInfo) RootfsURL(arch string) string {
 	// Currently only Jammy (22.04) and later are published to "https://cloud-images.ubuntu.com/wsl/"
 	codeNameSubUri := w.CodeName
 	imageBaseName := fmt.Sprintf("%s-server-cloudimg", w.CodeName)

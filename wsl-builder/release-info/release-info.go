@@ -92,7 +92,7 @@ func writeRow(w io.Writer, r common.WslReleaseInfo, f columns) error {
 		text = append(text, r.LauncherName+".exe")
 	}
 	if len(*f.rootfsArch) != 0 {
-		text = append(text, r.RootfsUrl(*f.rootfsArch))
+		text = append(text, r.RootfsURL(*f.rootfsArch))
 	}
 
 	_, err := fmt.Fprintln(w, strings.Join(text, "\t"))
