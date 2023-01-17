@@ -111,8 +111,15 @@ def main():
     logging.debug("arguments: %s", args)
 
     lpconn = lpinit()
+    
+    ostream = sys.stdout
+    if args.output:
+        ostream = open(args.output, "w+")
+
     for i in releases(lpconn, args.all, args.active, args.supported, args.devel, args.lts):
-        print("\t".join(i))
+        print("\t".join(i), file=ostream)
+
+    ostream.close()
     return 0
 
 
@@ -132,6 +139,8 @@ def _parse_arguments():
                         help="list the development release only")
     parser.add_argument("-l", "--lts", action="store_true", default=False,
                         help="list the LTS releases")
+    parser.add_argument("-o", "--output", action="store", default=None,
+                        help="specify what file to print the output to (default: stdout)")
     return parser.parse_args()
 
 
