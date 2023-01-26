@@ -53,6 +53,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: '3.3.x'
       - name: Install or update WSL
         uses: ./.github/actions/wsl-install
       - name: Build and install the appxbundle for testing
