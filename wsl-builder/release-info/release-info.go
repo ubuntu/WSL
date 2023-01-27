@@ -69,8 +69,7 @@ func writeHeader(w io.Writer, f columns) error {
 		text = append(text, "Rootfs")
 	}
 
-	_, err := fmt.Fprintln(w, strings.Join(text, "\t"))
-	if err != nil {
+	if _, err := fmt.Fprintln(w, strings.Join(text, "\t")); err != nil {
 		return fmt.Errorf("got an error writing header: %v", err)
 	}
 	return nil
@@ -95,8 +94,7 @@ func writeRow(w io.Writer, r common.WslReleaseInfo, f columns) error {
 		text = append(text, r.RootfsURL(*f.rootfsArch))
 	}
 
-	_, err := fmt.Fprintln(w, strings.Join(text, "\t"))
-	if err != nil {
+	if _, err := fmt.Fprintln(w, strings.Join(text, "\t")); err != nil {
 		return fmt.Errorf("got an error writing row for %q: %v", r.WslID, err)
 	}
 	return nil
