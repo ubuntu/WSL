@@ -27,8 +27,6 @@ func writeReleaseInfo(csvPath string, distros []string, cols columns) error {
 }
 
 // writeTable writes the information in a table into stdout.
-// Issues are reported to stderr.
-// Returns OK if there were no issues.
 func writeTable(releases []common.WslReleaseInfo, cols columns) error {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
