@@ -25,7 +25,7 @@ jobs:
     # This job has an implicit dependency on start-vm::Run RDP, because the runner
     # won't be started until then.
     env:
-      rootfs64: "http://cloud-images.ubuntu.com/wsl/lunar/current/ubuntu-lunar-wsl-amd64-wsl.rootfs.tar.gz"
+      rootfs64: "$HOME\\Downloads\\rootfs\\Ubuntu-Preview.tar.gz" # Cached by ./.github/workflows/update-rootfs-cache.yaml
       distroName: "Ubuntu-Preview"
       appID: "UbuntuPreview"
       launcher: "ubuntupreview.exe"

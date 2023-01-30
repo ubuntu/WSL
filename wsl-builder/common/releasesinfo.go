@@ -9,6 +9,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -231,4 +232,17 @@ func (w *WslReleaseInfo) refreshedTerminalProfileID() error {
 	w.TerminalProfileGUID = fmt.Sprintf("{%s}", terminalProfileGUID.String())
 
 	return nil
+}
+
+func (w *WslReleaseInfo) RootfsURL(arch string) string {
+	// Currently only Jammy (22.04) and later are published to "https://cloud-images.ubuntu.com/wsl/"
+	codeNameSubUri := w.CodeName
+	imageBaseName := fmt.Sprintf("%s-server-cloudimg", w.CodeName)
+	if strings.Compare(w.BuildVersion, "2204") >= 0 {
+		codeNameSubUri = path.Join("wsl", w.CodeName)
+		// The image base name scheme also changed.
+		imageBaseName = fmt.Sprintf("ubuntu-%s-wsl", w.CodeName)
+	}
+
+	return fmt.Sprintf("https://cloud-images.ubuntu.com/%s/current/%s-%s-wsl.rootfs.tar.gz", codeNameSubUri, imageBaseName, arch)
 }
