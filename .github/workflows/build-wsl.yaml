@@ -89,6 +89,8 @@ jobs:
     env:
       buildInfoPath: 'wiki/build-info'
       workDir: 'C:/Temp/builddir'
+    outputs:
+      store-needs-upload: ${{ steps.detect-upload-to-store.outputs.needs-upload }}
     steps:
       - name: Checkout WSL
         shell: bash
@@ -329,7 +331,7 @@ jobs:
 
       # Pushing PDB's to the wiki only makes sense if we uploaded new app versions to the store.
       - name: Copy debug databases to base wiki
-        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        if: ${{ needs.build-wsl.outputs.store-needs-upload == 'true' }}
         id: pdb-artifacts
         run: |
           set -eu
