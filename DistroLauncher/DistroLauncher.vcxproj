@@ -160,7 +160,6 @@
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SetOnceNamedEvent.h" />
-    <ClInclude Include="snapd.h" />
     <ClInclude Include="SplashEnabledStrategy.h" />
     <ClInclude Include="splash_controller.h" />
     <ClInclude Include="state_machine.h" />
@@ -194,7 +193,6 @@
     <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="ini_find_value.cpp" />
     <ClCompile Include="SetOnceNamedEvent.cpp" />
-    <ClCompile Include="snapd.cpp" />
     <ClCompile Include="SplashEnabledStrategy.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
