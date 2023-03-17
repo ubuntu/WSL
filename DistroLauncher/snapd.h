@@ -18,7 +18,7 @@
 
 namespace Oobe
 {
-    /// Move-only utility object class capable of running any callable in the exit scope.
+    /// Utility object class capable of running any callable in the exit scope.
     /// Be careful when passing lambdas with reference-captures since it will be called during destruction,
     /// thus the referenced objects may have been already destroyed.
     /// Please capture only objects outliving this one!!! Otherwise, make copies.
@@ -26,17 +26,10 @@ namespace Oobe
     template <typename OnScopeExit> class ScopeGuard
     {
       public:
-        ScopeGuard(OnScopeExit&& callable) : callable{std::forward<OnScopeExit>(callable)}
-        {
-            static_assert(noexcept(callable()), "Callable must explicitely not throw exceptions.");
-        }
-
-        ScopeGuard(ScopeGuard&& other) noexcept = default;
-        ScopeGuard(ScopeGuard& other) = delete;
-        ScopeGuard operator=(ScopeGuard& other) = delete;
-
+        ScopeGuard(OnScopeExit&& callable) : callable{std::forward<OnScopeExit>(callable)} {};
         ~ScopeGuard() noexcept
         {
+            static_assert(noexcept(callable()), "Callable must explicitely not throw exceptions.");
             callable();
         }
 
