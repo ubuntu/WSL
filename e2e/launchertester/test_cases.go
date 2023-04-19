@@ -228,7 +228,7 @@ func testInteropIsEnabled(t *testing.T) { //nolint: thelper, this is a test
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
-	got, err := wslCommand(ctx, "powershell.exe", "-Command", `Write-Output "Hello, world!"`).CombinedOutput()
+	got, err := wslCommand(ctx, "powershell.exe", "-noninteractive", "-nologo", "-noprofile", "-Command", `Write-Output "Hello, world!"`).CombinedOutput()
 	require.NoError(t, err, "Failed to launch powershell from WSL. Does interop work? %s", got)
 	require.Equal(t, "Hello, world!\r\n", string(got), "Unexpected output from powershell")
 }
