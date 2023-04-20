@@ -8,4 +8,4 @@ jobs:
     - uses: ubuntu/sync-issues-github-jira@v1
       with:
         webhook-url: ${{ secrets.JIRA_WEBHOOK_URL }}
-        component: 'WSL'
+        component: 'S-WSL'
