@@ -80,7 +80,8 @@ namespace Oobe
               std::visit(internal::overloaded{
                            [&](AutoInstall& option) { return impl_.do_autoinstall(option.autoInstallFile); },
                            [&](ManifestMatchedInstall& option) { return impl_.do_install(Mode::AutoDetect); },
-                           [&](InstallDefault& option) { return impl_.do_install(Mode::AutoDetect); },
+                           // Default empty CLI invocation goes to the upstream install ux on all apps instead of the OOBE.
+                           [&](InstallDefault& option) { return E_NOTIMPL; },
                            [&](InstallOnlyDefault& option) { return impl_.do_install(Mode::AutoDetect); },
                            [&](InteractiveInstallOnly<OobeGui>& option) { return impl_.do_install(Mode::Gui); },
                            [&](InteractiveInstallOnly<OobeTui>& option) { return impl_.do_install(Mode::Text); },
