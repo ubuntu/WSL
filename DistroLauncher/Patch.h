@@ -106,4 +106,11 @@ namespace Ubuntu
             }
         };
     };
-};
+
+    /// Collection of the patches that must be applied to all releases.
+    static const inline std::array<Patch, 0> releaseAgnosticPatches{};
+
+    /// All applicable patches specific to a specific Ubuntu app are defined in this data structure.
+    /// Change here as new patch requirements are found.
+    static const inline std::unordered_map<std::wstring_view, std::vector<Patch>> releaseSpecificPatches{};
+}

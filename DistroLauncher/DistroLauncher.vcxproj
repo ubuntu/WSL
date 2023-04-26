@@ -158,6 +158,7 @@
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Patch.h" />
+    <ClInclude Include="ApplyConfigPatches.h" />
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SetOnceNamedEvent.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="NoSplashStrategy.cpp" />
     <ClCompile Include="OOBE.cpp" />
     <ClCompile Include="Patch.cpp" />
+    <ClCompile Include="ApplyConfigPatches.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="ini_find_value.cpp" />

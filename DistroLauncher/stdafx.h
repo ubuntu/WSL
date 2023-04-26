@@ -51,6 +51,7 @@
 #include "OobeDefs.h"
 #include "ExitStatus.h"
 #include "OOBE.h"
+#include "ApplyConfigPatches.h"
 #include "ProcessRunner.h"
 #include "WSLInfo.h"
 #include "Win32Utils.h"
