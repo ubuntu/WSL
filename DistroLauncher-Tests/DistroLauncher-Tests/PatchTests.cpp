@@ -31,6 +31,8 @@ namespace Ubuntu
 
     enum class SampleStrings
     {
+        confComment,
+        fstab1804,
         systemd,
         wslConfAppend,
         wslConfOriginal,
@@ -38,6 +40,11 @@ namespace Ubuntu
     const char* sampleContents(SampleStrings which)
     {
         switch (which) {
+        case SampleStrings::confComment:
+            return "# This is a comment.";
+        case SampleStrings::fstab1804:
+            // copy-pasted from `hexdump -c /etc/fstab` on 18.04
+            return "LABEL=cloudimg-rootfs\t/\t ext4\tdefaults\t0 1\n";
         case SampleStrings::systemd:
             return "[Unit]\nDisable=Forever\n";
         case SampleStrings::wslConfAppend:
@@ -171,5 +178,55 @@ options=metadata
         EXPECT_FALSE(result.fail());
         std::string content(std::istreambuf_iterator<char>{result}, std::istreambuf_iterator<char>{});
         EXPECT_EQ(content, sampleContents(SampleStrings::wslConfAppend));
+    }
+
+    /* Patching functions tests - asserts their behavior */
+
+    TEST(PatchingFn, CloudImgLabel)
+    {
+        // Makes the /etc/fstab exactly like 18.04's
+        std::istringstream input(sampleContents(SampleStrings::fstab1804));
+        std::stringstream output;
+        PatchingFunctions::RemoveCloudImgLabel(input, output);
+        // the patch function should have removed the only line the file contained.
+        EXPECT_EQ(output.str().size(), 0);
+    }
+    TEST(PatchingFn, CloudImgLabel2)
+    {
+        std::string slightlyChanged{sampleContents(SampleStrings::confComment)};
+        slightlyChanged.append("\n    ");
+        slightlyChanged.append(sampleContents(SampleStrings::fstab1804));
+        std::istringstream input(slightlyChanged);
+        std::stringstream output;
+
+        // Apply
+        PatchingFunctions::RemoveCloudImgLabel(input, output);
+
+        // Assert
+        // the patch function should have preserved the other line, which is just a comment.
+        EXPECT_EQ(output.str(), sampleContents(SampleStrings::confComment));
+    }
+
+    /* Wiring tests - asserts the patching functions are associated with the distros and files as supposed. */
+
+    // Comparison operator for PatchConfig aggregate - helps with find algorithms.
+    bool operator==(const Patch& lhs, const Patch& rhs)
+    {
+        return lhs.patchFn == rhs.patchFn && lhs.configFilePath == rhs.configFilePath;
+    }
+
+    // Returns true if an equivalent [patchConfig] is registered for all distros.
+    bool isGloballyRegisteredFor(const Patch& patchConfig)
+    {
+        auto it = std::find(releaseAgnosticPatches.begin(), releaseAgnosticPatches.end(), patchConfig);
+
+        return it != releaseAgnosticPatches.end();
+    }
+
+    TEST(PatchWiringTest, CloudImgLabel)
+    {
+        // Makes sure the function PatchingFunctions::RemoveCloudImgLabel is associated with the file "/etc/fstab" for
+        // all distros.
+        EXPECT_TRUE(isGloballyRegisteredFor({"/etc/fstab", PatchingFunctions::RemoveCloudImgLabel}));
     }
 }

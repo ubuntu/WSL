@@ -107,8 +107,18 @@ namespace Ubuntu
         };
     };
 
+    /// The catalog of all existing patching functions the launcher might need to execute.
+    namespace PatchingFunctions
+    {
+        // Filters out lines from [fstab] which effectively start with "LABEL=cloudimg-rootfs"
+        bool RemoveCloudImgLabel(std::istreambuf_iterator<char> fstab, std::ostream& tmp);
+    }
     /// Collection of the patches that must be applied to all releases.
-    static const inline std::array<Patch, 0> releaseAgnosticPatches{};
+    static const inline std::array<const Patch, 1> releaseAgnosticPatches{
+      {
+        {"/etc/fstab", PatchingFunctions::RemoveCloudImgLabel},
+      },
+    };
 
     /// All applicable patches specific to a specific Ubuntu app are defined in this data structure.
     /// Change here as new patch requirements are found.
