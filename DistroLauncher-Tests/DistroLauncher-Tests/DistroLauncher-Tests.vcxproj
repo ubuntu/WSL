@@ -79,6 +79,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="..\..\DistroLauncher\local_named_pipe.cpp" />
     <ClCompile Include="..\..\DistroLauncher\named_mutex.cpp" />
     <ClCompile Include="..\..\DistroLauncher\OOBE.cpp" />
+    <ClCompile Include="..\..\DistroLauncher\PatchConfig.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ProcessRunner.cpp" />
     <ClCompile Include="..\..\DistroLauncher\SetOnceNamedEvent.cpp" />
     <ClCompile Include="..\..\DistroLauncher\stdafx.cpp" />
@@ -100,6 +101,7 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="IniFindValueTests.cpp" />
     <ClCompile Include="mock_api.cpp" />
     <ClCompile Include="named_mutex_tests.cpp" />
+    <ClCompile Include="PatchConfigTests.cpp" />
     <ClCompile Include="SetOnceNamedEventTests.cpp" />
     <ClCompile Include="SplashControllerTests.cpp" />
     <ClCompile Include="StateMachineTests.cpp" />

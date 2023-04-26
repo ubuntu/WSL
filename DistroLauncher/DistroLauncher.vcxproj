@@ -157,6 +157,7 @@
     <ClInclude Include="OOBE.h" />
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
+    <ClInclude Include="PatchConfig.h" />
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SetOnceNamedEvent.h" />
@@ -189,6 +190,7 @@
     <ClCompile Include="named_mutex.cpp" />
     <ClCompile Include="NoSplashStrategy.cpp" />
     <ClCompile Include="OOBE.cpp" />
+    <ClCompile Include="PatchConfig.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="find_main_thread_window.cpp" />
     <ClCompile Include="ini_find_value.cpp" />
