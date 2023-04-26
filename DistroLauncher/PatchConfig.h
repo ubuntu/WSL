@@ -51,7 +51,7 @@ namespace Ubuntu
 
       public:
         /// Creates a new Patcher instance, storing [linuxFile] translated to Windows paths according to a [pathPrefix].
-        Patcher(std::filesystem::path pathPrefix, std::filesystem::path linuxFile);
+        Patcher(const std::filesystem::path& pathPrefix, const std::filesystem::path& linuxFile);
 
         /// Movable but not copyable due the underlying stream, which is not copyable.
         Patcher() = default;
@@ -62,9 +62,9 @@ namespace Ubuntu
 
         /// Calls a [CreateFn] patching function. If the supplied callable succeeds, the modifications on the output
         /// file stream are commited to the original config file.
-        inline bool operator()(CreateFn* p)
+        inline bool operator()(CreateFn* patchFn)
         {
-            if (!p(modified)) {
+            if (!patchFn(modified)) {
                 return false;
             }
             return commit();
@@ -73,14 +73,14 @@ namespace Ubuntu
         /// Calls a [ModifyFn] patching function passing a read-only file stream pointing to the [configfilePath]. If
         /// the supplied callable succeeds, the modifications on the output file stream are commited to the original
         /// config file.
-        inline bool operator()(ModifyFn* p)
+        inline bool operator()(ModifyFn* patchFn)
         {
             // let the destructor close it automatically.
             std::ifstream original{translatedFilePath};
             if (original.fail()) {
                 return false;
             }
-            if (!p(original, modified)) {
+            if (!patchFn(original, modified)) {
                 return false;
             }
             return commit();
@@ -109,7 +109,7 @@ namespace Ubuntu
     /// Applies the [patch] by instantiating a [Patcher] with the [pathPrefix] for translating distro filesystem paths
     /// to Windows paths. This function is the way higher level constructs are expected to access the functionality
     /// exposed by this component.
-    inline bool apply(const PatchConfig& patch, std::filesystem::path pathPrefix)
+    inline bool apply(const PatchConfig& patch, const std::filesystem::path& pathPrefix)
     {
         return std::visit(Patcher{pathPrefix, patch.configFilePath}, patch.patch);
     }

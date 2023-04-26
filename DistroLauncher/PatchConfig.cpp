@@ -21,7 +21,7 @@
 namespace Ubuntu
 {
 
-    Patcher::Patcher(std::filesystem::path pathPrefix, std::filesystem::path linuxFile) : modified{}
+    Patcher::Patcher(const std::filesystem::path& pathPrefix, const std::filesystem::path& linuxFile)
     {
         // Path concatenation may surprise us if the linuxFile has a root component:
         // \\$wsl\Distro + /etc/fstab = \\$wsl/etc/fstab (latest root overrides previous).
