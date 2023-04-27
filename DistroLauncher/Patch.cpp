@@ -16,12 +16,12 @@
  */
 
 #include "stdafx.h"
-#include "PatchConfig.h"
+#include "Patch.h"
 
 namespace Ubuntu
 {
 
-    Patcher::Patcher(const std::filesystem::path& pathPrefix, const std::filesystem::path& linuxFile)
+    Patch::Patcher::Patcher(const std::filesystem::path& pathPrefix, const std::filesystem::path& linuxFile)
     {
         // Path concatenation may surprise us if the linuxFile has a root component:
         // \\$wsl\Distro + /etc/fstab = \\$wsl/etc/fstab (latest root overrides previous).
@@ -35,7 +35,26 @@ namespace Ubuntu
         translatedFilePath.make_preferred();
     }
 
-    bool Patcher::commit()
+    bool Patch::Patcher::handleCall(PatchFn& patchFn)
+    {
+        std::error_code err;
+        // let the destructor take care of closing the file, since we don't commit here.
+        std::ifstream original{};
+        std::istreambuf_iterator<char> input{}; // EOF by default.
+
+        // File exists - no OS error while checking that.
+        if (bool exists = std::filesystem::exists(translatedFilePath, err); !err && exists) {
+            original.open(translatedFilePath);
+            if (!original.fail()) {
+                input = std::istreambuf_iterator<char>{original};
+            }
+        }
+
+        // else we pass the iterator as is.
+        return patchFn(input, modified);
+    }
+
+    bool Patch::Patcher::commit()
     {
         std::error_code err;
         // like `mkdir -p`: existing directories won't set the error output parameter.

@@ -1,31 +1,31 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
-#include "PatchConfig.h"
+#include "Patch.h"
 
 namespace Ubuntu
 {
-    TEST(PatchConfig, PathTranslation)
+    TEST(Patch, PathTranslation)
     {
         // A typical distro path prefix on Windows 11
         const auto* win11Prefix = LR"(\\wsl.localhost\Ubuntu22.04LTS)";
         const auto* linuxFile = "/root/here-I-am";
-        Patcher patcher{win11Prefix, linuxFile};
+        Patch::Patcher patcher{win11Prefix, linuxFile};
         EXPECT_EQ(patcher.translatedPath(), std::filesystem::path{R"(\\wsl.localhost\Ubuntu22.04LTS\root\here-I-am)"});
     }
-    TEST(PatchConfig, PathTranslation2)
+    TEST(Patch, PathTranslation2)
     {
         // A typical distro path prefix on Windows 10
         const auto* win10Prefix = LR"(\\wsl$\Ubuntu18.04LTS)";
         const auto* linuxFile = "/root/here-I-am";
-        Patcher patcher{win10Prefix, linuxFile};
+        Patch::Patcher patcher{win10Prefix, linuxFile};
         EXPECT_EQ(patcher.translatedPath(), std::filesystem::path{R"(\\wsl$\Ubuntu18.04LTS\root\here-I-am)"});
     }
-    TEST(PatchConfig, PathTranslation3)
+    TEST(Patch, PathTranslation3)
     {
         // Simulates a prefix chosen for testing independently of WSL.
         const auto* win10Prefix = LR"(C:\\Temp)";
         const auto* linuxFile = "/root/here-I-am";
-        Patcher patcher{win10Prefix, linuxFile};
+        Patch::Patcher patcher{win10Prefix, linuxFile};
         EXPECT_EQ(patcher.translatedPath(), std::filesystem::path{R"(C:\\Temp\root\here-I-am)"});
     }
 
@@ -56,21 +56,21 @@ options=metadata
     }
 
     // A base class for the subsequent test fixtures declared via the TEST_F macro.
-    class PatchConfigTest : public ::testing::Test
+    class PatchTest : public ::testing::Test
     {
       protected:
         std::filesystem::path prefix;
-        std::optional<PatchConfig> patchConfig;
+        std::optional<Patch> patch;
         // Test setup
-        PatchConfigTest() : prefix{Win32Utils::thisAppRootdir()}
+        PatchTest() : prefix{Win32Utils::thisAppRootdir()}
         {
         }
         // Deletes any directories created during tests.
-        ~PatchConfigTest() override
+        ~PatchTest() override
         {
-            if (patchConfig.has_value()) {
+            if (patch.has_value()) {
 
-                std::filesystem::path linuxFile{patchConfig.value().configFilePath};
+                std::filesystem::path linuxFile{patch.value().configFilePath};
                 auto cleanUpDir{prefix / *(linuxFile.relative_path().begin())};
                 std::error_code err;
                 std::filesystem::remove_all(cleanUpDir, err);
@@ -79,12 +79,12 @@ options=metadata
 
         /* TEST HELPERS */
 
-        // Returns the path where the configuration etcWslConf should be written to according to the [patchConfig]
+        // Returns the path where the configuration etcWslConf should be written to according to the [patchFn]
         // value.
         std::filesystem::path expectedFile() const
         {
-            assert(patchConfig.has_value());
-            return prefix / std::filesystem::path{patchConfig.value().configFilePath}.relative_path();
+            assert(patch.has_value());
+            return prefix / std::filesystem::path{patch.value().configFilePath}.relative_path();
         }
 
         // Creates a fake file in the expected path with the supplied [contents].
@@ -98,19 +98,19 @@ options=metadata
         }
     };
 
-    TEST_F(PatchConfigTest, ApplyCreationPatch)
+    TEST_F(PatchTest, ApplyCreationPatch)
     {
         // Setup
-        patchConfig = PatchConfig{
+        patch = Patch{
           "/etc/systemd/system/funny.service.d/00-wsl.conf",
-          [](std::ostream& conf) {
+          [](std::istreambuf_iterator<char> original, std::ostream& conf) {
               std::string_view contents{sampleContents(SampleStrings::systemd)};
               conf.write(contents.data(), contents.length());
               return !conf.fail();
           },
         };
         // Act
-        apply(patchConfig.value(), prefix);
+        patch.value().apply(prefix);
 
         // Assert
         std::ifstream result{expectedFile()};
@@ -118,14 +118,14 @@ options=metadata
         std::string content(std::istreambuf_iterator<char>{result}, std::istreambuf_iterator<char>{});
         EXPECT_EQ(content, sampleContents(SampleStrings::systemd));
     }
-    TEST_F(PatchConfigTest, ApplyModPatch)
+    TEST_F(PatchTest, ApplyModPatch)
     {
         // Setup
-        patchConfig = PatchConfig{
+        patch = Patch{
           "/etc/wsl.conf",
-          [](std::istream& conf, std::ostream& mod) {
+          [](std::istreambuf_iterator<char> original, std::ostream& mod) {
               // copy original contents verbatim.
-              std::copy(std::istreambuf_iterator<char>(conf), std::istreambuf_iterator<char>{},
+              std::copy(original, std::istreambuf_iterator<char>{},
                         std::ostreambuf_iterator<char>(mod));
               // Appends new stuff
               std::string_view contents{sampleContents(SampleStrings::wslConfAppend)};
@@ -137,7 +137,7 @@ options=metadata
         makeExpectedFile(sampleContents(SampleStrings::wslConfOriginal));
 
         // Act
-        apply(patchConfig.value(), prefix);
+        patch.value().apply(prefix);
 
         // Assert
         std::ifstream result{expectedFile()};
@@ -148,12 +148,12 @@ options=metadata
 
         EXPECT_EQ(content, expectedContent);
     }
-    TEST_F(PatchConfigTest, ApplyRewritePatch)
+    TEST_F(PatchTest, ApplyRewritePatch)
     {
         // Setup
-        patchConfig = PatchConfig{
+        patch = Patch{
           "/etc/wsl.conf",
-          [](std::istream& conf, std::ostream& mod) {
+          [](std::istreambuf_iterator<char> original, std::ostream& mod) {
               // All new stuff, original contents simply disregarded.
               std::string_view contents{sampleContents(SampleStrings::wslConfAppend)};
               mod.write(contents.data(), contents.length());
@@ -164,7 +164,7 @@ options=metadata
         makeExpectedFile(sampleContents(SampleStrings::wslConfOriginal));
 
         // Act
-        apply(patchConfig.value(), prefix);
+        patch.value().apply(prefix);
 
         // Assert
         std::ifstream result{expectedFile()};
