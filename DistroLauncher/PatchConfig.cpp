@@ -44,7 +44,8 @@ namespace Ubuntu
             // directory cannot exist.
             return false;
         }
-        std::ofstream file{translatedFilePath, std::ios::trunc};
+        // Opening in binary mode to prevent translating \n into \r\n.
+        std::ofstream file{translatedFilePath, std::ios::binary | std::ios::trunc};
         if (file.fail()) {
             return false;
         }
