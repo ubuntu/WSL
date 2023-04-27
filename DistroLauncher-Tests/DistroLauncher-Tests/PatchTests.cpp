@@ -33,6 +33,7 @@ namespace Ubuntu
     {
         confComment,
         fstab1804,
+        randomFstab,
         systemd,
         wslConfAppend,
         wslConfOriginal,
@@ -41,14 +42,18 @@ namespace Ubuntu
     {
         switch (which) {
         case SampleStrings::confComment:
-            return "# This is a comment.";
+            return "# This is a comment.\n";
         case SampleStrings::fstab1804:
             // copy-pasted from `hexdump -c /etc/fstab` on 18.04
             return "LABEL=cloudimg-rootfs\t/\t ext4\tdefaults\t0 1\n";
+        case SampleStrings::randomFstab:
+            return R"(# <file system>        <dir>         <type>    <options>             <dump> <pass>
+LABEL=Debian    /    ext4   defaults    1 0
+)";
         case SampleStrings::systemd:
             return "[Unit]\nDisable=Forever\n";
         case SampleStrings::wslConfAppend:
-            return "[boot]\nsystemd=true";
+            return "[boot]\nsystemd=true\n";
         case SampleStrings::wslConfOriginal:
             return R"(
 [user]
@@ -191,11 +196,18 @@ options=metadata
         // the patch function should have removed the only line the file contained.
         EXPECT_EQ(output.str().size(), 0);
     }
-    TEST(PatchingFn, CloudImgLabel2)
+    TEST(PatchingFn, CloudImgLabelLeadingSpaces)
     {
         std::string slightlyChanged{sampleContents(SampleStrings::confComment)};
-        slightlyChanged.append("\n    ");
+        slightlyChanged.append("    ");
         slightlyChanged.append(sampleContents(SampleStrings::fstab1804));
+        // slightlyChanged is now:
+        /*
+         
+        # This is a comment.
+        LABEL=cloudimg-rootfs\t/\t ext4\tdefaults\t0 1\n
+        
+        */
         std::istringstream input(slightlyChanged);
         std::stringstream output;
 
@@ -205,6 +217,34 @@ options=metadata
         // Assert
         // the patch function should have preserved the other line, which is just a comment.
         EXPECT_EQ(output.str(), sampleContents(SampleStrings::confComment));
+    }
+    TEST(PatchingFn, CloudImgLabelThirdLine)
+    {
+        std::string slightlyChanged{sampleContents(SampleStrings::confComment)};
+        slightlyChanged.append(sampleContents(SampleStrings::fstab1804));
+        slightlyChanged.append(sampleContents(SampleStrings::randomFstab));
+        // slightlyChanged is now 4 lines and the second should be skipped.
+
+        std::istringstream input(slightlyChanged);
+        std::stringstream output;
+
+        // Apply
+        PatchingFunctions::RemoveCloudImgLabel(input, output);
+
+        // Assert
+        // the patch function should have preserved the other line, which is just a comment.
+        std::string expected{sampleContents(SampleStrings::confComment)};
+        expected.append(sampleContents(SampleStrings::randomFstab));
+        EXPECT_EQ(output.str(), expected);
+    }
+    TEST(PatchingFn, CloudImgRandomFstab)
+    {
+        // Makes the /etc/fstab unrelated to 18.04's, thus it must be preserved as is.
+        std::istringstream input(sampleContents(SampleStrings::randomFstab));
+        std::stringstream output;
+        PatchingFunctions::RemoveCloudImgLabel(input, output);
+        // Must be unchanged
+        EXPECT_EQ(output.str(), input.str());
     }
 
     /* Wiring tests - asserts the patching functions are associated with the distros and files as supposed. */
