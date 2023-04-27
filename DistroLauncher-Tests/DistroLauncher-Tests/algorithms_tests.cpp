@@ -97,3 +97,133 @@ TEST(AlgorithmTests, Concat)
     auto with_path = concat(L"diff ", example_file, L" ", example_file.wstring()); // Only first one to be quoted
     ASSERT_EQ(with_path, LR"(diff "/home/fox/documents/example.json" /home/fox/documents/example.json)");
 }
+
+TEST(AlgorithmTests, GetlineSingleEnded)
+{
+    std::string_view first = "Hello world!";
+    std::string contents{first};
+    contents += '\n';
+    std::istringstream ss{contents}; // "Hello world!\n"
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+    getline(it, got);
+    EXPECT_EQ(got, first);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{});
+
+    EXPECT_TRUE(ss.good());
+    char maybelast = '+';
+    ss >> maybelast;
+    EXPECT_EQ(maybelast, '+'); // unchanged
+    EXPECT_TRUE(ss.fail());
+    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+}
+
+TEST(AlgorithmTests, GetlineSingleNotEnded)
+{
+    std::string_view first = "Hello world!";
+    std::string contents{first};
+    std::istringstream ss{contents}; // "Hello world!"
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+    getline(it, got);
+    EXPECT_EQ(got, first);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{});
+
+    EXPECT_TRUE(ss.good());
+    char maybelast = '+';
+    ss >> maybelast;
+    EXPECT_EQ(maybelast, '+'); // unchanged
+    EXPECT_TRUE(ss.fail());
+    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+}
+
+TEST(AlgorithmTests, GetlineMulti)
+{
+    std::string_view first = "Hello world!";
+    std::string_view second = "This is a test";
+    std::string contents{first};
+    contents += '\n';
+    contents += second;
+    contents += '\n';
+    std::istringstream ss{contents}; // "Hello world!\nThis is a test\n"
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+    getline(it, got);
+    EXPECT_EQ(got, first);
+    EXPECT_NE(it, std::istreambuf_iterator<char>{});
+
+    getline(it, got);
+    EXPECT_EQ(got, second);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{});
+
+    EXPECT_TRUE(ss.good());
+    char maybelast = '+';
+    ss >> maybelast;
+    EXPECT_EQ(maybelast, '+'); // unchanged
+    EXPECT_TRUE(ss.fail());
+    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+}
+
+TEST(AlgorithmTests, GetlineEmpty)
+{
+    std::istringstream ss{""};
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+    getline(it, got);
+    EXPECT_EQ(got.size(), 0);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{});
+
+    EXPECT_TRUE(ss.good());
+    char maybelast = '+';
+    ss >> maybelast;
+    EXPECT_EQ(maybelast, '+'); // unchanged
+    EXPECT_TRUE(ss.fail());
+    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+}
+TEST(AlgorithmTests, GetlineEmpty2)
+{
+    std::istringstream ss{"\n\n"};
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+
+    getline(it, got);
+    EXPECT_EQ(got.size(), 0);
+    EXPECT_NE(it, std::istreambuf_iterator<char>{}); // not EOF yet.
+
+    getline(it, got);
+    EXPECT_EQ(got.size(), 0);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{}); // now it is EOF
+
+    EXPECT_TRUE(ss.good());
+    char maybelast = '+';
+    ss >> maybelast;
+    EXPECT_EQ(maybelast, '+'); // unchanged
+    EXPECT_TRUE(ss.fail());
+    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+}
+TEST(AlgorithmTests, LeftTrimmedWCharT)
+{
+    std::wstring_view view{L"no left spaces at all"};
+    EXPECT_EQ(left_trimmed(view), view);
+
+    std::wstring spaced{L"\t\r\n"};
+    spaced += view;
+    EXPECT_EQ(left_trimmed(std::wstring_view{spaced}), view);
+
+    std::wstring rightSpaced{view};
+    rightSpaced += L"\t\r\n";
+    EXPECT_EQ(left_trimmed(std::wstring_view{rightSpaced}), rightSpaced);
+}
+TEST(AlgorithmTests, LeftTrimmedChar)
+{
+    std::string_view view{"no left spaces at all"};
+    EXPECT_EQ(left_trimmed(view), view);
+
+    std::string spaced{"\t\r\n"};
+    spaced += view;
+    EXPECT_EQ(left_trimmed(std::string_view{spaced}), view);
+
+    std::string rightSpaced{view};
+    rightSpaced += "\t\r\n";
+    EXPECT_EQ(left_trimmed(std::string_view{rightSpaced}), rightSpaced);
+}

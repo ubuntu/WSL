@@ -130,3 +130,33 @@ template <typename T, typename... Args> void push_back_many(std::vector<T>& vec,
     vec.reserve(vec.size() + sizeof...(args));
     (vec.push_back(std::forward<Args>(args)), ...);
 }
+
+// Follows the semantics of std::getline(stream&, string&) while implemented for an iterator instead of the stream
+// itself, i.e. reads from [input] iterator until [delim] is found. Although it doesn't go to the string, it's
+// extracted from the underlying stream pointed by the [input] iterator. [str] is also erased before insertion.
+template <class CharT, class Traits, class Allocator>
+std::istreambuf_iterator<CharT, Traits>& getline(std::istreambuf_iterator<CharT, Traits>& input,
+                                                 std::basic_string<CharT, Traits, Allocator>& str, CharT delim = '\n')
+{
+    str.erase();
+    // missing std::copy_until - a copy_if that stops when the predicate evaluates to true :(
+    while (input != std::istreambuf_iterator<CharT, Traits>{}) {
+        char c = *input++;
+        if (c == delim) {
+            break;
+        }
+        str.append(1, c);
+    }
+    return input;
+    // We could, but let's not make it a template for now (at least until we find a need for reading another char type).
+    // We may find ourselves creating a std::istream just to call widen('\n') on it. Less then optimal.
+}
+
+// Returns a string view that starts on the first non-space element of [str] until its end.
+template <class CharT, class Traits>
+std::basic_string_view<CharT, Traits> left_trimmed(std::basic_string_view<CharT, Traits> str)
+{
+    auto nonSpaceStart = std::find_if_not(str.begin(), str.end(), [](auto elem) { return std::isspace(elem); });
+    auto trimmedSize = static_cast<std::size_t>(std::distance(nonSpaceStart, str.end()));
+    return std::basic_string_view<CharT, Traits>{&(*nonSpaceStart), trimmedSize};
+}
