@@ -43,7 +43,7 @@ namespace Ubuntu
         /// Applies the [patchFn] by instantiating a [Patcher] with the [pathPrefix] for translating distro filesystem
         /// paths to Windows paths. This function is the way higher level constructs are expected to access the
         /// functionality exposed by this component.
-        inline bool apply(const std::filesystem::path& pathPrefix) const
+        bool apply(const std::filesystem::path& pathPrefix) const
         {
             assert(patchFn != nullptr);
             Patcher patcher{pathPrefix, configFilePath};
@@ -88,7 +88,7 @@ namespace Ubuntu
 
             /// Calls [patchFn] with the appropriate input and output parameters and commits the patching result if the
             /// said function reports success.
-            inline bool operator()(PatchFn& patchFn)
+            bool operator()(PatchFn& patchFn)
             {
                 if (!handleCall(patchFn)) {
                     return false;
