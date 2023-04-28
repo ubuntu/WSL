@@ -141,11 +141,11 @@ std::istreambuf_iterator<CharT, Traits>& getline(std::istreambuf_iterator<CharT,
     str.erase();
     // missing std::copy_until - a copy_if that stops when the predicate evaluates to true :(
     while (input != std::istreambuf_iterator<CharT, Traits>{}) {
-        char c = *input++;
-        if (c == delim) {
+        char elem = *input++;
+        if (elem == delim) {
             break;
         }
-        str.append(1, c);
+        str.append(1, elem);
     }
     return input;
     // We could, but let's not make it a template for now (at least until we find a need for reading another char type).
