@@ -106,7 +106,8 @@ TEST(AlgorithmTests, GetlineSingleEnded)
     std::istringstream ss{contents}; // "Hello world!\n"
     std::string got;
     std::istreambuf_iterator<char> it{ss};
-    getline(it, got);
+
+    it = getline(it, got);
     EXPECT_EQ(got, first);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{});
 
@@ -125,7 +126,8 @@ TEST(AlgorithmTests, GetlineSingleNotEnded)
     std::istringstream ss{contents}; // "Hello world!"
     std::string got;
     std::istreambuf_iterator<char> it{ss};
-    getline(it, got);
+
+    it = getline(it, got);
     EXPECT_EQ(got, first);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{});
 
@@ -148,11 +150,12 @@ TEST(AlgorithmTests, GetlineMulti)
     std::istringstream ss{contents}; // "Hello world!\nThis is a test\n"
     std::string got;
     std::istreambuf_iterator<char> it{ss};
-    getline(it, got);
+
+    it = getline(it, got);
     EXPECT_EQ(got, first);
     EXPECT_NE(it, std::istreambuf_iterator<char>{});
 
-    getline(it, got);
+    it = getline(it, got);
     EXPECT_EQ(got, second);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{});
 
@@ -169,7 +172,8 @@ TEST(AlgorithmTests, GetlineEmpty)
     std::istringstream ss{""};
     std::string got;
     std::istreambuf_iterator<char> it{ss};
-    getline(it, got);
+
+    it = getline(it, got);
     EXPECT_EQ(got.size(), 0);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{});
 
@@ -186,11 +190,11 @@ TEST(AlgorithmTests, GetlineEmpty2)
     std::string got;
     std::istreambuf_iterator<char> it{ss};
 
-    getline(it, got);
+    it = getline(it, got);
     EXPECT_EQ(got.size(), 0);
     EXPECT_NE(it, std::istreambuf_iterator<char>{}); // not EOF yet.
 
-    getline(it, got);
+    it = getline(it, got);
     EXPECT_EQ(got.size(), 0);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{}); // now it is EOF
 

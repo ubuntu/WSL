@@ -25,7 +25,7 @@ namespace Ubuntu::PatchingFunctions
     {
         bool modified = false;
         for (std::string line; fstab != std::istreambuf_iterator<char>{};) {
-            getline(fstab, line);
+            fstab = getline(fstab, line);
             auto trimmedLeft = left_trimmed(std::string_view{line});
             // Write line if doesn't contain the offending label.
             if (!starts_with(trimmedLeft, "LABEL=cloudimg-rootfs")) {

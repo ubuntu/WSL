@@ -134,8 +134,11 @@ template <typename T, typename... Args> void push_back_many(std::vector<T>& vec,
 // Follows the semantics of std::getline(stream&, string&) while implemented for an iterator instead of the stream
 // itself, i.e. reads from [input] iterator until [delim] is found. Although it doesn't go to the string, it's
 // extracted from the underlying stream pointed by the [input] iterator. [str] is also erased before insertion.
+// Iterator is taken by copy, as all algorithms accepting iterators are, but one must remember that the underlying
+// stream linked to the iterator will still have it's internal state changed as the iterator advances, i.e.
+// contents are going to be extracted.
 template <class CharT, class Traits, class Allocator>
-std::istreambuf_iterator<CharT, Traits>& getline(std::istreambuf_iterator<CharT, Traits>& input,
+std::istreambuf_iterator<CharT, Traits> getline(std::istreambuf_iterator<CharT, Traits> input,
                                                  std::basic_string<CharT, Traits, Allocator>& str, CharT delim = '\n')
 {
     str.erase();
