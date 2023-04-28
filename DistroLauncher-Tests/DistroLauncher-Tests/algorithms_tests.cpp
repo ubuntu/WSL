@@ -98,6 +98,16 @@ TEST(AlgorithmTests, Concat)
     ASSERT_EQ(with_path, LR"(diff "/home/fox/documents/example.json" /home/fox/documents/example.json)");
 }
 
+void expectStreamEnding(std::istream& is)
+{
+    EXPECT_TRUE(is.good());
+    char maybelast = '+';
+    is >> maybelast;
+    EXPECT_EQ(maybelast, '+'); // unchanged
+    EXPECT_TRUE(is.fail());
+    EXPECT_TRUE(is.eof()) << "Still remains something on the stream.";
+}
+
 TEST(AlgorithmTests, GetlineSingleEnded)
 {
     std::string_view first = "Hello world!";
@@ -111,12 +121,7 @@ TEST(AlgorithmTests, GetlineSingleEnded)
     EXPECT_EQ(got, first);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{});
 
-    EXPECT_TRUE(ss.good());
-    char maybelast = '+';
-    ss >> maybelast;
-    EXPECT_EQ(maybelast, '+'); // unchanged
-    EXPECT_TRUE(ss.fail());
-    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+    expectStreamEnding(ss);
 }
 
 TEST(AlgorithmTests, GetlineSingleNotEnded)
@@ -131,12 +136,7 @@ TEST(AlgorithmTests, GetlineSingleNotEnded)
     EXPECT_EQ(got, first);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{});
 
-    EXPECT_TRUE(ss.good());
-    char maybelast = '+';
-    ss >> maybelast;
-    EXPECT_EQ(maybelast, '+'); // unchanged
-    EXPECT_TRUE(ss.fail());
-    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+    expectStreamEnding(ss);
 }
 
 TEST(AlgorithmTests, GetlineMulti)
@@ -159,12 +159,7 @@ TEST(AlgorithmTests, GetlineMulti)
     EXPECT_EQ(got, second);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{});
 
-    EXPECT_TRUE(ss.good());
-    char maybelast = '+';
-    ss >> maybelast;
-    EXPECT_EQ(maybelast, '+'); // unchanged
-    EXPECT_TRUE(ss.fail());
-    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+    expectStreamEnding(ss);
 }
 
 TEST(AlgorithmTests, GetlineEmpty)
@@ -177,12 +172,7 @@ TEST(AlgorithmTests, GetlineEmpty)
     EXPECT_EQ(got.size(), 0);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{});
 
-    EXPECT_TRUE(ss.good());
-    char maybelast = '+';
-    ss >> maybelast;
-    EXPECT_EQ(maybelast, '+'); // unchanged
-    EXPECT_TRUE(ss.fail());
-    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+    expectStreamEnding(ss);
 }
 TEST(AlgorithmTests, GetlineEmpty2)
 {
@@ -198,12 +188,7 @@ TEST(AlgorithmTests, GetlineEmpty2)
     EXPECT_EQ(got.size(), 0);
     EXPECT_EQ(it, std::istreambuf_iterator<char>{}); // now it is EOF
 
-    EXPECT_TRUE(ss.good());
-    char maybelast = '+';
-    ss >> maybelast;
-    EXPECT_EQ(maybelast, '+'); // unchanged
-    EXPECT_TRUE(ss.fail());
-    EXPECT_TRUE(ss.eof()) << "Still remains something on the stream.";
+    expectStreamEnding(ss);
 }
 TEST(AlgorithmTests, LeftTrimmedWCharT)
 {
