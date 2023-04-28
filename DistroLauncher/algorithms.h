@@ -139,7 +139,7 @@ template <typename T, typename... Args> void push_back_many(std::vector<T>& vec,
 // contents are going to be extracted.
 template <class CharT, class Traits, class Allocator>
 std::istreambuf_iterator<CharT, Traits> getline(std::istreambuf_iterator<CharT, Traits> input,
-                                                 std::basic_string<CharT, Traits, Allocator>& str, CharT delim = '\n')
+                                                std::basic_string<CharT, Traits, Allocator>& str, CharT delim = '\n')
 {
     str.erase();
     // missing std::copy_until - a copy_if that stops when the predicate evaluates to true :(
