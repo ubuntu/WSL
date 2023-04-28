@@ -13,9 +13,6 @@
     <ClCompile Include="..\..\DistroLauncher\extended_cli_parser.cpp">
       <Filter>DistroSources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\DistroLauncher\find_main_thread_window.cpp">
-      <Filter>DistroSources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\DistroLauncher\Helpers.cpp">
       <Filter>DistroSources</Filter>
     </ClCompile>
@@ -65,9 +62,6 @@
       <Filter>TestSources</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>TestSources</Filter>
-    </ClCompile>
-    <ClCompile Include="SplashControllerTests.cpp">
       <Filter>TestSources</Filter>
     </ClCompile>
     <ClCompile Include="StateMachineTests.cpp">
