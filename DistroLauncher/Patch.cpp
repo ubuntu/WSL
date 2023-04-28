@@ -18,6 +18,28 @@
 #include "stdafx.h"
 #include "Patch.h"
 
+// The meat: the catalog of patches we may need to perform on a distro.
+namespace Ubuntu::PatchingFunctions
+{
+    bool RemoveCloudImgLabel(std::istreambuf_iterator<char> fstab, std::ostream& tmp)
+    {
+        bool modified = false;
+        for (std::string line; fstab != std::istreambuf_iterator<char>{};) {
+            fstab = getline(fstab, line);
+            auto trimmedLeft = left_trimmed(std::string_view{line});
+            // Write line if doesn't contain the offending label.
+            if (!starts_with(trimmedLeft, "LABEL=cloudimg-rootfs")) {
+                tmp.write(line.c_str(), static_cast<std::streamsize>(line.length()));
+                tmp << '\n'; // getline never adds the newline.
+                continue;
+            }
+            modified = true; // only set if we skip writing a line.
+        }
+
+        return modified;
+    }
+}
+
 namespace Ubuntu
 {
 

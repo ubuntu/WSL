@@ -97,3 +97,122 @@ TEST(AlgorithmTests, Concat)
     auto with_path = concat(L"diff ", example_file, L" ", example_file.wstring()); // Only first one to be quoted
     ASSERT_EQ(with_path, LR"(diff "/home/fox/documents/example.json" /home/fox/documents/example.json)");
 }
+
+void expectStreamEnding(std::istream& is)
+{
+    EXPECT_TRUE(is.good());
+    char maybelast = '+';
+    is >> maybelast;
+    EXPECT_EQ(maybelast, '+'); // unchanged
+    EXPECT_TRUE(is.fail());
+    EXPECT_TRUE(is.eof()) << "Still remains something on the stream.";
+}
+
+TEST(AlgorithmTests, GetlineSingleEnded)
+{
+    std::string_view first = "Hello world!";
+    std::string contents{first};
+    contents += '\n';
+    std::istringstream ss{contents}; // "Hello world!\n"
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+
+    it = getline(it, got);
+    EXPECT_EQ(got, first);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{});
+
+    expectStreamEnding(ss);
+}
+
+TEST(AlgorithmTests, GetlineSingleNotEnded)
+{
+    std::string_view first = "Hello world!";
+    std::string contents{first};
+    std::istringstream ss{contents}; // "Hello world!"
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+
+    it = getline(it, got);
+    EXPECT_EQ(got, first);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{});
+
+    expectStreamEnding(ss);
+}
+
+TEST(AlgorithmTests, GetlineMulti)
+{
+    std::string_view first = "Hello world!";
+    std::string_view second = "This is a test";
+    std::string contents{first};
+    contents += '\n';
+    contents += second;
+    contents += '\n';
+    std::istringstream ss{contents}; // "Hello world!\nThis is a test\n"
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+
+    it = getline(it, got);
+    EXPECT_EQ(got, first);
+    EXPECT_NE(it, std::istreambuf_iterator<char>{});
+
+    it = getline(it, got);
+    EXPECT_EQ(got, second);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{});
+
+    expectStreamEnding(ss);
+}
+
+TEST(AlgorithmTests, GetlineEmpty)
+{
+    std::istringstream ss{""};
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+
+    it = getline(it, got);
+    EXPECT_EQ(got.size(), 0);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{});
+
+    expectStreamEnding(ss);
+}
+TEST(AlgorithmTests, GetlineEmpty2)
+{
+    std::istringstream ss{"\n\n"};
+    std::string got;
+    std::istreambuf_iterator<char> it{ss};
+
+    it = getline(it, got);
+    EXPECT_EQ(got.size(), 0);
+    EXPECT_NE(it, std::istreambuf_iterator<char>{}); // not EOF yet.
+
+    it = getline(it, got);
+    EXPECT_EQ(got.size(), 0);
+    EXPECT_EQ(it, std::istreambuf_iterator<char>{}); // now it is EOF
+
+    expectStreamEnding(ss);
+}
+TEST(AlgorithmTests, LeftTrimmedWCharT)
+{
+    std::wstring_view view{L"no left spaces at all"};
+    EXPECT_EQ(left_trimmed(view), view);
+
+    std::wstring spaced{L"\t\r\n"};
+    spaced += view;
+    EXPECT_EQ(left_trimmed(std::wstring_view{spaced}), view);
+
+    std::wstring rightSpaced{view};
+    rightSpaced += L"\t\r\n";
+    EXPECT_EQ(left_trimmed(std::wstring_view{rightSpaced}), rightSpaced);
+}
+TEST(AlgorithmTests, LeftTrimmedChar)
+{
+    std::string_view view{"no left spaces at all"};
+    EXPECT_EQ(left_trimmed(view), view);
+
+    std::string spaced{"\t\r\n"};
+    spaced += view;
+    EXPECT_EQ(left_trimmed(std::string_view{spaced}), view);
+
+    std::string rightSpaced{view};
+    rightSpaced += "\t\r\n";
+    EXPECT_EQ(left_trimmed(std::string_view{rightSpaced}), rightSpaced);
+}
