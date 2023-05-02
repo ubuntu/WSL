@@ -65,7 +65,9 @@ def releases(lpconn, all, active, supported, devel, lts):
                 m = milestone.name.split('-')[1]
                 if m == "updates":
                     continue
-                if milestone.date_targeted and milestone.date_targeted > datetime.now():
+                if not milestone.date_targeted:
+                    continue
+                if milestone.date_targeted > datetime.now():
                     next_milestone = milestone.date_targeted.strftime("%Y-%m-%d")
                     continue
                 milestone_ids = m.split('.')
