@@ -60,3 +60,4 @@ jobs:
           branch: auto-update-releases-${{ steps.get-branch-name.outputs.branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
           delete-branch: true
+          team-reviewers: ubuntu/wsl
