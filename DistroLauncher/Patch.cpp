@@ -46,6 +46,25 @@ namespace Ubuntu::PatchingFunctions
         return !output.fail();
     }
 
+    /**
+     * Overrides LoadCredential setting for systemd-sysusers.service
+     * See related bug report: https://bugs.launchpad.net/ubuntu/+source/lxd/+bug/1950787
+     * See related solution: https://git.launchpad.net/~ubuntu-core-dev/ubuntu/+source/systemd/commit/?id=d4e05ecbc
+     */
+    bool SysUsersDisableLoadCredential(std::istreambuf_iterator<char> input, std::ostream& output)
+    {
+        std::copy(input, std::istreambuf_iterator<char>{}, std::ostream_iterator<char>(output));
+        output << "\n[Service]\nLoadCredential=\n";
+        return true;
+    }
+
+    bool EnableSystemd(std::istreambuf_iterator<char> input, std::ostream& output)
+    {
+        std::copy(input, std::istreambuf_iterator<char>{}, std::ostream_iterator<char>(output));
+        output << "\n[boot]\nsystemd=true\n";
+        return true;
+    }
+
     bool SetDefaultUpgradePolicy(std::istreambuf_iterator<char> input, std::ostream& output)
     {
         // Decide which policy to use

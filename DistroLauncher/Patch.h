@@ -116,16 +116,28 @@ namespace Ubuntu
         // Creates an override to prevent the matching unit to start in containers.
         bool OverrideUnitVirtualizationContainer(std::istreambuf_iterator<char> input, std::ostream& output);
 
+        // Overrides LoadCredential setting for systemd-sysusers.service
+        bool SysUsersDisableLoadCredential(std::istreambuf_iterator<char> input, std::ostream& output);
+
+        // EnableSystemd enables systemd via the /etc/wsl.conf file.
+        bool EnableSystemd(std::istreambuf_iterator<char> input, std::ostream& output);
+
         // Sets the default upgrade policy according to the Appx being built.
         bool SetDefaultUpgradePolicy(std::istreambuf_iterator<char> input, std::ostream& output);
 
         // Marks the distro as needing a reboot, but does not act on it.
         bool DeferReboot(std::istreambuf_iterator<char> input, std::ostream& output);
     }
+
     /// Collection of the patches that must be applied to all releases.
     static const inline std::array releaseAgnosticPatches{
-      Patch{"/etc/fstab", PatchingFunctions::RemoveCloudImgLabel},
-      Patch{"/etc/update-manager/release-upgrades", PatchingFunctions::SetDefaultUpgradePolicy},
+      Patch{L"/etc/fstab", PatchingFunctions::RemoveCloudImgLabel},
+      Patch{L"/etc/systemd/system/systemd-sysusers.service.d/00-wsl.conf",
+            PatchingFunctions::SysUsersDisableLoadCredential},
+      Patch{L"/etc/systemd/system/systemd-binfmt.service.d/00-wsl.conf",
+            PatchingFunctions::OverrideUnitVirtualizationContainer},
+      Patch{L"/etc/wsl.conf", PatchingFunctions::EnableSystemd},
+      Patch{L"/etc/update-manager/release-upgrades", PatchingFunctions::SetDefaultUpgradePolicy},
       Patch{L"/run/launcher-command", PatchingFunctions::DeferReboot},
     };
 
