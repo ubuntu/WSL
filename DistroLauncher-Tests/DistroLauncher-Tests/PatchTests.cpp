@@ -290,4 +290,13 @@ options=metadata
         // That function is currently so simple that, if we consider the rest of the patching feature well tested, then
         // there is no reason to test it.
     }
+    TEST(PatchWiringTest, CondVirt2004)
+    {
+        // Makes sure the function PatchingFunctions::OverrideUnitVirtualizationContainer is associated with the file
+        // "/etc/systemd/system/multipathd.socket.d/00-wsl.conf" for 18.04.
+        EXPECT_TRUE(isRegisteredFor(L"Ubuntu-20.04", {
+                                                       "/etc/systemd/system/multipathd.socket.d/00-wsl.conf",
+                                                       PatchingFunctions::OverrideUnitVirtualizationContainer,
+                                                     }));
+    }
 }

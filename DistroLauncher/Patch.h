@@ -133,5 +133,12 @@ namespace Ubuntu
            PatchingFunctions::OverrideUnitVirtualizationContainer},
         },
       },
+      {
+        L"Ubuntu-20.04",
+        {
+          {"/etc/systemd/system/multipathd.socket.d/00-wsl.conf",
+           PatchingFunctions::OverrideUnitVirtualizationContainer},
+        },
+      },
     };
 }
