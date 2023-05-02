@@ -112,6 +112,9 @@ namespace Ubuntu
     {
         // Filters out lines from [fstab] which effectively start with "LABEL=cloudimg-rootfs"
         bool RemoveCloudImgLabel(std::istreambuf_iterator<char> fstab, std::ostream& tmp);
+
+        // Creates an override to prevent the matching unit to start in containers.
+        bool OverrideUnitVirtualizationContainer(std::istreambuf_iterator<char> unused, std::ostream& conf);
     }
     /// Collection of the patches that must be applied to all releases.
     static const inline std::array<const Patch, 1> releaseAgnosticPatches{
@@ -122,5 +125,13 @@ namespace Ubuntu
 
     /// All applicable patches specific to a specific Ubuntu app are defined in this data structure.
     /// Change here as new patch requirements are found.
-    static const inline std::unordered_map<std::wstring_view, std::vector<Patch>> releaseSpecificPatches{};
+    static const inline std::unordered_map<std::wstring_view, std::vector<Patch>> releaseSpecificPatches{
+      {
+        L"Ubuntu-18.04",
+        {
+          {"/etc/systemd/system/systemd-modules-load.service.d/00-wsl.conf",
+           PatchingFunctions::OverrideUnitVirtualizationContainer},
+        },
+      },
+    };
 }

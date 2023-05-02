@@ -38,6 +38,12 @@ namespace Ubuntu::PatchingFunctions
 
         return modified;
     }
+
+    bool OverrideUnitVirtualizationContainer(std::istreambuf_iterator<char> unused, std::ostream& conf)
+    {
+        conf << "[Unit]\nConditionVirtualization=!container\n";
+        return !conf.fail();
+    }
 }
 
 namespace Ubuntu
