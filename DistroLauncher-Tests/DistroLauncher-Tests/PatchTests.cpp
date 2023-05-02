@@ -184,7 +184,6 @@ options=metadata
         std::string content(std::istreambuf_iterator<char>{result}, std::istreambuf_iterator<char>{});
         EXPECT_EQ(content, sampleContents(SampleStrings::wslConfAppend));
     }
-
     /* Patching functions tests - asserts their behavior */
 
     TEST(PatchingFn, CloudImgLabel)
@@ -203,10 +202,10 @@ options=metadata
         slightlyChanged.append(sampleContents(SampleStrings::fstab1804));
         // slightlyChanged is now:
         /*
-         
+
         # This is a comment.
         LABEL=cloudimg-rootfs\t/\t ext4\tdefaults\t0 1\n
-        
+
         */
         std::istringstream input(slightlyChanged);
         std::stringstream output;
@@ -263,10 +262,32 @@ options=metadata
         return it != releaseAgnosticPatches.end();
     }
 
+    // Returns true if an equivalent [patchConfig] is registered for the [distro] specified.
+    bool isRegisteredFor(std::wstring_view distro, const Patch& patchConfig)
+    {
+        auto patches = releaseSpecificPatches.find(distro);
+        if (patches == releaseSpecificPatches.end()) {
+            return false;
+        }
+        auto it = std::find(patches->second.begin(), patches->second.end(), patchConfig);
+
+        return it != patches->second.end();
+    }
+
     TEST(PatchWiringTest, CloudImgLabel)
     {
         // Makes sure the function PatchingFunctions::RemoveCloudImgLabel is associated with the file "/etc/fstab" for
         // all distros.
         EXPECT_TRUE(isGloballyRegisteredFor({"/etc/fstab", PatchingFunctions::RemoveCloudImgLabel}));
+    }
+    TEST(PatchWiringTest, CondVirt1804)
+    {
+        // Makes sure the function PatchingFunctions::OverrideUnitVirtualizationContainer is associated with the file
+        // "/etc/systemd/system/systemd-modules-load.service.d/00-wsl.conf" for 18.04.
+        EXPECT_TRUE(isRegisteredFor(L"Ubuntu-18.04",
+                                    {"/etc/systemd/system/systemd-modules-load.service.d/00-wsl.conf",
+                                     PatchingFunctions::OverrideUnitVirtualizationContainer}));
+        // That function is currently so simple that, if we consider the rest of the patching feature well tested, then
+        // there is no reason to test it.
     }
 }
