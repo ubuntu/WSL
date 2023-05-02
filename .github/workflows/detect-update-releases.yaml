@@ -56,7 +56,7 @@ jobs:
           commit-message: Refreshes releases and assets
           title: Refresh releases and assets
           labels: automated pr
-          body: "[Auto-generated pull request](https://github.com/ubuntu/adsys/actions/workflows/detect-update-releases.yaml) by GitHub Action"
+          body: "[Auto-generated pull request](https://github.com/ubuntu/WSL/actions/workflows/detect-update-releases.yaml) by GitHub Action"
           branch: auto-update-releases-${{ steps.get-branch-name.outputs.branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
           delete-branch: true
