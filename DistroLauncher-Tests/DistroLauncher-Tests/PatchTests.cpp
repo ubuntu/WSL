@@ -245,6 +245,15 @@ options=metadata
         // Must be unchanged
         EXPECT_EQ(output.str(), input.str());
     }
+    TEST(PatchingFn, DefaultUpgradePolicy)
+    {
+        std::istringstream input("This is some\ntext that\n   should work as a sample\n     Prompt=WRONG\n some trailing text");
+        std::stringstream output;
+        PatchingFunctions::SetDefaultUpgradePolicy(input, output);
+
+        EXPECT_EQ(output.str(),
+                  "This is some\ntext that\n   should work as a sample\n     Prompt=normal\n some trailing text");
+    }
 
     /* Wiring tests - asserts the patching functions are associated with the distros and files as supposed. */
 
