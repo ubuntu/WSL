@@ -84,9 +84,6 @@
     <ClCompile Include="..\..\DistroLauncher\ChildProcess.cpp" />
     <ClCompile Include="SetOnceNamedEventTests.cpp" />
     <ClCompile Include="..\..\DistroLauncher\SetOnceNamedEvent.cpp" />
-    <ClCompile Include="..\..\DistroLauncher\upgrade_policy.cpp">
-      <Filter>DistroSources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\DistroLauncher\LauncherForceMode.cpp" />
     <ClCompile Include="LauncherForceModeTests.cpp" />
     <ClCompile Include="..\..\DistroLauncher\ApplicationStrategyCommon.cpp" />
