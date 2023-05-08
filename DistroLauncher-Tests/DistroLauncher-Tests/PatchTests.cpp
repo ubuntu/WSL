@@ -137,8 +137,7 @@ options=metadata
           "/etc/wsl.conf",
           [](std::istreambuf_iterator<char> original, std::ostream& mod) {
               // copy original contents verbatim.
-              std::copy(original, std::istreambuf_iterator<char>{},
-                        std::ostreambuf_iterator<char>(mod));
+              std::copy(original, std::istreambuf_iterator<char>{}, std::ostreambuf_iterator<char>(mod));
               // Appends new stuff
               std::string_view contents{sampleContents(SampleStrings::wslConfAppend)};
               mod.write(contents.data(), contents.length());
