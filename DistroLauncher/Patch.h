@@ -118,11 +118,15 @@ namespace Ubuntu
 
         // Sets the default upgrade policy according to the Appx being built.
         bool SetDefaultUpgradePolicy(std::istreambuf_iterator<char> input, std::ostream& output);
+
+        // Marks the distro as needing a reboot, but does not act on it.
+        bool DeferReboot(std::istreambuf_iterator<char> input, std::ostream& output);
     }
     /// Collection of the patches that must be applied to all releases.
     static const inline std::array releaseAgnosticPatches{
       Patch{"/etc/fstab", PatchingFunctions::RemoveCloudImgLabel},
       Patch{"/etc/update-manager/release-upgrades", PatchingFunctions::SetDefaultUpgradePolicy},
+      Patch{L"/run/launcher-command", PatchingFunctions::DeferReboot},
     };
 
     /// All applicable patches specific to a specific Ubuntu app are defined in this data structure.

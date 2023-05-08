@@ -254,6 +254,22 @@ options=metadata
         EXPECT_EQ(output.str(),
                   "This is some\ntext that\n   should work as a sample\n     Prompt=normal\n some trailing text");
     }
+    TEST(PatchingFn, DeferRebootNewFile)
+    {
+        std::istringstream input{};
+        std::stringstream output;
+        PatchingFunctions::DeferReboot(input, output);
+
+        EXPECT_EQ(output.str(), "\naction=reboot\n");
+    }
+    TEST(PatchingFn, DeferRebootAppend)
+    {
+        std::istringstream input("this is some sample text");
+        std::stringstream output;
+        PatchingFunctions::DeferReboot(input, output);
+
+        EXPECT_EQ(output.str(), "this is some sample text\naction=reboot\n");
+    }
 
     /* Wiring tests - asserts the patching functions are associated with the distros and files as supposed. */
 

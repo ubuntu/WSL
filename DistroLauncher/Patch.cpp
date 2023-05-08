@@ -81,6 +81,13 @@ namespace Ubuntu::PatchingFunctions
 
         return true;
     }
+
+    bool DeferReboot(std::istreambuf_iterator<char> input, std::ostream& output)
+    {
+        std::copy(input, std::istreambuf_iterator<char>{}, std::ostream_iterator<char>(output));
+        output << "\naction=reboot\n";
+        return true;
+    }
 }
 
 namespace Ubuntu
