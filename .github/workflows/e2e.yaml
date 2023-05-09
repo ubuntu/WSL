@@ -4,26 +4,25 @@ on:
   pull_request:
 concurrency: azure-vm
 
+env:
+  az_name: wsl-ci
+  az_resource_group: wsl
+
 jobs:
   vm-setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Start Azure VM
-        uses: ./.github/actions/vm-setup
+      - uses: azure/login@v1
         with:
-          az_name: wsl-ci
-          az_resource_group: wsl
-          az_creds: ${{ secrets.AZURE_VM_CREDS }}
-          az_vm_hostname: ${{ secrets.AZURE_VM_AUTHORITY }}
-          az_vm_username: ${{ secrets.AZURE_VM_UN }}
-          az_vm_password: ${{ secrets.AZURE_VM_UP }}
+          creds: ${{ secrets.AZURE_VM_CREDS }}
+      - name: Start the Runner
+        shell: bash
+        run: |
+          az vm start --name ${{ env.az_name }} --resource-group ${{ env.az_resource_group }}
 
   end-to-end-tests:
     runs-on: self-hosted
-    # This job has an implicit dependency on start-vm::Run RDP, because the runner
-    # won't be started until then.
+    needs: vm-setup
     env:
       rootfs64: "$HOME\\Downloads\\rootfs\\Ubuntu-Preview.tar.gz" # Cached by ./.github/workflows/update-rootfs-cache.yaml
       distroName: "Ubuntu-Preview"
@@ -97,14 +96,13 @@ jobs:
 
   stop-vm:
     runs-on: ubuntu-latest
-    needs: end-to-end-tests
+    needs: [vm-setup, end-to-end-tests]
     if: always()
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Stop Azure VM
-        uses: ./.github/actions/vm-stop
+      - uses: azure/login@v1
         with:
-          az_name: wsl-ci
-          az_resource_group: wsl
-          az_creds: ${{ secrets.AZURE_VM_CREDS }}
+          creds: ${{ secrets.AZURE_VM_CREDS }}
+      - name: Deallocate the Runner
+        shell: bash
+        run: |
+          az vm deallocate --name ${{ env.az_name }} --resource-group ${{ env.az_resource_group }}
