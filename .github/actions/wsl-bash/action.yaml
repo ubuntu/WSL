@@ -43,7 +43,7 @@ runs:
         max-attempts: 5
         exec: |
           $env:WSL_UTF8=1
-          # Redirecting to stdout to prevent PsExec from showing stderr as an exception
+          # Redirecting to stdout to prevent powershell from showing stderr as an exception
           $tmpDir="/tmp/github_${{github.run_number}}_${{github.run_attempt}}"
           wsl.exe -d ${{ inputs.distro }} --cd '${{ inputs.working-dir }}' -- bash -c "bash ${tmpDir}/script.sh 2>&1"
           if ( ! $? ) { Exit(1) }
