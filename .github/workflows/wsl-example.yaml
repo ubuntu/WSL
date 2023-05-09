@@ -18,27 +18,18 @@ env:
 
 jobs:
   vm-setup:
-    # This job starts your Azure VM and opens up to RDP connections. It'll keep running
-    # in the background to host RDP connections until the machine is stopped by stop-vm.
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Start Azure VM
-        uses: ./.github/actions/vm-setup
+      - uses: azure/login@v1
         with:
-          az_name: ${{ env.az_name }}
-          az_resource_group: ${{ env.az_resource_group }}
-          az_creds: ${{ secrets.AZURE_VM_CREDS }}
-          az_vm_hostname: ${{ secrets.AZURE_VM_AUTHORITY }}
-          az_vm_username: ${{ secrets.AZURE_VM_UN }}
-          az_vm_password: ${{ secrets.AZURE_VM_UP }}
+          creds: ${{ secrets.AZURE_VM_CREDS }}
+      - name: Start the Runner
+        shell: bash
+        run: |
+          az vm start --name ${{ env.az_name }} --resource-group ${{ env.az_resource_group }}
 
   run-script:
-    # This job has an implicit dependency on start-vm, because the runner
-    # won't be started until the VM is turned on. It must run concurrently with
-    # vm-setup, so don't add an explicit depenendency.
-    # Don't do this: needs: vm-setup
+    needs: vm-setup
     runs-on: self-hosted
     steps:
       - name: Checkout
@@ -73,16 +64,14 @@ jobs:
             wsl --list --verbose
 
   stop-vm:
-    # This action stops your Azure VM, hence stopping the RDP connection as well.
     runs-on: ubuntu-latest
-    needs: run-script
+    needs: [vm-setup, run-script]
     if: always()
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Stop Azure VM
-        uses: ./.github/actions/vm-stop
+      - uses: azure/login@v1
         with:
-          az_name: ${{ env.az_name }}
-          az_resource_group: ${{ env.az_resource_group }}
-          az_creds: ${{ secrets.AZURE_VM_CREDS }}
+          creds: ${{ secrets.AZURE_VM_CREDS }}
+      - name: Deallocate the Runner
+        shell: bash
+        run: |
+          az vm deallocate --name ${{ env.az_name }} --resource-group ${{ env.az_resource_group }}
