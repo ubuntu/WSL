@@ -55,13 +55,11 @@ jobs:
           exec: |
             echo "Hello from $(lsb_release -ds)"
 
-      # You'll probably use this action if you program runs on Windows and uses WSL
       - name: Run powershell on Windows
-        uses: ./.github/actions/wsl-powershell
-        with:
-          exec: |
-            $env:WSL_UTF8=1 # Recommended otherwise it's hard to read on Github
-            wsl --list --verbose
+        shell: powershell
+        env:
+          WSL_UTF8: "1" # Recommended otherwise it's hard to read on Github
+        run: wsl --list --verbose
 
   stop-vm:
     runs-on: ubuntu-latest

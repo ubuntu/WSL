@@ -71,22 +71,22 @@ jobs:
           .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 ${{ env.rootfs64 }}
           Write-Output "::endgroup::"
       - name: Run tests
-        uses: ./.github/actions/wsl-powershell
-        with:
-          exec: |
-            Write-Output "::group::Environment setup"
-            $env:WSL_UTF8=1
-            $env:LAUNCHER_REPO_ROOT=$PWD
-            wsl.exe --version
-            wsl --unregister ${{ env.distroName }} 2>&1 | Out-Null
-            cd .\e2e
-            Write-Output "::endgroup::"
+        shell: powershell
+        env:
+          WSL_UTF8: "1"
+        run: |
+          Write-Output "::group::Environment setup"
+          $env:LAUNCHER_REPO_ROOT=$PWD
+          wsl.exe --version
+          wsl --unregister ${{ env.distroName }} 2>&1 | Out-Null
+          cd .\e2e
+          Write-Output "::endgroup::"
 
-            Write-Output "::group::Tests"
-            go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher }}
-            $exitStatus=$?
-            Write-Output "::endgroup::"
-            if ( ! $exitStatus ) { Exit(1) }
+          Write-Output "::group::Tests"
+          go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher }}
+          $exitStatus=$?
+          Write-Output "::endgroup::"
+          if ( ! $exitStatus ) { Exit(1) }
 
       - name: Remove the installed package
         if: always()

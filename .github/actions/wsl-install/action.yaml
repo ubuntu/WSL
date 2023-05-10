@@ -13,38 +13,39 @@ runs:
     - name: Install WSL
       shell: powershell
       continue-on-error: true
+      env:
+        WSL_UTF8: "1"
       run: |
-        # Install or update WSL
-        $env:WSL_UTF8=1
         winget install --name 'Windows Subsystem for Linux' --accept-source-agreements --accept-package-agreements --silent --verbose
 
     - name: Install the new distro
       if: ${{ inputs.distro != '' }}
-      uses: ubuntu/WSL/.github/actions/wsl-powershell@main
-      with:
-        exec: |
-          # Install the new distro
-          switch ( "${{ inputs.distro }}" )
-          {
-              "Ubuntu"         { $storeId="9PDXGNCFSCZV" ; $launcher="ubuntu.exe"         ;  $appxname="Ubuntu"          }
-              "Ubuntu-Preview" { $storeId="9P7BDVKVNXZ6" ; $launcher="ubuntupreview.exe"  ;  $appxname="UbuntuPreview"   }
-              "Ubuntu-22.04"   { $storeId="9PN20MSR04DW" ; $launcher="ubuntu2204.exe"     ;  $appxname="Ubuntu22.04LTS"  }
-              "Ubuntu-20.04"   { $storeId="9MTTCL66CPXJ" ; $launcher="ubuntu2004.exe"     ;  $appxname="Ubuntu20.04LTS"  }
-              "Ubuntu-18.04"   { $storeId="9PNKSF5ZN4SW" ; $launcher="ubuntu1804.exe"     ;  $appxname="Ubuntu18.04LTS"  }
-              default          { Write-Output "Error: Unknown distro ${distro}" ; Exit(1) }
-          }
+      shell: powershell
+      env:
+        WSL_UTF8: "1"
+      run: |
+        # Install the new distro
+        switch ( "${{ inputs.distro }}" )
+        {
+            "Ubuntu"         { $storeId="9PDXGNCFSCZV" ; $launcher="ubuntu.exe"         ;  $appxname="Ubuntu"          }
+            "Ubuntu-Preview" { $storeId="9P7BDVKVNXZ6" ; $launcher="ubuntupreview.exe"  ;  $appxname="UbuntuPreview"   }
+            "Ubuntu-22.04"   { $storeId="9PN20MSR04DW" ; $launcher="ubuntu2204.exe"     ;  $appxname="Ubuntu22.04LTS"  }
+            "Ubuntu-20.04"   { $storeId="9MTTCL66CPXJ" ; $launcher="ubuntu2004.exe"     ;  $appxname="Ubuntu20.04LTS"  }
+            "Ubuntu-18.04"   { $storeId="9PNKSF5ZN4SW" ; $launcher="ubuntu1804.exe"     ;  $appxname="Ubuntu18.04LTS"  }
+            default          { Write-Output "Error: Unknown distro ${distro}" ; Exit(1) }
+        }
 
-          # Unregister and uninstall pre-existing distro
-          Remove-AppxPackage "$(Get-AppxPackage | Where-Object Name -like "CanonicalGroupLimited.${appxname}")" 3>&1 2>&1 | Out-Null
+        # Unregister and uninstall pre-existing distro
+        Remove-AppxPackage "$(Get-AppxPackage | Where-Object Name -like "CanonicalGroupLimited.${appxname}")" 3>&1 2>&1 | Out-Null
 
-          # Install a new distro
-          winget install --id "${storeId}"  --accept-source-agreements  --accept-package-agreements --silent
+        # Install a new distro
+        winget install --id "${storeId}"  --accept-source-agreements  --accept-package-agreements --silent
 
-          # Register the new distro
-          wsl.exe --unregister ${{ inputs.distro }} 3>&1 2>&1 | Out-Null
-          & ${launcher} install --root --ui=none
+        # Register the new distro
+        wsl.exe --unregister ${{ inputs.distro }} 3>&1 2>&1 | Out-Null
+        & ${launcher} install --root --ui=none
 
-          # Testing succesful install
-          & ${launcher} run echo Created a new distro with user: '$(whoami)'
+        # Testing succesful install
+        & ${launcher} run echo Created a new distro with user: '$(whoami)'
 
-          if ( ! $? ) { Exit(1) }
+        if ( ! $? ) { Exit(1) }
