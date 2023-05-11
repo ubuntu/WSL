@@ -36,13 +36,16 @@ runs:
         }
 
         # Unregister and uninstall pre-existing distro
-        Remove-AppxPackage "$(Get-AppxPackage | Where-Object Name -like "CanonicalGroupLimited.${appxname}")" 3>&1 2>&1 | Out-Null
+        $pkgFullName = (Get-AppxPackage | Where-Object Name -like "CanonicalGroupLimited.${appxname}").PackageFullName
+        if ( "${pkg}" -ne '' ) {
+            Remove-AppxPackage "${pkgFullName}" 3>&1 2>&1 | Out-Null
+            wsl.exe --unregister ${{ inputs.distro }} 3>&1 2>&1 | Out-Null
+        }
 
         # Install a new distro
-        winget install --id "${storeId}"  --accept-source-agreements  --accept-package-agreements --silent
+        winget install --id "${storeId}" --accept-source-agreements --accept-package-agreements --silent
 
         # Register the new distro
-        wsl.exe --unregister ${{ inputs.distro }} 3>&1 2>&1 | Out-Null
         & ${launcher} install --root --ui=none
 
         # Testing succesful install
