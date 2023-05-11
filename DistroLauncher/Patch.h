@@ -115,12 +115,14 @@ namespace Ubuntu
 
         // Creates an override to prevent the matching unit to start in containers.
         bool OverrideUnitVirtualizationContainer(std::istreambuf_iterator<char> input, std::ostream& output);
+
+        // Sets the default upgrade policy according to the Appx being built.
+        bool SetDefaultUpgradePolicy(std::istreambuf_iterator<char> input, std::ostream& output);
     }
     /// Collection of the patches that must be applied to all releases.
-    static const inline std::array<const Patch, 1> releaseAgnosticPatches{
-      {
-        {"/etc/fstab", PatchingFunctions::RemoveCloudImgLabel},
-      },
+    static const inline std::array releaseAgnosticPatches{
+      Patch{"/etc/fstab", PatchingFunctions::RemoveCloudImgLabel},
+      Patch{"/etc/update-manager/release-upgrades", PatchingFunctions::SetDefaultUpgradePolicy},
     };
 
     /// All applicable patches specific to a specific Ubuntu app are defined in this data structure.

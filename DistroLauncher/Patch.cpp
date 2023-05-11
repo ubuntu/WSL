@@ -45,6 +45,42 @@ namespace Ubuntu::PatchingFunctions
         output << "\n[Unit]\nConditionVirtualization=!container\n";
         return !output.fail();
     }
+
+    bool SetDefaultUpgradePolicy(std::istreambuf_iterator<char> input, std::ostream& output)
+    {
+        // Decide which policy to use
+        const auto policy = []() -> std::string {
+            std::wstring_view distro = DistributionInfo::WindowTitle;
+            if (distro == L"Ubuntu") {
+                return "lts";
+            }
+            if (starts_with(distro, L"Ubuntu") && ends_with(distro, L"LTS")) {
+                return "never";
+            }
+            return "normal";
+        }();
+
+        // Copy until "Prompt=" is found
+        std::string line;
+        std::string_view prefix;
+        auto it = getline(input, line);
+        for (; it != std::istreambuf_iterator<char>{}; it = getline(it, line)) {
+            auto trimmed = left_trimmed(std::string_view{line});
+            if (starts_with(trimmed, "Prompt")) {
+                prefix = std::string_view(&*line.cbegin(), line.size() - trimmed.size());
+                break;
+            }
+            output << line << '\n';
+        }
+
+        // Override prompt
+        output << prefix << "Prompt=" << policy << '\n';
+
+        // Copy the rest of the file
+        std::copy(it, std::istreambuf_iterator<char>{}, std::ostream_iterator<char>(output));
+
+        return true;
+    }
 }
 
 namespace Ubuntu
