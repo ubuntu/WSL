@@ -20,6 +20,7 @@ runs:
     - name: Clone repo
       uses: ubuntu/WSL/.github/actions/wsl-bash@main
       with:
+        distro: ${{ inputs.distro }}
         exec: |
           mkdir -p ${{ inputs.working-dir }}
           git clone --quiet --depth 1 https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
