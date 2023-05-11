@@ -114,7 +114,7 @@ namespace Ubuntu
         bool RemoveCloudImgLabel(std::istreambuf_iterator<char> fstab, std::ostream& tmp);
 
         // Creates an override to prevent the matching unit to start in containers.
-        bool OverrideUnitVirtualizationContainer(std::istreambuf_iterator<char> unused, std::ostream& conf);
+        bool OverrideUnitVirtualizationContainer(std::istreambuf_iterator<char> input, std::ostream& output);
     }
     /// Collection of the patches that must be applied to all releases.
     static const inline std::array<const Patch, 1> releaseAgnosticPatches{
