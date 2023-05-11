@@ -2,6 +2,6 @@ Checks: 'bugprone-*,performance-*,readability-*,google-readability-casting,moder
 HeaderFilterRegex: DistroLauncher/.+\.h$
 CheckOptions:
   - key: readability-identifier-length.IgnoredParameterNames
-    value: "hr|ok|st"
+    value: "hr|ok|st|it"
   - key: readability-identifier-length.IgnoredVariableNames
-    value: "hr|ok|st"
+    value: "hr|ok|st|it"
