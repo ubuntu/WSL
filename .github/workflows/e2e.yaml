@@ -72,18 +72,17 @@ jobs:
           Write-Output "::endgroup::"
       - name: Run tests
         shell: powershell
-        env:
-          WSL_UTF8: "1"
+        working-directory: e2e
         run: |
           Write-Output "::group::Environment setup"
           $env:LAUNCHER_REPO_ROOT=$PWD
+          $env:WSL_UTF8 = 1
           wsl.exe --version
-          wsl --unregister ${{ env.distroName }} 2>&1 | Out-Null
-          cd .\e2e
+          wsl.exe --unregister '${{ env.distroName }}' 2>&1 | Out-Null
           Write-Output "::endgroup::"
 
           Write-Output "::group::Tests"
-          go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher }}
+          go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name '${{ env.distroName }}' --launcher-name '${{ env.launcher }}'
           $exitStatus=$?
           Write-Output "::endgroup::"
           if ( ! $exitStatus ) { Exit(1) }
