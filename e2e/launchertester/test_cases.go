@@ -131,7 +131,7 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
 
 	distroNameToFailedUnits := map[string][]string{
 		"Ubuntu-18.04":   {"user@0.service", "atd.service"},
-		"Ubuntu-20.04":   {"user@0.service", "atd.service", "systemd-remount-fs.service"},
+		"Ubuntu-20.04":   {"user@0.service", "atd.service"},
 		"Ubuntu-22.04":   {"user@0.service"},
 		"Ubuntu":         {"user@0.service"},
 		"Ubuntu-Preview": {"user@0.service"},
