@@ -130,10 +130,10 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
 	terminateDistro(t)
 
 	distroNameToFailedUnits := map[string][]string{
-		"Ubuntu-18.04":   {"user@0.service", "atd.service", "systemd-modules-load.service"},
-		"Ubuntu-20.04":   {"user@0.service", "atd.service", "ssh.service", "systemd-remount-fs.service", "multipathd.socket"},
-		"Ubuntu-22.04":   {"user@0.service", "systemd-sysusers.service"},
-		"Ubuntu":         {"user@0.service", "systemd-sysusers.service"},
+		"Ubuntu-18.04":   {"user@0.service", "atd.service"},
+		"Ubuntu-20.04":   {"user@0.service", "atd.service"},
+		"Ubuntu-22.04":   {"user@0.service"},
+		"Ubuntu":         {"user@0.service"},
 		"Ubuntu-Preview": {"user@0.service"},
 	}
 
@@ -236,8 +236,8 @@ func testInteropIsEnabled(t *testing.T) { //nolint: thelper, this is a test
 // systemdIsExpected returns true if systemd is expected to be enabled by default on this distro.
 func systemdIsExpected() bool {
 	distroNameToExpectSystemd := map[string]bool{
-		"Ubuntu":         false,
-		"Ubuntu-22.04":   false,
+		"Ubuntu":         true,
+		"Ubuntu-22.04":   true,
 		"Ubuntu-20.04":   false,
 		"Ubuntu-18.04":   false,
 		"Ubuntu-Preview": true,
