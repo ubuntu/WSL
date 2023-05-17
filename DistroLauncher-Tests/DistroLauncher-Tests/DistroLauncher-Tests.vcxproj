@@ -82,7 +82,6 @@ if EXIST "$(SharedIdb)" xcopy /Y /F "$(SharedIdb)" "$(IntDir)"</Command>
     <ClCompile Include="..\..\DistroLauncher\ProcessRunner.cpp" />
     <ClCompile Include="..\..\DistroLauncher\SetOnceNamedEvent.cpp" />
     <ClCompile Include="..\..\DistroLauncher\stdafx.cpp" />
-    <ClCompile Include="..\..\DistroLauncher\upgrade_policy.cpp" />
     <ClCompile Include="..\..\DistroLauncher\Win32Utils.cpp" />
     <ClCompile Include="..\..\DistroLauncher\WindowsUserInfo.cpp" />
     <ClCompile Include="..\..\DistroLauncher\WslApiLoader.cpp" />
