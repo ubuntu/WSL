@@ -18,7 +18,7 @@ runs:
   using: 'composite'
   steps:
     - name: Clone repo
-      uses: ubuntu/WSL/.github/actions/wsl-bash@main
+      uses: ./.github/actions/wsl-bash
       with:
         distro: ${{ inputs.distro }}
         exec: |
