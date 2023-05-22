@@ -160,6 +160,9 @@ template <class CharT, class Traits>
 std::basic_string_view<CharT, Traits> left_trimmed(std::basic_string_view<CharT, Traits> str)
 {
     auto nonSpaceStart = std::find_if_not(str.begin(), str.end(), [](auto elem) { return std::isspace(elem); });
+    if (nonSpaceStart == str.end()) {
+        return std::basic_string_view<CharT, Traits>{};
+    }
     auto trimmedSize = static_cast<std::size_t>(std::distance(nonSpaceStart, str.end()));
     return std::basic_string_view<CharT, Traits>{&(*nonSpaceStart), trimmedSize};
 }
