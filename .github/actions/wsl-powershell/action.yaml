@@ -62,7 +62,7 @@ runs:
         '${env:Path}="$(Get-Content path.txt);${env:Path}"' > script.ps1
         "${env:exec}" >> script.ps1
 
-        c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i 1 powershell.exe -Command @"
+        c:\sysinternalssuite\psexec.exe -nobanner -accepteula -w $PWD.Path -i $higherSession powershell.exe -Command @"
         powershell.exe -File script.ps1 3>&1 2>&1 > ".\output.log"
         Write-Output "`${LastExitCode}" > ".\exitCode.log"
         "@
