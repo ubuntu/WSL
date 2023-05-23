@@ -4,26 +4,25 @@ on:
   pull_request:
 concurrency: azure-vm
 
+env:
+  az_name: wsl-ci
+  az_resource_group: wsl
+
 jobs:
   vm-setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Start Azure VM
-        uses: ./.github/actions/vm-setup
+      - uses: azure/login@v1
         with:
-          az_name: wsl-ci
-          az_resource_group: wsl
-          az_creds: ${{ secrets.AZURE_VM_CREDS }}
-          az_vm_hostname: ${{ secrets.AZURE_VM_AUTHORITY }}
-          az_vm_username: ${{ secrets.AZURE_VM_UN }}
-          az_vm_password: ${{ secrets.AZURE_VM_UP }}
+          creds: ${{ secrets.AZURE_VM_CREDS }}
+      - name: Start the Runner
+        shell: bash
+        run: |
+          az vm start --name ${{ env.az_name }} --resource-group ${{ env.az_resource_group }}
 
   end-to-end-tests:
     runs-on: self-hosted
-    # This job has an implicit dependency on start-vm::Run RDP, because the runner
-    # won't be started until then.
+    needs: vm-setup
     env:
       rootfs64: "$HOME\\Downloads\\rootfs\\Ubuntu-Preview.tar.gz" # Cached by ./.github/workflows/update-rootfs-cache.yaml
       distroName: "Ubuntu-Preview"
@@ -72,22 +71,21 @@ jobs:
           .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 ${{ env.rootfs64 }}
           Write-Output "::endgroup::"
       - name: Run tests
-        uses: ./.github/actions/wsl-powershell
-        with:
-          exec: |
-            Write-Output "::group::Environment setup"
-            $env:WSL_UTF8=1
-            $env:LAUNCHER_REPO_ROOT=$PWD
-            wsl.exe --version
-            wsl --unregister ${{ env.distroName }} 2>&1 | Out-Null
-            cd .\e2e
-            Write-Output "::endgroup::"
+        shell: powershell
+        run: |
+          Write-Output "::group::Environment setup"
+          $env:LAUNCHER_REPO_ROOT=$PWD
+          $env:WSL_UTF8 = 1
+          wsl.exe --version
+          wsl.exe --unregister '${{ env.distroName }}' 2>&1 | Out-Null
+          cd e2e
+          Write-Output "::endgroup::"
 
-            Write-Output "::group::Tests"
-            go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name ${{ env.distroName }} --launcher-name ${{ env.launcher }}
-            $exitStatus=$?
-            Write-Output "::endgroup::"
-            if ( ! $exitStatus ) { Exit(1) }
+          Write-Output "::group::Tests"
+          go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name '${{ env.distroName }}' --launcher-name '${{ env.launcher }}'
+          $exitStatus=$?
+          Write-Output "::endgroup::"
+          if ( ! $exitStatus ) { Exit(1) }
 
       - name: Remove the installed package
         if: always()
@@ -97,14 +95,13 @@ jobs:
 
   stop-vm:
     runs-on: ubuntu-latest
-    needs: end-to-end-tests
+    needs: [vm-setup, end-to-end-tests]
     if: always()
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Stop Azure VM
-        uses: ./.github/actions/vm-stop
+      - uses: azure/login@v1
         with:
-          az_name: wsl-ci
-          az_resource_group: wsl
-          az_creds: ${{ secrets.AZURE_VM_CREDS }}
+          creds: ${{ secrets.AZURE_VM_CREDS }}
+      - name: Deallocate the Runner
+        shell: bash
+        run: |
+          az vm deallocate --name ${{ env.az_name }} --resource-group ${{ env.az_resource_group }}

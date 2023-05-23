@@ -21,11 +21,12 @@ runs:
       shell: powershell
       env:
         exec: ${{ inputs.exec }}
+        scriptDir: /tmp/github_${{github.run_number}}_${{github.run_attempt}}
       run: |
         Write-Output '::group::Storage of script into WSL'
-        $tmpDir="/tmp/github_${{github.run_number}}_${{github.run_attempt}}"
-        $dirWindows="\\wsl.localhost\${{ inputs.distro }}${tmpDir}"
+        $dirWindows="\\wsl.localhost\${{ inputs.distro }}${{ env.scriptDir }}"
 
+        New-Item -Force -Path "${dirWindows}" -ItemType Directory | Out-Null
         New-Item -Force -Path "${dirWindows}\script.sh" -ItemType File | Out-Null
 
         # The following function is used because:
@@ -38,12 +39,10 @@ runs:
         if ( "${exit}" -eq "$False" ) { Exit(1) }
 
     - name: Run linux script
-      uses: ubuntu/WSL/.github/actions/wsl-powershell@main
-      with:
-        max-attempts: 5
-        exec: |
-          $env:WSL_UTF8=1
-          # Redirecting to stdout to prevent PsExec from showing stderr as an exception
-          $tmpDir="/tmp/github_${{github.run_number}}_${{github.run_attempt}}"
-          wsl.exe -d ${{ inputs.distro }} --cd '${{ inputs.working-dir }}' -- bash -c "bash ${tmpDir}/script.sh 2>&1"
+      shell: powershell
+      env:
+        scriptDir: /tmp/github_${{github.run_number}}_${{github.run_attempt}}
+        WSL_UTF8: "1"
+      run: |
+          wsl.exe -d ${{ inputs.distro }} --cd '${{ inputs.working-dir }}' -- bash "${{ env.scriptDir }}/script.sh"
           if ( ! $? ) { Exit(1) }
