@@ -373,5 +373,5 @@ jobs:
           for build in $(git diff-tree --no-commit-id --name-only -r HEAD | grep buildid); do
             AppID=$(basename $build);
             AppID=${AppID%-buildid.md};
-            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker $AppID $GITHUB_RUN_ID
+            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker --debug $AppID $GITHUB_RUN_ID
           done
