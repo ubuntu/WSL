@@ -37,7 +37,7 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
         return hr;
     }
 
-    Ubuntu::ApplyConfigPatches(DistributionInfo::Name);
+    Ubuntu::ConfigRootFs(DistributionInfo::Name, g_wslApi);
 
     // Create a user account.
     if (createUser) {

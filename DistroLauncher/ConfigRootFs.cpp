@@ -17,10 +17,15 @@
 
 #include "stdafx.h"
 #include "Patch.h"
-#include "ApplyConfigPatches.h"
+#include "ConfigRootfs.h"
 
 namespace Ubuntu
 {
+    void ConfigRootFs(const std::wstring& DistroName, WslApiLoader& wsl)
+    {
+        ApplyConfigPatches(DistroName);
+    }
+
     void ApplyConfigPatches(std::wstring_view DistroName)
     {
         // I think the WslPathPrefix no longer belongs to Oobe namespace. But let's leave that for later.
