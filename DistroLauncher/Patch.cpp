@@ -39,11 +39,10 @@ namespace Ubuntu::PatchingFunctions
         return modified;
     }
 
-    bool OverrideUnitVirtualizationContainer(std::istreambuf_iterator<char> input, std::ostream& output)
+    bool OverrideUnitVirtualizationContainer(std::istreambuf_iterator<char> unused, std::ostream& conf)
     {
-        std::copy(input, std::istreambuf_iterator<char>{}, std::ostream_iterator<char>{output});
-        output << "\n[Unit]\nConditionVirtualization=!container\n";
-        return !output.fail();
+        conf << "[Unit]\nConditionVirtualization=!container\n";
+        return !conf.fail();
     }
 
     /**
