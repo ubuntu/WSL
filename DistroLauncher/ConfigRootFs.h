@@ -45,4 +45,7 @@ namespace Ubuntu
 
     /// Applies any relevant patch for the [DistroName].
     void ApplyConfigPatches(std::wstring_view DistroName);
+
+    /// Disables the relevant systemd units by means of running `systemctl disable`.
+    void DisableSystemdUnits(WslApiLoader& wsl);
 }
