@@ -22,6 +22,8 @@ runs:
       with:
         distro: ${{ inputs.distro }}
         exec: |
+          set -eu
+
           export GIT_TERMINAL_PROMPT=0
 
           mkdir -p ${{ inputs.working-dir }}
