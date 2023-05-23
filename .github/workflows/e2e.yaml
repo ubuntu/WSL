@@ -72,13 +72,13 @@ jobs:
           Write-Output "::endgroup::"
       - name: Run tests
         shell: powershell
-        working-directory: e2e
         run: |
           Write-Output "::group::Environment setup"
           $env:LAUNCHER_REPO_ROOT=$PWD
           $env:WSL_UTF8 = 1
           wsl.exe --version
           wsl.exe --unregister '${{ env.distroName }}' 2>&1 | Out-Null
+          cd e2e
           Write-Output "::endgroup::"
 
           Write-Output "::group::Tests"
