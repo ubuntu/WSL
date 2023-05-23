@@ -22,8 +22,11 @@ runs:
       with:
         distro: ${{ inputs.distro }}
         exec: |
+          export GIT_TERMINAL_PROMPT=0
+
           mkdir -p ${{ inputs.working-dir }}
           git clone --quiet --depth 1 https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
+
           cd ${{ inputs.working-dir }}
           git fetch --quiet --depth 1 --no-tags --prune origin +${{ github.sha }}:${{ github.ref }}
           git checkout --quiet ${{ github.sha }}
