@@ -17,7 +17,7 @@
 
 #include "stdafx.h"
 #include "Patch.h"
-#include "ConfigRootfs.h"
+#include "ConfigRootFs.h"
 
 namespace Ubuntu
 {
@@ -59,6 +59,6 @@ namespace Ubuntu
     void DisableSystemdUnits(WslApiLoader& wsl)
     {
         DWORD exitCode;
-        auto hr = wsl.WslLaunchInteractive(L"systemctl disable ssh &>/dev/null", true, &exitCode);
+        wsl.WslLaunchInteractive(L"systemctl disable ssh &>/dev/null", TRUE, &exitCode);
     }
 }
