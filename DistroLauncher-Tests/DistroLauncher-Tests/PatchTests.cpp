@@ -137,8 +137,7 @@ options=metadata
           "/etc/wsl.conf",
           [](std::istreambuf_iterator<char> original, std::ostream& mod) {
               // copy original contents verbatim.
-              std::copy(original, std::istreambuf_iterator<char>{},
-                        std::ostreambuf_iterator<char>(mod));
+              std::copy(original, std::istreambuf_iterator<char>{}, std::ostreambuf_iterator<char>(mod));
               // Appends new stuff
               std::string_view contents{sampleContents(SampleStrings::wslConfAppend)};
               mod.write(contents.data(), contents.length());
@@ -245,6 +244,22 @@ options=metadata
         // Must be unchanged
         EXPECT_EQ(output.str(), input.str());
     }
+    TEST(PatchingFn, EnableSystemdNewFile)
+    {
+        std::istringstream input{}; // sample wsl.conf file
+        std::stringstream output;
+        PatchingFunctions::EnableSystemd(input, output);
+
+        EXPECT_EQ(output.str(), "\n[boot]\nsystemd=true\n");
+    }
+    TEST(PatchingFn, EnableSystemdAppend)
+    {
+        std::istringstream input("[interop]\nenabled=true"); // sample wsl.conf file
+        std::stringstream output;
+        PatchingFunctions::EnableSystemd(input, output);
+
+        EXPECT_EQ(output.str(), "[interop]\nenabled=true\n[boot]\nsystemd=true\n");
+    }
     TEST(PatchingFn, DefaultUpgradePolicy)
     {
         std::istringstream input("This is some\ntext that\n   should work as a sample\n     Prompt=WRONG\n some trailing text");
@@ -269,6 +284,22 @@ options=metadata
         PatchingFunctions::DeferReboot(input, output);
 
         EXPECT_EQ(output.str(), "this is some sample text\naction=reboot\n");
+    }
+    TEST(PatchingFn, SysUsersDisableLoadCredentialNewFile)
+    {
+        std::istringstream input{};
+        std::stringstream output;
+        PatchingFunctions::SysUsersDisableLoadCredential(input, output);
+
+        EXPECT_EQ(output.str(), "\n[Service]\nLoadCredential=\n");
+    }
+    TEST(PatchingFn, SysUsersDisableLoadCredentialAppend)
+    {
+        std::istringstream input("this is some sample text");
+        std::stringstream output;
+        PatchingFunctions::SysUsersDisableLoadCredential(input, output);
+
+        EXPECT_EQ(output.str(), "this is some sample text\n[Service]\nLoadCredential=\n");
     }
 
     /* Wiring tests - asserts the patching functions are associated with the distros and files as supposed. */

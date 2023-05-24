@@ -195,7 +195,6 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="systemd_config.cpp" />
     <ClCompile Include="Win32Utils.cpp" />
     <ClCompile Include="WindowsUserInfo.cpp" />
     <ClCompile Include="WinTuiStrategy.cpp" />

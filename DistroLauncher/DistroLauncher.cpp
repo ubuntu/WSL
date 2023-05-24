@@ -38,11 +38,6 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
     }
 
     Ubuntu::ApplyConfigPatches(DistributionInfo::Name);
-    // Prepare distro for systemd enablement, and conditionally enable it
-    const bool enable_systemd = ends_with(DistributionInfo::Name, L".Dev") ||
-      DistributionInfo::Name == L"Ubuntu" || DistributionInfo::Name == L"Ubuntu-22.04" ||
-      DistributionInfo::Name == L"Ubuntu-Preview";
-    Systemd::Configure(enable_systemd);
 
     // Create a user account.
     if (createUser) {
