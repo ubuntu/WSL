@@ -76,8 +76,12 @@ jobs:
           Write-Output "::group::Environment setup"
           $env:LAUNCHER_REPO_ROOT=$PWD
           $env:WSL_UTF8 = 1
+          
+          # Shutting down WSL. This is sometimes necessary as it prevents "Access is denied" later.
+          wsl.exe --shutdown
           wsl.exe --version
           wsl.exe --unregister '${{ env.distroName }}' 2>&1 | Out-Null
+
           cd e2e
           Write-Output "::endgroup::"
 

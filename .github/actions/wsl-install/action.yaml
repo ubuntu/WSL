@@ -13,16 +13,12 @@ runs:
     - name: Install WSL
       shell: powershell
       continue-on-error: true
-      env:
-        WSL_UTF8: "1"
       run: |
         winget install --name 'Windows Subsystem for Linux' --accept-source-agreements --accept-package-agreements --silent --verbose
 
     - name: Install the new distro
       if: ${{ inputs.distro != '' }}
       shell: powershell
-      env:
-        WSL_UTF8: "1"
       run: |
         # Install the new distro
         switch ( "${{ inputs.distro }}" )
@@ -38,7 +34,13 @@ runs:
         # Unregister and uninstall pre-existing distro
         $pkgFullName = (Get-AppxPackage | Where-Object Name -like "CanonicalGroupLimited.${appxname}").PackageFullName
         if ( "${pkg}" -ne '' ) {
+            Write-Output "Remove leftover APPX"
             Remove-AppxPackage "${pkgFullName}" 3>&1 2>&1 | Out-Null
+        }
+
+        $env:WSL_UTF8=1
+        if ( "$(wsl --list --all | Select-String "Ubuntu-Preview")" -ne '' ) {
+            Write-Output "Remove leftover distro"
             wsl.exe --unregister ${{ inputs.distro }} 3>&1 2>&1 | Out-Null
         }
 
