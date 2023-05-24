@@ -66,7 +66,7 @@ jobs:
         if: ${{ env.withFlutterApp == 'true' }}
         with:
           channel: stable
-          flutter-version: '3.7.x'
+          flutter-version: '3.10.x'
       - name: Build Bundle
         working-directory: ${{ env.workDir }}
         run:  msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:UapAppxPackageBuildMode=SideloadOnly -verbosity:normal
