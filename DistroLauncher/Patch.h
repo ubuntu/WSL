@@ -156,7 +156,6 @@ namespace Ubuntu
         {
           {"/etc/systemd/system/multipathd.socket.d/00-wsl.conf",
            PatchingFunctions::OverrideUnitVirtualizationContainer},
-          {"/lib/systemd/system/ssh.service", PatchingFunctions::OverrideUnitVirtualizationContainer},
         },
       },
     };

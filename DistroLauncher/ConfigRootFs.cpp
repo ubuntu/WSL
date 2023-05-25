@@ -17,10 +17,22 @@
 
 #include "stdafx.h"
 #include "Patch.h"
-#include "ApplyConfigPatches.h"
+#include "ConfigRootFs.h"
 
 namespace Ubuntu
 {
+    void ConfigRootFs(const std::wstring& DistroName, WslApiLoader& wsl)
+    {
+        ApplyConfigPatches(DistroName);
+        // Currently the only systemd unit mapped for explicit disablement is ssh on 20.04.
+        // If other cases appear, we should follow some strategy similar to the ApplyConfigPatches
+        // to properly select which units to disable for which distro release. The selection should still
+        // be internal, i.e. non visible from DistroLauncher.cpp.
+        if (DistroName == L"Ubuntu-20.04") {
+            DisableSystemdUnits(wsl);
+        }
+    }
+
     void ApplyConfigPatches(std::wstring_view DistroName)
     {
         // I think the WslPathPrefix no longer belongs to Oobe namespace. But let's leave that for later.
@@ -42,5 +54,11 @@ namespace Ubuntu
         for (const auto& patch : releaseSpecific->second) {
             patch.apply(pathPrefix);
         }
+    }
+
+    void DisableSystemdUnits(WslApiLoader& wsl)
+    {
+        DWORD exitCode;
+        wsl.WslLaunchInteractive(L"systemctl disable ssh &>/dev/null", TRUE, &exitCode);
     }
 }

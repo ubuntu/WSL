@@ -157,7 +157,7 @@
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Patch.h" />
-    <ClInclude Include="ApplyConfigPatches.h" />
+    <ClInclude Include="ConfigRootFs.h" />
     <ClInclude Include="ProcessRunner.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SetOnceNamedEvent.h" />
@@ -188,7 +188,7 @@
     <ClCompile Include="named_mutex.cpp" />
     <ClCompile Include="OOBE.cpp" />
     <ClCompile Include="Patch.cpp" />
-    <ClCompile Include="ApplyConfigPatches.cpp" />
+    <ClCompile Include="ConfigRootFs.cpp" />
     <ClCompile Include="ProcessRunner.cpp" />
     <ClCompile Include="ini_find_value.cpp" />
     <ClCompile Include="SetOnceNamedEvent.cpp" />

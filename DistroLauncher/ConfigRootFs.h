@@ -18,6 +18,10 @@
 
 namespace Ubuntu
 {
+    /// Performs post-registration file system configuration and tweaks to optimize the behavior of the distro image to
+    /// WSL. The actions come in two distinct natures: config file patching and systemd unit disabling. See
+    /// [ApplyConfigPatches] and [DisableSystemdUnits] for details.
+    void ConfigRootFs(const std::wstring& DistroName, WslApiLoader& wsl);
     /**
      * The distro launcher is equipped with a simple mechanism to adapt the root filesystem contents to some WSL
      * specificities through patching distro configuration files.
@@ -41,4 +45,7 @@ namespace Ubuntu
 
     /// Applies any relevant patch for the [DistroName].
     void ApplyConfigPatches(std::wstring_view DistroName);
+
+    /// Disables the relevant systemd units by means of running `systemctl disable`.
+    void DisableSystemdUnits(WslApiLoader& wsl);
 }
