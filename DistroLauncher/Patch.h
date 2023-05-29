@@ -127,6 +127,10 @@ namespace Ubuntu
 
         // Marks the distro as needing a reboot, but does not act on it.
         bool DeferReboot(std::istreambuf_iterator<char> input, std::ostream& output);
+
+        // Causes an empty file to be written, useful for disabling certain services such as cloud-init,
+        // where the mere presence of the empty file is enough to signal that it shouldn't run.
+        bool Empty(std::istreambuf_iterator<char> /* unused */, std::ostream& /* unused */);
     }
 
     /// Collection of the patches that must be applied to all releases.
@@ -139,6 +143,8 @@ namespace Ubuntu
       Patch{L"/etc/wsl.conf", PatchingFunctions::EnableSystemd},
       Patch{L"/etc/update-manager/release-upgrades", PatchingFunctions::SetDefaultUpgradePolicy},
       Patch{L"/run/launcher-command", PatchingFunctions::DeferReboot},
+      // See https://bugs.launchpad.net/cloud-init/+bug/2008727/comments/2 for the file path.
+      Patch{L"/etc/cloud/cloud-init.disabled", PatchingFunctions::Empty},
     };
 
     /// All applicable patches specific to a specific Ubuntu app are defined in this data structure.

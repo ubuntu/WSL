@@ -106,6 +106,11 @@ namespace Ubuntu::PatchingFunctions
         output << "\naction=reboot\n";
         return true;
     }
+
+    bool Empty(std::istreambuf_iterator<char> /* unused */, std::ostream& /* unused */)
+    {
+        return true;
+    }
 }
 
 namespace Ubuntu
