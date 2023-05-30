@@ -30,7 +30,7 @@ runs:
           git clone --quiet --depth 1 https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
 
           cd ${{ inputs.working-dir }}
-          git fetch --quiet --depth 1 --no-tags --prune origin +${{ github.sha }}:${{ github.ref }}
+          git fetch --quiet --depth 1 --no-tags --prune --update-head-ok origin +${{ github.sha }}:${{ github.ref }}
           git checkout --quiet ${{ github.sha }}
 
           if [ "${{ inputs.submodules }}" = true ] ; then
