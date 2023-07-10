@@ -109,9 +109,6 @@ int wmain(int argc, wchar_t const *argv[])
 
     // Initialize a vector of arguments.
     std::vector<std::wstring_view> arguments;
-    
-    arguments[5];
-
     for (int index = 1; index < argc; index += 1) {
         arguments.push_back(argv[index]);
     }
