@@ -81,8 +81,29 @@ HRESULT SetDefaultUser(std::wstring_view userName)
     return hr;
 }
 
+int DebugReportHook(int reportType, char *message, int *returnValue)
+{
+    const auto type = [=]() -> std::string_view {
+        switch (reportType) {
+        case _CRT_WARN:
+            return "[WARNING]";
+        case _CRT_ERROR:
+            return "[ERROR]";
+        case _CRT_ASSERT:
+            return "[ASSERT]";
+        default:
+            return "[UNKNOWN]";
+        }
+    }();
+
+    std::cerr << type << " " << message;
+    exit(EXIT_FAILURE);
+}
+
 int wmain(int argc, wchar_t const *argv[])
 {
+    _CrtSetReportHook(DebugReportHook);
+
     // Update the title bar of the console window.
     SetConsoleTitleW(DistributionInfo::WindowTitle.c_str());
 
