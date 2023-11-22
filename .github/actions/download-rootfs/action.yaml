@@ -77,6 +77,9 @@ runs:
 
           $url = $data[1]
 
+          # Make sure there is no previous leftover
+          Remove-Item -Force "$file.tmp" 2>&1 | Out-Null
+
           Write-Output "::group::Downloading ${name}"
           Write-Output "Downloading from ${url}"
           pwsh.exe -Command Invoke-WebRequest -Uri "$url" -OutFile "${file}.tmp" -Resume -MaximumRetryCount 5 -RetryIntervalSec 2
