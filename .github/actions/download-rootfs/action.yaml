@@ -30,6 +30,10 @@ runs:
     - name: Prepare environment
       shell: powershell
       run: |
+        # Install PowerShell
+        $PsVersion
+        winget install --id Microsoft.Powershell --silent --accept-package-agreements --accept-source-agreements --source winget
+
         # Prepare environment
         Write-Output "::group::Build wsl release info generator"
         go build .\wsl-builder\release-info\
@@ -51,6 +55,8 @@ runs:
     - name: Download Ubuntu rootfs
       shell: powershell
       run: |
+        # Ensure we are using the right version of Powershell
+        $PsVersion
         # Download rootfs
         .\release-info.exe "${{ inputs.path }}\ubuntu-releases.csv" ${{ inputs.distros }} --rootfs amd64 --short 1> "${{ inputs.path }}\wsl-releases.csv"
         if ( "${LastExitCode}" -ne "0" ) {
