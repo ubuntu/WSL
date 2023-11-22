@@ -31,6 +31,10 @@ runs:
       shell: powershell
       run: |
         # Prepare environment
+
+        # Install PowerShell
+        winget install --id Microsoft.Powershell --silent --accept-package-agreements --accept-source-agreements --source winget
+
         Write-Output "::group::Build wsl release info generator"
         go build .\wsl-builder\release-info\
         if ( "${LastExitCode}" -ne "0" ) {
@@ -71,9 +75,14 @@ runs:
 
           $url = $data[1]
 
+          # Make sure there is no previous leftover
+          if (Test-Path "$file.tmp") {
+            Remove-Item -Force "$file.tmp" 2>&1 | Out-Null
+          }
+
           Write-Output "::group::Downloading ${name}"
           Write-Output "Downloading from ${url}"
-          Invoke-WebRequest -Uri "$url" -OutFile "${file}.tmp"
+          pwsh.exe -Command Invoke-WebRequest -Uri "$url" -OutFile "${file}.tmp" -Resume -MaximumRetryCount 5 -RetryIntervalSec 2
           if ( ! $? ) {
             $allSuccess = $false
             Write-Output "Error: Failed download"
