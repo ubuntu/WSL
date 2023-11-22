@@ -45,13 +45,8 @@ func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper, this is a test
 	t.Parallel()
 	var expectedRelease string
 
-	distroNameToRelease := map[string]string{
-		"Ubuntu":         "22.04",
-		"Ubuntu-22.04":   "22.04",
-		"Ubuntu-20.04":   "20.04",
-		"Ubuntu-18.04":   "18.04",
-		"Ubuntu-Preview": "23.10",
-	}
+	distroNameToRelease, e := getDistroReleases()
+	require.NoError(t, e, "failed to initialize the list of distro")
 
 	expectedRelease, ok := distroNameToRelease[*distroName]
 	if !ok {

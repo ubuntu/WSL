@@ -181,3 +181,37 @@ func distroState(t *testing.T) string {
 
 	return distroNotFoundMsg
 }
+
+// getDistroReleases parses the output of distro-info and returns the list of supported WSL releases
+func getDistroReleases() (map[string]string, error) {
+	distroNameToRelease := map[string]string{}
+
+	out, err := exec.Command("distro-info", "-r", "--supported-esm").Output()
+	if err != nil {
+		return nil, err
+	}
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+
+	var version string
+	// All but last line which is the devel release
+	for i := 0; i < len(lines)-1; i++ {
+		line := lines[i]
+		// Only collect LTS releases
+		if strings.HasSuffix(line, "LTS") {
+			version = strings.TrimSpace(strings.TrimSuffix(line, "LTS"))
+			distroNameToRelease["Ubuntu-"+version] = version
+		}
+	}
+
+	// output of distro-info is sorted so Ubuntu is the last LTS of the list
+	distroNameToRelease["Ubuntu"] = version
+
+	// Get the dev release. It can be a non-LTS version
+	out, err = exec.Command("distro-info", "-rd").Output()
+	if err != nil {
+		return nil, err
+	}
+	distroNameToRelease["Ubuntu-Preview"] = strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(string(out)), "LTS"))
+
+	return distroNameToRelease, nil
+}
