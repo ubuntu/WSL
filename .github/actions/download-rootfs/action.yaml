@@ -76,7 +76,7 @@ runs:
           $url = $data[1]
 
           # Make sure there is no previous leftover
-          if (Test-Path $file) {
+          if (Test-Path "$file.tmp") {
             Remove-Item -Force "$file.tmp" 2>&1 | Out-Null
           }
 
