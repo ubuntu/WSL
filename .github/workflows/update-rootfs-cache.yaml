@@ -11,7 +11,7 @@ on:
      paths:
       # We run it when changing one if its dependencies
       - .github/workflows/update-rootfs-cache.yaml
-      - .github/actions/download-rootfs.yaml
+      - .github/actions/download-rootfs/action.yaml
 
 env:
   az_name: wsl-ci
