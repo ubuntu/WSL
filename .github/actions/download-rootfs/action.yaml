@@ -30,11 +30,11 @@ runs:
     - name: Prepare environment
       shell: powershell
       run: |
+        # Prepare environment
+
         # Install PowerShell
-        $PsVersion
         winget install --id Microsoft.Powershell --silent --accept-package-agreements --accept-source-agreements --source winget
 
-        # Prepare environment
         Write-Output "::group::Build wsl release info generator"
         go build .\wsl-builder\release-info\
         if ( "${LastExitCode}" -ne "0" ) {
