@@ -55,8 +55,6 @@ runs:
     - name: Download Ubuntu rootfs
       shell: powershell
       run: |
-        # Ensure we are using the right version of Powershell
-        $PsVersion
         # Download rootfs
         .\release-info.exe "${{ inputs.path }}\ubuntu-releases.csv" ${{ inputs.distros }} --rootfs amd64 --short 1> "${{ inputs.path }}\wsl-releases.csv"
         if ( "${LastExitCode}" -ne "0" ) {
@@ -78,7 +76,9 @@ runs:
           $url = $data[1]
 
           # Make sure there is no previous leftover
-          Remove-Item -Force "$file.tmp" 2>&1 | Out-Null
+          if (Test-Path $file) {
+            Remove-Item -Force "$file.tmp" 2>&1 | Out-Null
+          }
 
           Write-Output "::group::Downloading ${name}"
           Write-Output "Downloading from ${url}"
