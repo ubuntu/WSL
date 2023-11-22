@@ -73,7 +73,7 @@ runs:
 
           Write-Output "::group::Downloading ${name}"
           Write-Output "Downloading from ${url}"
-          Invoke-WebRequest -Uri "$url" -OutFile "${file}.tmp"
+          Invoke-WebRequest -Uri "$url" -OutFile "${file}.tmp" -Resume -MaximumRetryCount 5 -RetryIntervalSec 2
           if ( ! $? ) {
             $allSuccess = $false
             Write-Output "Error: Failed download"
