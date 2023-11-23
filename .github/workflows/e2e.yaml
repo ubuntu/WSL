@@ -28,7 +28,7 @@ jobs:
       distroName: "Ubuntu-Preview"
       appID: "UbuntuPreview"
       launcher: "ubuntupreview.exe"
-      goversion: "1.18"
+      goversion: "1.21.4"
     steps:
       - name: Checkout
         uses: actions/checkout@v3

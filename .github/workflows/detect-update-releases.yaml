@@ -14,7 +14,7 @@ on:
     - cron: '42 0 * * 6'
 
 env:
-  goversion: '1.18'
+  goversion: '1.21.4'
 
 jobs:
   update-releases:

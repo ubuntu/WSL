@@ -26,7 +26,7 @@ runs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: "1.18"
+        go-version: "1.21.4"
     - name: Prepare environment
       shell: powershell
       run: |
