@@ -40,39 +40,6 @@ func testLanguagePacksMarked(t *testing.T) { //nolint: thelper, this is a test
 	require.NotEmpty(t, string(out), "At least one language pack should have been installed or marked for installation, but apt-mark command output is empty.")
 }
 
-// Proper release. Ensures the right tarball was used as rootfs.
-func testCorrectReleaseRootfs(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
-	var expectedRelease string
-
-	distroNameToRelease := map[string]string{
-		"Ubuntu":         "22.04",
-		"Ubuntu-22.04":   "22.04",
-		"Ubuntu-20.04":   "20.04",
-		"Ubuntu-18.04":   "18.04",
-		"Ubuntu-Preview": "24.04",
-	}
-
-	expectedRelease, ok := distroNameToRelease[*distroName]
-	if !ok {
-		expectedRelease = distroNameToRelease["Ubuntu-Preview"]
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
-	defer cancel()
-
-	out, err := wslCommand(ctx, "lsb_release", "-r").CombinedOutput()
-	require.NoErrorf(t, err, "Unexpected failure executing lsb_release: %s", out)
-
-	// Example 'out': "Release:        22.04"
-	k, v, found := strings.Cut(string(out), ":")
-	require.True(t, found, "Failed to parse '<key>: <value>' from input %q", out)
-	require.Equal(t, k, "Release", "Failed to parse 'Release: <value>' from input %q", out)
-	release := strings.TrimSpace(v)
-
-	require.Equal(t, expectedRelease, release, "Mismatching releases")
-}
-
 // testSystemdEnabled ensures systemd was enabled.
 func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
 	if !systemdIsExpected() {

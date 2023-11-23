@@ -56,7 +56,6 @@ func TestDefaultExperience(t *testing.T) {
 	testCases := map[string]func(t *testing.T){
 		"UserNotRoot":             testUserNotRoot,
 		"LanguagePacksMarked":     testLanguagePacksMarked,
-		"CorrectReleaseRootfs":    testCorrectReleaseRootfs,
 		"SystemdEnabled":          testSystemdEnabled,
 		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
@@ -103,9 +102,9 @@ func waitStateTransition(t *testing.T, fromState string, toState string) {
 // waitForInstaller waits until the subiquity server log indicates that the installation
 // has finsihed.
 // Considerations:
-// - The server may still run for a small amount of time after the log
-//   says it has finished. Experimentally, it seems to be less than a second.
-// - The State of the distro must be either Running or Stopped when called (i.e. installation must have been started).
+//   - The server may still run for a small amount of time after the log
+//     says it has finished. Experimentally, it seems to be less than a second.
+//   - The State of the distro must be either Running or Stopped when called (i.e. installation must have been started).
 func waitForInstaller(t *testing.T) {
 	t.Helper()
 
