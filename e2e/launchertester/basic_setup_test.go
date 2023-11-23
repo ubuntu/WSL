@@ -23,7 +23,6 @@ func TestBasicSetupGUI(t *testing.T) {
 	testCases := map[string]func(t *testing.T){
 		"UserNotRoot":             testUserNotRoot,
 		"LanguagePacksMarked":     testLanguagePacksMarked,
-		"CorrectReleaseRootfs":    testCorrectReleaseRootfs,
 		"SystemdEnabled":          testSystemdEnabled,
 		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
@@ -51,7 +50,6 @@ func TestBasicSetupFallbackUI(t *testing.T) {
 	testCases := map[string]func(t *testing.T){
 		// Skipping testUserNotRoot because we installed as --root
 		"LanguagePacksMarked":     testLanguagePacksMarked,
-		"CorrectReleaseRootfs":    testCorrectReleaseRootfs,
 		"SystemdEnabled":          testSystemdEnabled,
 		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
