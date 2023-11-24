@@ -23,7 +23,7 @@ on:
 concurrency: build-wsl
 
 env:
-  goversion: '1.18'
+  goversion: '1.21.4'
 
 jobs:
   build-matrix:

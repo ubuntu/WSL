@@ -1,6 +1,6 @@
 module github.com/ubuntu/wsl/wsl-builder/prepare-build
 
-go 1.18
+go 1.21.4
 
 require (
 	github.com/spf13/cobra v1.1.3

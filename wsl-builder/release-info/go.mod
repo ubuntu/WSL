@@ -1,6 +1,6 @@
 module release-info
 
-go 1.18
+go 1.21.4
 
 require (
 	github.com/0xrawsec/golang-utils v1.3.2
