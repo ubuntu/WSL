@@ -91,7 +91,7 @@ However, this tutorial is not about running Linux GUI applications from WSL (whi
 
 Let’s try this right away: from Windows, launch a web browser and enter the `URL printed above` with the corresponding token, for example: `http://localhost:8888/?token=1d80ee69da6238f22bb683a4acd00025d32d15dde91cbdf4`.
 
-![|624x347](https://lh6.googleusercontent.com/i_Rmp5m01T2w9ElO5d4H5j2N5KQBFyvhB2y30fXXIDo7bc2tdkhC-l_kL0i7h89P7PlhMiXGsoQ4UIMzi4ym2LRhXuw-TyN9yFqab_1-XEPgHYWGKLC_ILKoq6hb8w7kFGczNYyv)
+![|624x347](assets/interop/jupyter.png)
 
 And it works! You can thus easily expose and share any services that are using network ports between your Windows machine and WSL instances!
 
@@ -166,7 +166,7 @@ Some preliminary warnings: accessing Windows filesystem from Ubuntu is using the
 
 From the Jupyter main screen, create a new notebook to start developing an interactive Python solution. You can do this by clicking on the `New` button, and then clicking on the `Python 3` option, as we can see below.
 
-![Jupyter Notebook: A Beginner's Tutorial|624x251](https://lh6.googleusercontent.com/X6T9tOAGDq6SXC21xkmqmKQe7cZmviCW1o2QRM_ftvz7HvlAbkHmt7aVfNxPhyZpD79Rc1jeNazU1Xw97sOPO3lg-4OVxvfMrPil5RfjLxLfcPLseJ9gu5ayURJEVijK0-ojK_mu)
+![Jupyter Notebook: A Beginner's Tutorial|624x251](assets/interop/jupyter-python.jpg)
 
 Copy this to the first cell, adapting the input directory:
 
@@ -200,7 +200,7 @@ This script will enumerate all files under `/mnt/c/Users/mysuser/path/my/subdire
 
 Let’s execute it by clicking on the “Run” button in the web interface.
 
-![|624x469](https://lh6.googleusercontent.com/uRetJKFK5CzPEc3WvxFTUyrIFiOeBYZJa-9yUD9vaju-5e92uNB-0M0F-mLBL2fiX6Y-BQEp9IbzDVz1Cs_EMpShKIItm3MzI1MYRJ6dXoUC5yqN1rz16Jx-S0Gce_r2WpAJv3SH)
+![|624x469](assets/interop/jupyter-script.png)
 
 Note that while the entry is running, you will have a `In [*]` with the star marker. This will be replaced by `In [1]:` when completed. Once done and the results are printed, let’s ensure that the CSV file is present on disk using an Ubuntu terminal:
 
@@ -254,7 +254,7 @@ First, we are able to export the `HOME` variable to subprocess, telling us that 
 
 Open Windows Explorer and navigate to that path to confirm they are visible there:
 
-![|624x352](https://lh3.googleusercontent.com/pWvRtOfLQ41H-f5TPxoFGpEUpafcxfPiJlbKYhaxNVMbt0ZPhqbRvPSTSMaJ3eVTH2kCsR8-W-XarytRHayVMM7bP0F1IVPrObWXG4TQ4m7EtI0K3Il-y3OiGNWs1JBhqcBuNiY1)
+![|624x352](assets/interop/ubuntu-home.png)
 
 Let’s now create a PowerShell script, from Windows, on this Ubuntu filesystem and save it there:
 
@@ -293,7 +293,6 @@ This PowerShell script, written from Windows on your Linux instance will be quit
 This is all very impressive, we have been able to share network, environment variables, paths, and files, and execute processes interchangeably between Ubuntu and Windows. Let’s go one step further by chaining all of this together in a single, but effective line:
 
 ```
-
 $ cat stats-raw.csv | powershell.exe -ExecutionPolicy Bypass -File $HOME/filter-less-than-five.ps1 | tee stats.csv
 "mime_type","count"
 "text/plain","468"
@@ -332,7 +331,7 @@ Note: You can’t deny it’s really amazing to be able to execute explorer.exe 
 
 This will open LibreOffice, Microsoft Excel, or any other tool you may have associated with CSV files. From there, you will be able to draw beautiful charts, make further analyses, and so on. But that’s another story…
 
-![|624x389](https://lh4.googleusercontent.com/i5swjYD91d2MFAzOTxTwfLIUBvUzcbec05jamfclgAIJ-vhnDlq4TVd-2gIideys1h5w1EXjWBUm5oy7heCSYQpkm0mxGRNNEzoBAhLHaeZFWPsITziDRVvxqqo4gT4kG7PWEEXv)
+![|624x389](assets/interop/spreadsheet.png)
 
 ## Enjoy Ubuntu on WSL!
 
