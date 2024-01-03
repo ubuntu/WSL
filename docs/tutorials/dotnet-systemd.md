@@ -56,7 +56,7 @@ We can verify the template has been installed correctly by running:
 
 And looking for the `Bot Framework Echo Bot` template in the list.
 
-![|624x153](https://lh6.googleusercontent.com/hC_8ZIlfpv-43hU-rTQZDWEE2SiLoW_YgzDpcgQqKGAZpCf3Q3a24WVmeld0qUDW6N29g2W3KMBtiYfpCHWpT-lw34F_oKU2nvzaPqEkx2hkU-TApiWJhMlIUsjv-uThatjFYL2qvgMsXnzD5f_vicfEpMFogLICs-TGg8fpzS0xIbtXv9z-VVcn1A)
+![|624x153](assets/dotnet-systemd/templates.png)
 
 Create a new Echo Bot project using the following command. We use `echoes` as the name for our bot.
 
@@ -72,11 +72,11 @@ Once inside, the project should be ready to run. Test it with:
 
 If everything was set up correctly you should see a similar output to the one below:
 
-![|624x357](https://lh5.googleusercontent.com/HIIkWmxltlh8Z8Sdut-i5qndnZ1YJ9tcZnlhOZLlcR6c3Gt7PL4R_ZWQBr3tWnM1tVcO_y7pjtnGVp3QnVvH-pRgp7A3Vn0NrloUwhKe9y5BedXIEPK9b0L7OUCuuFGoDowzowwA9Wuz_6pmz69v3D8KVsW819aMytbhlWqkJK1MhNUuLrtvMwrL4g)
+![|624x357](assets/dotnet-systemd/welcome-to-dotnet.png)
 
 Leave the EchoBot App running in WSL for now. Open a new browser window on your Windows host and navigate to `localhost:3978` where you should see the following window:
 
-![|624x347](https://lh3.googleusercontent.com/wBMwGYN0hAwIocrDcbhQW87tKPKz8bku8Hxb-Xk43o5NBjoYbMRpHDJI4hHfO3uNy15KFFFH-RpiTjytJEvHIbwfxKs-GSBGlCyH92P8m0xVW77AUORLsH4xHdfJhlRpuC6tNqoCVwVBi5HUEQ4sCIiNMegmlXqjoQKxZxEbhz33_DmtcHLwwjzd0g)
+![|624x347](assets/dotnet-systemd/your-bot-is-ready.png)
 
 Leave everything running as we move to the next step.
 
@@ -86,15 +86,15 @@ Download the Bot Emulator from the official [Microsoft GitHub](https://github.co
 
 Running it will present you with the following screen, but before you can connect to your bot you need to change a few settings.
 
-![|624x411](https://lh3.googleusercontent.com/7inX9LYw8kQrGtWZnMpDHFRsONq1s9dDsH2V1qsxK61Pe3L2grkXyzjTa8ZQU4WEJt2JPahl-n1kOBSTlguBL9AhqQkQbXCZhTWbq_qAq6EwgwdsKI3kFKefGnYxmd0fWDnNJnVPwJUS_vAVIwIDH-OBqqVJo7e0HkgC9AeYsLZGOKPh4rlBcmMEnQ)
+![|624x411](assets/dotnet-systemd/bot-framework-emulator.png)
 
 First, get the IP address of your machine by running `ipconfig` in a PowerShell terminal.
 
-![|624x357](https://lh6.googleusercontent.com/lKKzgkZQJ1ln64R-fzI6PPQ5h6TQEot69Ki7i7C_l3aQJLwY-oRVsm350s96ytriXHKnhaoWZptIKcL_A59BhMIkvKBjSEmyZKioVpWkGmqLYRsDDswq10ds1-xlvkwn8B9o_OGcK0wPogyUWLJfIKEMBIh8X3sbToXhKlXffX7aMzz6ZR-axSqqjA)
+![|624x357](assets/dotnet-systemd/ipconfig.png)
 
 Then select the setting icon in the corner of the Bot Framework Emulator and enter your IP under ‘localhost override'.
 
-![|624x411](https://lh6.googleusercontent.com/s6wiapLi-IxcfxX85UgfslQVWW9kJI9V7S-8BGA6QLYKSDUkkZ91trfmNOHrjG402xi2fuY2dXAyhhokWToxwG6gsGwydeg1OC3-f3g6ZyNn6DNNpPk8VbMMt4sEva7mmJO-FH1uyZerX8YrTszE_cR-AWgxQ-C8BGdPUAoWcqTH1dic3C0NRSEeSw)
+![|624x411](assets/dotnet-systemd/emulator-settings.png)
 
 Click save and navigate back to the Welcome tab.
 
@@ -103,9 +103,9 @@ Click ‘Open Bot’ and under ‘Bot URL’ input:
 http://localhost:3978/api/messages
 ```
 
-![|624x411](https://lh3.googleusercontent.com/S_D4Q_HSqo4lXrAYa-SrWXzc9PQKjimydwcplyJLug1jsCjo8eE2Xf1Dgp7lTyWiO8-zFK-aDak490Vi3L8TitJiZaw28vobqklM4m6eHyRjoHYKqKXgCEXTyddFh-4siCBki3nMPNRPCCzm-vZldENifIIFGEqrgDdE0mPagmbR2c16WcNf52Vang)
+![|624x411](assets/dotnet-systemd/open-a-bot.png)
 
-And click ‘Connect’ to connect to your Echo Bot running in WSL and start chatting!![|624x411](https://lh3.googleusercontent.com/HcTemxFbz7xRaYvlvTZziWb-qQktpRTuZyeTBVEqs0TY2XqVfNkYPJcVLxlbueeVIFk4JKpA52fTiWbVE1l01LpjWHLjsXYCUzOF8zocrlW4B2SWsbmIiLxp00hk4E5bzEVoKMUiNK4gb76ttZ2ZmD1Aj5d2qZ3tkC22W8mxJb4V-yWGG_ySGjlGHg)
+And click ‘Connect’ to connect to your Echo Bot running in WSL and start chatting!![|624x411](assets/dotnet-systemd/start-chatting.png)
 
 Congratulations, your Echo Chat Bot App is running on Ubuntu WSL as an App. Now it is time to make it run as a service.
 
@@ -125,7 +125,7 @@ From the ‘echoes’ directory.
 
 Navigate to ‘Program.cs’ and insert `.UserSystemd()` as a new line in the location shown in the screenshot.
 
-![|624x381](https://lh5.googleusercontent.com/fYkhep5H-fBStxkqUtaXb8jfSSZ3YPta5vTu8eQZgQGeDRU7oFERlnEc1JHlY-UtB4HSBcdBqn8SDsMFVf0bxv6UGCy0CMZ6PBztBGh4DNBx6HIaWt5LJ4yRPU5i8XCSkeMSYaZBWvDh7S3QaZVH6PqyEM1c1EUUu-ugnIPKszWb1pnQgWTko5A4Ug)
+![|624x381](assets/dotnet-systemd/program-cs.png)
 
 Save and close the project in VS code and return to your WSL terminal.
 
@@ -149,7 +149,7 @@ SyslogIdentifier=echoes
 WantedBy=multi-user.target
 ```
 
-![|624x401](https://lh3.googleusercontent.com/u37gfrOD-U3AbnFBRSgNnqUatrvPIaDssbkia5SHhc0osPOtPXIBC4-fxz7HfGUs4CxdK28LvkGvtKRuOOmTxZeWqgBR7QpSoCkTPj9GA6wzY8m9R574PzgQMlIeO1GZhxPopX2AnYR1QrS5xNYG67xSYQ23ATvloEtCevpO4RkwopSeOntBTKcF1A)
+![|624x401](assets/dotnet-systemd/nano-service-file.png)
 
 Save your file and reload your services with:
 
@@ -161,7 +161,7 @@ To reload the services. You can check if your service is ready by running:
 
 You should get the following output:
 
-![|624x77](https://lh5.googleusercontent.com/2M4cbrth9TmT8im85UbOsYJaXgDTiIvBLUgZLTq53cVkW_IMZ70B7BJ5sqCagQ4vAdbz2tv3xnCWX9aUajFZstYEusWCtdbR0dEG6GlK5rfI2A91WZjj67V1kx6Gwc9o5mUnvaeCxY-4kX0gC0SxoENczCmB_8hKou-XW97OYGYP8tvCPFxi_m_PRw)
+![|624x77](assets/dotnet-systemd/systemctl-status-inactive.png)
 
 Now start your service and then check its status again.
 
@@ -170,11 +170,11 @@ Now start your service and then check its status again.
 
 If everything has been configured correctly you should get an output similar to the below.
 
-![|624x401](https://lh3.googleusercontent.com/vBX3JPcYXL1-6SBPzeROdYlVZXHF-WHN2CFxMw3BXsD-_cD4wICa_jhLWBCD2xaerIDHg-CtJwH73pkDqbGNdvXNvuFUXmYr9DJ9unT7jt73oqwQvv2VfMV25PkS8i8DCGglixpNUMVa1Jrvc7mZIiT45-u-Q-TyHz6SeLNh1owTn3KzHo_U4dAN8A)
+![|624x401](assets/dotnet-systemd/systemctl-status-running.png)
 
 Return to your Windows host and reconnect to your Bot Emulator using the same information as before and confirm that your bot is running, but this time as a systemd service!
 
-![|624x411](https://lh4.googleusercontent.com/4-r5Pk2e178d0R4mzJgtGKOVdjzYdzyGehV3-Ff4_tZXh9n6i0sUlv5pTxdEhhPywJSyYxv3Q9lJi_Q4aElpus8HjH9DkPVyfTx3JQHsCyOySxC6g1NK0bCjLk77trC9OxVawnIPo36Xl8YWPIYYYI1_Eqq_9Q4tMYmA3bqNRzjWYjH1B2UD1kiEzA)
+![|624x411](assets/dotnet-systemd/start-chatting-service.png)
 
 You can stop your bot from running at any time with the command:
 
