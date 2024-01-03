@@ -83,7 +83,7 @@ After some seconds we should have an instance of Mantic Minotaur ready. Notice t
 
 Running a command with sudo demonstrates that the password was set to “ubuntu” as we would expect.
 
-![image](assets/autoinstall-screenshot-1.png)
+![image](assets/autoinstall/autoinstall-screenshot-1.png)
 
 Experiment playing with that config by changing the username and password. Don’t forget that this is a setup process, so you’ll need to unregister the existing Ubuntu Preview instance before running the auto-install command again. To generate the encrypted version of the desired password you can run on another instance of Ubuntu the mkpasswd command (part of the whois package) or openssl passwd:
 
@@ -124,7 +124,7 @@ wslconfadvanced:
 
 The result should look something like:
 
-![image](assets/autoinstall-screenshot-2.png)
+![image](assets/autoinstall/autoinstall-screenshot-2.png)
 
 That’s it. Although rather limited, the Ubuntu WSL auto-install feature has the potential to unlock many interesting use cases, such as allowing standardised deployments of WSL instances or installing packages via early and late commands.
 

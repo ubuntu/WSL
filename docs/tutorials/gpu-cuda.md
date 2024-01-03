@@ -15,7 +15,7 @@ While WSL's default setup allows you to develop cross-platform applications with
 * Ubuntu on WSL2 previously installed
 * Familiarity with Linux command line utilities and interacting with Ubuntu on WSL2
 
-> ⓘ Note: If you need more introductory topics, such as how to install Ubuntu on WSL, refer to previous tutorials that can be found [here](install-ubuntu-wsl2.md).
+> ⓘ Note: If you need more introductory topics, such as how to install Ubuntu on WSL, refer to previous tutorials that can be found [here](../guides/install-ubuntu-wsl2.md).
 
 
 ## Prerequisites
@@ -132,6 +132,6 @@ We hope you enjoy using Ubuntu inside WSL for your Data Science projects. Don’
 * [Setting up WSL for Data Science](https://ubuntu.com/blog/wsl-for-data-scientist)
 * [Ubuntu WSL for Data Scientists Whitepaper](https://ubuntu.com/engage/ubuntu-wsl-for-data-scientists)
 * [NVIDIA's CUDA Post Installation Actions](gpu-cuda.md)
-* [Install Ubuntu on WSL2 on Windows 10 and Windows 11 with GUI Support](install-ubuntu-wsl2.md)
+* [Install Ubuntu on WSL2](../guides/install-ubuntu-wsl2.md)
 * [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
 * [Ask Ubuntu](https://askubuntu.com/)

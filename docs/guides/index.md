@@ -5,5 +5,6 @@
 ```{toctree}
 :titlesonly:
 
+install-ubuntu-wsl2
 autoinstall
 ```

@@ -26,7 +26,7 @@ This tutorial assumes that you already have WSL2 installed with the latest LTS r
 
 If not, check out our getting started tutorial for Windows 10 and Windows 11:
 
-* [Install Ubuntu on WSL2 on Windows 10 and Windows 11 with GUI support](install-ubuntu-wsl2.md)
+* [Install Ubuntu on WSL2](../guides/install-ubuntu-wsl2.md)
 
 For this tutorial, we will assume that you have installed the [Ubuntu](https://www.microsoft.com/en-us/p/ubuntu/9pdxgncfsczv?rtc=1&activetab=pivot:overviewtab) main WSL application.
 
@@ -352,6 +352,6 @@ We hope you enjoy using Ubuntu inside WSL. Don’t forget to check out our other
 * [WSL ENV documentation](https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows/)
 * [WSL.conf documentation](https://learn.microsoft.com/en-us/windows/wsl/wsl-config)
 * [Jupyter notebook](https://jupyter.org/)
-* [Install Ubuntu on WSL2 on Windows 10 and Windows 11 with GUI Support](install-ubuntu-wsl2.md)
+* [Install Ubuntu on WSL2](../guides/install-ubuntu-wsl2.md)
 * [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
 * [Ask Ubuntu](https://askubuntu.com/)
