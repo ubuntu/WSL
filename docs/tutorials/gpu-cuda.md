@@ -35,37 +35,37 @@ Make sure the following prerequisites are met before moving forward:
 
 Please refer to the official [WSL documentation](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps) for up-to-date links matching your specific GPU vendor. You can find these in `Install support for Linux GUI apps > Prerequisites` . For this example, we will download the `NVIDIA GPU Driver for WSL`.
 
-![|624x283](https://lh3.googleusercontent.com/At632eOPirKgKd8OBD-sLfHui7WAa1lZSIDERr-BZNsqC28pAbX1dbAmbLbDO0aFQWvYShXJvwn42Pq7tvVkokWp5tl28oxoTlF-z0iyx3dLxiXYiq53wy17QgvxSD_Kh0Hd_l25)
+![|624x283](assets/gpu-cuda/install-drivers.png)
 
 > ⓘ **Note:** This is the only device driver you’ll need to install. Do not install any display driver on Ubuntu.
 
 Once downloaded, double-click on the executable file and click `Yes` to allow the program to make changes to your computer.
 
-![|624x136](https://lh4.googleusercontent.com/hsDq_ojZTfuOQrlUdHdJ3dpyjuzg2lSvN5idhz3QdXXvCjZo-cJwCf_fbwwy680q6ZsuryAm-D4c5nQhGh3NYRmFQp_7q0izm9Fszsb-kkCy852LICUqNXFFpbOasGFGicplhQ-T)
+![|624x136](assets/gpu-cuda/downloads-folder.png)
 
-![|358x312](https://lh3.googleusercontent.com/ae6rEjwtpjWICy-udy6dVQSpxJdg8_Ql8LYojYiEPl_rJhQeEsppJTuViILfuHKRjiuH1q4pIuB-Wgwm-PQUiM68eQcAbiXrkc1WDbYZAXjsXHJFA9qD47E3guX2aEGr21yC8i9a)
+![|358x312](assets/gpu-cuda/nvidia-allow-changes.png)
 
 Confirm the default directory and allow the self-extraction process to proceed.
 
-![|369x175](https://lh5.googleusercontent.com/vEjsLLyFvRAPl4j62bXAmgbvicKJT_BsLoBtiHPSPYRgsDMd8RuFmpN1Sfbu_eOzxW2SOFBgiG4DPRQriTyfcmnFagu8z_IM47rvopk_o1f40paF2IdGWFU-7TdqowJe3tgQlGGh)
+![|369x175](assets/gpu-cuda/default-dir.png)
 
-![|368x168](https://lh6.googleusercontent.com/PIGJXcLazCzqxl8vKoeWuFd0PxqQZ1KlsCRnPYEi8Yn3WmXlERJ6NUzFTSjijTuG8s_n02kbLtyfMGt2ThYJpEITjXiLQvfrrFV8sJc6YOii8QwDCsGX_rl0-m6UaTg_X4mYQ77I)
+![|368x168](assets/gpu-cuda/please-wait-install.png)
 
 A splash screen appears with the driver version number and quickly turns into the main installer window. Read and accept the license terms to continue.
 
-![|541x276](https://lh4.googleusercontent.com/SX3xhVRQNuWaVfpCmWI94VhZ8DuS8NIHw4ImHuWSmpr75tn-elq1pcuL4r-9CdpVKBbDCq3VgbC_QaaZi6PzJ_dTTPK2a3RrfTLcv7zrUHOngjZXLcIZwEVGoMlf83zUf_1-vZuz)
+![|541x276](assets/gpu-cuda/splash-screen.png)
 
-![|542x412](https://lh3.googleusercontent.com/fxMK_4rBBoIkmFbLGosmekl0BbnsILbGr3P8hERX4sQGH4x2yk93y7QyM5O-W-89Zkx00KealuDEk2cTJlosztG9u-Kb8CKQVfD7PbEETJMfCc4jZfIbvQLoR6lbOvD38p9zKuJ7)
+![|542x412](assets/gpu-cuda/license.png)
 
 Confirm the wizard defaults by clicking `Next` and wait until the end of the installation. You might be prompted to restart your computer.
 
-![|536x397](https://lh3.googleusercontent.com/FQ5vOd2CNoPxksFJcuqHvpTWMP6lcu5a1vNZK6aK91EiDxMoCiCm4pq8Z5J5WZGptEObFg80L0m4KO7b3_DH8645DyMR-EvHbAM4wBzRmuBsADRthIE_udhF946AqUfSMoaHuTPb)
+![|536x397](assets/gpu-cuda/installation-options.png)
 
-![|542x404](https://lh3.googleusercontent.com/FCfbRxBKnDdvVYKYTAtPA0ILSczxDmwpTmA4h3VxJWUVqgwIl9-Go1MZsYRn6trNar19oRFhWJFnVSS6Y9voOrBF9ht5na7lq8rmWKKOpK4_Q2ephb7-WnlVbLlEqOLAhPaQYyXY)
+![|542x404](assets/gpu-cuda/installing.png)
 
 This step ends with a screen similar to the image below.
 
-![|544x406](https://lh5.googleusercontent.com/RZDS3p48YaNDDnVkl7vgZRN_oY-qCgy5ptcYlcbc3_Gbo6ySrPumZVipUkCHvxJxgC73wKQy1uKw9co90_TQRkT_Cn8Q4Lz9ccWNJDzWWcCQNLPUmS1cMgvLpSVTA-fuilBIIdtb)
+![|544x406](assets/gpu-cuda/install-finished.png)
 
 ## Install NVIDIA CUDA on Ubuntu
 
@@ -91,7 +91,7 @@ Then setup the appropriate package for Ubuntu WSL:
 
 Once complete, you should see a series of outputs that end in `done.`:
 
-![|544x559](https://lh3.googleusercontent.com/LOGRRLAHq7YA19ljM0eh0wpGwP1cXthB_bnDahTzxI3bziWb-qb9vZTvpAtEfKXUIghsgcNMvxTLz3xq2WquH_d_Fd34S6YAFM1UHCKjEuFTkL7nzMKAKYbDD-EInDpS2tjjZnQK7XIzijXDTg)
+![|544x559](assets/gpu-cuda/done-done.png)
 
 Congratulations! You should have a working installation of CUDA by now. Let’s test it in the next step.
 
@@ -113,13 +113,13 @@ To build the application, go to the cloned repository directory and type `make`:
 
 A successful build will look like the screenshot below. Once complete, run the application:
 
-![|624x135](https://lh5.googleusercontent.com/iN_jDkNiloSVVaGfK4Zr6nHOxa9vj-2aqKhf1jG0nxBmoN2YkA7sHXtaqiVGo8YB6hKlksq8oyzlLH1IitT6A6Jhq18D1PuwqRPRSF-bkaGTWIyTECtkO_XBzQcIMHIbeHJsX5QUHGWkloRu6w)
+![|624x135](assets/gpu-cuda/make.png)
 
 > `./deviceQuery`
 
 You should see a similar output to the following detailing the functionality of your CUDA setup (the exact results depend on your hardware setup):
 
-![|548x599](https://lh4.googleusercontent.com/0k7z_3i-WHJpebmYsRDCeHHh5DMdO-4xzsiPQz_jTuh4wRZV0-L7-5IiRlFLfIwku-VM2rKCdew_e2GieYloED-3jNEi-M8oByat6pasY7C3GHf7f3IegV2Q98faY-81w77m2Ix43BrZFBIAQw)
+![|548x599](assets/gpu-cuda/device-query.png)
 
 ## Enjoy Ubuntu on WSL!
 

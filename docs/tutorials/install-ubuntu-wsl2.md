@@ -20,7 +20,7 @@ wsl --install
 
 This command will enable the features necessary to run WSL and also install the default Ubuntu distribution of Linux available in the Microsoft Store. It is recommended to reboot your machine after this initial installation to complete the setup. You can also install WSL from the Microsoft Store.
 
-## Download Ubuntu
+## Install Ubuntu WSL
 
 WSL supports a variety of Linux distributions including the latest Ubuntu release. Check out [the documentation](../reference/distributions.md) to see which one you prefer. For the rest of this tutorial we'll use `Ubuntu` as the example.
 
@@ -46,6 +46,8 @@ You'll see a list of distros available and their ID. Choose the one you prefer a
 ```powershell
 winget install --Id 9PDXGNCFSCZV --source msstore
 ```
+
+<!-- TODO: Run -->
 
 ### Method 3: WSL Command line interface
 
