@@ -1,5 +1,5 @@
 # Install Ubuntu on WSL2 and get started with graphical applications
-*Authored by Oliver Smith (oliver.smith@canonical.com)*
+*Authored by Oliver Smith ([oliver.smith@canonical.com](mailto:oliver.smith@canonical.com))*
 
 ## What you will learn:
 
@@ -17,9 +17,7 @@
 
 ## Install WSL
 
-Duration: 3:00
-
-WSL can be installed from the command line. Open a powershell prompt as an Administrator (we recommend using Windows Terminal) and run:
+WSL can be installed from the command line. Open a PowerShell prompt as an Administrator (we recommend using Windows Terminal) and run:
 
 `wsl --install`
 
@@ -30,21 +28,19 @@ You can also install WSL from the Microsoft Store.
 
 ### Installation of WSL from the Microsoft Store
 
-Duration: 3:00
+The WSL app is available to install directly from the Microsoft Store like other Windows applications.
 
-The WSL app is availble to install directly from the Microsoft Store like other Windows applications.
-
-To install the WSL application from the Microsoft Store, open it and search for **Windows subsystem**.
+To install the WSL application from the Microsoft Store, open it and search for `Windows subsystem`.
 
 ![|624x487](https://assets.ubuntu.com/v1/625ba435-search-windlows-subsystem.png)
 
-Click on the item **Windows Subsystem for Linux** to open the corresponding application page.
+Click on the item `Windows Subsystem for Linux` to open the corresponding application page.
 
 ![|624x488](https://assets.ubuntu.com/v1/976c348a-click-item.png)
 
-Click on **Get** to download and install the application.
+Click on `Get` to download and install the application.
 
-Upon installation, you can click on **Open**, but it will not do much since there is no Linux distribution installed.
+Upon installation, you can click on `Open`, but it will not do much since there is no Linux distribution installed.
 
 However, if you really want to open the WSL application without installing a distribution, you’ll see a nice and short help message that you must follow in order to make something useful with WSL:
 
@@ -54,33 +50,18 @@ You can now proceed with the installation of Ubuntu.
 
 ## Download Ubuntu
 
-Duration: 4:00
-
-WSL supports a variety of Linux distributions including the [latest Ubuntu release](https://www.microsoft.com/en-us/p/ubuntu/9pdxgncfsczv?rtc=1&activetab=pivot:overviewtab), Ubuntu 20.04 LTS and Ubuntu 18.04 LTS. You can find them by opening the Microsoft Store app and searching for **Ubuntu**.
-
-![|624x581](https://assets.ubuntu.com/v1/ffc52b0d-search-ubuntu.png)
-
-Choose the distribution you prefer and then select **Get**.
-
-> ⓘ  **Which version should I choose?**
-> There are three types of Ubuntu releases published to the Microsoft Store:
-> * Ubuntu with a version number e.g. **Ubuntu 20.04.x**. This will always be 20.04 and upgrades won’t be proposed.
-> * Ubuntu **without a version number**. This is the latest LTS version of Ubuntu after the first point release. At the time of writing, it is Ubuntu 22.04. It will remain Ubuntu 22.04 until the first point release of the next LTS release of Ubuntu, for example 24.04.1 in 2024.
-> * **Ubuntu Preview** is a daily build of the latest development version of Ubuntu. You should install it if you want to live on the edge but not for production workload as it doesn’t receive the same amount of QA as stable releases and may break at any time.
+WSL supports a variety of Linux distributions including the latest Ubuntu release. Check out [the documentation](../reference/distributions.md) to see which one you prefer. Choose the distribution you prefer and then select `Get`.
 
 ![|624x489](https://assets.ubuntu.com/v1/6460fec3-choose-distribution.png)
 
-Ubuntu will then install on your machine.
-
-Once installed, you can either launch the application directly from the store or search for Ubuntu in your Windows search bar.
+Ubuntu will then be installed on your machine. Once installed, you can either launch the application directly from the store or search for Ubuntu in your Windows search bar.
 
 ![|624x580](https://assets.ubuntu.com/v1/c614939a-search-ubuntu-windows.png)
 
 ### Install Ubuntu from the command line
 
 It is possible to install the same Ubuntu applications available on the Windows Store directly from the command line.
-
-In a Powershell terminal you can run:
+In a PowerShell terminal you can run:
 
 `wsl --list --online` to see all available distros.
 
@@ -94,11 +75,9 @@ You can install a distro using the NAME by running:
 
 Use `wsl -l -v` to see all your currently installed distros and which version of WSL they are using:
 
- ![image|690x311](upload://8wtRQNGduqwF6nsGyGg41s0kZIR.png) 
+![image|690x311](upload://8wtRQNGduqwF6nsGyGg41s0kZIR.png) 
 
 ## Configure Ubuntu
-
-Duration: 5:00
 
 Congratulations, you now have an Ubuntu terminal running on your Windows machine!
 
@@ -114,13 +93,13 @@ Then
 
 `sudo apt full-upgrade`
 
-Press **Y** when prompted.
+Press `Y` when prompted.
 
 ### (Optional) Enable systemd
 
-In September 2022, Microsoft [announced support for systemd in WSL](https://ubuntu.com/blog/ubuntu-wsl-enable-systemd). This long-awaited upgrade to WSL unlocks a huge number of quality of life features for managing processes and services. This includes snapd support, which enables users to take advantage of all of the tools and apps available on [snapcraft.io](https://snapcraft.io/store).
+In September 2022, Microsoft [announced support for systemd in WSL](https://ubuntu.com/blog/ubuntu-wsl-enable-systemd). This long-awaited upgrade to WSL unlocks a huge number of quality-of-life features for managing processes and services. This includes snapd support, which enables users to take advantage of all of the tools and apps available on [snapcraft.io](https://snapcraft.io/store).
 
-To enable systemd you will need make a small modification to **/etc/wsl.conf** in your Ubuntu distribution.
+To enable systemd you will need make a small modification to `/etc/wsl.conf` in your Ubuntu distribution.
 
 Run `sudo nano /etc/wsl.conf' to open the file and insert the following lines:
 
@@ -128,15 +107,13 @@ Run `sudo nano /etc/wsl.conf' to open the file and insert the following lines:
 [boot]
 systemd=true
 ```
-Then restart your distro by running `wsl --shutdown` in powershell and relaunching.
+Then restart your distro by running `wsl --shutdown` in PowerShell and relaunching.
 
 > ⓘ  Systemd is enabled by default in the [Ubuntu Preview](https://apps.microsoft.com/store/detail/ubuntu-preview/9P7BDVKVNXZ6) application.
 
 ## Install and use a GUI package
 
-Duration: 5:00
-
-WSL2 comes with WSLg enabled by default. WSLg allows you to run graphical linux applications.
+WSL2 comes with WSLg enabled by default. WSLg allows you to run graphical Linux applications.
 
 To check that you have the latest package lists, type:
 
@@ -150,11 +127,11 @@ To run the xeyes, a “follow the mouse” application, type:
 
 `xeyes &`
 
-The **&** at the end of the line will execute the command asynchronously. In other words, the shell will run the command in the background and return to the command prompt immediately.
+The `&` at the end of the line will execute the command asynchronously. In other words, the shell will run the command in the background and return to the command prompt immediately.
 
-The first launch of a GUI application takes a few seconds while WSL is initializing the graphics stack. Next executions of GUI applications are much faster.
+The first launch of a GUI application takes a few seconds while WSL is initialising the graphics stack. Next executions of GUI applications are much faster.
 
-Leave **xeyes** opened and run the calculator **xcalc** with:
+Leave `xeyes` opened and run the calculator `xcalc` with:
 
 `xcalc`
 
@@ -166,9 +143,9 @@ Note that applications running under WSLg display a little penguin at the bottom
 
 ![|150x50](https://assets.ubuntu.com/v1/689c4427-icons-taskbar.png)
 
-Close **xeyes** and **xcalc** by pressing the **cross** icon on the top right corner of each X application window.
+Close `xeyes` and `xcalc` by pressing the `cross` icon on the top right corner of each X application window.
 
-Xcalc and xeyes are very basic X Windows applications but there are plenty of choices in the Linux ecosystem corresponding to your needs and available out of the box on Ubuntu.
+`xcalc` and `xeyes` are very basic X Windows applications but there are plenty of choices in the Linux ecosystem corresponding to your needs and available out of the box on Ubuntu.
 
 In the following example, we will use [GNU Octave](https://www.gnu.org/software/octave/index) to perform numerical computation.
 
@@ -184,81 +161,58 @@ Then start the application:
 
 `octave --gui &`
 
-Do not forget the ampersand **&** at the end of the line, so the application is started in the background and we can continue using the same terminal window.
+Do not forget the ampersand `&` at the end of the line, so the application is started in the background and we can continue using the same terminal window.
 
 ![|624x373](https://assets.ubuntu.com/v1/64a67442-octave.png)
 
-In Octave, click on the **New script** icon to open a new editor window and copy/paste the following code:
+In Octave, click on the `New script` icon to open a new editor window and copy/paste the following code:
 
-    #{
-
-    Inspired by the work of Bruno Girin ([Geek Thoughts: Fractals with Octave: Classic Mandelbrot and Julia](http://brunogirin.blogspot.com/2008/12/fractals-with-octave-classic-mandelbrot.html))
-
-    Calculate a Julia set
-
-    zmin: Minimum value of c
-
-    zmax: Maximum value of c
-
-    hpx: Number of horizontal pixels
-
-    niter: Number of iterations
-
-    c: A complex number
-
-    #}
-
-    function M = julia(zmin, zmax, hpx, niter, c)
-
+```octave
+#{
+Inspired by the work of Bruno Girin ([Geek Thoughts: Fractals with Octave: Classic Mandelbrot and Julia](http://brunogirin.blogspot.com/2008/12/fractals-with-octave-classic-mandelbrot.html))
+Calculate a Julia set
+zmin: Minimum value of c
+zmax: Maximum value of c
+hpx: Number of horizontal pixels
+niter: Number of iterations
+c: A complex number
+#}
+function M = julia(zmin, zmax, hpx, niter, c)
     %% Number of vertical pixels
-
     vpx=round(hpx*abs(imag(zmax-zmin)/real(zmax-zmin)));
-
     %% Prepare the complex plane
-
     [zRe,zIm]=meshgrid(linspace(real(zmin),real(zmax),hpx),
-
     linspace(imag(zmin),imag(zmax),vpx));
-
     z=zRe+i*zIm;
-
     M=zeros(vpx,hpx);
-
     %% Generate Julia
-
     for s=1:niter
-
-    mask=abs(z)<2;
-
-    M(mask)=M(mask)+1;
-
-    z(mask)=z(mask).^2+c;
-
+        mask=abs(z)<2;
+        M(mask)=M(mask)+1;
+        z(mask)=z(mask).^2+c;
     end
-
     M(mask)=0;
+end
+```
 
-    end
 
 This code is the function that will calculate the Julia set.
 
-Save it to a file named **julia.m**. Since it is a function definition, the name of the file must match the name of the function.
+Save it to a file named `julia.m`. Since it is a function definition, the name of the file must match the name of the function.
 
 Open a second editor window with the New Script button and copy and paste the following code:
+```octave
+Jc1=julia(-1.6+1.2i, 1.6-1.2i, 640, 128, -0.75+0.2i);
+imagesc(Jc1)
+axis off
+colormap('default');
+```
 
-    Jc1=julia(-1.6+1.2i, 1.6-1.2i, 640, 128, -0.75+0.2i);
+This code calls the function defined in `julia.m`. You can later change the parameters if you want to explore the Julia fractal.
 
-    imagesc(Jc1)
+Save it to a file named `juliatest.m`.
 
-    axis off
-
-    colormap('default');
-
-This code calls the function defined in **julia.m**. You can later change the parameters if you want to explore the Julia fractal.
-
-Save it to a file named **juliatest.m**.
-
-And finally, press the button **Save File and Run**.
+And finally, press the button `Save File and Run`.
 
 ![|570x225](https://assets.ubuntu.com/v1/489f6ccd-save-file.png)
 
@@ -271,8 +225,6 @@ Like Octave, this window is displayed using WSLg completely transparently to the
 Enjoy!
 
 ## Enjoy Ubuntu on WSL!
-
-Duration: 1:00
 
 That’s it! In this tutorial, we’ve shown you how to install WSL and Ubuntu on Windows 11, set up your profile, install a few packages, and run a graphical application.
 

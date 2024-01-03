@@ -79,7 +79,7 @@ Let’s save that in the local directory (D:\ in the screenshots) named `conf.ya
 ubuntupreview.exe install --autoinstall .\conf.yaml
 ```
 
-After some seconds we should have an instance of Mantic Minotaur ready. Notice that the autoinstallation won’t execute a shell after completion, it will just quit the launcher. That behavior fits into unattended setup scenarios.
+After some seconds we should have an instance of Mantic Minotaur ready. Notice that the autoinstallation won’t execute a shell after completion, it will just quit the launcher. That behaviour fits into unattended setup scenarios.
 
 Running a command with sudo demonstrates that the password was set to “ubuntu” as we would expect.
 
@@ -126,13 +126,13 @@ The result should look something like:
 
 ![image](assets/autoinstall-screenshot-2.png)
 
-That’s it. Although rather limited, the Ubuntu WSL auto-install feature has the potential to unlock many interesting use cases, such as allowing standardized deployments of WSL instances or installing packages via early and late commands.
+That’s it. Although rather limited, the Ubuntu WSL auto-install feature has the potential to unlock many interesting use cases, such as allowing standardised deployments of WSL instances or installing packages via early and late commands.
 
 ## Ubuntu WSL autoinstall reference
 
 ### Overall format
 
-The autoinstall file is YAML. At the top level, it must be a mapping containing the keys described in this document. Unrecognized keys are ignored.
+The autoinstall file is YAML. At the top level, it must be a mapping containing the keys described in this document. Unrecognised keys are ignored.
 
 ### Command lists
 Several config keys are lists of commands to be executed. Each command can be a string (in which case it is executed via “sh -c”) or a list, in which case it is executed directly. Any command exiting with a non-zero return code is considered an error and aborts the install (except for `error-commands`, where it is ignored).
@@ -194,13 +194,13 @@ identity:
 Shell commands to run after the installation has been completed successfully and any updates and packages installed, just before the system reboots. As with the early commands, they run in the rootfs environment; there is no chroot or equivalent mechanism for the WSL setup.
 
 ### WSL specifics
-The keys `wslconfbase` and `wslconfspecific` hold configuration data that will be written to the `/etc/wsl.conf` file, overriding the WSL default configuration for the instance being set up. Refer to Microsoft documentation for WSL advanced configuration to find the details of the subkeys. To properly map the configuration keys in the autoinstall YAML and the wsl.conf INI format, consider that `wslconfbase.automount_root` in YAML maps to INI `automount.root`, that is, the underscore in the subkey name delimits the section in the INI. See the example below for further clarification.
+The keys `wslconfbase` and `wslconfspecific` hold configuration data that will be written to the `/etc/wsl.conf` file, overriding the WSL default configuration for the instance being set up. Refer to Microsoft documentation for WSL advanced configuration to find the details of the subkeys. To properly map the configuration keys in the autoinstall YAML and the `wsl.conf` INI format, consider that `wslconfbase.automount_root` in YAML maps to INI `automount.root`, that is, the underscore in the subkey name delimits the section in the INI. See the example below for further clarification.
 
 
 <table border=1>
 <tr>
 <th> Autoinstall YAML syntax    </th>
-<th> wsl.conf INI syntax        </th>
+<th> `wsl.conf` INI syntax        </th>
 </tr>
 <tr>
 <td>

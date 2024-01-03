@@ -1,9 +1,9 @@
 # Run a .Net Echo Bot as a systemd service on Ubuntu WSL
-*Authored by Oliver Smith (oliver.smith@canonical.com)*
+*Authored by Oliver Smith ([oliver.smith@canonical.com](mailto:oliver.smith@canonical.com))*
 
-.Net is an open source development platform from Microsoft that enables developers to build multi-platform applications from a single codebase.
+.Net is an open-source development platform from Microsoft that enables developers to build multi-platform applications from a single codebase.
 
-In this tutorial we demonstrate how easy it is to start working with .Net on Ubuntu WSL by creating a simple chatbot accessible from your Windows host. We also take advantage of WSL’s new systemd support to run our bot as a systemd service for easier deployment.
+In this tutorial we demonstrate how easy it is to start working with .Net on Ubuntu WSL by creating a simple chatbot accessible from your Windows host. We also take advantage of WSL's new systemd support to run our bot as a systemd service for easier deployment.
 
 ## Requirements
 
@@ -17,9 +17,9 @@ You can check your current WSL version by running:
 
 > `> wsl -- version`
 
-In your Powershell terminal.
+In your PowerShell terminal.
 
-To enable systemd on your Ubuntu distribution you need to add the following content to **/etc/wsl.conf**​:
+To enable systemd on your Ubuntu distribution you need to add the following content to `/etc/wsl.conf`​:
 
 > `[boot]`
 > `systemd=true`
@@ -39,7 +39,7 @@ It is recommended to create a new directory for this project, do so now and navi
 >`$ sudo mkdir ~/mybot`
 >`$ cd mybot`
 
-## Install and run the Bot Framework Echobot template
+## Install and run the Bot Framework EchoBot template
 
 Create a new directory for the project and navigate to it before proceeding:
 
@@ -54,11 +54,11 @@ We can verify the template has been installed correctly by running:
 
 >`$ dotnet new --list`
 
-And looking for the **Bot Framework Echo Bot** template in the list.
+And looking for the `Bot Framework Echo Bot` template in the list.
 
 ![|624x153](https://lh6.googleusercontent.com/hC_8ZIlfpv-43hU-rTQZDWEE2SiLoW_YgzDpcgQqKGAZpCf3Q3a24WVmeld0qUDW6N29g2W3KMBtiYfpCHWpT-lw34F_oKU2nvzaPqEkx2hkU-TApiWJhMlIUsjv-uThatjFYL2qvgMsXnzD5f_vicfEpMFogLICs-TGg8fpzS0xIbtXv9z-VVcn1A)
 
-Create a new Echo Bot project using the following command. We use **echoes** as the name for our bot.
+Create a new Echo Bot project using the following command. We use `echoes` as the name for our bot.
 
 >`$ dotnet new echobot -n echoes`
 
@@ -74,7 +74,7 @@ If everything was set up correctly you should see a similar output to the one be
 
 ![|624x357](https://lh5.googleusercontent.com/HIIkWmxltlh8Z8Sdut-i5qndnZ1YJ9tcZnlhOZLlcR6c3Gt7PL4R_ZWQBr3tWnM1tVcO_y7pjtnGVp3QnVvH-pRgp7A3Vn0NrloUwhKe9y5BedXIEPK9b0L7OUCuuFGoDowzowwA9Wuz_6pmz69v3D8KVsW819aMytbhlWqkJK1MhNUuLrtvMwrL4g)
 
-Leave the Echobot App running in WSL for now. Open a new browser window on your Windows host and navigate to **localhost:3978** where you should see the following window:
+Leave the EchoBot App running in WSL for now. Open a new browser window on your Windows host and navigate to `localhost:3978` where you should see the following window:
 
 ![|624x347](https://lh3.googleusercontent.com/wBMwGYN0hAwIocrDcbhQW87tKPKz8bku8Hxb-Xk43o5NBjoYbMRpHDJI4hHfO3uNy15KFFFH-RpiTjytJEvHIbwfxKs-GSBGlCyH92P8m0xVW77AUORLsH4xHdfJhlRpuC6tNqoCVwVBi5HUEQ4sCIiNMegmlXqjoQKxZxEbhz33_DmtcHLwwjzd0g)
 
@@ -82,7 +82,7 @@ Leave everything running as we move to the next step.
 
 ## Install the Bot Emulator on Windows and connect to your bot
 
-Download the Bot Emulator from the official [Microsoft Github](https://github.com/Microsoft/BotFramework-Emulator/releases/tag/v4.14.1), taking care to select [BotFramework-Emulator-4.14.1-windows-setup.exe](https://github.com/microsoft/BotFramework-Emulator/releases/download/v4.14.1/BotFramework-Emulator-4.14.1-windows-setup.exe) and install.
+Download the Bot Emulator from the official [Microsoft GitHub](https://github.com/Microsoft/BotFramework-Emulator/releases/tag/v4.14.1), taking care to select [BotFramework-Emulator-4.14.1-windows-setup.exe](https://github.com/microsoft/BotFramework-Emulator/releases/download/v4.14.1/BotFramework-Emulator-4.14.1-windows-setup.exe) and install.
 
 Running it will present you with the following screen, but before you can connect to your bot you need to change a few settings.
 
@@ -98,9 +98,10 @@ Then select the setting icon in the corner of the Bot Framework Emulator and ent
 
 Click save and navigate back to the Welcome tab.
 
-Click ‘Open Bot’ and under ‘Bot Url’ input:
-
+Click ‘Open Bot’ and under ‘Bot URL’ input:
+```
 http://localhost:3978/api/messages
+```
 
 ![|624x411](https://lh3.googleusercontent.com/S_D4Q_HSqo4lXrAYa-SrWXzc9PQKjimydwcplyJLug1jsCjo8eE2Xf1Dgp7lTyWiO8-zFK-aDak490Vi3L8TitJiZaw28vobqklM4m6eHyRjoHYKqKXgCEXTyddFh-4siCBki3nMPNRPCCzm-vZldENifIIFGEqrgDdE0mPagmbR2c16WcNf52Vang)
 
@@ -110,7 +111,7 @@ Congratulations, your Echo Chat Bot App is running on Ubuntu WSL as an App. Now 
 
 ## Running your Echo Bot as a systemd service
 
-Return to your running WSL distro and end the app with **Ctrl+C**.
+Return to your running WSL distro and end the app with `Ctrl+C`.
 
 Then install the .Net systemd extension with:
 
@@ -122,7 +123,7 @@ Now we need to open our ‘echoes’ project in VS Code by running:
 
 From the ‘echoes’ directory.
 
-Navigate to ‘Program.cs’ and insert **.UserSystemd()** as a new line in the location shown in the screenshot.
+Navigate to ‘Program.cs’ and insert `.UserSystemd()` as a new line in the location shown in the screenshot.
 
 ![|624x381](https://lh5.googleusercontent.com/fYkhep5H-fBStxkqUtaXb8jfSSZ3YPta5vTu8eQZgQGeDRU7oFERlnEc1JHlY-UtB4HSBcdBqn8SDsMFVf0bxv6UGCy0CMZ6PBztBGh4DNBx6HIaWt5LJ4yRPU5i8XCSkeMSYaZBWvDh7S3QaZVH6PqyEM1c1EUUu-ugnIPKszWb1pnQgWTko5A4Ug)
 
@@ -132,7 +133,7 @@ Next we need to create a service file for your bot using your favourite editor, 
 
 >`$ sudo nano /etc/systemd/system/echoes.service`
 
-Then paste the below taking care to change the path of ‘WorkingDirectory’ to the location of your project folder.
+Then paste the below taking care to change the path of `WorkingDirectory` to the location of your project folder.
 
 ```
 [Unit]
@@ -183,9 +184,9 @@ You can stop your bot from running at any time with the command:
 
 You now have a simple Echo Bot running as a systemd service on WSL that you can access from your host Windows machine.
 
-If you would like to expand on this example try reviewing some of the more advanced [Bot Framework samples](https://github.com/Microsoft/BotBuilder-Samples/blob/main/README.md) on the Microsoft github.
+If you would like to expand on this example try reviewing some of the more advanced [Bot Framework samples](https://github.com/Microsoft/BotBuilder-Samples/blob/main/README.md) on the Microsoft GitHub.
 
-To read more about how Ubuntu supports .Net developers, making it easier than ever to build multi platform services and applications, read our [recent announcement](https://ubuntu.com/blog/install-dotnet-on-ubuntu).
+To read more about how Ubuntu supports .Net developers, making it easier than ever to build multi-platform services and applications, read our [recent announcement](https://ubuntu.com/blog/install-dotnet-on-ubuntu).
 
 ### Further Reading
 

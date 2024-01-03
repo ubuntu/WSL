@@ -11,7 +11,7 @@ WSL can be installed from the Microsoft Store.
 ## Ubuntu and WSL
 
 While Microsoft provides the virtual machine, the kernel, and a few more utilities; Ubuntu provides the distribution that runs on top of them. 
-We develop multiple flavors of Ubuntu for WSL, which you can read more about [here](reference/distributions.md). These flavors materialize as applications on the Microsoft Store.
+We develop multiple flavours of Ubuntu for WSL, which you can read more about [here](reference/distributions.md). These flavours materialise as applications on the Microsoft Store.
 
 
 ```{toctree}
