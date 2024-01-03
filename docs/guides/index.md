@@ -1,9 +1,9 @@
 (reference)=
 
-# Ubuntu WSL reference
+# Ubuntu WSL guides
 
 ```{toctree}
 :titlesonly:
 
-distributions
+autoinstall
 ```

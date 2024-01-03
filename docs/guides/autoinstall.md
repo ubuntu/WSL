@@ -1,4 +1,4 @@
-# Auto Installation Support
+# Using the Auto-installation feature
 
 The [Ubuntu Preview app](https://apps.microsoft.com/detail/9P7BDVKVNXZ6?hl=en-us&gl=US) exposes a rather incomplete and highly experimental subset of the automatic installation feature offered by Subiquity. In the following sections, we’ll explore what can be done with that feature and how to do it.
 

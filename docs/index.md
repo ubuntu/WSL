@@ -20,4 +20,5 @@ We develop multiple flavors of Ubuntu for WSL, which you can read more about [he
 
 self
 reference/index
+guides/index
 ```
