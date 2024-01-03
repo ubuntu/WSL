@@ -194,5 +194,5 @@ To read more about how Ubuntu supports .Net developers, making it easier than ev
 * [Bot Framework samples](https://github.com/Microsoft/BotBuilder-Samples/blob/main/README.md)
 * [Enabling GPU acceleration on Ubuntu on WSL2 with the NVIDIA CUDA Platform](gpu-cuda.md)
 * [Windows and Ubuntu interoperability on WSL2](interop.md)
-* [Microsoft WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
+* [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
 * [Ask Ubuntu](https://askubuntu.com/)

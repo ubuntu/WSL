@@ -18,7 +18,7 @@ We’ll illustrate all these notions by generating data from your Ubuntu WSL ins
 
 * Know how to use command line tools on Windows or Linux.
 * A PC with Windows 10 or 11.
-* Optional: [LibreOffice](https://www.libreoffice.org/download/download/) or MS Excel to visualise and manipulate generated data from Ubuntu.
+* Optional: [LibreOffice](https://www.libreoffice.org/download/download-libreoffice/) or MS Excel to visualise and manipulate generated data from Ubuntu.
 
 ## Install Ubuntu on WSL2
 
@@ -32,7 +32,7 @@ For this tutorial, we will assume that you have installed the [Ubuntu](https://w
 
 Once you have completed the relevant tutorial, the following steps will work on either Windows 10 or 11.
 
-Note: in this tutorial, we consider that interoperability is turned on in WSL.conf, which is the default behaviour. If you have disabled it, you can either use the ubuntu reconfiguration tool on Ubuntu 22.04+, or, for earlier versions, directly modify back `wsl.conf` yourself as described on [wsl.conf documentation](https://docs.microsoft.com/en-us/windows/wsl/wsl-config). The settings you are interested in are `[Interop]`: `enabled` and `appendWindowsPath` both set to true (or not being present, which defaults to true).
+Note: in this tutorial, we consider that interoperability is turned on in WSL.conf, which is the default behaviour. If you have disabled it, you can either use the ubuntu reconfiguration tool on Ubuntu 22.04+, or, for earlier versions, directly modify back `wsl.conf` yourself as described on [wsl.conf documentation](https://learn.microsoft.com/en-us/windows/wsl/wsl-config). The settings you are interested in are `[Interop]`: `enabled` and `appendWindowsPath` both set to true (or not being present, which defaults to true).
 
 ## Share ports between WSL and Windows
 
@@ -152,7 +152,7 @@ And here we go! We now know where our user profile data is accessible on WSL tha
 Going further:
 
 * There are many other flags available for environment variables sharing via `WSLENV`. Check out the reference section to have a look at some handy links explaining each of them.
-* The place where your Windows filesystems are mounted can vary depending on your configuration. This can be changed with our configuration tool on Ubuntu 22.04+ or by modifying the `automount` section [in wsl.conf](https://docs.microsoft.com/en-us/windows/wsl/wsl-config).
+* The place where your Windows filesystems are mounted can vary depending on your configuration. This can be changed with our configuration tool on Ubuntu 22.04+ or by modifying the `automount` section [in wsl.conf](https://learn.microsoft.com/en-us/windows/wsl/wsl-config).
 
 With this, we are now ready to generate some statistics on your Windows user profile directory from our WSL instance!
 
@@ -196,7 +196,7 @@ with open("stats-raw.csv", "w") as f:
 print(data)
 ```
 
-This script will enumerate all files under `/mnt/c/Users/mysuser/path/my/subdirectory`, get the mime types of each entry, and count them. It will write the result in your Ubuntu user home directory as a [Comma-separated Values](http://wikipedia.org/wiki/Comma-separated_values) file named `stats-raw.csv` and print it as well for your viewing pleasure. :)
+This script will enumerate all files under `/mnt/c/Users/mysuser/path/my/subdirectory`, get the mime types of each entry, and count them. It will write the result in your Ubuntu user home directory as a [Comma-separated Values](https://en.wikipedia.org/wiki/Comma-separated_values) file named `stats-raw.csv` and print it as well for your viewing pleasure. :)
 
 Let’s execute it by clicking on the “Run” button in the web interface.
 
@@ -351,8 +351,8 @@ We hope you enjoy using Ubuntu inside WSL. Don’t forget to check out our other
 ### Further Reading
 
 * [WSL ENV documentation](https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows/)
-* [WSL.conf documentation](https://docs.microsoft.com/en-us/windows/wsl/wsl-config)
+* [WSL.conf documentation](https://learn.microsoft.com/en-us/windows/wsl/wsl-config)
 * [Jupyter notebook](https://jupyter.org/)
 * [Install Ubuntu on WSL2 on Windows 10 and Windows 11 with GUI Support](install-ubuntu-wsl2.md)
-* [Microsoft WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
+* [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
 * [Ask Ubuntu](https://askubuntu.com/)

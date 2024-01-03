@@ -15,7 +15,7 @@ While WSL's default setup allows you to develop cross-platform applications with
 * Ubuntu on WSL2 previously installed
 * Familiarity with Linux command line utilities and interacting with Ubuntu on WSL2
 
-> ⓘ Note: If you need more introductory topics, such as how to install Ubuntu on WSL, refer to previous tutorials that can be found [here for Windows 11](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview) and [here for Windows 10](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview).
+> ⓘ Note: If you need more introductory topics, such as how to install Ubuntu on WSL, refer to previous tutorials that can be found [here](install-ubuntu-wsl2.md).
 
 
 ## Prerequisites
@@ -33,7 +33,7 @@ Make sure the following prerequisites are met before moving forward:
 
 > ⓘ Specific drivers are needed to enable use of a virtual GPU, which is how Ubuntu applications are able to access your GPU hardware, so you’ll need to follow this step even if your system drivers are up-to-date.
 
-Please refer to the official [WSL documentation](https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps) for up-to-date links matching your specific GPU vendor. You can find these in `Install support for Linux GUI apps > Prerequisites` . For this example, we will download the `NVIDIA GPU Driver for WSL`.
+Please refer to the official [WSL documentation](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps) for up-to-date links matching your specific GPU vendor. You can find these in `Install support for Linux GUI apps > Prerequisites` . For this example, we will download the `NVIDIA GPU Driver for WSL`.
 
 ![|624x283](https://lh3.googleusercontent.com/At632eOPirKgKd8OBD-sLfHui7WAa1lZSIDERr-BZNsqC28pAbX1dbAmbLbDO0aFQWvYShXJvwn42Pq7tvVkokWp5tl28oxoTlF-z0iyx3dLxiXYiq53wy17QgvxSD_Kh0Hd_l25)
 
@@ -133,5 +133,5 @@ We hope you enjoy using Ubuntu inside WSL for your Data Science projects. Don’
 * [Ubuntu WSL for Data Scientists Whitepaper](https://ubuntu.com/engage/ubuntu-wsl-for-data-scientists)
 * [NVIDIA's CUDA Post Installation Actions](gpu-cuda.md)
 * [Install Ubuntu on WSL2 on Windows 10 and Windows 11 with GUI Support](install-ubuntu-wsl2.md)
-* [Microsoft WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
+* [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
 * [Ask Ubuntu](https://askubuntu.com/)

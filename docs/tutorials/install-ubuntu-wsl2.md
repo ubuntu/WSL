@@ -104,11 +104,11 @@ Note that applications running under WSLg display a little penguin at the bottom
 
 ![|150x50](assets/install-ubuntu-wsl2/icons-taskbar.png)
 
-Close `xeyes` and `xcalc` by pressing the `X` icon on the top right corner of each X application window. `xcalc` and `xeyes` are very basic X Windows applications but there are plenty of choices in the Linux ecosystem corresponding to your needs and available out of the box on Ubuntu. In the next example, we will use [GNU Octave](https://www.gnu.org/software/octave/index) to perform numerical computation.
+Close `xeyes` and `xcalc` by pressing the `X` icon on the top right corner of each X application window. `xcalc` and `xeyes` are very basic X Windows applications but there are plenty of choices in the Linux ecosystem corresponding to your needs and available out of the box on Ubuntu. In the next example, we will use [GNU Octave](https://octave.org/index.html) to perform numerical computation.
 
 ## A more advanced example: GNU octave
 
-> ⓘ GNU Octave is software featuring a [high-level programming language](https://en.wikipedia.org/wiki/High-level_programming_language), primarily intended for [numerical computations](https://en.wikipedia.org/wiki/Numerical_analysis). Octave helps in solving linear and nonlinear problems numerically, and for performing other numerical experiments using a language that is mostly compatible with [MATLAB](https://en.wikipedia.org/wiki/MATLAB). [[GNU / Octave](https://www.gnu.org/software/octave/about) ]
+> ⓘ GNU Octave is software featuring a [high-level programming language](https://en.wikipedia.org/wiki/High-level_programming_language), primarily intended for [numerical computations](https://en.wikipedia.org/wiki/Numerical_analysis). Octave helps in solving linear and nonlinear problems numerically, and for performing other numerical experiments using a language that is mostly compatible with [MATLAB](https://en.wikipedia.org/wiki/MATLAB). [[GNU / Octave](https://octave.org/about.html) ]
 
 We will use it to calculate and draw a beautiful Julia fractal. The goal here is to use Octave to demonstrate how WSLg works, not to go through the theory of fractals. 
 
@@ -193,6 +193,5 @@ We hope you enjoy working with Ubuntu inside WSL. Don’t forget to check out [o
 ### Further Reading
 * [Setting up WSL for Data Science](https://ubuntu.com/blog/upgrade-data-science-workflows-ubuntu-wsl)
 * [Whitepaper: Ubuntu WSL for Data Scientists](https://ubuntu.com/engage/ubuntu-wsl-for-data-scientists)
-* [Microsoft WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
-* [WSL on Ubuntu Wiki](https://wiki.ubuntu.com/WSL)
+* [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
 * [Ask Ubuntu](https://askubuntu.com/)

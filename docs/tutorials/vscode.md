@@ -93,7 +93,7 @@ Once complete, your native version of Visual Studio Code will open the folder.
 
 ## Creating a basic web server
 
-In Visual Studio Code, create a new file called `package.json` and add the following text ([original example](https://docs.microsoft.com/en-gb/archive/blogs/cdndevs/visual-studio-code-and-local-web-server))
+In Visual Studio Code, create a new file called `package.json` and add the following text ([original example](https://learn.microsoft.com/en-gb/archive/blogs/cdndevs/visual-studio-code-and-local-web-server#3-add-a-packagejson-file-to-the-project-folder))
 
 ```json
 
@@ -143,8 +143,7 @@ We hope you enjoy using Ubuntu inside WSL. Don’t forget to check out our other
 
 ### Further Reading
 
-* [Install Ubuntu on WSL2 on Windows 10](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview)
-* [Install Ubuntu on WSL2 on Windows 11 with GUI Support](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#6-enjoy-ubuntu-on-wsl)
-* [Microsoft WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
+* [Install Ubuntu on WSL2 with GUI Support](install-ubuntu-wsl2.md)
+* [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
 * [Setting up WSL for Data Science](https://ubuntu.com/blog/wsl-for-data-scientist)
 * [Ask Ubuntu](https://askubuntu.com/)
