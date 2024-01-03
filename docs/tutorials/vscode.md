@@ -19,8 +19,7 @@ This tutorial assumes that you already have WSL2 installed with the latest LTS r
 
 If not, check out our getting started tutorials for Windows 10 and Windows 11:
 
-* [Install Ubuntu on WSL2 on Windows 10](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview)
-* [Install Ubuntu on WSL2 on Windows 11 with GUI support](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview)
+* [Install Ubuntu on WSL2 on Windows 11 with GUI support](install-ubuntu-wsl2.md)
 
 Once you have completed the relevant tutorial, the following steps will work on either Windows 10 or 11.
 
@@ -148,5 +147,4 @@ We hope you enjoy using Ubuntu inside WSL. Don’t forget to check out our other
 * [Install Ubuntu on WSL2 on Windows 11 with GUI Support](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#6-enjoy-ubuntu-on-wsl)
 * [Microsoft WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
 * [Setting up WSL for Data Science](https://ubuntu.com/blog/wsl-for-data-scientist)
-* [WSL on Ubuntu Wiki](https://wiki.ubuntu.com/WSL)
 * [Ask Ubuntu](https://askubuntu.com/)

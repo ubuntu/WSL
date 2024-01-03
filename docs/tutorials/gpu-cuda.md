@@ -131,8 +131,7 @@ We hope you enjoy using Ubuntu inside WSL for your Data Science projects. Don’
 
 * [Setting up WSL for Data Science](https://ubuntu.com/blog/wsl-for-data-scientist)
 * [Ubuntu WSL for Data Scientists Whitepaper](https://ubuntu.com/engage/ubuntu-wsl-for-data-scientists)
-* [NVIDIA's CUDA Post Installation Actions](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#post-installation-actions)
-* [Install Ubuntu on WSL2 on Windows 10 and Windows 11 with GUI Support](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#6-enjoy-ubuntu-on-wsl)
+* [NVIDIA's CUDA Post Installation Actions](gpu-cuda.md)
+* [Install Ubuntu on WSL2 on Windows 10 and Windows 11 with GUI Support](install-ubuntu-wsl2.md)
 * [Microsoft WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
-* [WSL on Ubuntu Wiki](https://wiki.ubuntu.com/WSL)
 * [Ask Ubuntu](https://askubuntu.com/)
