@@ -31,15 +31,15 @@ To install Visual Studio Code visit the Microsoft Store and search for `Visual S
 
 Then click `Install`.
 
-![|624x483](https://lh4.googleusercontent.com/fxK-GQTU494Ymkg5kC2Q_B1WrQWF_KCsfr_oynfNYCijich4YRJW_NBtiGlu3wkmNMVcMPsiLUAVU0u97HKKZjaxwE5hgoeWY2lWrvSeVRJytRQ-syRKpiIdoHMsCvtbSQjLnzsV)
+![|624x483](assets/vscode/msstore.png)
 
 Alternatively, you can install Visual Studio Code from the web link [here](https://code.visualstudio.com/Download).
 
-![|624x353](https://lh5.googleusercontent.com/KR_KmSNnEQHYK9k0btOkFycduImStjTilvIOo_b5l5bfvLdMarmOsz3pdqbBUh6AkjtqnQlCqZDUuvvLvHxzFG4jo8aMvgTeyvN-X8Hx1rGVqL9Gdycpdg895qYLLZH3z0y4Xk9u)
+![|624x353](assets/vscode/download-vs-code.png)
 
 During installation, under the `Additional Tasks` step, ensure the `Add to PATH` option is checked.
 
-![|624x492](https://lh3.googleusercontent.com/cr-zWLzIVrOBpaVn6yvWJPTvu8o0OGi6opGATSP0nc1Co86FZBCHohr_BZ976dnZc3UT3AP0q34qH_4IJm53AP7m5LHFfgNnSQWAo_MSQ0pldb9gP7j06ixAbSfymEzgl6N0Q9Qb)
+![|624x492](assets/vscode/aditional-tasks.png)
 
 Once the installation is complete, open Visual Studio Code.
 
@@ -49,7 +49,7 @@ Navigate to the `Extensions` menu in the sidebar and search for `Remote Developm
 
 This is an extension pack that allows you to open any folder in a container, remote machine, or in WSL. Alternatively, you can just install `Remote - WSL`.
 
-![|624x469](https://lh3.googleusercontent.com/kf_tf7pJ2qgB7rZ5RuVnjO4kSxKC5eIm6foZ9uWfpikYheY4Z1oJDbGAnLUSqobOXUPxAObKaNaf_6uQWiDQn3OOpiQmcGCnHGM3AJlX6Jrtpz6AiW4idUogjvJdC7jlFUhd7JuG)
+![|624x469](assets/vscode/remote-extension.png)
 
 Once installed we can test it out by creating an example local web server with Node.js
 
@@ -87,7 +87,7 @@ Now, open up your folder in Visual Studio Code, you can do this by typing:
 
 The first time you do this, it will trigger a download for the necessary dependencies:
 
-![|624x321](https://lh5.googleusercontent.com/rRnGBVuvzWOGaE-p2x9GFNcJYW4R6GFss2m4r2zHZSUu98EW1azYlVfVRh9H84QQP0Hd9ZLLDKqXxPr5_5PrXjB1OZoC6AbQCCl1T4_1Jz5Y2aQqkfnsp2rwcYTg7-k6I4aFbyfB)
+![|624x321](assets/vscode/downloading-vscode-server.png)
 
 Once complete, your native version of Visual Studio Code will open the folder.
 
@@ -129,7 +129,7 @@ Finally, type the following to launch the web server:
 
 You can now navigate to `localhost:10001` in your native Windows web browser by using `CTRL+Left Click` on the terminal links.
 
-![|624x351](https://lh6.googleusercontent.com/RLj_lnMccHDntQVAzm-k-UOjTKLFh00t2cCUpX7P80I0h8hrtUnCvvsB2gZy7QlrXHq4f0wT3tV46YK4SoYUGv_AnH-vjJKwvl1-ymWQIFv_HSWFrNam_A_cfYUPZkJ9hTrzEqC4)
+![|624x351](assets/vscode/hello-world.png)
 
 That’s it!
 
