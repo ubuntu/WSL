@@ -4,6 +4,8 @@ autoinstall
 autoinstallation
 automount
 automount
+awk
+boolean
 BotFramework
 chatbot
 chroot
@@ -17,7 +19,9 @@ CUDA
 distro
 distros
 EchoBot
+ENV
 exe
+executables
 executables
 filesystem
 filesystems
@@ -33,6 +37,7 @@ INI
 init
 interop
 io
+js
 Jupyter
 localhost
 localhost
@@ -41,6 +46,7 @@ Mantic
 mkpasswd
 mountfstab
 nano
+npm
 NVIDIA
 OpenGL
 openssl
@@ -49,9 +55,11 @@ passwd
 PowerShell
 realname
 rootfs
+runtime
 SDK
 snapcraft
 snapd
+stdout
 subdirectory
 Subiquity
 Subiquity's
@@ -64,23 +72,18 @@ ubuntu
 unregister
 UTF
 vGPU
+webserver
 Whitepaper
 whois
+Winget
 wsl
 WSL
 WSL's
 wslconfadvanced
 wslconfbase
 WSLg
-npm
-js
 xcalc
-stdout
-executables
-awk
-ENV
 xeyes
-webserver
 
 # Contributor names and emails
 Didier
