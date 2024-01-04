@@ -1,4 +1,4 @@
-(reference)=
+(guides)=
 
 # Ubuntu WSL guides
 

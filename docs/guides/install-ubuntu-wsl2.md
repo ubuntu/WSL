@@ -67,7 +67,7 @@ winget install --Id "9PDXGNCFSCZV" --source msstore
 
 You'll be prompted to accept the source and package agreements before installing. You need to accept them in order to proceed.
 
-Check out [the documentation](../reference/distributions.md#naming) to see which executable matches your application and run it.
+Check out [the documentation](../reference/distributions.md) to see which executable matches your application and run it.
 ```
 ubuntu.exe
 ```

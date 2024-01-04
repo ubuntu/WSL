@@ -12,11 +12,11 @@ Due to different limitations in different contexts, these applications will have
 
 1. App name is the name you'll see in the Microsoft Store and Winget.
 2. AppxPackage is the name you'll see in `Get-AppxPackage`.
-3. DistroName is the name you'll see when doing `wsl -l -v` or `wsl -l --online`.
+3. Distro name is the name you'll see when doing `wsl -l -v` or `wsl -l --online`.
 4. Executable is the program you need to run to start the distro.
 
-| App name           | AppxPackage name                     | DistroName     | Executable        |
-| ------------------ | ------------------------------------ | -------------- | ----------------- |
-| Ubuntu             | CanonicalGroupLimited.Ubuntu         | Ubuntu         | ubuntu.exe        |
-| Ubuntu (Preview)   | CanonicalGroupLimited.UbuntuPreview  | Ubuntu-Preview | ubuntupreview.exe |
-| Ubuntu XX.YY.Z LTS | CanonicalGroupLimited.UbuntuXX.YYLTS | Ubuntu-XX.YY   | ubuntuXXYY.exe    |
+| App name             | AppxPackage name                       | Distro name      | Executable          |
+| -------------------- | -------------------------------------- | ---------------- | ------------------- |
+| `Ubuntu`             | `CanonicalGroupLimited.Ubuntu`         | `Ubuntu`         | `ubuntu.exe`        |
+| `Ubuntu (Preview)`   | `CanonicalGroupLimited.UbuntuPreview`  | `Ubuntu-Preview` | `ubuntupreview.exe` |
+| `Ubuntu XX.YY.Z LTS` | `CanonicalGroupLimited.UbuntuXX.YYLTS` | `Ubuntu-XX.YY`   | `ubuntuXXYY.exe`    |

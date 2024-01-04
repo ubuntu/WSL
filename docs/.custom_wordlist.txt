@@ -1,5 +1,6 @@
 API
 appendwindowspath
+AppxPackage
 autoinstall
 autoinstallation
 automount
@@ -7,6 +8,7 @@ automount
 awk
 boolean
 BotFramework
+CanonicalGroupLimited
 chatbot
 chroot
 codebase
@@ -17,6 +19,7 @@ Ctrl
 cuda
 CUDA
 distro
+DistroName
 distros
 EchoBot
 ENV
@@ -25,7 +28,6 @@ executables
 executables
 filesystem
 filesystems
-generatehosts
 generatehosts
 generateresolvconf
 GitHub
@@ -69,6 +71,7 @@ subprocess
 sudo
 systemd
 ubuntu
+UbuntuPreview
 unregister
 UTF
 vGPU
@@ -96,3 +99,9 @@ smith
 carlos
 Nihelton
 santanadeoliveira
+Edu
+Gómez
+Escandell
+edu
+gomez
+escandell

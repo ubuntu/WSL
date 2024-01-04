@@ -3,7 +3,7 @@
 
 WSL is an ideal platform to run your Linux workflows while using your Windows machines. Here we show an example of how to set up GNU octave and run a toy program.
 
-First, you'll need to set up Ubuntu on WSL, see [here](../guides/data-science-engineering.md).
+First, you'll need to set up Ubuntu on WSL, see [here](../guides/install-ubuntu-wsl2.md).
 
 ## GNU octave
 
