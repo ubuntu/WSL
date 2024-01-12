@@ -1,6 +1,6 @@
 (tutorials)=
 
-# Ubuntu WSL tutorials
+# Tutorials
 
 ```{toctree}
 :titlesonly:
