@@ -1,6 +1,6 @@
 (reference)=
 
-# Ubuntu WSL reference
+# Reference
 
 ```{toctree}
 :titlesonly:

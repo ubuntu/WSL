@@ -19,7 +19,7 @@ We develop multiple flavours of Ubuntu for WSL, which you can read more about [h
 :titlesonly:
 
 self
-reference/index
-guides/index
 tutorials/index
+guides/index
+reference/index
 ```

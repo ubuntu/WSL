@@ -1,6 +1,6 @@
 (guides)=
 
-# Ubuntu WSL guides
+# How-to guides
 
 ```{toctree}
 :titlesonly:
