@@ -117,7 +117,7 @@ Save the file and then, in the same folder, create a new one called `index.html`
 
 Add the following text, and then save and close:
 
-`<h1>Hello World<h1>`
+`<h1>Hello World</h1>`
 
 Now return to your Ubuntu terminal (or use the Visual Studio Code terminal window) and type the following to install a server defined by the above specifications detailed in `package.json`:
 
