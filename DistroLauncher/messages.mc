@@ -125,5 +125,5 @@ Usage:
               Sets the default user to <username>. This must be an existing user.
 
     help
-        Print usage information.
+        Print usage information and exit.
 .
