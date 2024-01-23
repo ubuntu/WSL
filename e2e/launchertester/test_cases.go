@@ -216,3 +216,24 @@ func systemdIsExpected() bool {
 	}
 	return expectSystemd
 }
+
+func testHelpFlag(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	// usageFirstLine is the first line printed after '> laucher.exe --help'.
+	// The usage message is not localized so it's safe to assert on it.
+	const usageFirstLine = "Launches or configures a Linux distribution."
+
+	out, err := launcherCommand(ctx, "run", "help").CombinedOutput()
+	require.NoError(t, err, "could not run '%s run help': %v, %s", *launcherName, err, out)
+	require.NotContains(t, string(out), usageFirstLine, "help command should not have been picked up by the launcher")
+
+	out, err = launcherCommand(ctx, "-c", "help").CombinedOutput()
+	require.NoError(t, err, "could not run '%s -c help': %v, %s", *launcherName, err, out)
+	require.NotContains(t, string(out), usageFirstLine, "help command should not have been picked up by the launcher")
+
+	out, err = launcherCommand(ctx, "help").CombinedOutput()
+	require.NoError(t, err, "could not run '%s help': %v, %s", *launcherName, err, out)
+	require.Contains(t, string(out), usageFirstLine, "help command should have been picked up by the launcher")
+}

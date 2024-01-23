@@ -12,6 +12,7 @@
 #define ARG_INSTALL_ROOT        L"--root"
 #define ARG_RUN                 L"run"
 #define ARG_RUN_C               L"-c"
+#define ARG_HELP                L"help"
 
 // Helper class for calling WSL Functions:
 // https://msdn.microsoft.com/en-us/library/windows/desktop/mt826874(v=vs.85).aspx
@@ -111,6 +112,12 @@ int wmain(int argc, wchar_t const *argv[])
     std::vector<std::wstring_view> arguments;
     for (int index = 1; index < argc; index += 1) {
         arguments.push_back(argv[index]);
+    }
+
+    // Deal with possible help flag.
+    if (!arguments.empty() && arguments.front() == ARG_HELP) {
+        Helpers::PrintMessage(MSG_USAGE);
+        return 0;
     }
 
     Oobe::Application<> app(arguments);
