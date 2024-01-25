@@ -21,9 +21,9 @@ the latest LTS application as well.
 
 Locate your Windows user home directory. It typically is `C:\Users\<YOUR_USER_NAME>`.
 
-> You can be sure about that path by running `echo $env:USERPROFILE` in powershell.
+> You can be sure about that path by running `echo $env:USERPROFILE` in PowerShell.
 
-Inside your Windows user home directory, create a new folder named `.cloud-init` (notice the `.` alla Linux
+Inside your Windows user home directory, create a new folder named `.cloud-init` (notice the `.` à la Linux
 configuration directories), and inside it create a new empty file named `Ubuntu-Preview.user-data`. That file name must
 match the name of the distro instance that will create in the next step.
 
@@ -61,7 +61,7 @@ Save it and close it.
 
 ## Register a new Ubuntu-Preview instance
 
-In Powershell, run:
+In PowerShell, run:
 
 ```powershell
 ubuntupreview.exe install --root
@@ -73,7 +73,7 @@ We skip the user creation, since we expect cloud-init to do it.
 
 ## Check that cloud-init is running
 
-In Powershell again run:
+In PowerShell again run:
 
 
 ```powershell
@@ -188,5 +188,5 @@ We hope you enjoy using Ubuntu inside WSL!
 
 ### Further Reading
 
-To know more about cloud-init support for WSL checkout the [WSL Datasource reference in cloud-int docs](https://cloudinit.readthedocs.io/en/latest/reference/datasources/wsl.html).
+To know more about cloud-init support for WSL checkout the [WSL data source reference in cloud-int docs](https://cloudinit.readthedocs.io/en/latest/reference/datasources/wsl.html).
 To learn more about cloud-init in general visit [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
