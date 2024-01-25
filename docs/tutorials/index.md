@@ -10,4 +10,5 @@ interop
 dotnet-systemd
 gpu-cuda
 data-science-and-engineering
+cloud-init
 ```
