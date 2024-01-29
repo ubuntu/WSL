@@ -189,5 +189,5 @@ We hope you enjoy using Ubuntu inside WSL!
 
 ### Further Reading
 
-To know more about cloud-init support for WSL checkout the [WSL data source reference in cloud-int docs](https://cloudinit.readthedocs.io/en/latest/reference/datasources/wsl.html).
+To know more about cloud-init support for WSL checkout the [WSL data source reference in cloud-init's docs](https://cloudinit.readthedocs.io/en/latest/reference/datasources/wsl.html).
 To learn more about cloud-init in general visit [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
