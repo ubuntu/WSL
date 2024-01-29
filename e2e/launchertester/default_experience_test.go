@@ -17,8 +17,6 @@ func TestDefaultExperience(t *testing.T) {
 	t.Skip("Skipped: fails in Azure") // TODO: Fix
 	wslSetup(t)
 
-	var installCompleted bool
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -44,8 +42,6 @@ func TestDefaultExperience(t *testing.T) {
 	cancel()
 	err = cmd.Wait()
 	require.NoError(t, err, "Unexpected error after finishing command")
-
-	installCompleted = true
 
 	testCases := map[string]func(t *testing.T){
 		"UserNotRoot":             testUserNotRoot,
