@@ -70,6 +70,7 @@ We skip the user creation, since we expect cloud-init to do it.
 
 > If you want to be sure that there is now an Ubuntu-Preview instance, run `wsl -l -v`.
 > Notice that the application is named `UbuntuPreview` but the WSL instance created is named `Ubuntu-Preview`.
+> See more about that naming convention in [our reference documentation](../reference/distributions.md#naming).
 
 ## Check that cloud-init is running
 
