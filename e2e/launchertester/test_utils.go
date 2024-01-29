@@ -16,7 +16,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/ubuntu/wsl/e2e/constants"
 )
 
 const (
@@ -33,8 +32,8 @@ const (
 	commandTimeout     = 10 * time.Second // Timeout to use for "instantaneous" commands such as "echo" or "exit"
 )
 
-var launcherName = flag.String("launcher-name", constants.DefaultLauncherName, "WSL distro launcher under test.")
-var distroName = flag.String("distro-name", constants.DefaultDistroName, "WSL distro instance registered for testing.")
+var launcherName = flag.String("launcher-name", DefaultLauncherName, "WSL distro launcher under test.")
+var distroName = flag.String("distro-name", DefaultDistroName, "WSL distro instance registered for testing.")
 
 // wslSetup validates the test environment and ensures the distro is unregistered at the end.
 func wslSetup(t *testing.T) {
@@ -58,7 +57,7 @@ func wslSetup(t *testing.T) {
 func subiquityLogs(t *testing.T) string {
 	t.Helper()
 
-	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
+	rootDir := os.Getenv(LauncherRepoEnvVar)
 	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
 
 	// Prints debug logs
@@ -96,7 +95,7 @@ func subiquityLogs(t *testing.T) string {
 func removeOldLogs(t *testing.T) {
 	t.Helper()
 
-	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
+	rootDir := os.Getenv(LauncherRepoEnvVar)
 	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
 	err := os.Remove(clientLogFullPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -126,8 +125,8 @@ func launcherCommand(ctx context.Context, verb string, args ...string) *exec.Cmd
 func checkValidTestbed(t *testing.T) {
 	t.Helper()
 
-	rootDir := os.Getenv(constants.LauncherRepoEnvVar)
-	require.NotEmptyf(t, rootDir, "Setup: %s not set. It should point to the launcher repo root directory.", constants.LauncherRepoEnvVar)
+	rootDir := os.Getenv(LauncherRepoEnvVar)
+	require.NotEmptyf(t, rootDir, "Setup: %s not set. It should point to the launcher repo root directory.", LauncherRepoEnvVar)
 
 	status := distroState(t)
 	require.Equal(t, "DistroNotFound", status, "Setup: the tested distro is registered. Make a backup and unregister it before running the tests.")
