@@ -56,6 +56,7 @@ func TestBasicSetupFallbackUI(t *testing.T) {
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
 		"UpgradePolicyIdempotent": testUpgradePolicyIdempotent,
 		"InteropIsEnabled":        testInteropIsEnabled,
+		"HelpFlag":                testHelpFlag,
 	}
 
 	for name, tc := range testCases {
