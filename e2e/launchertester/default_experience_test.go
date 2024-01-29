@@ -18,12 +18,6 @@ func TestDefaultExperience(t *testing.T) {
 	wslSetup(t)
 
 	var installCompleted bool
-	t.Cleanup(func() {
-		if installCompleted || !t.Failed() {
-			return
-		}
-		t.Log(subiquityLogs(t))
-	})
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

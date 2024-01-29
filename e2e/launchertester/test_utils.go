@@ -4,12 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"errors"
 	"flag"
-	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -40,7 +36,6 @@ func wslSetup(t *testing.T) {
 	t.Helper()
 
 	checkValidTestbed(t)
-	removeOldLogs(t)
 
 	t.Cleanup(func() {
 		if err := exec.Command("wsl.exe", "--shutdown").Run(); err != nil {
@@ -51,56 +46,6 @@ func wslSetup(t *testing.T) {
 			t.Logf("Failed to unregister distro after test: %v", err)
 		}
 	})
-}
-
-// subiquityLogs prints the logs if a test fails.
-func subiquityLogs(t *testing.T) string {
-	t.Helper()
-
-	rootDir := os.Getenv(LauncherRepoEnvVar)
-	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
-
-	// Prints debug logs
-	var s string
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	out, err := wslCommand(ctx, "cat", subiquityAnswerFile).CombinedOutput()
-	if err != nil {
-		t.Logf("Failed to retrieve subiquity answer file: %v\n%s", err, out)
-	} else {
-		s = s + fmt.Sprintf("\n==== Subiquity answer file  ====\n%s\n", out)
-	}
-
-	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	out, err = wslCommand(ctx, "cat", serverLogPath).CombinedOutput()
-	if err != nil {
-		t.Logf("Failed to retrieve server debug log: %v\n%s", err, out)
-	} else {
-		s = s + fmt.Sprintf("\n==== Server Debug Log ====\n%s\n", out)
-	}
-
-	out, err = os.ReadFile(clientLogFullPath)
-	if err != nil {
-		t.Logf("Failed to retrieve client debug log: %v\n%s", err, out)
-	} else {
-		s = s + fmt.Sprintf("\n==== Client Debug Log ====\n%s\n", out)
-	}
-
-	return s
-}
-
-// removeOldLogs removes subiquity logs from previous tests.
-func removeOldLogs(t *testing.T) {
-	t.Helper()
-
-	rootDir := os.Getenv(LauncherRepoEnvVar)
-	clientLogFullPath := filepath.Join(rootDir, clientLogPath)
-	err := os.Remove(clientLogFullPath)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		t.Log(t, "Failed to remove old install log at %q: %v", clientLogFullPath, err)
-	}
 }
 
 // wslCommand mocks exec.CommandContext with WSL commands.
@@ -124,9 +69,6 @@ func launcherCommand(ctx context.Context, verb string, args ...string) *exec.Cmd
 // checkValidTestbed checks that the test environment is valid.
 func checkValidTestbed(t *testing.T) {
 	t.Helper()
-
-	rootDir := os.Getenv(LauncherRepoEnvVar)
-	require.NotEmptyf(t, rootDir, "Setup: %s not set. It should point to the launcher repo root directory.", LauncherRepoEnvVar)
 
 	status := distroState(t)
 	require.Equal(t, "DistroNotFound", status, "Setup: the tested distro is registered. Make a backup and unregister it before running the tests.")
