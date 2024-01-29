@@ -119,14 +119,14 @@ u@mib:~$
 
 Once logged in the new distro instance's shell, verify that:
 
-1. The default user match what was configured in the user data file (in our case `u`).
+1. The default user matches what was configured in the user data file (in our case `u`).
 
 ```sh
 u@mib:~$ whoami
 u
 ```
 
-2. The cloud-config user data supplied was approved by cloud-init validation.
+2. The supplied cloud-config user data was approved by cloud-init validation.
 
 ```sh
 u@mib:~$ sudo cloud-init schema --system
@@ -183,11 +183,11 @@ See LICENSE.txt for license information.
 
 That’s all folks! In this tutorial, we’ve shown you how to use cloud-init to automatically setup Ubuntu on WSL 2 with minimal touch.
 
-That workflow can be used to ensure a baseline for your next project that rely on Ubuntu WSL, ready for work.
+This workflow can be used to ensure a baseline for your next project that relies on Ubuntu WSL, ready for work.
 
 We hope you enjoy using Ubuntu inside WSL!
 
 ### Further Reading
 
 To know more about cloud-init support for WSL checkout the [WSL data source reference in cloud-init's docs](https://cloudinit.readthedocs.io/en/latest/reference/datasources/wsl.html).
-To learn more about cloud-init in general visit [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
+To learn more about cloud-init in general visit [cloud-init's official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
