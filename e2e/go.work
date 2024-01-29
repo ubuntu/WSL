@@ -3,5 +3,4 @@ go 1.21.4
 use (
 	./constants
 	./launchertester
-	./ui-driver
 )
