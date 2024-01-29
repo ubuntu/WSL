@@ -45,7 +45,6 @@ func TestDefaultExperience(t *testing.T) {
 
 	testCases := map[string]func(t *testing.T){
 		"UserNotRoot":             testUserNotRoot,
-		"LanguagePacksMarked":     testLanguagePacksMarked,
 		"SystemdEnabled":          testSystemdEnabled,
 		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,

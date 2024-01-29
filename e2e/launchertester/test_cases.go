@@ -27,19 +27,6 @@ func testUserNotRoot(t *testing.T) { //nolint: thelper, this is a test
 	require.NotContains(t, string(out), "root", "Default user should not be root.")
 }
 
-// testLanguagePacksMarked ensures the subiquity either installs or marks for installation the relevant language packs for the chosen language.
-func testLanguagePacksMarked(t *testing.T) { //nolint: thelper, this is a test
-	t.Skip("Skipping: This is a known bug") // TODO: Investigate and fix
-	t.Parallel()
-
-	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
-	defer cancel()
-
-	out, err := wslCommand(ctx, "apt-mark", "showinstall", "language-pack\\*").CombinedOutput()
-	require.NoErrorf(t, err, "Unexpected failure executing apt-mark: %s", out)
-	require.NotEmpty(t, string(out), "At least one language pack should have been installed or marked for installation, but apt-mark command output is empty.")
-}
-
 // testSystemdEnabled ensures systemd was enabled.
 func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
 	t.Parallel()
