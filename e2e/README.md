@@ -2,7 +2,7 @@
 
 This subdirectory contains the infrastructure to allow a CI workflow (or developers) to run a full end-to-end test against an Ubuntu WSL appx.
 
-The key component to allow that happening is materialized in the form of Go packages:
+The key component to allow that happening is materialized in the form of a Go package:
 
 - `launchertester` is the high level testing code, where we invoke the distro launcher with certain command line parameters and asserts that the registered instance fulfills our expectations.
 
