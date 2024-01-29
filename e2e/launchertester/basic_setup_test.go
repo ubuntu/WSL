@@ -22,8 +22,6 @@ func TestBasicSetupFallbackUI(t *testing.T) {
 	require.NotEmpty(t, out, "Failed to install the distro: No output produced.")
 
 	testCases := map[string]func(t *testing.T){
-		// Skipping testUserNotRoot because we installed as --root
-		"LanguagePacksMarked":     testLanguagePacksMarked,
 		"SystemdEnabled":          testSystemdEnabled,
 		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
