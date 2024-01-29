@@ -33,8 +33,8 @@ Open that file with your text editor of choice (`notepad.exe` is just fine) and 
 #cloud-config
 locale: pt_BR
 users:
-- name: u
-  gecos: Ubuntu
+- name: jdoe
+  gecos: John Doe
   groups: [adm,dialout,cdrom,floppy,sudo,audio,dip,video,plugdev,netdev]
   sudo: ALL=(ALL) NOPASSWD:ALL
   shell: /bin/bash
