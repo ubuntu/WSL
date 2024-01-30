@@ -26,7 +26,7 @@ jobs:
     runs-on: self-hosted
     needs: vm-setup
     env:
-      rootfs64: "$HOME\\Downloads\\rootfs\\Ubuntu-Preview.tar.gz" # Cached by ./.github/workflows/update-rootfs-cache.yaml
+      rootFsCache: "${env:USERPROFILE}\\Downloads\\rootfs"
       distroName: Ubuntu-Preview
       appID: UbuntuPreview
       launcher: ubuntupreview.exe
@@ -53,6 +53,11 @@ jobs:
           go-version-file: ./e2e/go.work
       - name: Install or update WSL
         uses: ./.github/actions/wsl-install
+      - name: Download rootfs
+        uses: ./.github/actions/download-rootfs
+        with:  
+          distros: ${{ env.distroName }}
+          path: ${{ env.rootFsCache }}
       - name: Build and install the appxbundle for testing
         shell: powershell
         run: |
@@ -64,7 +69,7 @@ jobs:
           Write-Output "::endgroup::"
 
           Write-Output "::group::Building and installing appbundle"
-          .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 ${{ env.rootfs64 }}
+          .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 "${{ env.rootFsCache }}/${{ env.distroName }}.tar.gz"
           Write-Output "::endgroup::"
       - name: Run tests
         shell: powershell
