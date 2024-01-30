@@ -18,12 +18,11 @@
 // https://msdn.microsoft.com/en-us/library/windows/desktop/mt826874(v=vs.85).aspx
 WslApiLoader g_wslApi(DistributionInfo::Name);
 
-static HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app);
+static HRESULT InstallDistribution(bool createUser);
 static HRESULT SetDefaultUser(std::wstring_view userName);
 
-HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
+HRESULT InstallDistribution(bool createUser)
 {
-    app.runSplash();
     // Register the distribution.
     Helpers::PrintMessage(MSG_STATUS_INSTALLING);
     HRESULT hr = g_wslApi.WslRegisterDistribution();
@@ -38,22 +37,14 @@ HRESULT InstallDistribution(bool createUser, Oobe::Application<>& app)
         return hr;
     }
 
-    Ubuntu::ConfigRootFs(DistributionInfo::Name, g_wslApi);
-
     // Create a user account.
     if (createUser) {
-        if (!app.shouldSkipInstaller()) {
-            if (SUCCEEDED(app.setup())) {
-                return S_OK;
-            }
-        }
         Helpers::PrintMessage(MSG_CREATE_USER_PROMPT);
         std::wstring userName;
         do {
             userName = Helpers::GetUserInput(MSG_ENTER_USERNAME, 32);
 
         } while (!DistributionInfo::CreateUser(userName));
-        Oobe::ExitStatusHandling();
 
         // Set this user account as the default.
         hr = SetDefaultUser(userName);
@@ -120,7 +111,6 @@ int wmain(int argc, wchar_t const *argv[])
         return 0;
     }
 
-    Oobe::Application<> app(arguments);
     // Ensure that the Windows Subsystem for Linux optional component is installed.
     DWORD exitCode = 1;
     if (!g_wslApi.WslIsOptionalComponentInstalled()) {
@@ -139,7 +129,7 @@ int wmain(int argc, wchar_t const *argv[])
 
         // If the "--root" option is specified, do not create a user account.
         bool useRoot = ((installOnly) && (arguments.size() > 1) && (arguments[1] == ARG_INSTALL_ROOT));
-        hr = InstallDistribution(!useRoot, app);
+        hr = InstallDistribution(!useRoot);
         if (FAILED(hr)) {
             if (hr == HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS)) {
                 Helpers::PrintMessage(MSG_INSTALL_ALREADY_EXISTS);
@@ -155,7 +145,7 @@ int wmain(int argc, wchar_t const *argv[])
     // Parse the command line arguments.
     if ((SUCCEEDED(hr)) && (!installOnly)) {
         if (arguments.empty()) {
-            hr = g_wslApi.WslLaunchInteractive(Oobe::WrapCommand(L"").c_str(), false, &exitCode);
+            hr = g_wslApi.WslLaunchInteractive(L"", false, &exitCode);
 
             // Check exitCode to see if wsl.exe returned that it could not start the Linux process
             // then prompt users for input so they can view the error message.
@@ -172,10 +162,10 @@ int wmain(int argc, wchar_t const *argv[])
                 command += arguments[index];
             }
 
-            hr = g_wslApi.WslLaunchInteractive(Oobe::WrapCommand(command.c_str()).c_str(), true, &exitCode);
+            hr = g_wslApi.WslLaunchInteractive(command.c_str(), true, &exitCode);
 
         } else if (arguments[0] == ARG_CONFIG) {
-            hr = app.reconfigure();
+            hr = E_INVALIDARG;
             if (arguments.size() == 3) {
                 if (arguments[1] == ARG_CONFIG_DEFAULT_USER) {
                     hr = SetDefaultUser(arguments[2]);
@@ -205,9 +195,6 @@ int wmain(int argc, wchar_t const *argv[])
             Helpers::PromptForInput();
         }
     }
-
-    // Check and run any cleanup instruction
-    Oobe::ExitStatusHandling();
 
     return SUCCEEDED(hr) ? exitCode : 1;
 }

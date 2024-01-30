@@ -33,13 +33,6 @@ class WslApiLoader
     HRESULT WslConfigureDistribution(ULONG defaultUID,
                                      WSL_DISTRIBUTION_FLAGS wslDistributionFlags);
 
-    HRESULT WslGetDistributionConfiguration(ULONG* distributionVersion,
-                                            ULONG* defaultUID,
-                                            WSL_DISTRIBUTION_FLAGS* wslDistributionFlags,
-                                            PSTR** defaultEnvironmentVariables,
-                                            ULONG* defaultEnvironmentVariableCount
-                                            );
-
     HRESULT WslLaunchInteractive(PCWSTR command,
                                  BOOL useCurrentWorkingDirectory,
                                  DWORD *exitCode);
@@ -57,7 +50,6 @@ class WslApiLoader
     WSL_IS_DISTRIBUTION_REGISTERED _isDistributionRegistered;
     WSL_REGISTER_DISTRIBUTION _registerDistribution;
     WSL_CONFIGURE_DISTRIBUTION _configureDistribution;
-    WSL_GET_DISTRIBUTION_CONFIGURATION _getDistributionConfiguration;
     WSL_LAUNCH_INTERACTIVE _launchInteractive;
     WSL_LAUNCH _launch;
 };

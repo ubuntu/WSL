@@ -14,7 +14,6 @@ WslApiLoader::WslApiLoader(const std::wstring& distributionName) :
         _isDistributionRegistered = (WSL_IS_DISTRIBUTION_REGISTERED)GetProcAddress(_wslApiDll, "WslIsDistributionRegistered");
         _registerDistribution = (WSL_REGISTER_DISTRIBUTION)GetProcAddress(_wslApiDll, "WslRegisterDistribution");
         _configureDistribution = (WSL_CONFIGURE_DISTRIBUTION)GetProcAddress(_wslApiDll, "WslConfigureDistribution");
-        _getDistributionConfiguration = (WSL_GET_DISTRIBUTION_CONFIGURATION)GetProcAddress(_wslApiDll, "WslGetDistributionConfiguration");
         _launchInteractive = (WSL_LAUNCH_INTERACTIVE)GetProcAddress(_wslApiDll, "WslLaunchInteractive");
         _launch = (WSL_LAUNCH)GetProcAddress(_wslApiDll, "WslLaunch");
     }
@@ -33,7 +32,6 @@ BOOL WslApiLoader::WslIsOptionalComponentInstalled()
             (_isDistributionRegistered != nullptr) &&
             (_registerDistribution != nullptr) &&
             (_configureDistribution != nullptr) &&
-            (_getDistributionConfiguration != nullptr) &&
             (_launchInteractive != nullptr) &&
             (_launch != nullptr));
 }
@@ -61,20 +59,6 @@ HRESULT WslApiLoader::WslConfigureDistribution(ULONG defaultUID, WSL_DISTRIBUTIO
     }
 
     return hr;
-}
-
-HRESULT WslApiLoader::WslGetDistributionConfiguration(ULONG* distributionVersion,
-                                                      ULONG* defaultUID,
-                                                      WSL_DISTRIBUTION_FLAGS* wslDistributionFlags, 
-                                                      PSTR** defaultEnvironmentVariables,
-                                                      ULONG* defaultEnvironmentVariableCount)
-{
-    return _getDistributionConfiguration(_distributionName.c_str(),
-                                         distributionVersion,
-                                         defaultUID,
-                                         wslDistributionFlags,
-                                         defaultEnvironmentVariables,
-                                         defaultEnvironmentVariableCount);
 }
 
 HRESULT WslApiLoader::WslLaunchInteractive(PCWSTR command, BOOL useCurrentWorkingDirectory, DWORD *exitCode)
