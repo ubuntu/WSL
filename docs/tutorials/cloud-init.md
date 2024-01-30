@@ -55,7 +55,7 @@ runcmd:
 
 Save it and close it.
 
-> That example will create a user named `u` and set it as default via `/etc/wsl.conf`, install the packages
+> That example will create a user named `jdoe` and set it as default via `/etc/wsl.conf`, install the packages
 > `ginac-tools` and `octave` and install `vcpkg` from the git repository, since there is no deb or snap of that
 > application (hence the reason for being included in this tutorial - it requires an unusual setup).
 
@@ -115,29 +115,29 @@ Welcome to Ubuntu Noble Numbat (development branch) (GNU/Linux 5.15.137.3-micros
 
 This message is shown once a day. To disable it please create the
 /home/cn/.hushlogin file.
-u@mib:~$
+jdoe@mib:~$
 ```
 
 Once logged in the new distro instance's shell, verify that:
 
-1. The default user matches what was configured in the user data file (in our case `u`).
+1. The default user matches what was configured in the user data file (in our case `jdoe`).
 
 ```sh
-u@mib:~$ whoami
-u
+jdoe@mib:~$ whoami
+jdoe
 ```
 
 2. The supplied cloud-config user data was approved by cloud-init validation.
 
 ```sh
-u@mib:~$ sudo cloud-init schema --system
+jdoe@mib:~$ sudo cloud-init schema --system
 Valid schema user-data
 ```
 
 3. The locale is set
 
 ```sh
-u@mib:~$ locale
+jdoe@mib:~$ locale
 LANG=pt_BR
 LANGUAGE=
 LC_CTYPE="pt_BR"
@@ -159,7 +159,7 @@ LC_ALL=
 4. The packages were installed and the commands they provide are available
 
 ```sh
-u@mib:~$ apt list --installed | egrep 'ginac|octave'
+jdoe@mib:~$ apt list --installed | egrep 'ginac|octave'
 
 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
 
@@ -174,7 +174,7 @@ octave/noble,now 8.4.0-1 amd64 [installed]
    documentation (there is no deb or snap available for that program).
 
 ```sh
-u@mib:~$ /opt/vcpkg/vcpkg version
+jdoe@mib:~$ /opt/vcpkg/vcpkg version
 vcpkg package management program version 2024-01-11-710a3116bbd615864eef5f9010af178034cb9b44
 
 See LICENSE.txt for license information.
