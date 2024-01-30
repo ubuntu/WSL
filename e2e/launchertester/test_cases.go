@@ -27,24 +27,8 @@ func testUserNotRoot(t *testing.T) { //nolint: thelper, this is a test
 	require.NotContains(t, string(out), "root", "Default user should not be root.")
 }
 
-// testLanguagePacksMarked ensures the subiquity either installs or marks for installation the relevant language packs for the chosen language.
-func testLanguagePacksMarked(t *testing.T) { //nolint: thelper, this is a test
-	t.Skip("Skipping: This is a known bug") // TODO: Investigate and fix
-	t.Parallel()
-
-	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
-	defer cancel()
-
-	out, err := wslCommand(ctx, "apt-mark", "showinstall", "language-pack\\*").CombinedOutput()
-	require.NoErrorf(t, err, "Unexpected failure executing apt-mark: %s", out)
-	require.NotEmpty(t, string(out), "At least one language pack should have been installed or marked for installation, but apt-mark command output is empty.")
-}
-
 // testSystemdEnabled ensures systemd was enabled.
 func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
-	if !systemdIsExpected() {
-		t.Skipf("Skipping systemd checks on %s", *distroName)
-	}
 	t.Parallel()
 
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
@@ -64,35 +48,6 @@ func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
 
 // testSystemdUnits ensures the list of failed units does not regress.
 func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
-	if !systemdIsExpected() {
-		// Making a backup for /etc/wsl.conf file
-		// We touch it first because it may or may not not exist. An empty
-		// file is the same as no file as far as WSL is concerned.
-		ctx, cancel := context.WithTimeout(context.Background(), commandTimeout)
-		defer cancel()
-
-		out, err := wslCommandAsUser(ctx, "root", "bash", "-c", `touch /etc/wsl.conf && cp /etc/wsl.conf /etc/wsl.conf.backup`).CombinedOutput()
-		require.NoError(t, err, "Failed to enable systemd: %s", out)
-
-		// Enable systemd in config file
-		ctx, cancel = context.WithTimeout(context.Background(), commandTimeout)
-		defer cancel()
-
-		out, err = wslCommandAsUser(ctx, "root", "bash", "-c", `printf '\n[boot]\nsystemd=true\n' >> /etc/wsl.conf`).CombinedOutput()
-		require.NoError(t, err, "Failed to enable systemd: %s", out)
-
-		// Restore backup after test finishes
-		t.Cleanup(func() {
-			ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
-			defer cancel()
-
-			out, err := wslCommandAsUser(ctx, "root", "bash", "-c", `mv /etc/wsl.conf.backup /etc/wsl.conf`).CombinedOutput()
-			require.NoError(t, err, "Failed to revert systemd enablement: %s", out)
-
-			terminateDistro(t) // To disable systemd
-		})
-	}
-
 	// Terminating to start systemd, and to ensure no services from previous tests are running
 	terminateDistro(t)
 
@@ -198,23 +153,6 @@ func testInteropIsEnabled(t *testing.T) { //nolint: thelper, this is a test
 	got, err := wslCommand(ctx, "powershell.exe", "-noninteractive", "-nologo", "-noprofile", "-Command", `Write-Output "Hello, world!"`).CombinedOutput()
 	require.NoError(t, err, "Failed to launch powershell from WSL. Does interop work? %s", got)
 	require.Equal(t, "Hello, world!\r\n", string(got), "Unexpected output from powershell")
-}
-
-// systemdIsExpected returns true if systemd is expected to be enabled by default on this distro.
-func systemdIsExpected() bool {
-	distroNameToExpectSystemd := map[string]bool{
-		"Ubuntu":         true,
-		"Ubuntu-22.04":   true,
-		"Ubuntu-20.04":   false,
-		"Ubuntu-18.04":   false,
-		"Ubuntu-Preview": true,
-	}
-
-	expectSystemd, ok := distroNameToExpectSystemd[*distroName]
-	if !ok { // Development version
-		return distroNameToExpectSystemd["Ubuntu-Preview"]
-	}
-	return expectSystemd
 }
 
 func testHelpFlag(t *testing.T) {
