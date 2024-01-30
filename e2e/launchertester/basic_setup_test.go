@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestBasicSetupGUI runs a battery of assertions after installing with WSL's default OOBE.
-func TestBasicSetupFallbackUI(t *testing.T) {
+// TestBasicSetup runs a battery of assertions after installing with the distro launcher.
+func TestBasicSetup(t *testing.T) {
 	wslSetup(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
