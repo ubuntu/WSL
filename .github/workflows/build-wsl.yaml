@@ -18,8 +18,8 @@ on:
         description: 'Should we upload the appxbundle to the store'
         required: true
         default: 'yes'
-  schedule:
-    - cron: '0 10 * * *'
+  #schedule:
+  #  - cron: '0 10 * * *'
 concurrency: build-wsl
 
 env:
