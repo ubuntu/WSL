@@ -27,8 +27,10 @@ runs:
       uses: actions/setup-go@v3
       with:
         go-version: "1.21.4"
-    - name: Prepare environment
+    - name: Generate WSL release info
       shell: powershell
+      # Repository root
+      working-directory: ${{ github.action_path }}\..\..\..\
       run: |
         # Prepare environment
 
@@ -38,28 +40,34 @@ runs:
         Write-Output "::group::Build wsl release info generator"
         go build .\wsl-builder\release-info\
         if ( "${LastExitCode}" -ne "0" ) {
+          Write-Output "::endgroup::"
           Exit(1)
         }
         Write-Output "::endgroup::"
 
         Write-Output "::group::Fetch release info"
-        if ( ! $(Test-Path -Path "${{ inputs.path }}") ) {
-          New-Item -Type Directory -Path "${{ inputs.path }}" | Out-Null
-        }
-
         python .\wsl-builder\lp-distro-info -o "${{ inputs.path }}\ubuntu-releases.csv"
         Get-Content "${{ inputs.path }}\ubuntu-releases.csv"
         Write-Output "::endgroup::"
-        Exit(${LastExitCode})
+               
+        Write-Output "::group::Filter release info"
+        if(!(Test-Path "${{ inputs.path }}")) {
+          New-Item -Type Directory -Path "${{ inputs.path }}"
+        }
+        .\release-info.exe "${{ inputs.path }}\ubuntu-releases.csv" ${{ inputs.distros }} --rootfs amd64 --short 1> "${{ inputs.path }}\wsl-releases.csv"
+        Write-Output "::endgroup::"
 
+        # Check for success
+        if (Test-Path "${{ inputs.path }}\wsl-releases.csv") {
+          Exit(0)
+        }
+        Write-Error "Did not write WSL releases file"
+        Exit(1)
     - name: Download Ubuntu rootfs
       shell: powershell
       run: |
         # Download rootfs
-        .\release-info.exe "${{ inputs.path }}\ubuntu-releases.csv" ${{ inputs.distros }} --rootfs amd64 --short 1> "${{ inputs.path }}\wsl-releases.csv"
-        if ( "${LastExitCode}" -ne "0" ) {
-            Exit(1)
-        }
+        cd "${{ inputs.path }}"
 
         $releaseList = $(Get-Content "wsl-releases.csv") -split "\n"
         $allSuccess = $true
@@ -88,8 +96,8 @@ runs:
     - name: Cleanup
       if: always()
       shell: powershell
-      working-directory: ${{ inputs.path }}
       run: |
-        Remove-Item ".\ubuntu-releases.csv" 2>&1 | Out-Null
-        Remove-Item ".\wsl-releases.csv"    2>&1 | Out-Null
+        # Cleanup
+        Remove-Item "${{ inputs.path }}\ubuntu-releases.csv" 2>&1 | Out-Null
+        Remove-Item "${{ inputs.path }}\wsl-releases.csv"    2>&1 | Out-Null
         Exit(0)
