@@ -50,7 +50,7 @@ function Test-Checksums {
 
     # Download remote checksum
     $checksumURL = "$(Get-URIParent -URI "${URL}")SHA256SUMS"
-    Invoke-WebRequest -Uri "${checksumURL}" -OutFile "${Checksums}" -Resume -MaximumRetryCount 5 -RetryIntervalSec 2
+    pwsh.exe -Command pwsh.exe -Command Invoke-WebRequest -Uri "${checksumURL}" -OutFile "${Checksums}" -Resume -MaximumRetryCount 5 -RetryIntervalSec 2
     if (! $?) {
         Write-Warning "Could not download checksums"
         return $false
@@ -88,7 +88,7 @@ function main {
     }
 
     # Download Rootfs into temp file
-    Invoke-WebRequest -Uri "${URL}" -OutFile "${RootFS}.tmp" -Resume -MaximumRetryCount 5 -RetryIntervalSec 2
+    pwsh.exe -Command Invoke-WebRequest -Uri "${URL}" -OutFile "${RootFS}.tmp" -Resume -MaximumRetryCount 5 -RetryIntervalSec 2
     if ( ! $? ) {
         Write-Error "Error: Failed download"
         return 1
