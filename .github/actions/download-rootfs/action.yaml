@@ -27,8 +27,10 @@ runs:
       uses: actions/setup-go@v3
       with:
         go-version: "1.21.4"
-    - name: Prepare environment
+    - name: Generate WSL release info
       shell: powershell
+      # Repository root
+      working-directory: ${{ github.action_path }}\..\..\..\
       run: |
         # Prepare environment
 
@@ -38,32 +40,36 @@ runs:
         Write-Output "::group::Build wsl release info generator"
         go build .\wsl-builder\release-info\
         if ( "${LastExitCode}" -ne "0" ) {
+          Write-Output "::endgroup::"
           Exit(1)
         }
         Write-Output "::endgroup::"
 
         Write-Output "::group::Fetch release info"
-        if ( ! $(Test-Path -Path "${{ inputs.path }}") ) {
-          New-Item -Type Directory -Path "${{ inputs.path }}" | Out-Null
-        }
-
         python .\wsl-builder\lp-distro-info -o "${{ inputs.path }}\ubuntu-releases.csv"
         Get-Content "${{ inputs.path }}\ubuntu-releases.csv"
         Write-Output "::endgroup::"
-        Exit(${LastExitCode})
+               
+        Write-Output "::group::Filter release info"
+        if(!(Test-Path "${{ inputs.path }}")) {
+          New-Item -Type Directory -Path "${{ inputs.path }}"
+        }
+        .\release-info.exe "${{ inputs.path }}\ubuntu-releases.csv" ${{ inputs.distros }} --rootfs amd64 --short 1> "${{ inputs.path }}\wsl-releases.csv"
+        Write-Output "::endgroup::"
 
+        # Check for success
+        if (Test-Path "${{ inputs.path }}\wsl-releases.csv") {
+          Exit(0)
+        }
+        Write-Error "Did not write WSL releases file"
+        Exit(1)
     - name: Download Ubuntu rootfs
       shell: powershell
       run: |
         # Download rootfs
-        .\release-info.exe "${{ inputs.path }}\ubuntu-releases.csv" ${{ inputs.distros }} --rootfs amd64 --short 1> "${{ inputs.path }}\wsl-releases.csv"
-        if ( "${LastExitCode}" -ne "0" ) {
-            Remove-Item "${{ inputs.path }}\ubuntu-releases.csv" 2>&1 | Out-Null
-            Remove-Item "${{ inputs.path }}\wsl-releases.csv" 2>&1    | Out-Null
-            Exit(1)
-        }
+        cd "${{ inputs.path }}"
 
-        $releaseList = $(Get-Content "${{ inputs.path }}\wsl-releases.csv") -split "\n"
+        $releaseList = $(Get-Content "wsl-releases.csv") -split "\n"
         $allSuccess = $true
 
         foreach ($release in $releaseList) {
@@ -71,42 +77,27 @@ runs:
 
           # $name is the one in inputs.distros
           $name = $data[0]
-          $file = "${{ inputs.path }}\${name}.tar.gz"
-
+          $file = ".\${name}.tar.gz"
           $url = $data[1]
 
-          # Make sure there is no previous leftover
-          if (Test-Path "$file.tmp") {
-            Remove-Item -Force "$file.tmp" 2>&1 | Out-Null
-          }
-
-          Write-Output "::group::Downloading ${name}"
-          Write-Output "Downloading from ${url}"
-          pwsh.exe -Command Invoke-WebRequest -Uri "$url" -OutFile "${file}.tmp" -Resume -MaximumRetryCount 5 -RetryIntervalSec 2
+          & ${{ github.action_path }}\download-rootfs.ps1 -Path "${file}" -URL "$url"
           if ( ! $? ) {
             $allSuccess = $false
-            Write-Output "Error: Failed download"
-            Remove-Item -Force "$file.tmp" 2>&1 | Out-Null
-            Write-Output "::endgroup::"
-            continue
-          }
-          Write-Output "Successful download"
-
-          Move-Item -Force "$file.tmp" "$file"
-          if ( ! $? ) {
-            $allSuccess = $false
-            Write-Output "Error: Failed to override old cache"
-            Remove-Item -Force "$file.tmp"  2>&1 | Out-Null
-            Write-Output "::endgroup::"
-            continue
+            Write-Output "Error: Could not download ${name}"
           }
 
-          Write-Output "Successfully overwritten old cache."
           Write-Output "::endgroup::"
         }
 
-        Remove-Item "${{ inputs.path }}\ubuntu-releases.csv" 2>&1 | Out-Null
-        Remove-Item "${{ inputs.path }}\wsl-releases.csv"    2>&1 | Out-Null
         if ( "${allSuccess}" -eq "$false" ) {
             Exit(1)
         }
+        Exit(0)
+    - name: Cleanup
+      if: always()
+      shell: powershell
+      run: |
+        # Cleanup
+        Remove-Item "${{ inputs.path }}\ubuntu-releases.csv" 2>&1 | Out-Null
+        Remove-Item "${{ inputs.path }}\wsl-releases.csv"    2>&1 | Out-Null
+        Exit(0)
