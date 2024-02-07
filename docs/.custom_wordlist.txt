@@ -51,6 +51,7 @@ nano
 npm
 NVIDIA
 OpenGL
+OpenID
 openssl
 OpenVINO
 passwd
