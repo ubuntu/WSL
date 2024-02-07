@@ -1,3 +1,4 @@
+(reference::distros)=
 # Distributions
 Our flagship distribution is Ubuntu. This is the one that is installed by default when you install WSL for the first time. However, we develop several flavours. It may be the case that one or more of these flavours fits your needs better.
 
