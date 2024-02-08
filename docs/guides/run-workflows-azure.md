@@ -1,4 +1,4 @@
-# How to run GitHub workflow on WSL
+# How to run GitHub workflows on WSL
 > Read more: [How we improved testing Ubuntu on WSL – and how you can too!](https://ubuntu.com/blog/improved-testing-ubuntu-wsl)
 
 Most of the time, what works on Ubuntu desktop works on WSL as well. However, there are some exceptions. Furthermore, you may want to test software that lives both on Windows and inside WSL. In these cases, you may want to run your automated testing on a Windows machine with WSL rather than a regular ubuntu machine.
