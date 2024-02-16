@@ -90,7 +90,6 @@ That’s it! In this tutorial, we’ve shown you how to install WSL and Ubuntu o
 We hope you enjoy working with Ubuntu inside WSL. Don’t forget to check out [our blog](https://ubuntu.com/blog) for the latest news on all things Ubuntu.
 
 ### Further Reading
-* [Advanced autoinstallation features](autoinstall.md)
 * [Setting up WSL for Data Science](https://ubuntu.com/blog/upgrade-data-science-workflows-ubuntu-wsl)
 * [Whitepaper: Ubuntu WSL for Data Scientists](https://ubuntu.com/engage/ubuntu-wsl-for-data-scientists)
 * [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
