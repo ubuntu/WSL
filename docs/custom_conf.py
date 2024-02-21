@@ -117,6 +117,7 @@ redirects = {}
 
 linkcheck_ignore = [
     'http://127.0.0.1:8000',
+    'https://askubuntu.com',
     ]
 
 # Pages on which to ignore anchors
