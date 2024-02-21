@@ -105,3 +105,4 @@ Escandell
 edu
 gomez
 escandell
+powershell
