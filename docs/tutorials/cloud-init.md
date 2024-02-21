@@ -3,8 +3,12 @@
 
 Cloud-init is an industry-standard multi-distribution method for cross-platform cloud instance initialisation.
 Ubuntu WSL users can now leverage it to perform an automatic setup to get a working instance with minimal touch.
-That feature is currently experimental and, thus only available on the UbuntuPreview app. Soon that will be available for
-the latest LTS application as well.
+
+```{note}
+**Coming soon*:
+
+That feature is currently in development and will be available soon on the UbuntuPreview app first, then gradually released for the latest LTS applications.
+```
 
 ## What you will learn:
 
