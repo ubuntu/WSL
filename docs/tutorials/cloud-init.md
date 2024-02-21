@@ -4,6 +4,8 @@
 Cloud-init is an industry-standard multi-distribution method for cross-platform cloud instance initialisation.
 Ubuntu WSL users can now leverage it to perform an automatic setup to get a working instance with minimal touch.
 
+> See more:  [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
+
 ```{note}
 **Coming soon*:
 
@@ -62,6 +64,9 @@ Save it and close it.
 > That example will create a user named `jdoe` and set it as default via `/etc/wsl.conf`, install the packages
 > `ginac-tools` and `octave` and install `vcpkg` from the git repository, since there is no deb or snap of that
 > application (hence the reason for being included in this tutorial - it requires an unusual setup).
+
+
+> See more: [WSL data source reference](https://cloudinit.readthedocs.io/en/latest/reference/datasources/wsl.html).
 
 ## Register a new Ubuntu-Preview instance
 
@@ -191,9 +196,4 @@ That’s all folks! In this tutorial, we’ve shown you how to use cloud-init to
 This workflow will guarantee a solid foundation for your next Ubuntu WSL project.
 
 We hope you enjoy using Ubuntu inside WSL!
-
-### Further Reading
-
-To know more about cloud-init support for WSL check out the [WSL data source reference in cloud-init documentation](https://cloudinit.readthedocs.io/en/latest/reference/datasources/wsl.html).
-To learn more about cloud-init in general visit [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
 
