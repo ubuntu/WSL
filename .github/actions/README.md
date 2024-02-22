@@ -17,7 +17,7 @@ latest (and recommended) version--.
 ## Setup
 
 ### 1. Create a Windows 11 VM on Azure
-Just follow Azure's instructions, no special customization is necessary.
+Just follow Azure's instructions, no special customisation is necessary.
 
 ### 2. Prepare your runner
 Install the following Microsoft utilities.
