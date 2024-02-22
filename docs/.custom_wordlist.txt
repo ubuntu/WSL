@@ -4,9 +4,11 @@ BotFramework
 chatbot
 codebase
 conf
+config
 CSV
 cuda
 CUDA
+Dev
 distro
 distros
 EchoBot
@@ -23,8 +25,11 @@ localhost
 LTS
 npm
 OpenGL
+OpenID
 OpenVINO
 PowerShell
+rootfs
+Rootfs
 runtime
 SDK
 stdout
@@ -32,7 +37,9 @@ subdirectory
 subprocess
 systemd
 ubuntu
+UbuntuPreview
 vGPU
+VMs
 webserver
 Whitepaper
 Winget
