@@ -244,5 +244,6 @@ func (w *WslReleaseInfo) RootfsURL(arch string) string {
 		imageBaseName = fmt.Sprintf("ubuntu-%s-wsl", w.CodeName)
 	}
 
-	return fmt.Sprintf("https://cloud-images.ubuntu.com/%s/current/%s-%s-wsl.rootfs.tar.gz", codeNameSubUri, imageBaseName, arch)
+	return fmt.Sprintf("https://cloud-images.ubuntu.com/%s/current/%s-%s-wsl.%s.rootfs.tar.gz",
+		codeNameSubUri, imageBaseName, arch, strings.ToLower(w.AppID))
 }

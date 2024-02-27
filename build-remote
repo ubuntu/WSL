@@ -204,7 +204,7 @@ def main():
                 shouldExit = True
             arch = os.path.basename(build.distro_arch_series_link)
             for f in build.getFileUrls():
-                if not f.endswith(".rootfs.tar.gz"):
+                if not f.endswith(f".{selected_appID.lower()}.rootfs.tar.gz"):
                     continue
                 rootfses.append("%s::%s" % (f, arch))
         if shouldExit:
