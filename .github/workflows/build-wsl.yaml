@@ -116,11 +116,8 @@ jobs:
           # Download rootfses, checksum and place them at the correct place
           go build ./wsl-builder/prepare-build
           extraArgs=""
-          if [ ${{ matrix.Upload }} != "yes" ]; then
-              extraArgs="--build-id 9999"
-          fi
           if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
-            extraArgs="${extraArgs} --no-checksum"
+            extraArgs="--no-checksum"
           fi
           archsBundle="$(./prepare-build prepare ${{ env.buildInfoPath }}/${{ matrix.AppID }}-buildid.md ${{ matrix.AppID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
