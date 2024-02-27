@@ -90,7 +90,7 @@ jobs:
       buildInfoPath: 'wiki/build-info'
       workDir: 'C:/Temp/builddir'
     outputs:
-      store-needs-upload: ${{ steps.detect-upload-to-store.outputs.needs-upload }}
+      has-changes: ${{ steps.detect-changes.outputs.has-changes }}
     steps:
       - name: Checkout WSL
         shell: bash
@@ -116,11 +116,8 @@ jobs:
           # Download rootfses, checksum and place them at the correct place
           go build ./wsl-builder/prepare-build
           extraArgs=""
-          if [ ${{ matrix.Upload }} != "yes" ]; then
-              extraArgs="--build-id 9999"
-          fi
           if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
-            extraArgs="${extraArgs} --no-checksum"
+            extraArgs="--no-checksum"
           fi
           archsBundle="$(./prepare-build prepare ${{ env.buildInfoPath }}/${{ matrix.AppID }}-buildid.md ${{ matrix.AppID }} ${{ matrix.Rootfses }} ${extraArgs})"
           echo "AppxBundlePlatforms=${archsBundle}" >> $GITHUB_ENV
@@ -186,9 +183,8 @@ jobs:
           path: |
             ${{ env.workDir }}/debug-database-${{ matrix.AppID }}/
           retention-days: 7
-      - name: Check if we need to upload new build
-        id: detect-upload-to-store
-        if: ${{ matrix.Upload == 'yes' }}
+      - name: Detect any potential changes and if we should upload automatically to the Store
+        id: detect-changes
         working-directory: ${{ env.workDir }}
         shell: bash
         run: |
@@ -196,11 +192,18 @@ jobs:
 
           build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.AppID }}-buildid.md")
 
-          echo "::set-output name=needs-upload::false"
+          echo "::set-output name=has-changes::false"
+          echo "::set-output name=should-upload::false"
 
           # Store md5sum of rootfs, launcher and assets related code
           fingerprint_file="${{ matrix.AppID }}-fingerprint.md"
-          fingerprint_filepath="${{ env.buildInfoPath }}/${{ matrix.AppID }}-fingerprint.md"
+          fingerprint_filepath="${{ env.buildInfoPath }}/${fingerprint_file}"
+
+          first_upload="false"
+          if [ ! -f "${fingerprint_filepath}" ]; then
+            first_upload="true"
+          fi
+
           # First. the rootfses
           echo '```' > "${fingerprint_filepath}"
           md5sum */install.tar.gz | sort -k2 >> "${fingerprint_filepath}"
@@ -213,35 +216,41 @@ jobs:
 
           cd "${{ env.buildInfoPath }}"
           git add "${fingerprint_file}"
-          # If build-id is 0, we don’t want to submit it to the store as first submission is manual.
-          # We let the other steps and jobs happening to save artifacts (build-id, fingerprints) of the first build
+
           hasChanges="$(git diff --staged ${fingerprint_file})"
           cd -
-
           if [ -z "${hasChanges}" ]; then
             exit 0
           fi
 
-          echo "::set-output name=save-artifacts::true"
+          echo "::set-output name=has-changes::true"
 
-          if [ "${build_id}" = "0" ]; then
+          if [ ${{ matrix.Upload }} != "yes" ]; then
+            echo "::notice::${{ matrix.AppID }} build ${build_id} ready for sideload or manual submission to the Microsoft Store"
+            exit 0
+          fi
+
+          # If we are doing a first build for this distro, we don’t want to submit it to the store as first submission
+          # is manual. We let the other steps and jobs happening to save artifacts (build-id, fingerprints) of
+          # the first build.
+          if [ "${first_upload}" = "true" ]; then
             echo "::notice::This is the first build for ${{ matrix.AppID }}. It needs to be submitted manually to the Microsoft Store"
             exit 0
           fi
           echo "::notice::Uploading to the store ${{ matrix.AppID }} build ${build_id}"
-          echo "::set-output name=needs-upload::true"
+          echo "::set-output name=should-upload::true"
 
-          echo "Uploading new version: some files have changed:"
+          echo "Uploading new version as some files have changed:"
           echo "${hasChanges}"
 
       - name: Install Store Broker
-        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        if: ${{ steps.detect-changes.outputs.should-upload == 'true' }}
         working-directory: ${{ env.workDir }}
         shell: powershell
         run: |
           Install-Module -Name StoreBroker -AcceptLicense -Force -Scope CurrentUser -Verbose
       - name: Submit to Microsoft Store
-        if: ${{ steps.detect-upload-to-store.outputs.needs-upload == 'true' }}
+        if: ${{ steps.detect-changes.outputs.should-upload == 'true' }}
         working-directory: ${{ env.workDir }}
         shell: powershell
         run: |
@@ -270,7 +279,7 @@ jobs:
           Update-ApplicationSubmission -AppId $appid -SubmissionDataPath "out\appstore-submission.json" -PackagePath "out\appstore-submission.zip" -Force -Autocommit -ReplacePackages -UpdateListings -UpdatePublishModeAndVisibility -UpdatePricingAndAvailability -UpdateAppProperties -UpdateGamingOptions -UpdateTrailers -UpdateNotesForCertification
 
       - name: Upload build artifacts
-        if: ${{ steps.detect-upload-to-store.outputs.save-artifacts == 'true' }}
+        if: ${{ steps.detect-changes.outputs.has-changes == 'true' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts-${{ matrix.AppID }}
@@ -306,7 +315,7 @@ jobs:
 
       # Pushing PDB's to the wiki only makes sense if we uploaded new app versions to the store.
       - name: Copy debug databases to base wiki
-        if: ${{ needs.build-wsl.outputs.store-needs-upload == 'true' }}
+        if: ${{ needs.build-wsl.outputs.has-changes == 'true' }}
         id: pdb-artifacts
         run: |
           set -eu
