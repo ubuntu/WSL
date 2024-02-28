@@ -20,7 +20,6 @@ on:
         default: 'yes'
   #schedule:
   #  - cron: '0 10 * * *'
-concurrency: build-wsl
 
 env:
   goversion: '1.21.4'
