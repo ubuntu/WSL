@@ -184,9 +184,9 @@ for root, dirs, files in os.walk("/mnt/c/Users/mysuser/path/my/subdirectory"):
       continue
     if mime_type not in data:
       data[mime_type] = 0
-      data[mime_type] += 1
-      csv_cols = ["mime_type", "count"]
+    data[mime_type] += 1
 
+csv_cols = ["mime_type", "count"]
 with open("stats-raw.csv", "w") as f:
   writer = csv.writer(f)
   writer.writerow(csv_cols)
