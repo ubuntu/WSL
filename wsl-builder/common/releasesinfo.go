@@ -9,7 +9,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -234,16 +233,27 @@ func (w *WslReleaseInfo) refreshedTerminalProfileID() error {
 	return nil
 }
 
+// RootfsURL returns the URL to the rootfs tarball for the given architecture.
+// The base image name is in the format:
+// ubuntu-<version>-wsl-<arch>-<upgrade-flavor>.rootfs.tar.gz
+// before 24.04, upgrade-flavor is always "wsl"
+// otherwise:
+// - ubuntu -> wsl (upgade: lts)
+// - ubuntupreview -> preview (upgrade: always)
+// - ubuntu24.04lts -> 24.04lts (upgrade: never)
 func (w *WslReleaseInfo) RootfsURL(arch string) string {
-	// Currently only Jammy (22.04) and later are published to "https://cloud-images.ubuntu.com/wsl/"
-	codeNameSubUri := w.CodeName
-	imageBaseName := fmt.Sprintf("%s-server-cloudimg", w.CodeName)
-	if strings.Compare(w.BuildVersion, "2204") >= 0 {
-		codeNameSubUri = path.Join("wsl", w.CodeName)
-		// The image base name scheme also changed.
-		imageBaseName = fmt.Sprintf("ubuntu-%s-wsl", w.CodeName)
-	}
+	imageBaseName := fmt.Sprintf("ubuntu-%s-wsl-%s", w.CodeName, arch)
 
-	return fmt.Sprintf("https://cloud-images.ubuntu.com/%s/current/%s-%s-wsl.%s.rootfs.tar.gz",
-		codeNameSubUri, imageBaseName, arch, strings.ToLower(w.AppID))
+	suffix := "wsl"
+	// We have multiple versions with different upgrade policy management. Pick the one based on the app name.
+	if strings.Compare(w.BuildVersion, "2404") >= 0 {
+		// The CPC publisher strip the "ubuntu" prefix
+		suffix = strings.TrimPrefix(strings.ToLower(w.AppID), "ubuntu")
+		if suffix == "" {
+			suffix = "wsl"
+		}
+	}
+	imageName := fmt.Sprintf("%s-%s.rootfs.tar.gz", imageBaseName, suffix)
+
+	return fmt.Sprintf("https://cloud-images.ubuntu.com/wsl/%s/current/%s", w.CodeName, imageName)
 }
