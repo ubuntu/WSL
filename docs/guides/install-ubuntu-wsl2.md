@@ -4,8 +4,6 @@
 ## What you will learn:
 
 * How to enable and install WSL on Windows 10 and Windows 11
-* How to install and run a simple graphical application that uses WSLg
-* How to install and run a much more advanced application that uses WSLg
 
 ## What you will need:
 
