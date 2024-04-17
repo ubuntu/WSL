@@ -73,11 +73,13 @@ def appID_to_releases(lpconn):
     for serie in ubuntu.series:
         if serie.status == "Active Development":
             r["UbuntuPreview"] = serie.name
+            continue
 
         is_lts = ((int(serie.version.split('.')[0]) % 2 == 0) and serie.version.endswith('.04'))
         if is_lts:
             r["Ubuntu%sLTS" % serie.version] = serie.name
-            latest_lts = serie.name
+            if latest_lts == "":
+                latest_lts = serie.name
 
     r["Ubuntu"] = latest_lts
     return r
