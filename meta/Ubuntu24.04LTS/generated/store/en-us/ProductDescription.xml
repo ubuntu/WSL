@@ -41,7 +41,7 @@ https://ubuntu.com/wsl
     <AppFeature>Linux Terminal</AppFeature>
     <AppFeature>GUI</AppFeature>
   </AppFeatures>
-  <CopyrightAndTrademark>© 2022 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.</CopyrightAndTrademark>
+  <CopyrightAndTrademark>© 2024 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.</CopyrightAndTrademark>
   <AdditionalLicenseTerms>https://www.ubuntu.com/legal/terms-and-policies</AdditionalLicenseTerms>
 
   <!-- Empty fields to overwrite them with every updates -->
