@@ -261,9 +261,14 @@ jobs:
           Set-StoreBrokerAuthentication -TenantId '${{ secrets.AZUREAD_TENANTID }}' -Credential $cred
 
           # Get store app ID for AppID
-          $appid = (Get-Applications -GetAll | Where-Object PackageIdentityName -like '*${{ matrix.AppID }}').id
+          # We need to map Ubuntu24.04LTS to Ubuntu24.04 as Ubuntu24.04LTS application is broken on the Store.
+          $AppID = '${{ matrix.AppID }}'
+          If($AppID -eq 'Ubuntu24.04LTS') {
+            $AppID = 'Ubuntu24.04'
+          }
+          $appid = (Get-Applications -GetAll | Where-Object PackageIdentityName -like *$AppID).id
           If($appid -eq '') {
-            echo "No app found for AppID: ${{ matrix.AppID }}"
+            echo "No app found for AppID: $AppID"
             exit 1
           }
 
