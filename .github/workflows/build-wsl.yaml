@@ -280,7 +280,7 @@ jobs:
           # Prepare and submit to the Store
           cd store\
           New-SubmissionPackage -ConfigPath ..\meta\SBConfig.json
-          Update-ApplicationSubmission -AppId $appid -SubmissionDataPath "out\appstore-submission.json" -PackagePath "out\appstore-submission.zip" -Force -Autocommit -ReplacePackages -UpdatePublishModeAndVisibility -UpdatePricingAndAvailability -UpdateAppProperties -UpdateGamingOptions -UpdateTrailers -UpdateNotesForCertification
+          Update-ApplicationSubmission -AppId $appid -SubmissionDataPath "out\appstore-submission.json" -PackagePath "out\appstore-submission.zip" -Autocommit
 
       - name: Upload build artifacts
         if: ${{ steps.detect-changes.outputs.has-changes == 'true' }}
