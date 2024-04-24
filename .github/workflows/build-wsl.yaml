@@ -33,6 +33,7 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
+          sudo rm /etc/apt/sources.list.d/microsoft-prod.list
           sudo DEBIAN_FRONTEND=noninteractive apt update
           sudo DEBIAN_FRONTEND=noninteractive apt install -y jq
       - uses: actions/checkout@v3
