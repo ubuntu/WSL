@@ -6,11 +6,7 @@ Ubuntu WSL users can now leverage it to perform an automatic setup to get a work
 
 > See more:  [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
 
-```{note}
-**Coming soon*:
-
-That feature is currently in development and will be available soon on the UbuntuPreview app first, then gradually released for the latest LTS applications.
-```
+The latest release of Ubuntu (Noble Numbat 24.04 LTS) comes with cloud-init already preinstalled, so you'll need that specific application to follow this tutorial. Ubuntu 24.04 LTS can be installed from [this link to the Microsoft Store](https://www.microsoft.com/store/productId/9NZ3KLHXDJP5?ocid=pdpshare). A previous version of this tutorial used Ubuntu-Preview, because that comes with the latest in-development features. You can still use it to follow the instructions below, if you prefer.
 
 ## What you will learn:
 
@@ -21,7 +17,7 @@ That feature is currently in development and will be available soon on the Ubunt
 ## What you will need:
 
 - Windows 11 with WSL 2 already enabled
-- The latest UbuntuPreview application from Microsoft Store.
+- The latest Ubuntu24.04LTS application from Microsoft Store.
 
 ## Write the cloud-config file
 
@@ -30,7 +26,7 @@ Locate your Windows user home directory. It typically is `C:\Users\<YOUR_USER_NA
 > You can be sure about that path by running `echo $env:USERPROFILE` in PowerShell.
 
 Inside your Windows user home directory, create a new folder named `.cloud-init` (notice the `.` à la Linux
-configuration directories), and inside the new directory, create an empty file named `Ubuntu-Preview.user-data`. That file name must
+configuration directories), and inside the new directory, create an empty file named `Ubuntu-24.04.user-data`. That file name must
 match the name of the distro instance that will be created in the next step.
 
 Open that file with your text editor of choice (`notepad.exe` is just fine) and paste in the following contents:
@@ -69,18 +65,18 @@ Save it and close it.
 
 > See more: [WSL data source reference](https://cloudinit.readthedocs.io/en/latest/reference/datasources/wsl.html).
 
-## Register a new Ubuntu-Preview instance
+## Register a new Ubuntu-24.04 instance
 
 In PowerShell, run:
 
 ```powershell
-ubuntupreview.exe install --root
+ubuntu2404.exe install --root
 ```
 
 We skip the user creation since we expect cloud-init to do it.
 
-> If you want to be sure that there is now an Ubuntu-Preview instance, run `wsl -l -v`.
-> Notice that the application is named `UbuntuPreview` but the WSL instance created is named `Ubuntu-Preview`.
+> If you want to be sure that there is now an Ubuntu-24.04 instance, run `wsl -l -v`.
+> Notice that the application is named `Ubuntu24.04LTS` but the WSL instance created is named `Ubuntu-24.04`.
 > See more about that naming convention in [our reference documentation](naming).
 
 ## Check that cloud-init is running
@@ -89,7 +85,7 @@ In PowerShell again run:
 
 
 ```powershell
-ubuntupreview run cloud-init status --wait
+ubuntu2404.exe run cloud-init status --wait
 ```
 
 That will wait until cloud-init completes configuring the new instance we just created. When done, you should see an
@@ -110,13 +106,13 @@ Restart the distro just to make sure the changes in `/etc/wsl.conf` made by clou
 below:
 
 ```powershell
-> wsl -t Ubuntu-Preview
+> wsl -t Ubuntu-24.04
 The operation completed successfully.
-> ubuntupreview
+> ubuntu2404.exe
 To run a command as administrator (user "root"), use "sudo <command>".
 See "man sudo_root" for details.
 
-Welcome to Ubuntu Noble Numbat (development branch) (GNU/Linux 5.15.137.3-microsoft-standard-WSL2 x86_64)
+Welcome to Ubuntu Noble Numbat (GNU/Linux 5.15.137.3-microsoft-standard-WSL2 x86_64)
 
  * Documentation:  https://help.ubuntu.com
  * Management:     https://landscape.canonical.com
@@ -195,6 +191,14 @@ See LICENSE.txt for license information.
 That’s all folks! In this tutorial, we’ve shown you how to use cloud-init to automatically set up Ubuntu on WSL 2 with minimal touch.
 
 This workflow will guarantee a solid foundation for your next Ubuntu WSL project.
+
+As a side note, users installing the distro with the `wsl --install` online command must take a few steps to ensure cloud-init has time to do its job. First, make sure to install with the `--no-launch` flag, then use the distro launcher to install without creating a user (if you expect cloud-init to do it for you as described in this tutorial) and finally watch cloud-init do its job. The commands are outlined below:
+
+```powershell
+wsl --install --no-launch -d Ubuntu-24.04
+ubuntu2404.exe install --root
+ubuntu2404.exe run cloud-init status --wait
+```
 
 We hope you enjoy using Ubuntu inside WSL!
 
