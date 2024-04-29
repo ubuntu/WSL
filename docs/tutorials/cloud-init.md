@@ -55,7 +55,8 @@ write_files:
 packages: [ginac-tools, octave]
 
 runcmd:
-   - git clone https://github.com/Microsoft/vcpkg.git /opt/vcpkg
+   - sudo git clone https://github.com/Microsoft/vcpkg.git /opt/vcpkg
+   - sudo apt-get install zip curl -y
    - /opt/vcpkg/bootstrap-vcpkg.sh
 ```
 
