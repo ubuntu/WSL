@@ -24,6 +24,7 @@ Jupyter
 localhost
 LTS
 npm
+Numbat
 OpenGL
 OpenID
 OpenVINO
