@@ -125,7 +125,7 @@ Welcome to Ubuntu 24.04 LTS (GNU/Linux 5.15.146.1-microsoft-standard-WSL2 x86_64
 
 
 This message is shown once a day. To disable it please create the
-/home/u/.hushlogin file.
+/home/jdoe/.hushlogin file.
 jdoe@mib:~$
 ```
 
