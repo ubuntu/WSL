@@ -15,7 +15,7 @@ Systemd support is a new feature of WSL and only available on WSL version XX or 
 
 You can check your current WSL version by running:
 
-> `> wsl -- version`
+> `> wsl --version`
 
 In your PowerShell terminal.
 
