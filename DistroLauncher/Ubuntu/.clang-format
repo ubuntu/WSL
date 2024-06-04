@@ -1,0 +1,11 @@
+BasedOnStyle: Google
+---
+Language: Cpp
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: All
+ColumnLimit: 100
+DerivePointerAlignment: false
+InsertNewlineAtEOF: true
+PointerAlignment: Left
+# We need to keep stdafx.h as the first include of any cpp file.
+SortIncludes: false
