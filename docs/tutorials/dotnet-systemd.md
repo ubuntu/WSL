@@ -11,7 +11,7 @@ We will create the bot using .Net on Ubuntu WSL and it will be accessible from t
 
 * A PC running Windows 11
 * The latest version of the WSL Windows Store application
-* Ubuntu 24.04 LTS or Ubuntu Preview installed
+* Ubuntu 22.04 LTS, Ubuntu 24.04 LTS or Ubuntu Preview installed
 
 Systemd support is a new feature of WSL and only available on WSL version 0.67.6 or higher.
 
@@ -36,7 +36,8 @@ To install this version of .Net for your project you only need to run:
 
 > `sudo apt install dotnet8`
 
-In this tutorial we will be using .Net 6, which requires adding the backports archive.
+In this tutorial we will be using .Net 6, which requires adding the backports archive for older .Net versions on Ubuntu 24.04 LTS.
+If you are using Ubuntu 22.04 LTS you can skip this step.
 ```
 
 To install .Net 6 on Ubuntu 24.04 LTS we will first add the backports archive for .Net with the following command:
