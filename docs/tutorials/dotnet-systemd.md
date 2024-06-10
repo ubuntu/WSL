@@ -15,17 +15,17 @@ We will create the bot using .Net on Ubuntu WSL and it will be accessible from t
 
 Systemd support is a new feature of WSL and only available on WSL version 0.67.6 or higher.
 
-You can check your current WSL version by running:
+In your PowerShell terminal, you can check your current WSL version by running:
 
 > `wsl --version`
 
-In your PowerShell terminal.
-
-To enable systemd on your Ubuntu distribution you need to add the following content to `/etc/wsl.conf`​:
+Inside WSL, you can check that systemd is enabled on your Ubuntu distribution by running `cat /etc/wsl.conf`.
+If enabled the output will be:
 
 > `[boot]`  
 > `systemd=true`
 
+If set to `false` open the file with `sudo nano /etc/wsl.conf`, set to `true` and save.
 Make sure to restart your distribution after you have made this change.
 
 ## Install .Net
