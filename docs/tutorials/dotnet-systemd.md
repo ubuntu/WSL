@@ -143,14 +143,14 @@ Next we need to create a service file for your bot using your favourite editor, 
 
 > `sudo nano /etc/systemd/system/echoes.service`
 
-Then paste the below taking care to change the path of `WorkingDirectory` to the location of your project folder.
+Then paste the snippet below taking care to replace `<your-username>` with your username.
 
 ```
 [Unit]
 Description=The first ever WSL Ubuntu systemd .NET ChatBot Service
 
 [Service]
-WorkingDirectory=/home/local-optimum/demos/mybot/echoes
+WorkingDirectory=/home/<your-username>/mybot/echoes
 Environment=DOTNET_CLI_HOME=/temp
 ExecStart=dotnet run
 SyslogIdentifier=echoes
