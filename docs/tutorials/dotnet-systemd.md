@@ -110,7 +110,8 @@ Then select the setting icon in the bottom-left corner of the Bot Framework Emul
 Click 'Save' and navigate back to the Welcome tab.
 
 Click ‘Open Bot’ and under ‘Bot URL’ input:
-```
+
+```text
 http://localhost:3978/api/messages
 ```
 
@@ -144,7 +145,7 @@ Next we need to create a service file for your bot using your favourite editor, 
 
 Then paste the snippet below taking care to replace `<your-username>` with your username.
 
-```
+```text
 [Unit]
 Description=The first ever WSL Ubuntu systemd .NET ChatBot Service
 
