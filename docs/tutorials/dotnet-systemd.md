@@ -53,7 +53,7 @@ Run `dotnet --version` to confirm that the package was installed successfully.
 
 Create a new directory for the project and navigate to it before proceeding:
 
-> `sudo mkdir ~/mybot`  
+> `mkdir ~/mybot`  
 > `cd mybot`
 
 Once inside we can install the EchoBot C# template by running:
