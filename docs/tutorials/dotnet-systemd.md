@@ -117,7 +117,9 @@ http://localhost:3978/api/messages
 
 ![|624x411](assets/dotnet-systemd/open-a-bot.png)
 
-And click ‘Connect’ to connect to your Echo Bot running in WSL and start chatting!![|624x411](assets/dotnet-systemd/start-chatting.png)
+And click ‘Connect’ to connect to your Echo Bot running in WSL and start chatting!
+
+![|624x411](assets/dotnet-systemd/start-chatting.png)
 
 Congratulations, your Echo Chat Bot App is running on Ubuntu WSL as an App. Now it is time to make it run as a service.
 
