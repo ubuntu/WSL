@@ -128,11 +128,9 @@ Then install the .Net systemd extension with:
 
 > `sudo dotnet add package Microsoft.Extensions.Hosting.Systemd`
 
-Now we need to open our ‘echoes’ project in VS Code by running:
+We can open our project with VS Code by running this command in the 'echoes' directory:
 
 > `code .`
-
-From the ‘echoes’ directory.
 
 Navigate to ‘Program.cs’ and insert `.UseSystemd()` as a new line in the location shown in the screenshot.
 
