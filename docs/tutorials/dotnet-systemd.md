@@ -11,7 +11,7 @@ We will create the bot using .Net on Ubuntu WSL and it will be accessible from t
 
 * A PC running Windows 11
 * The latest version of the WSL Windows Store application
-* Ubuntu, Ubuntu 22.04 LTS or Ubuntu Preview installed
+* Ubuntu 24.04 LTS or Ubuntu Preview installed
 
 Systemd support is a new feature of WSL and only available on WSL version 0.67.6 or higher.
 
