@@ -103,7 +103,7 @@ First, get the IP address of your machine by running `ipconfig` in a PowerShell 
 
 ![|624x357](assets/dotnet-systemd/ipconfig.png)
 
-Then select the setting icon in the corner of the Bot Framework Emulator and enter your IP under ‘localhost override'.
+Then select the setting icon in the bottom-left corner of the Bot Framework Emulator and enter your IP under ‘localhost override'.
 
 ![|624x411](assets/dotnet-systemd/emulator-settings.png)
 
