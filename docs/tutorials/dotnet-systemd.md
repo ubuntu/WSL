@@ -107,7 +107,7 @@ Then select the setting icon in the bottom-left corner of the Bot Framework Emul
 
 ![|624x411](assets/dotnet-systemd/emulator-settings.png)
 
-Click save and navigate back to the Welcome tab.
+Click 'Save' and navigate back to the Welcome tab.
 
 Click ‘Open Bot’ and under ‘Bot URL’ input:
 ```
