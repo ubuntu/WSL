@@ -30,7 +30,20 @@ Make sure to restart your distribution after you have made this change.
 
 ## Install .Net
 
-.Net has recently [been added to the Ubuntu repositories](https://ubuntu.com/blog/install-dotnet-on-ubuntu). This means you can now quickly install a bundle with both the SDK and runtime with a single command:
+```{note}
+In Ubuntu 24.04 LTS .Net 8 is available [in the Ubuntu repositories](https://ubuntu.com/blog/install-dotnet-on-ubuntu).
+To install this version of .Net for your project you only need to run:
+
+> `sudo apt install dotnet8`
+
+In this tutorial we will be using .Net 6, which requires adding the backports archive.
+```
+
+To install .Net 6 on Ubuntu 24.04 LTS we will first add the backports archive for .Net with the following command:
+
+> `sudo add-apt-repository ppa:dotnet/backports`
+
+Now we can install a bundle with both the SDK and runtime for .Net 6:
 
 > `sudo apt install dotnet6`
 
