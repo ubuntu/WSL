@@ -28,7 +28,7 @@ If enabled the output will be:
 > `[boot]`  
 > `systemd=true`
 
-If set to `false` open the file with `sudo nano /etc/wsl.conf`, set to `true` and save.
+If systemd is set to `false` then open the file with `sudo nano /etc/wsl.conf`, set it to `true` and save.
 Make sure to restart your distribution after you have made this change.
 
 ## Install .NET
