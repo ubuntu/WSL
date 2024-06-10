@@ -69,7 +69,7 @@ And looking for the `Bot Framework Echo Bot` template in the list.
 
 ![|624x153](assets/dotnet-systemd/templates.png)
 
-Create a new Echo Bot project using the following command. We use `echoes` as the name for our bot.
+Create a new Echo Bot project, with `echoes` as the name for our bot, using the following command:
 
 > `dotnet new echobot -n echoes`
 
