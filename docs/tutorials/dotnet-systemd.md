@@ -17,7 +17,7 @@ Systemd support is a new feature of WSL and only available on WSL version 0.67.6
 
 You can check your current WSL version by running:
 
-> `> wsl --version`
+> `wsl --version`
 
 In your PowerShell terminal.
 
@@ -32,29 +32,29 @@ Make sure to restart your distribution after you have made this change.
 
 .Net has recently [been added to the Ubuntu repositories](https://ubuntu.com/blog/install-dotnet-on-ubuntu). This means you can now quickly install a bundle with both the SDK and runtime with a single command:
 
->`$ sudo apt install dotnet6`
+> `sudo apt install dotnet6`
 
 Run `dotnet --version` to confirm that the package was installed successfully.
 
 It is recommended to create a new directory for this project, do so now and navigate to it before proceeding:
 
->`$ sudo mkdir ~/mybot`  
->`$ cd mybot`
+> `sudo mkdir ~/mybot`  
+> `cd mybot`
 
 ## Install and run the Bot Framework EchoBot template
 
 Create a new directory for the project and navigate to it before proceeding:
 
->`$ sudo mkdir ~/mybot`  
->`$ cd mybot`
+> `sudo mkdir ~/mybot`  
+> `cd mybot`
 
 Once inside we can install the EchoBot C# template by running:
 
->`$ dotnet new -i Microsoft.Bot.Framework.CSharp.EchoBot`
+> `dotnet new -i Microsoft.Bot.Framework.CSharp.EchoBot`
 
 We can verify the template has been installed correctly by running:
 
->`$ dotnet new --list`
+> `dotnet new --list`
 
 And looking for the `Bot Framework Echo Bot` template in the list.
 
@@ -62,15 +62,15 @@ And looking for the `Bot Framework Echo Bot` template in the list.
 
 Create a new Echo Bot project using the following command. We use `echoes` as the name for our bot.
 
->`$ dotnet new echobot -n echoes`
+> `dotnet new echobot -n echoes`
 
 Once this has completed we can navigate into the new directory that has been created.
 
->`$ cd ~/mybot/echoes`
+> `cd ~/mybot/echoes`
 
 Once inside, the project should be ready to run. Test it with:
 
->`$ sudo dotnet run`
+> `sudo dotnet run`
 
 If everything was set up correctly you should see a similar output to the one below:
 
@@ -117,11 +117,11 @@ Return to your running WSL distro and end the app with `Ctrl+C`.
 
 Then install the .Net systemd extension with:
 
->`$ sudo dotnet add package Microsoft.Extensions.Hosting.Systemd`
+> `sudo dotnet add package Microsoft.Extensions.Hosting.Systemd`
 
 Now we need to open our ‘echoes’ project in VS Code by running:
 
->`$ code .`
+> `code .`
 
 From the ‘echoes’ directory.
 
@@ -133,7 +133,7 @@ Save and close the project in VS code and return to your WSL terminal.
 
 Next we need to create a service file for your bot using your favourite editor, for example.
 
->`$ sudo nano /etc/systemd/system/echoes.service`
+> `sudo nano /etc/systemd/system/echoes.service`
 
 Then paste the below taking care to change the path of `WorkingDirectory` to the location of your project folder.
 
@@ -155,11 +155,11 @@ WantedBy=multi-user.target
 
 Save your file and reload your services with:
 
->`$ sudo systemctl daemon-reload`
+> `sudo systemctl daemon-reload`
 
 To reload the services. You can check if your service is ready by running:
 
->`$ systemctl status echoes.service`
+> `systemctl status echoes.service`
 
 You should get the following output:
 
@@ -167,8 +167,8 @@ You should get the following output:
 
 Now start your service and then check its status again.
 
->`$ sudo systemctl start echoes.service`
->`$ sudo systemctl status echoes.service`
+> `sudo systemctl start echoes.service`
+> `sudo systemctl status echoes.service`
 
 If everything has been configured correctly you should get an output similar to the below.
 
@@ -180,7 +180,7 @@ Return to your Windows host and reconnect to your Bot Emulator using the same in
 
 You can stop your bot from running at any time with the command:
 
->`$ sudo systemctl stop echoes.service`
+> `sudo systemctl stop echoes.service`
 
 ## Tutorial complete!
 
