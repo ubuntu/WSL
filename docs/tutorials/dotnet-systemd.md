@@ -178,6 +178,7 @@ You should get the following output:
 Now start your service and then check its status again.
 
 > `sudo systemctl start echoes.service`
+
 > `sudo systemctl status echoes.service`
 
 If everything has been configured correctly you should get an output similar to the below.
