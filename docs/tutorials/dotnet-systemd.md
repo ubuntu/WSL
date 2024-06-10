@@ -1,9 +1,11 @@
 # Run a .Net Echo Bot as a systemd service on Ubuntu WSL
 *Authored by Oliver Smith ([oliver.smith@canonical.com](mailto:oliver.smith@canonical.com))*
 
-.Net is an open-source development platform from Microsoft that enables developers to build multi-platform applications from a single codebase.
+In this tutorial we will take advantage of WSL's systemd support to run a chatbot as a systemd service for easier deployment.
 
-In this tutorial we demonstrate how easy it is to start working with .Net on Ubuntu WSL by creating a simple chatbot accessible from your Windows host. We also take advantage of WSL's new systemd support to run our bot as a systemd service for easier deployment.
+We will create the bot using .Net on Ubuntu WSL and it will be accessible from the Windows host.
+
+.Net is an open-source development platform from Microsoft that enables developers to build multi-platform applications from a single codebase.
 
 ## Requirements
 
