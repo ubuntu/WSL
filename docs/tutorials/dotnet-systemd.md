@@ -34,21 +34,17 @@ Make sure to restart your distribution after you have made this change.
 
 ## Install .NET
 
+To install .NET 6 on Ubuntu 24.04 LTS we first need to add the backports archive for .NET.
+
 ```{note}
-In Ubuntu 24.04 LTS .NET 8 is available [in the Ubuntu repositories](https://ubuntu.com/blog/install-dotnet-on-ubuntu).
-To install this version of .NET for your project you only need to run:
-
-> `sudo apt install dotnet8`
-
-In this tutorial we will be using .NET 6, which requires adding the backports archive for older .NET versions on Ubuntu 24.04 LTS.
-If you are using Ubuntu 22.04 LTS you can skip this step.
+If you are using Ubuntu 22.04 LTS you can skip the command for installing backports and install the .NET 6 bundle directly. 
 ```
 
-To install .NET 6 on Ubuntu 24.04 LTS we will first add the backports archive for .NET with the following command:
+Run this command to install backports, which includes .NET 6:
 
 > `sudo add-apt-repository ppa:dotnet/backports`
 
-Now we can install a bundle with both the SDK and runtime for .NET 6:
+To install a bundle with both the SDK and runtime for .NET 6 run:
 
 > `sudo apt install dotnet6`
 
