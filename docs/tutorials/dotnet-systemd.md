@@ -10,16 +10,17 @@ We will create the bot using .NET on Ubuntu WSL and it will be accessible from t
 ## Requirements
 
 * A PC running Windows 11
-* The latest version of the WSL Windows Store application
-* Ubuntu 22.04 LTS, Ubuntu 24.04 LTS or Ubuntu Preview installed
+* The latest version of WSL from the Microsoft Store
+* Ubuntu, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS
+* Visual Studio Code (recommended)
 
-Systemd support is a new feature of WSL and only available on WSL version 0.67.6 or higher.
+Systemd support is required for this tutorial and is available on WSL version 0.67.6 or higher.
 
 In your PowerShell terminal, you can check your current WSL version by running:
 
 > `wsl --version`
 
-Inside WSL, you can check that systemd is enabled on your Ubuntu distribution by running:
+Inside WSL, you can check that systemd is enabled on your Ubuntu distribution with the following command:
 
 > `cat /etc/wsl.conf`
 
@@ -202,12 +203,13 @@ You now have a simple Echo Bot running as a systemd service on WSL that you can 
 
 If you would like to expand on this example try reviewing some of the more advanced [Bot Framework samples](https://github.com/Microsoft/BotBuilder-Samples/blob/main/README.md) on the Microsoft GitHub.
 
-To read more about how Ubuntu supports .NET developers, making it easier than ever to build multi-platform services and applications, read our [recent announcement](https://ubuntu.com/blog/install-dotnet-on-ubuntu).
+To read more about how Ubuntu supports .NET developers, making it easier than ever to build multi-platform services and applications, read our [previous announcement](https://ubuntu.com/blog/install-dotnet-on-ubuntu).
 
 ### Further Reading
 
 * [.NET on Ubuntu](https://ubuntu.com/blog/install-dotnet-on-ubuntu)
 * [Bot Framework samples](https://github.com/Microsoft/BotBuilder-Samples/blob/main/README.md)
+* [Working with Visual Studio Code on Ubuntu WSL](vscode.md)
 * [Enabling GPU acceleration on Ubuntu on WSL2 with the NVIDIA CUDA Platform](gpu-cuda.md)
 * [Windows and Ubuntu interoperability on WSL2](interop.md)
 * [Microsoft WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
