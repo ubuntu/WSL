@@ -61,11 +61,11 @@ Once inside we can install the EchoBot C# template by running:
 
 > `dotnet new -i Microsoft.Bot.Framework.CSharp.EchoBot`
 
-We can verify the template has been installed correctly by running:
+We can then verify the template has been installed correctly:
 
 > `dotnet new --list`
 
-And looking for the `Bot Framework Echo Bot` template in the list.
+You should be able to find the `Bot Framework Echo Bot` template in the list.
 
 ![|624x153](assets/dotnet-systemd/templates.png)
 
@@ -73,11 +73,11 @@ Create a new Echo Bot project, with `echoes` as the name for our bot, using the 
 
 > `dotnet new echobot -n echoes`
 
-Once this has completed we can navigate into the new directory that has been created.
+After this has completed we can navigate into the new directory that has been created.
 
 > `cd ~/mybot/echoes`
 
-Once inside, the project should be ready to run. Test it with:
+From inside this directory the project should be ready to run. Test it with:
 
 > `sudo dotnet run`
 
@@ -139,7 +139,7 @@ Navigate to ‘Program.cs’ and insert `.UseSystemd()` as a new line in the loc
 
 ![|624x381](assets/dotnet-systemd/program-cs.png)
 
-Save and close the project in VS code and return to your WSL terminal.
+Save and close the project in VS Code and return to your WSL terminal.
 
 Next we need to create a service file for your bot using your favourite editor, for example.
 
