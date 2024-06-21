@@ -23,4 +23,8 @@ namespace DistributionInfo
 
     // Query the UID of the user account.
     ULONG QueryUid(std::wstring_view userName);
+
+    // Returns true if system initialization tasks are complete.
+    // If [wantUser] is true, we consider creating the default user part of such tasks.
+    bool CheckInitTasks(WslApiLoader& api, bool wantUser);
 }
