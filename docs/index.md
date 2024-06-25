@@ -24,6 +24,34 @@ Linux, Windows and the browser.
 
 ## In this documentation
 
+````{grid} 1 1 2 2
+
+```{grid-item-card} [Tutorials](tutorials/index)
+
+**Start here** with hands-on tutorials for new users to learn Ubuntu WSL
+```
+
+```{grid-item-card} [How-to guides](guides/index)
+
+**Follow step-by-step** instructions for key operations and common tasks for Ubuntu WSL
+```
+
+````
+
+````{grid} 1 1 2 2
+:reverse:
+
+```{grid-item-card} [Reference](reference/index)
+
+**Read technical descriptions** of important factual information relating to Ubuntu WSL
+```
+
+```{grid-item-card} [Explanations](explanations/index)
+
+**Read explanatory notes** on important concepts
+```
+
+````
 
 
 ```{toctree}
@@ -34,4 +62,5 @@ self
 tutorials/index
 guides/index
 reference/index
+explanations/index
 ```
