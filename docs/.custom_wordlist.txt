@@ -19,7 +19,11 @@ executables
 filesystem
 filesystems
 GPG
+GUI
+GUIs
 init
+IDE
+IDEs
 js
 Jupyter
 localhost
@@ -29,6 +33,7 @@ Numbat
 OpenGL
 OpenID
 OpenVINO
+performant
 PowerShell
 rootfs
 Rootfs
@@ -40,6 +45,7 @@ subprocess
 systemd
 ubuntu
 UbuntuPreview
+UP4W
 vGPU
 VMs
 webserver
