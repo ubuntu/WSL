@@ -13,8 +13,8 @@ Linux-native graphical applications.
 Ubuntu WSL can be used to build projects in a performant Linux environment
 without the overhead of traditional virtual machine or dual-boot setups.
 Organisations that manage a Microsoft infrastructure can empower developers who
-prefer a Linux-based workflow. With Ubuntu Pro for WSL, large fleets of Ubuntu
-WSL machines can also be administered with ease and security.
+prefer a Linux-based workflow. With [Ubuntu Pro for WSL](explanations/up4w), large
+fleets of Ubuntu WSL machines can also be administered with ease and security.
 
 Ubuntu WSL is for the programmer who wants a fully-featured Linux development
 environment but must use a Windows device, the system administrator who
