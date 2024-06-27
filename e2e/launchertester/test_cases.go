@@ -32,8 +32,6 @@ func testWhetherUserIsRoot(t *testing.T, mustBeRoot bool) { //nolint: thelper, t
 
 // testSystemdEnabled ensures systemd was enabled.
 func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
-
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
@@ -93,8 +91,6 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
 
 // testCorrectUpgradePolicy ensures upgrade policy matches the one expected for the app.
 func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
-
 	/* Ubuntu always upgrade to next lts */
 	wantPolicy := "lts"
 	ltsRegex := regexp.MustCompile(`^Ubuntu-\d{2}\.\d{2}$`) // Ubuntu-WX.YZ
@@ -150,7 +146,6 @@ func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper, this is a te
 // testInteropIsEnabled ensures interop works fine.
 // See related issue: https://github.com/ubuntu/WSL/issues/334
 func testInteropIsEnabled(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
