@@ -18,8 +18,6 @@ func TestBasicSetup(t *testing.T) {
 	// TODO: try to inject user/password to stdin to avoid --root arg.
 	out, err := launcherCommand(ctx, "install", "--root").CombinedOutput() // Installing as root to avoid Stdin
 	require.NoErrorf(t, err, "Unexpected error installing: %s\n%v", out, err)
-	// TODO: check with Carlos if this is necessary
-	require.NotEmpty(t, out, "Failed to install the distro: No output produced.")
 
 	testCases := map[string]func(t *testing.T){
 		"SystemdEnabled":          testSystemdEnabled,

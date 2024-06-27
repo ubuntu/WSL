@@ -14,12 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const (
-	serverLogPath       = "/var/log/installer/systemsetup-server-debug.log"
-	clientLogPath       = "ubuntu-desktop-installer/packages/ubuntu_wsl_setup/build/windows/runner/Debug/.ubuntu_wsl_setup.exe/ubuntu_wsl_setup.exe.log"
-	subiquityAnswerFile = "/var/log/prefill-system-setup.yaml"
-)
-
 // These timeouts have been decided on experimentally, according to the time each action
 // could reasonably need on an Azure runner.
 const (
