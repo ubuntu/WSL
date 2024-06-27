@@ -28,9 +28,9 @@ jobs:
     needs: vm-setup
     env:
       rootFsCache: "${env:USERPROFILE}\\Downloads\\rootfs"
-      distroName: Ubuntu-Preview
-      appID: UbuntuPreview
-      launcher: ubuntupreview.exe
+      distroName: Ubuntu-24.04
+      appID: Ubuntu24.04LTS
+      launcher: ubuntu2404.exe
     steps:
       - name: Checkout
         uses: actions/checkout@v3
