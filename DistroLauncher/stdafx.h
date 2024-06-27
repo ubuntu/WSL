@@ -32,3 +32,6 @@
 
 // Message strings compiled from .MC file.
 #include "messages.h"
+
+// Ubuntu extensions
+#include "Ubuntu/InitTasks.h"

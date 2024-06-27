@@ -37,7 +37,7 @@ HRESULT InstallDistribution(bool createUser)
         return hr;
     }
 
-    if (DistributionInfo::CheckInitTasks(g_wslApi, createUser)) {
+    if (Ubuntu::CheckInitTasks(g_wslApi, createUser)) {
         return ERROR_SUCCESS;
     }
 
