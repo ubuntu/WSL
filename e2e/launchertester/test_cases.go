@@ -177,3 +177,11 @@ func testHelpFlag(t *testing.T) {
 	require.NoError(t, err, "could not run '%s help': %v, %s", *launcherName, err, out)
 	require.Contains(t, string(out), usageFirstLine, "help command should have been picked up by the launcher")
 }
+
+func testFileExists(t *testing.T, linuxPath string) {
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	out, err := launcherCommand(ctx, "run", "test", "-e", linuxPath).CombinedOutput()
+	require.NoError(t, err, "Unexpected error checking file existence: %s", out)
+}
