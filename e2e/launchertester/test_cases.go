@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"os/exec"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -94,7 +95,8 @@ func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper, this is a test
 
 	/* Ubuntu always upgrade to next lts */
 	wantPolicy := "lts"
-	if strings.HasPrefix(*distroName, "Ubuntu") && strings.HasSuffix(*distroName, "LTS") {
+	ltsRegex := regexp.MustCompile(`^Ubuntu-\d{2}\.\d{2}$`) // Ubuntu-WX.YZ
+	if ltsRegex.MatchString(*distroName) {
 		wantPolicy = "never"
 	} else if *distroName != "Ubuntu" {
 		// Preview and Dev
