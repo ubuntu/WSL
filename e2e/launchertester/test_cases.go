@@ -15,17 +15,19 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-// testUserNotRoot ensures the default user is not root.
-func testUserNotRoot(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
-
+// testWhetherUserIsRoot ensures the default user is root or not based on the value of mustBeRoot.
+func testWhetherUserIsRoot(t *testing.T, mustBeRoot bool) { //nolint: thelper, this is a test
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
 	out, err := wslCommand(ctx, "whoami").CombinedOutput()
 	require.NoErrorf(t, err, "Unexpected failure executing whoami: %s", out)
 
-	require.NotContains(t, string(out), "root", "Default user should not be root.")
+	if mustBeRoot {
+		require.Contains(t, string(out), "root", "Default user should be root.")
+	} else {
+		require.NotContains(t, string(out), "root", "Default user should not be root.")
+	}
 }
 
 // testSystemdEnabled ensures systemd was enabled.
