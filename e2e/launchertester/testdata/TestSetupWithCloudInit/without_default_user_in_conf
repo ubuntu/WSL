@@ -1,0 +1,13 @@
+#cloud-config
+users:
+  - name: testuser
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+  - name: nontestuser
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+
+runcmd:
+  - touch /home/testuser/with_default_user.done

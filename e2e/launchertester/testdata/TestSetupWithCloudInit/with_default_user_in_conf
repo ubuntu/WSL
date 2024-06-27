@@ -1,0 +1,22 @@
+#cloud-config
+users:
+  - name: nontestuser
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+  - name: testuser
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+
+write_files:
+  - path: /etc/wsl.conf
+    append: true
+    content: |
+      [user]
+      default=testuser
+
+runcmd:
+  # Make sure to take longer than WSL boot timeout (10s).
+  - sleep 30s
+  - touch /etc/with_default_user.done
