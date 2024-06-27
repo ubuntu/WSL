@@ -88,7 +88,7 @@ jobs:
           Write-Output "::endgroup::"
 
           Write-Output "::group::Tests"
-          go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name '${{ env.distroName }}' --launcher-name '${{ env.launcher }}'
+          go test .\launchertester\ -timeout 30m --distro-name '${{ env.distroName }}' --launcher-name '${{ env.launcher }}'
           $exitStatus=$?
           Write-Output "::endgroup::"
           if ( ! $exitStatus ) { Exit(1) }
