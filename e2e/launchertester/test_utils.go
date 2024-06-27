@@ -6,6 +6,7 @@ import (
 	"context"
 	"flag"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -115,4 +116,25 @@ func distroState(t *testing.T) string {
 	require.NoErrorf(t, scanner.Err(), "Unexpected error in scanner: %v", err)
 
 	return distroNotFoundMsg
+}
+
+// TestFixturePath returns the path of the dir or file for storing fixture specific to the subtest name.
+func TestFixturePath(t *testing.T) string {
+	t.Helper()
+
+	// Ensures that only the name of the parent test is used.
+	familyName, subtestName, _ := strings.Cut(t.Name(), "/")
+
+	return filepath.Join("testdata", familyName, normalizeName(t, subtestName))
+}
+
+// normalizeName returns a path from name with illegal Windows
+// characters replaced or removed.
+func normalizeName(t *testing.T, name string) string {
+	t.Helper()
+
+	name = strings.ReplaceAll(name, `\`, "_")
+	name = strings.ReplaceAll(name, ":", "")
+	name = strings.ToLower(name)
+	return name
 }
