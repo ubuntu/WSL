@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap2="http://schemas.microsoft.com/appx/manifest/uap/windows10/2" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap mp uap2 uap3 rescap desktop">
-  <Identity Name="CanonicalGroupLimited.Ubuntu" Version="2204.4.42.0" Publisher="CN=23596F84-C3EA-4CD8-A7DF-550DCE37BCD0" ProcessorArchitecture="x64" />
+  <Identity Name="CanonicalGroupLimited.Ubuntu" Version="2404.0.42.0" Publisher="CN=23596F84-C3EA-4CD8-A7DF-550DCE37BCD0" ProcessorArchitecture="x64" />
   <mp:PhoneIdentity PhoneProductId="160867c6-4e75-4e36-85c6-1543de07d5f3" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Ubuntu</DisplayName>
