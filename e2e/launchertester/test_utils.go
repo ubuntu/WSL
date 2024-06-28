@@ -6,18 +6,13 @@ import (
 	"context"
 	"flag"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
-)
-
-const (
-	serverLogPath       = "/var/log/installer/systemsetup-server-debug.log"
-	clientLogPath       = "ubuntu-desktop-installer/packages/ubuntu_wsl_setup/build/windows/runner/Debug/.ubuntu_wsl_setup.exe/ubuntu_wsl_setup.exe.log"
-	subiquityAnswerFile = "/var/log/prefill-system-setup.yaml"
 )
 
 // These timeouts have been decided on experimentally, according to the time each action
@@ -77,7 +72,7 @@ func checkValidTestbed(t *testing.T) {
 func terminateDistro(t *testing.T) {
 	t.Helper()
 	out, err := exec.Command("wsl.exe", "--terminate", *distroName).CombinedOutput()
-	require.NoError(t, err, "Failed to shut down WLS: %s", out)
+	require.NoError(t, err, "Failed to shut down WSL: %s", out)
 }
 
 // distroState parses the output of "wsl -l -v" to find the state of the current distro.
@@ -121,4 +116,25 @@ func distroState(t *testing.T) string {
 	require.NoErrorf(t, scanner.Err(), "Unexpected error in scanner: %v", err)
 
 	return distroNotFoundMsg
+}
+
+// TestFixturePath returns the path of the dir or file for storing fixture specific to the subtest name.
+func TestFixturePath(t *testing.T) string {
+	t.Helper()
+
+	// Ensures that only the name of the parent test is used.
+	familyName, subtestName, _ := strings.Cut(t.Name(), "/")
+
+	return filepath.Join("testdata", familyName, normalizeName(t, subtestName))
+}
+
+// normalizeName returns a path from name with illegal Windows
+// characters replaced or removed.
+func normalizeName(t *testing.T, name string) string {
+	t.Helper()
+
+	name = strings.ReplaceAll(name, `\`, "_")
+	name = strings.ReplaceAll(name, ":", "")
+	name = strings.ToLower(name)
+	return name
 }

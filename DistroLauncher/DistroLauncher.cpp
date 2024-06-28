@@ -37,6 +37,10 @@ HRESULT InstallDistribution(bool createUser)
         return hr;
     }
 
+    if (Ubuntu::CheckInitTasks(g_wslApi, createUser)) {
+        return ERROR_SUCCESS;
+    }
+
     // Create a user account.
     if (createUser) {
         Helpers::PrintMessage(MSG_CREATE_USER_PROMPT);
