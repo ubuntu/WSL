@@ -67,9 +67,9 @@ std::wstring str2wide(const std::string& str, UINT codePage = CP_THREAD_ACP);
 class IniReader {
  public:
   explicit IniReader(fs::path path) : file{path} {}
-  // Returns the value of [section].key as a string.
-  // To ease distinguishing the parameters, section is expected to contain the
-  // square-brackets.
+  // Returns the value of the first occurrence of [section].key as a string, matching the current
+  // WSL behavior (as of version 2.2.4). To ease distinguishing the parameters, section is expected
+  // to contain the square-brackets.
   std::string operator()(std::string_view section, std::string_view key) {
     if (!seekSection(section)) {
       return {};
