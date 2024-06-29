@@ -18,7 +18,7 @@ Key features:
   - A consistent development to deployment workflow when using Ubuntu in the cloud
   - 5 years of security patching with Ubuntu Long Term Support (LTS) releases
 
-Ubuntu currently provides the 22.04.4 LTS release. When new LTS versions are released, Ubuntu can be upgraded once the first point release is available. This can be done from the command line by using:
+Ubuntu currently provides the 24.04 LTS release. When new LTS versions are released, Ubuntu can be upgraded once the first point release is available. This can be done from the command line by using:
 
     sudo do-release-upgrade
 
@@ -30,7 +30,7 @@ For more information about Ubuntu WSL and how Canonical supports developers plea
 
 https://ubuntu.com/wsl
 </Description>
-  <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver=22.04</ReleaseNotes>
+  <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver=24.04</ReleaseNotes>
   <DevStudio>Canonical Ltd. and the OpenSource community</DevStudio>
   <ScreenshotCaptions>
     <!-- Valid length: 200 character limit, up to 9 elements per platform -->
