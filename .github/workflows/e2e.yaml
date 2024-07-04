@@ -28,6 +28,7 @@ jobs:
     needs: vm-setup
     env:
       rootFsCache: "${env:USERPROFILE}\\Downloads\\rootfs"
+      # TODO: Move this to "Ubuntu" once we have backported everything and Ubuntu is transitionned to 24.04
       distroName: Ubuntu-24.04
       appID: Ubuntu24.04LTS
       launcher: ubuntu2404.exe
