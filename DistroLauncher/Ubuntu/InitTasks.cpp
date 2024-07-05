@@ -7,7 +7,8 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
-#include <utility>
+#include <iostream>
+#include <optional>
 #include <vector>
 #include <system_error>
 
@@ -116,8 +117,8 @@ std::vector<UserEntry> getAllUsers(WslApiLoader& api);
 // Returns the defaultUser set in /etc/wsl.conf or the empty string if none is set.
 std::string defaultUserInWslConf();
 
-// Converts a multi-byte into a wide string.
-std::wstring str2wide(const std::string& str, UINT codePage = CP_THREAD_ACP);
+// Converts a multi-byte null-terminated string into a wide string.
+std::wstring str2wide(std::string_view str, UINT codePage = CP_THREAD_ACP);
 
 bool enforceDefaultUser(WslApiLoader& api) try {
   auto users = getAllUsers(api);
@@ -169,78 +170,109 @@ bool enforceDefaultUser(WslApiLoader& api) try {
   return false;
 }
 
-// Decomposes a line such as `key = value` into its [key] and [value] components.
-std::pair<std::string_view, std::string_view> matchKeyValuePair(std::string_view line);
+// A truly temporary file copy.
+//
+// Invariant: while this object exists, so does the underlying file,
+// being auto-deleted by the OS when this object goes out of scope.
+class TempFileCopy {
+  fs::path p;
+  HANDLE h = nullptr;
 
-// A limited INI "parser" capable of retrieving the value of a [section].key entry.
-class IniReader {
  public:
-  explicit IniReader(fs::path path) : file{path} {}
-  // Returns the value of the first occurrence of [section].key as a string, matching the current
-  // WSL behavior (as of version 2.2.4). To ease distinguishing the parameters, section is expected
-  // to contain the square-brackets.
-  std::string getValue(std::string_view section, std::string_view key) {
-    if (!seekSection(section)) {
-      return {};
+  ~TempFileCopy() {
+    if (h) {
+      CloseHandle(h);
     }
-    return findValueInCurrentSection(key);
   }
-  ~IniReader() = default;
+  const fs::path& path() const { return p; }
 
- private:
-  // Positions the file stream past the line where section is declared.
-  // Returns false if section is not found.
-  // Note: this function always starts from the beginning of the file.
-  // Precondition: file must be open.
-  bool seekSection(std::string_view section) {
-    std::string line;
-    file.seekg(0);
-    while (std::getline(file, line) && line.find(section, 0) == std::string::npos) {}
-    return !file.eof();
-  }
+  // Creates a temporary copy of the source file configured for auto removal by the OS when this
+  // object goes out of scope under the system's preferred temporary directory.
+  explicit TempFileCopy(const fs::path& source) {
+    // When debugging fs::temp_directory_path() returns a path like LOCALAPPDATA\Temp, but once
+    // packaged it should point inside LOCALAPPDATA\Packages\<PackageFullName>\...
+    auto path = fs::temp_directory_path();
 
-  // Iterates file until key, another section or EOF is found.
-  // If the key is found, its value is returned. Empty string, otherwise.
-  // Precondition: the file stream cursor must be positioned inside the correct section.
-  std::string findValueInCurrentSection(std::string_view key) {
-    for (std::string line; std::getline(file, line);) {
-      if (line.find('[', 0) != std::string::npos) {
-        // found another section, so value not found.
-        return {};
-      }
-      if (auto [k, v] = matchKeyValuePair(line); k == key) {
-        return std::string{v};
-      }
+    wchar_t rawDestination[MAX_PATH] = {'\0'};
+    if (auto uniqueCode = GetTempFileNameW(path.native().c_str(), L"wsl", 0, rawDestination);
+        uniqueCode == 0) {
+      std::string msg{"couldn't create a temporary file inside "};
+      msg += path.string();
+      throw std::system_error{static_cast<int>(GetLastError()), std::system_category(), msg};
+    }
+    fs::path destination{rawDestination};
+
+    // GetTempFileNameA would have created a file for us thus we need to overwrite it.
+    fs::copy_file(source, destination, fs::copy_options::overwrite_existing);
+    fs::permissions(destination, fs::perms::owner_read | fs::perms::owner_write);
+
+    // Allow others to read but not write it, and configure it to be deleted automatically when the
+    // handle is closed (what's the destructor does automatically no matter what).
+    HANDLE file = CreateFileW(
+        rawDestination, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+        FILE_ATTRIBUTE_TEMPORARY | FILE_ATTRIBUTE_READONLY | FILE_FLAG_DELETE_ON_CLOSE, nullptr);
+    if (file == INVALID_HANDLE_VALUE) {
+      std::string msg{"couldn't open file in auto-delete mode: "};
+      msg += path.string();
+      throw std::system_error{static_cast<int>(GetLastError()), std::system_category(), msg};
     }
 
+    // fully initializes the object.
+    p = destination;
+    h = file;
+  }
+};
+
+// Reads [user].default from an existing wsl.conf file located at the ini path provided.
+std::string readIniDefaultUser(const fs::path& ini) {
+  // `getconf LOGIN_NAME_MAX` returns 256, but glibc restricts user login names to 32 chars long.
+  static constexpr auto utNameSize = 33;  // With room for the NULL terminator just in case.
+  char uname[utNameSize] = {'\0'};
+  auto len =
+      GetPrivateProfileStringA("user", "default", nullptr, uname, utNameSize, ini.string().c_str());
+
+  // GetPrivateProfileStringA set errno to ERROR_FILE_NOT_FOUND if the file
+  // or section or key are not found or if the file is ill-formed. We know the file exists.
+  // Absent user.default entry is a common case, we don't want to spam users for that.
+  // I don't see what other errors that could raise.
+  if (auto e = GetLastError(); len == 0 && e == ERROR_FILE_NOT_FOUND) {
     return {};
   }
 
-  std::ifstream file;
-};
+  return uname;
+}
 
 std::string defaultUserInWslConf() try {
   auto etcWslConf = wslConfPath();
-
-  std::error_code err;
-  if (!fs::exists(etcWslConf, err)) {
+  if (!fs::exists(etcWslConf)) {
     return {};
   }
-  if (err) {
-    Helpers::PrintErrorMessage(HRESULT_FROM_WIN32(err.value()));
-    return {};
-  }
+  // Copy /etc/wsl.conf to a temporary local path (guaranteed by the OS to be auto-deleted) from
+  // where GetPrivateProfileStringA can read it.
+  TempFileCopy copy(etcWslConf);
+  return readIniDefaultUser(copy.path());
 
-  IniReader conf{etcWslConf};
-  std::string defaultUser = conf.getValue("[user]", "default");
-  if (defaultUser.empty()) {
-    return {};
-  }
-
-  return defaultUser;
-} catch (std::exception const&) {
-  _putws(L"CheckInitTasks: failed to read /etc/wsl.conf");
+} catch (std::system_error const& err) {
+  // std::filesystem_error is child of std::system_error
+  std::wcout << L"CheckInitTasks: failed to read /etc/wsl.conf: " << err.code() << ": "
+             << str2wide(err.what());
   return {};
+}
+
+std::wstring str2wide(std::string_view str, UINT codePage) {
+  if (str.empty() || str.size() >= INT_MAX) return {};
+
+  int inputSize = static_cast<int>(str.size());
+  int required = ::MultiByteToWideChar(codePage, 0, str.data(), inputSize, NULL, 0);
+  if (0 == required) return {};
+
+  std::wstring str2;
+  str2.resize(required);
+
+  int converted = ::MultiByteToWideChar(codePage, 0, str.data(), inputSize, &str2[0], required);
+  if (0 == converted) return {};
+
+  return str2;
 }
 
 // A non-interactive WSL process, turned into a class so we don't have to worry about closing
@@ -283,7 +315,7 @@ std::vector<UserEntry> getAllUsers(WslApiLoader& api) {
   WslProcess getent{L"getent passwd"};
   auto [error, exitCode, output] = getent.run(api, 10'000);
   if (!error.empty()) {
-    _putws(L"getAllUsers: ");
+    _putws(L"failed to read passwd database: ");
     _putws(error.c_str());
     if (exitCode != 0) {
       wprintf(L"%lld", exitCode);
@@ -375,54 +407,6 @@ WslProcess::Result WslProcess::run(WslApiLoader& api, DWORD timeout) {
   }
 
   return {{}, 0, contents};
-}
-
-std::pair<std::string_view, std::string_view> matchKeyValuePair(std::string_view line) {
-  static constexpr char whitespaces[] = " \n\r\f\v\t";
-  std::size_t keyStart = line.find_first_not_of(whitespaces, 0);
-  if (keyStart == std::string::npos) {
-    return {};  // empty/blank line.
-  }
-  std::size_t equalSignPos = line.find_first_of('=', keyStart);
-  if (equalSignPos == std::string::npos) {
-    return {};  // not a key-value pair.
-  }
-  std::size_t keyLength = equalSignPos - keyStart;
-  if (keyLength <= 0) {
-    return {};  // line starts with '='?
-  }
-  // first non whitespace char after the '='.
-  std::size_t valueStarts = line.find_first_not_of(whitespaces, equalSignPos + 1);
-  if (valueStarts == std::string::npos) {
-    return {};  // no value.
-  }
-  // first whitespace after the value start position.
-  std::size_t valueEnds = line.find_first_of(whitespaces, valueStarts);
-  if (valueEnds == std::string::npos) {
-    // there is no whitespace, not even a new line.
-    valueEnds = line.length();
-  }
-
-  std::size_t valueLength = valueEnds - valueStarts;
-  std::string_view key = line.substr(keyStart, keyLength);
-  std::string_view value = line.substr(valueStarts, valueLength);
-  return {key, value};
-}
-
-std::wstring str2wide(const std::string& str, UINT codePage) {
-  if (str.empty() || str.size() >= INT_MAX) return {};
-
-  int inputSize = static_cast<int>(str.size());
-  int required = ::MultiByteToWideChar(codePage, 0, str.data(), inputSize, NULL, 0);
-  if (0 == required) return {};
-
-  std::wstring str2;
-  str2.resize(required);
-
-  int converted = ::MultiByteToWideChar(codePage, 0, str.data(), inputSize, &str2[0], required);
-  if (0 == converted) return {};
-
-  return str2;
 }
 
 }  // namespace
