@@ -5,7 +5,6 @@
 #include <charconv>
 #include <exception>
 #include <filesystem>
-#include <fstream>
 #include <sstream>
 #include <iostream>
 #include <optional>
@@ -79,30 +78,6 @@ fs::path wslConfPath() {
   return etcWslConf;
 }
 
-void writeUserToWslConf(std::string_view name) {
-  auto oldPath = wslConfPath();
-  auto newPath = wslConfPath();
-  newPath.replace_extension(".new");
-
-  {
-    // Write the new file starting with the [user] section.
-    // ios::binary is needed otherwise '\r' will be added on Windows :(.
-    std::ofstream confNew{newPath, std::ios::binary};
-    confNew << "[user]\ndefault=" << name << '\n';
-
-    // Read existing content.
-    std::ifstream confOld{oldPath};
-    std::string original{std::istreambuf_iterator<char>(confOld), std::istreambuf_iterator<char>()};
-    if (!original.empty()) {
-      // and copy that to the new file.
-      std::copy(original.begin(), original.end(), std::ostreambuf_iterator<char>(confNew));
-    }
-  }
-
-  // Files are closed by now, we may replace the old file with the new one.
-  fs::rename(newPath, oldPath);
-}
-
 bool setDefaultUserViaWslApi(WslApiLoader& api, unsigned long uid) {
   if (auto hr = api.WslConfigureDistribution(uid, WSL_DISTRIBUTION_FLAGS_DEFAULT); FAILED(hr)) {
     Helpers::PrintErrorMessage(hr);
@@ -117,9 +92,6 @@ std::vector<UserEntry> getAllUsers(WslApiLoader& api);
 // Returns the defaultUser set in /etc/wsl.conf or the empty string if none is set.
 std::string defaultUserInWslConf();
 
-// Converts a multi-byte null-terminated string into a wide string.
-std::wstring str2wide(std::string_view str, UINT codePage = CP_THREAD_ACP);
-
 bool enforceDefaultUser(WslApiLoader& api) try {
   auto users = getAllUsers(api);
 
@@ -130,15 +102,14 @@ bool enforceDefaultUser(WslApiLoader& api) try {
   }
   // 1. We read the default user name from /etc/wsl
   if (auto name = defaultUserInWslConf(); !name.empty()) {
+    // We still need the UID to be able to call the WSL API.
     auto found = std::find_if(users.begin(), users.end(),
                               [&name](const UserEntry& u) { return u.name == name; });
-    if (found != users.end()) {
-      return setDefaultUserViaWslApi(api, found->uid);
+    if (found == users.end()) {
+      // no UID, nothing to do, bail out
+      return true;
     }
-    wprintf(
-        L"CheckInitTasks: user \"%s\" referred in /etc/wsl.conf "
-        L"was not found in the system, entry may be overwritten.\n",
-        str2wide(name).c_str());
+    return setDefaultUserViaWslApi(api, found->uid);
   }
   // 2. Check for the Windows registry
   // This call returns the UID of the current default user (most likely root, unless someone set a
@@ -147,7 +118,6 @@ bool enforceDefaultUser(WslApiLoader& api) try {
     auto found = std::find_if(users.begin(), users.end(),
                               [&uid](const UserEntry& u) { return u.uid == uid; });
     if (found != users.end()) {
-      writeUserToWslConf(found->name);
       return true;
     }
   }
@@ -157,9 +127,6 @@ bool enforceDefaultUser(WslApiLoader& api) try {
   auto found = std::find_if(users.begin(), users.end(),
                             [](const UserEntry& u) { return u.uid > 999 && u.uid < 65534; });
   if (found != users.end()) {
-    writeUserToWslConf(found->name);
-    // Do this last because its effect is immediate, i.e. the resulting default user could not be
-    // allowed to write /etc/wsl.conf for example.
     return setDefaultUserViaWslApi(api, found->uid);
   }
 
@@ -241,6 +208,8 @@ std::string readIniDefaultUser(const fs::path& ini) {
 
   return uname;
 }
+// Converts a multi-byte null-terminated string into a wide string.
+std::wstring str2wide(std::string_view str, UINT codePage = CP_THREAD_ACP);
 
 std::string defaultUserInWslConf() try {
   auto etcWslConf = wslConfPath();
