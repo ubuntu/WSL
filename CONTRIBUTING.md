@@ -68,11 +68,7 @@ At this point, if you are still not sure, try to contact a maintainer of one of 
 Contributions are made via Issues and Pull Requests (PRs). A few general guidelines that cover both:
 
 * Use the advisories page of the repository and not a public bug report to
-report security vulnerabilities. For Ubuntu WSL, please use [launchpad private
-bugs](https://bugs.launchpad.net/ubuntuwsl/+filebug) which is
-monitored by our security team. On an Ubuntu machine, it’s best to use
-`ubuntu-bug wsl` to collect relevant information.
-<!-- QUERY: is `wsl` the correct argument here???. -->
+report security vulnerabilities. 
 * Search for existing Issues and PRs before creating your own.
 * Give a friendly ping in the comment thread to the submitter or a contributor to draw attention if your issue is blocking — while we work hard to makes sure issues are handled in a timely manner it can take time to investigate the root cause. 
 * Read [this Ubuntu discourse post](https://discourse.ubuntu.com/t/contribute/26) for resources and tips on how to get started, especially if you've never contributed before
