@@ -127,7 +127,7 @@ bool enforceDefaultUser(WslApiLoader& api) try {
     _putws(L"CheckInitTasks: couldn't find any users in NSS database\n");
     return false;
   }
-
+  // 1. We read the default user name from /etc/wsl
   if (auto name = defaultUserInWslConf(); !name.empty()) {
     auto found = std::find_if(users.begin(), users.end(),
                               [&name](const UserEntry& u) { return u.name == name; });
@@ -139,7 +139,9 @@ bool enforceDefaultUser(WslApiLoader& api) try {
         L"was not found in the system, entry may be overwritten.\n",
         str2wide(name).c_str());
   }
-
+  // 2. Check for the Windows registry
+  // This call returns the UID of the current default user (most likely root, unless someone set a
+  // different UID via the registry editor or WSL API).
   if (auto uid = DistributionInfo::QueryUid(L""); uid != 0) {
     auto found = std::find_if(users.begin(), users.end(),
                               [&uid](const UserEntry& u) { return u.uid == uid; });
@@ -149,7 +151,7 @@ bool enforceDefaultUser(WslApiLoader& api) try {
     }
   }
 
-  // No default user set anywhere. Let's search for the first non-system user.
+  // 3. Finally, search for the first non-system user.
   // UID 65534 is typically the user 'nobody' and non-system users have UID>=1000.
   auto found = std::find_if(users.begin(), users.end(),
                             [](const UserEntry& u) { return u.uid > 999 && u.uid < 65534; });
