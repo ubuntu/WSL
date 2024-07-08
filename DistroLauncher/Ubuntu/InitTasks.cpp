@@ -18,7 +18,7 @@ void waitForInitTasks(WslApiLoader& api);
 // Enforces the existence of a default WSL user either:
 // - defined in /etc/wsl.conf (which might not be in effect yet)
 // - defined in WSL API/registry
-// - or the lowest UID >= 1000 in the NSS passwd database
+// - or the lowest non-system account with UID >= 1000 in the NSS passwd database
 // Returns false if a default user couldn't be set.
 bool enforceDefaultUser(WslApiLoader& api);
 }  // namespace
@@ -83,6 +83,7 @@ fs::path wslConfPath() {
 
 bool setDefaultUserViaWslApi(WslApiLoader& api, unsigned long uid) {
   if (auto hr = api.WslConfigureDistribution(uid, WSL_DISTRIBUTION_FLAGS_DEFAULT); FAILED(hr)) {
+    _putws(L"ERROR: failed to set default user: ");
     Helpers::PrintErrorMessage(hr);
     return false;
   }
@@ -101,34 +102,34 @@ std::vector<UserEntry> getAllUsers(WslApiLoader& api);
 // Returns the defaultUser set in /etc/wsl.conf or the empty string if none is set.
 std::string defaultUserInWslConf();
 
+// Converts a multi-byte null-terminated string into a wide string.
+std::wstring str2wide(std::string_view str, UINT codePage = CP_THREAD_ACP);
+
 bool enforceDefaultUser(WslApiLoader& api) try {
   auto users = getAllUsers(api);
 
   if (users.empty()) {
     // unexpectedly nothing to do
-    _putws(L"CheckInitTasks: couldn't find any users in NSS database\n");
+    _putws(L"ERROR: couldn't find any users in NSS database\n");
     return false;
   }
-  // 1. We read the default user name from /etc/wsl
+  // 1. We read the default user name from /etc/wsl.conf
   if (auto name = defaultUserInWslConf(); !name.empty()) {
     // We still need the UID to be able to call the WSL API.
     auto found = std::find_if(users.begin(), users.end(),
                               [&name](const UserEntry& u) { return u.name == name; });
     if (found == users.end()) {
-      // no UID, nothing to do, bail out
+      // no UID, nothing to do, the system is in a bad state where the user requested in wsl.conf
+      // doesn't exist. We won't fix that.
       return true;
     }
     return setDefaultUserViaWslApi(api, found->uid);
   }
   // 2. Check for the Windows registry
-  // This call returns the UID of the current default user (most likely root, unless someone set a
-  // different UID via the registry editor or WSL API).
+  // This call returns the UID of the current default user, most likely root, unless someone set a
+  // different UID via the registry editor or WSL API, for which case we are done.
   if (auto uid = DistributionInfo::QueryUid(L""); uid != 0) {
-    auto found = std::find_if(users.begin(), users.end(),
-                              [&uid](const UserEntry& u) { return u.uid == uid; });
-    if (found != users.end()) {
-      return true;
-    }
+    return true;
   }
 
   // 3. Finally, search for the first non-system user.
@@ -138,10 +139,11 @@ bool enforceDefaultUser(WslApiLoader& api) try {
     return setDefaultUserViaWslApi(api, found->uid);
   }
 
-  _putws(L"CheckInitTasks: no candidate default user was found\n");
+  _putws(L"ERROR: no candidate default user was found\n");
   return false;
-} catch (...) {
-  _putws(L"CheckInitTasks: Unexpected failure when trying to set the default WSL user");
+} catch (const std::exception& err) {
+  _putws(L"ERROR: Unexpected failure when enforcing the default user: ");
+  _putws(str2wide(err.what()).c_str());
   return false;
 }
 
@@ -216,8 +218,6 @@ std::string readIniDefaultUser(const fs::path& ini) {
 
   return uname;
 }
-// Converts a multi-byte null-terminated string into a wide string.
-std::wstring str2wide(std::string_view str, UINT codePage = CP_THREAD_ACP);
 
 std::string defaultUserInWslConf() try {
   auto etcWslConf = wslConfPath();
@@ -231,7 +231,7 @@ std::string defaultUserInWslConf() try {
 
 } catch (std::system_error const& err) {
   // std::filesystem_error is child of std::system_error
-  std::wcout << L"CheckInitTasks: failed to read /etc/wsl.conf: " << err.code() << ": "
+  std::wcout << L"ERROR: failed to read /etc/wsl.conf: " << err.code() << ": "
              << str2wide(err.what());
   return {};
 }
