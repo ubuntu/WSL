@@ -5,8 +5,6 @@
 #include <charconv>
 #include <exception>
 #include <filesystem>
-#include <sstream>
-#include <iostream>
 #include <optional>
 #include <vector>
 #include <system_error>
@@ -75,12 +73,6 @@ void waitForInitTasks(WslApiLoader& api) {
   api.WslLaunchInteractive(L"cloud-init status --long", FALSE, &exitCode);
 }
 
-// Groups the pieces of information from a single user entry in the passwd database we care about.
-struct UserEntry {
-  std::string name;
-  ULONG uid = -1;
-};
-
 namespace fs = std::filesystem;
 fs::path wslConfPath() {
   // init-once, lazily.
@@ -96,6 +88,12 @@ bool setDefaultUserViaWslApi(WslApiLoader& api, unsigned long uid) {
   }
   return true;
 }
+// Groups the pieces of information from a single user entry in the passwd database we care about.
+struct UserEntry {
+  std::string name;
+  ULONG uid = -1;
+  bool hasLogin = false;
+};
 
 // Collects all users found in the NSS passwd database, sorted by UID.
 std::vector<UserEntry> getAllUsers(WslApiLoader& api);
@@ -134,9 +132,8 @@ bool enforceDefaultUser(WslApiLoader& api) try {
   }
 
   // 3. Finally, search for the first non-system user.
-  // UID 65534 is typically the user 'nobody' and non-system users have UID>=1000.
   auto found = std::find_if(users.begin(), users.end(),
-                            [](const UserEntry& u) { return u.uid > 999 && u.uid < 65534; });
+                            [](const UserEntry& u) { return u.uid > 999 && u.hasLogin; });
   if (found != users.end()) {
     return setDefaultUserViaWslApi(api, found->uid);
   }
@@ -291,6 +288,107 @@ class WslProcess {
   explicit WslProcess(std::wstring command_) : command_{command_} {};
 };
 
+// Views a string as a collection of (most likely non-null terminated) substring slices split by the
+// provided delimiter, visited unidirectionally. The backing string is required to outlive this for
+// safe usage. Useful for lazy iteration.
+class SplitView {
+ private:
+  std::string_view parent;
+  char delimiter;
+  std::string_view::const_iterator start;
+
+ public:
+  SplitView(std::string_view str, char delimiter)
+      : parent(str), delimiter(delimiter), start(parent.begin()) {}
+
+  std::optional<std::string_view> next() {
+    if (start == parent.end()) {
+      return std::nullopt;
+    }
+
+    auto end = std::find(start, parent.end(), delimiter);
+    std::string_view token = parent.substr(start - parent.begin(), end - start);
+
+    if (end != parent.end()) {
+      start = end + 1;
+    } else {
+      start = end;
+    }
+
+    return token;
+  }
+
+  // This allows plugging the SplitView into std algorithms and range-for loops.
+  auto begin() { return iterator(this); }
+  auto end() { return iterator::sentinel(this); }
+
+  class iterator {
+   private:
+    SplitView* splitView;
+    std::optional<std::string_view> current;
+
+    iterator(SplitView* splitView, const std::optional<std::string_view>& current)
+        : splitView(splitView), current(current) {}
+
+   public:
+    // Creates a new iterator pointing to the next value of the SplitView, i.e. the
+    // begin-iterator.
+    iterator(SplitView* splitView) : splitView{splitView}, current{splitView->next()} {}
+    // Creates a new sentinel iterator for the provided SplitView, i.e. the end-iterator.
+    static iterator sentinel(SplitView* splitView) { return iterator{splitView, std::nullopt}; }
+
+    // boiler-plate to define a standard-compliant iterator interface.
+    using value_type = std::string_view;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const std::string_view*;
+    using reference = const std::string_view&;
+    using iterator_category = std::input_iterator_tag;
+
+    reference operator*() const { return *current; }
+    pointer operator->() const { return &(*current); }
+
+    iterator& operator++() {
+      current = splitView->next();
+      return *this;
+    }
+
+    iterator operator++(int) {
+      iterator temp = *this;
+      ++(*this);
+      return temp;
+    }
+
+    friend bool operator==(const iterator& a, const iterator& b) {
+      return a.splitView == b.splitView && a.current == b.current;
+    }
+
+    friend bool operator!=(const iterator& a, const iterator& b) { return !(a == b); }
+  };
+};
+
+// Parses a string modelling a line of passwd into a UserEntry object.
+// We only care about login name, UID and the login shell, although the lines should have 7 fields:
+// ^NAME:ENCRYPTION:UID:...3 fields...:SHELL\n$
+// Returns std::nullopt on parse failure, the exact error for ill-formed lines is not needed.
+std::optional<UserEntry> userEntryFromString(std::string_view line);
+
+// Assuming UnaryOperation returns a std::optional, applies it to each element of the range
+// [first,last[ and stores the results that actually hold a value into the output range.
+// It's like std::transform, but skips the results of UnaryOperation that returns std::nullopt,
+// thus the output range size is going to be smaller than or equal to the input range size.
+template <typename InputIt, typename OutputIt, typename UnaryOperation>
+OutputIt transform_maybe(InputIt first, InputIt last, OutputIt d_first, UnaryOperation unary_op) {
+  while (first != last) {
+    auto&& in = *first;
+    std::optional maybe = unary_op(in);
+    if (maybe) {
+      *d_first++ = *maybe;
+    }
+    ++first;
+  }
+  return d_first;
+}
+
 std::vector<UserEntry> getAllUsers(WslApiLoader& api) {
   WslProcess getent{L"getent passwd"};
   auto [error, exitCode, output] = getent.run(api, 10'000);
@@ -307,35 +405,61 @@ std::vector<UserEntry> getAllUsers(WslApiLoader& api) {
     return {};
   }
 
-  // Partially parsing getent output, breaking on the first ill-formed line.
-  // We only care about login name and UID:
-  // ^NAME:ENCRYPTION:UID:...\n$
   std::vector<UserEntry> users;
-  std::string line;
-  for (std::istringstream pipeReader{output}; std::getline(pipeReader, line);) {
-    std::istringstream lineReader{line};
-    std::string name, unused, u;
-    if (!std::getline(lineReader, name, ':')) {
-      break;
-    }
-    if (!std::getline(lineReader, unused, ':')) {
-      break;
-    }
-    if (!std::getline(lineReader, u, ':')) {
-      break;
-    }
-
-    ULONG uid = -1;
-    auto ud = std::from_chars(u.data(), u.data() + u.length(), uid);
-    if (ud.ec != std::errc{}) {
-      break;
-    }
-    users.push_back(UserEntry{name, uid});
-  }
-
+  // Where the boilerplate pays-off: splits the getent output by lines
+  SplitView lines{output, '\n'};
+  // and store the parsed results in the users vector.
+  transform_maybe(lines.begin(), lines.end(), std::back_inserter(users), userEntryFromString);
+  // Finally sort that vector by UID.
   std::sort(users.begin(), users.end(),
             [](const UserEntry& a, const UserEntry& b) { return a.uid < b.uid; });
   return users;
+}
+
+std::optional<UserEntry> userEntryFromString(std::string_view line) {
+  SplitView fields{line, ':'};
+  // Field 0: name
+  auto name = fields.next();
+  if (!name || name->empty()) {
+    return std::nullopt;
+  }
+  // Field 1: encryption flag, unused.
+  auto unused = fields.next();
+  if (!unused) {
+    return std::nullopt;
+  }
+  // Field 2: UID
+  auto u = fields.next();
+  if (!u) {
+    return std::nullopt;
+  }
+  ULONG uid = -1;
+  auto ud = std::from_chars(u->data(), u->data() + u->length(), uid);
+  if (ud.ec != std::errc{}) {
+    // cannot convert UID to an integer
+    return std::nullopt;
+  }
+  // Fields 3, 4 and 5: unused in this context, but still must be checked, otherwise the line is
+  // ill-formed.
+  for (int i = 0; i < 3; ++i) {
+    if (unused = fields.next(); !unused) {
+      return std::nullopt;
+    }
+  }
+  // Field 6: the login shell.
+  auto shell = fields.next();
+  if (!shell || shell->empty()) {
+    return std::nullopt;
+  }
+
+  // For this particular case it seems that an exclusion list is easier than a
+  // positive list of what shells are valid as there are more valid shell choices (sh, bash, csh,
+  // dash, ksh, tcsh, zsh, fish, ...).
+  bool hasLogin =
+      (shell->find("/sync") == std::string::npos && shell->find("/nologin") == std::string::npos &&
+       shell->find("/false") == std::string::npos);
+
+  return UserEntry{std::string{name->begin(), name->end()}, uid, hasLogin};
 }
 
 WslProcess::Result WslProcess::run(WslApiLoader& api, DWORD timeout) {
