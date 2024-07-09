@@ -3,18 +3,16 @@ users:
   - name: nontestuser
     groups: sudo
     shell: /bin/bash
-    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+    sudo: ALL=(ALL) NOPASSWD:ALL
   - name: testuser
     groups: sudo
     shell: /bin/bash
-    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+    sudo: ALL=(ALL) NOPASSWD:ALL
 
 write_files:
   - path: /etc/wsl.conf
     append: true
-    content: |
-      [user]
-      default=testuser
+    content: "[user]\r\ndefault=testuser\r\n"
 
 runcmd:
   # Make sure to take longer than WSL boot timeout (10s).

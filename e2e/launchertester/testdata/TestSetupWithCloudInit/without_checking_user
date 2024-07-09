@@ -3,11 +3,11 @@ users:
   - name: nontestuser
     groups: sudo
     shell: /bin/bash
-    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+    sudo: ALL=(ALL) NOPASSWD:ALL
   - name: testuser
     groups: sudo
     shell: /bin/bash
-    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+    sudo: ALL=(ALL) NOPASSWD:ALL
 
 write_files:
   - path: /etc/wsl.conf
