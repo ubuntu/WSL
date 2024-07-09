@@ -33,7 +33,7 @@ Linux, Windows and the browser.
 
 ```{grid-item-card} [How-to guides](guides/index)
 
-**Follow step-by-step** instructions for key operations and common tasks for Ubuntu WSL
+**Follow step-by-step** instructions for performing common tasks with Ubuntu WSL, including making your own contributions to the project
 ```
 
 ````
@@ -52,6 +52,21 @@ Linux, Windows and the browser.
 ```
 
 ````
+
+## Project and community
+
+Ubuntu WSL and Ubuntu Pro for WSL are members of the Ubuntu family. These are open-source projects that warmly welcome community contributions, suggestions, fixes and constructive feedback. Check out our [contribution page](guides/contributing) for guidelines on how best to bring your ideas, bug reports and more.
+
+```{important}
+We do not directly maintain WSL, which is a Microsoft product.
+If you have identified a problem or bug in WSL then submit an Issue in
+[Microsoft's WSL project repository](https://github.com/microsoft/WSL/issues/).
+
+```
+
+- [Code of Conduct](https://ubuntu.com/community/code-of-conduct)
+- [Contribute to the project](guides/contributing)
+- [Ask and answer questions on the forum](https://discourse.ubuntu.com/c/wsl/27)
 
 
 ```{toctree}

@@ -8,4 +8,5 @@
 install-ubuntu-wsl2
 autoinstall
 run-workflows-azure
+contributing
 ```
