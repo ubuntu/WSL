@@ -3,12 +3,16 @@ package launchertester
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/ubuntu/gowsl"
 )
 
 // TestBasicSetup runs a battery of assertions after installing with the distro launcher.
@@ -39,12 +43,14 @@ func TestBasicSetup(t *testing.T) {
 func TestSetupWithCloudInit(t *testing.T) {
 	testCases := map[string]struct {
 		install_root bool
+		withRegistry bool
 		wantUser     string
 		wantFile     string
 	}{
-		"With default user in conf":    {wantUser: "testuser", wantFile: "/etc/with_default_user.done"},
-		"Without default user in conf": {wantUser: "testuser", wantFile: "/home/testuser/with_default_user.done"},
-		"Without checking user":        {install_root: true, wantUser: "root", wantFile: "/home/testuser/with_default_user.done"},
+		"With default user in conf":     {wantUser: "testuser", wantFile: "/etc/with_default_user.done"},
+		"With default user in registry": {withRegistry: true, wantUser: "testuser", wantFile: "/etc/with_default_user.done"},
+		"Without default user in conf":  {wantUser: "testuser", wantFile: "/home/testuser/with_default_user.done"},
+		"Without checking user":         {install_root: true, wantUser: "root", wantFile: "/home/testuser/with_default_user.done"},
 	}
 
 	home, err := os.UserHomeDir()
@@ -80,8 +86,69 @@ func TestSetupWithCloudInit(t *testing.T) {
 			if tc.install_root {
 				args = append(args, "--root")
 			}
+
+			registrySet := make(chan error)
+			if !tc.withRegistry {
+				close(registrySet)
+			} else {
+				go func() {
+					defer close(registrySet)
+
+					d := gowsl.NewDistro(ctx, *distroName)
+					for {
+						select {
+						case <-ctx.Done():
+							registrySet <- ctx.Err()
+							return
+						default:
+						}
+
+						state, err := d.State()
+						if err != nil {
+							// WSL is not ready for concurrent access. Errors are very likely when registering or unregistering.
+							t.Logf("Couldn't to get distro state this time: %v", err)
+							time.Sleep(10 * time.Second)
+							continue
+						}
+
+						if state == gowsl.Uninstalling {
+							registrySet <- fmt.Errorf("too late: distro is uninstalling")
+							return
+						}
+
+						if state == gowsl.NonRegistered || state == gowsl.Installing {
+							t.Logf("Waiting for distro to be registered")
+							time.Sleep(10 * time.Second)
+							continue
+						}
+						// if running or stopped
+						id := wslCommand(ctx, "id", "-u", tc.wantUser)
+						out, err := id.CombinedOutput()
+						if err != nil {
+							t.Logf("Failed to get uid for %s: %v", tc.wantUser, err)
+							time.Sleep(300 * time.Millisecond)
+							continue
+						}
+						uid, err := strconv.Atoi(strings.TrimSpace(string(out)))
+						if err != nil {
+							t.Logf("Failed to parse %s: %v", out, err)
+							time.Sleep(300 * time.Millisecond)
+							continue
+						}
+						if uid < 1000 || uid > 60000 {
+							registrySet <- fmt.Errorf("unexpected uid: %d", uid)
+							return
+						}
+						registrySet <- d.DefaultUID(uint32(uid))
+						return
+					}
+				}()
+			}
+
 			out, err := launcherCommand(ctx, "install", args...).CombinedOutput() // Using the "install" command to avoid the shell after installation.
 			require.NoErrorf(t, err, "Unexpected error installing: %s\n%v", out, err)
+
+			require.NoError(t, <-registrySet, "Failed to set default user via GoWSL/registry")
 
 			testSystemdEnabled(t)
 			testInteropIsEnabled(t)
