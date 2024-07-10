@@ -58,19 +58,19 @@ func TestSetupWithCloudInit(t *testing.T) {
 	}
 
 	home, err := os.UserHomeDir()
-	require.NoError(t, err, "Cannot get user home directory")
+	require.NoError(t, err, "Setup: Cannot get user home directory")
 	cloudinitdir := filepath.Join(home, ".cloud-init")
 	backupDir := filepath.Join(t.TempDir(), "cloud-init-backup")
 	if _, err = os.Stat(cloudinitdir); err == nil {
 		require.NoError(t, os.Rename(cloudinitdir, backupDir), "Failed to backup cloud-init directory")
 	}
-	require.NoError(t, os.MkdirAll(cloudinitdir, 0755), "Cannot create cloud-init directory")
+	require.NoError(t, os.MkdirAll(cloudinitdir, 0755), "Setup: Cannot create cloud-init directory")
 	t.Cleanup(func() {
 		if err := os.RemoveAll(cloudinitdir); err != nil {
-			t.Logf("Failed to remove user-data file after test: %v", err)
+			t.Logf("Setup: Failed to remove user-data file after test: %v", err)
 		}
 		if err = os.Rename(backupDir, cloudinitdir); err != nil {
-			t.Logf("Failed to restore cloud-init directory after test: %v", err)
+			t.Logf("Setup: Failed to restore cloud-init directory after test: %v", err)
 		}
 	})
 
@@ -82,9 +82,9 @@ func TestSetupWithCloudInit(t *testing.T) {
 			defer cancel()
 
 			userdata, err := os.ReadFile(TestFixturePath(t))
-			require.NoError(t, err, "Cannot read test user-data file")
+			require.NoError(t, err, "Setup: Cannot read test user-data file")
 			err = os.WriteFile(filepath.Join(cloudinitdir, "default.user-data"), userdata, 0755)
-			require.NoError(t, err, "Cannot write user-data file to the right location")
+			require.NoError(t, err, "Setup: Cannot write user-data file to the right location")
 
 			var args []string
 			if tc.install_root {
@@ -110,18 +110,18 @@ func TestSetupWithCloudInit(t *testing.T) {
 						state, err := d.State()
 						if err != nil {
 							// WSL is not ready for concurrent access. Errors are very likely when registering or unregistering.
-							t.Logf("Couldn't to get distro state this time: %v", err)
+							t.Logf("Setup: Couldn't to get distro state this time: %v", err)
 							time.Sleep(10 * time.Second)
 							continue
 						}
 
 						if state == gowsl.Uninstalling {
-							registrySet <- fmt.Errorf("too late: distro is uninstalling")
+							registrySet <- fmt.Errorf("Setup: too late to set the registry: distro is uninstalling")
 							return
 						}
 
 						if state == gowsl.NonRegistered || state == gowsl.Installing {
-							t.Logf("Waiting for distro to be registered")
+							t.Logf("Setup: Waiting for distro to be registered to set default user via registry")
 							time.Sleep(10 * time.Second)
 							continue
 						}
@@ -129,19 +129,19 @@ func TestSetupWithCloudInit(t *testing.T) {
 						id := wslCommand(ctx, "id", "-u", tc.withRegistryUser)
 						out, err := id.CombinedOutput()
 						if err != nil {
-							t.Logf("Failed to get uid for %s: %v", tc.withRegistryUser, err)
+							t.Logf("Setup: Failed to get uid for %s: %v", tc.withRegistryUser, err)
 							time.Sleep(300 * time.Millisecond)
 							continue
 						}
 						uid, err := strconv.Atoi(strings.TrimSpace(string(out)))
 						if err != nil {
-							t.Logf("Failed to parse %s: %v", out, err)
+							t.Logf("Setup: Failed to parse %s: %v", out, err)
 							time.Sleep(300 * time.Millisecond)
 							continue
 						}
 						// We use cloud-init to create the user with cloud-config data we control, so we expect it to be in the range of normal users.
 						if uid < 1000 || uid > 60000 {
-							registrySet <- fmt.Errorf("unexpected uid: %d", uid)
+							registrySet <- fmt.Errorf("Setup: unexpected uid: %d", uid)
 							return
 						}
 						registrySet <- d.DefaultUID(uint32(uid))
@@ -153,7 +153,9 @@ func TestSetupWithCloudInit(t *testing.T) {
 			out, err := launcherCommand(ctx, "install", args...).CombinedOutput() // Using the "install" command to avoid the shell after installation.
 			require.NoErrorf(t, err, "Unexpected error installing: %s\n%v", out, err)
 
-			require.NoError(t, <-registrySet, "Failed to set default user via GoWSL/registry")
+			// Seems out of order but setting the registry is concurrent with the installation, hopefully it will be set before the
+			// launcher checks for the default user. Either way the user assertion in the end of this test case will work as exoected.
+			require.NoError(t, <-registrySet, "Setup: Failed to set default user via GoWSL/registry")
 
 			testSystemdEnabled(t)
 			testInteropIsEnabled(t)
