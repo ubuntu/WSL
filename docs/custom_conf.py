@@ -228,3 +228,6 @@ rst_prolog = '''
 # Define a selector that only adds copy buttons to code blocks without the class `no-copy`
 copybutton_selector = "div:not(.no-copy) > div.highlight > pre"
 
+# Define prompts to be excluded from copying when a copy button is used 
+copybutton_prompt_text = r"^.*?[\$>#]\s+"
+copybutton_prompt_is_regexp = True
