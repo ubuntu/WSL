@@ -4,7 +4,7 @@ on:
   pull_request:
     paths-ignore:
       - docs/**
-      - *.md
+      - "*.md"
 concurrency: azure-vm
 
 env:
