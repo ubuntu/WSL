@@ -224,3 +224,7 @@ rst_prolog = '''
 .. role:: center
    :class: align-center
 '''
+
+# Define a selector that only adds copy buttons to code blocks without the class `no-copy`
+copybutton_selector = "div:not(.no-copy) > div.highlight > pre"
+
