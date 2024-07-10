@@ -42,29 +42,36 @@ Let’s install [Jupyter notebook](https://jupyter.org/), a web-based interactiv
 
 1. Start our WSL instance, on a terminal, using Ubuntu:
 
-> $ ubuntu.exe
+```{code-block} text
+$ ubuntu.exe
+```
 
 2. Install the python package manager [pip](https://pypi.org/project/pip/):
 
-```
-
+```{code-block} text
 $ sudo apt update
-
 $ sudo apt install python3-pip
-
 ```
 
 3. Get Jupyter notebook installed via pip:
 
-> $ pip install notebook
+```{code-block} text
+$ pip install notebook
+```
 
 ### Executing Jupyter notebook.
 
 Finally, let’s start Jupyter, by adding it to the user PATH first:
 
-```
+```{code-block} text
 $ export PATH=$PATH:~/.local/bin
 $ jupyter notebook --no-browser
+```
+
+This should generate output like the following:
+
+```{code-block} text
+:class: no-copy
 [I 10:52:23.760 NotebookApp] Writing notebook server cookie secret to /home/u/.local/share/jupyter/runtime/notebook_cookie_secret
 [I 10:52:24.205 NotebookApp] Serving notebooks from local directory: /home/u
 [I 10:52:24.205 NotebookApp] Jupyter Notebook 6.4.10 is running at:
@@ -103,17 +110,34 @@ Our next step is to be able to generate some statistics on our Windows user pers
 
 On another terminal, under PowerShell, let’s first check our Windows user profile directory:
 
-```
+```{code-block} text
 PS C:\Users\myuser> echo $env:USERPROFILE
+```
+
+The path will be outputted:
+
+```{code-block} text
+:class: no-copy
 C:\Users\myuser
 ```
 
 Let’s share it with Ubuntu by setting `WSLENV`:
 
-```
+```{code-block} text
 PS C:\Users\myuser> $env:WSLENV="USERPROFILE"
 PS C:\Users\myuser> ubuntu.exe
+```
+
+The last command will start ubuntu where we can test that the variable has been shared:
+
+```{code-block} text
 $ echo $USERPROFILE
+```
+
+Running this command will again show the path:
+
+```{code-block} text
+:class: no-copy
 C:\Users\myuser
 ```
 
@@ -121,8 +145,14 @@ Awesome! Setting `WSLENV="ENVVAR1:ENVVAR2:…"` allows us to share multiple envi
 
 However, you may notice that the environment variable value was shared as is, which is fine in most cases but not for path-related content. Let’s check:
 
-```
+```{code-block} text
 $ ls 'C:\Users\myuser'
+```
+
+This will fail to list any files and output the following message:
+
+```{code-block} text
+:class: no-copy
 ls: cannot access 'C:\Users\myuser': No such file or directory
 ```
 
@@ -132,13 +162,35 @@ Yet we haven’t done all that for nothing! `WSLENV` variable declaration can be
 
 Let’s try again. Run `exit` to shutdown Ubuntu, then in PowerShell set `WSLENV` again using the `/p` suffix then start Ubuntu:
 
-```
-$ exit
+```{code-block} text
+
 PS C:\Users\myuser> $env:WSLENV="USERPROFILE/p"
 PS C:\Users\myuser> ubuntu.exe
+```
+
+Now in Ubuntu test the environmental variable like before:
+
+```{code-block} text
 $ echo $USERPROFILE
+```
+
+The output should show that the path has been translated:
+
+```{code-block} text
+:class: no-copy
 /mnt/c/Users/myuser
+```
+
+Now let's check the Windows files with the Linux `ls` command:
+
+```{code-block} text
 $ ls /mnt/c/Users/myuser
+```
+
+This should now list the files in the directory as expected:
+
+```{code-block} text
+:class: no-copy
 AppData
 'Application Data'
 Contacts
@@ -204,8 +256,14 @@ Let’s execute it by clicking on the “Run” button in the web interface.
 
 Note that while the entry is running, you will have a `In [*]` with the star marker. This will be replaced by `In [1]:` when completed. Once this is completed and the results have been printed, let’s ensure that the CSV file is present on disk using an Ubuntu terminal:
 
-```
+```{code-block} text
 $ cat stats-raw.csv
+```
+
+The output should look like this:
+
+```{code-block} text
+:class: no-copy
 mime_type,count
 text/plain,468
 chemical/x-cerius,3
@@ -240,12 +298,22 @@ Of course, interoperability goes both ways, and we already know exactly how to d
 
 Similarly to `USERPROFILE`, we want, this time, to share the user `HOME` variable with Windows, and let interoperability translate it to a Windows-compatible path. In an Ubuntu terminal set the environment variable, making sure to use the `/p` suffix then open a Windows command prompt:
 
-```
+```{code-block} text
 $ export WSLENV=HOME/p
 $ cmd.exe
+```
+
+We can check if the path has been translated with:
+
+```{code-block} text
 C:\Windows> set HOME
+```
+
+The following output confirms a Windows-compatible path:
+
+```{code-block} text
+:class: no-copy
 HOME=\\wsl.localhost\Ubuntu\home\u
-C:\Windows> exit
 ```
 
 
@@ -261,7 +329,7 @@ Let’s now create a PowerShell script, from Windows, on this Ubuntu filesystem 
 
 You can open any editor, from Notepad to a full-fledged IDE. Create a file named `filter-less-than-five.ps1` under `\\wsl.localhost\Ubuntu\home\<youruser>` (with the following content:
 
-```powershell
+```{code-block} powershell
 $csvImport = $input | ConvertFrom-CSV
 
 # Create Array for Exporting out data
@@ -281,7 +349,7 @@ This script will take a CSV-formatted content as input, filter any item which ha
 
 After saving, let’s check that it’s available on the WSL side:
 
-```
+```{code-block} text
 $ cat filter-less-than-five.ps1
 ```
 
@@ -293,8 +361,14 @@ This PowerShell script, written from Windows on your Linux instance will be quit
 
 This is all very impressive, we have been able to share network, environment variables, paths and files, as well execute processes interchangeably between Ubuntu and Windows. Let’s go one step further by chaining all of this together in a single, but effective line:
 
-```
+```{code-block} text
 $ cat stats-raw.csv | powershell.exe -ExecutionPolicy Bypass -File $HOME/filter-less-than-five.ps1 | tee stats.csv
+```
+
+This yields the output:
+
+```{code-block} text
+:class: no-copy
 "mime_type","count"
 "text/plain","468"
 "application/x-pkcs12","5"
@@ -324,7 +398,7 @@ This deep integration for back-and-forth access between systems allows users to 
 
 Finally, we can even run the default associated GUI Windows application associated with those files, from Ubuntu:
 
-```
+```{code-block} text
 $ explorer.exe stats.csv
 ```
 

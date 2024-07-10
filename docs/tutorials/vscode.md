@@ -57,33 +57,44 @@ Once installed we can test it out by creating an example local web server with N
 
 Open your WSL Ubuntu terminal and ensure everything is up to date by typing:
 
-` sudo apt update`
+```{code-block} text
+sudo apt update
+```
 
 Then:
 
-`sudo apt upgrade`
+```{code-block} text
+sudo apt upgrade
+```
 
 Entering your password and pressing `Y` when prompted.
 
 Next, install Node.js and npm:
 
-    sudo apt-get install nodejs
-
-    sudo apt install npm
+```{code-block} text
+sudo apt-get install nodejs
+sudo apt install npm
+```
 
 Press `Y` when prompted.
 
 Now, create a new folder for our server.
 
-`mkdir serverexample/`
+```{code-block} text
+mkdir serverexample/
+```
 
 Then navigate into it:
 
-`cd serverexample/`
+```{code-block} text
+cd serverexample/
+```
 
 Now, open up your folder in Visual Studio Code, you can do this by typing:
 
-`code .`
+```{code-block} text
+code .
+```
 
 The first time you do this, it will trigger a download for the necessary dependencies:
 
@@ -95,8 +106,7 @@ Once complete, your native version of Visual Studio Code will open the folder.
 
 In Visual Studio Code, create a new file called `package.json` and add the following text ([original example](https://learn.microsoft.com/en-gb/archive/blogs/cdndevs/visual-studio-code-and-local-web-server#3-add-a-packagejson-file-to-the-project-folder))
 
-```json
-
+```{code-block} json
 {
     "name": "Demo",
     "version": "1.0.0",
@@ -117,15 +127,21 @@ Save the file and then, in the same folder, create a new one called `index.html`
 
 Add the following text, then save and close:
 
-`<h1>Hello World</h1>`
+```{code-block} html
+<h1>Hello World</h1>
+```
 
 Now return to your Ubuntu terminal (or use the Visual Studio Code terminal window) and type the following to install a server defined by the above specifications detailed in `package.json`:
 
-`npm install`
+```{code-block} text
+npm install
+```
 
 Finally, type the following to launch the web server:
 
-`npm start`
+```{code-block} text
+npm start
+```
 
 You can now navigate to `localhost:10001` in your native Windows web browser by using `CTRL+LeftClick` on the terminal links.
 

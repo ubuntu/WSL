@@ -13,13 +13,14 @@ We will use it to calculate and draw a beautiful Julia fractal. The goal here is
 
 First thing is to install the software like we did for x11-apps, from the terminal prompt run:
 
-```
+```{code-block} text
 sudo apt update
 sudo apt install -y octave
 ```
 
 Then start the application:
-```
+
+```{code-block} text
 octave --gui &
 ```
 
@@ -29,7 +30,7 @@ Do not forget the ampersand `&` at the end of the line, so the application is st
 
 In Octave, click on the `New script` icon to open a new editor window and copy/paste the following code:
 
-```octave
+```{code-block} octave
 #{
 Inspired by the work of Bruno Girin ([Geek Thoughts: Fractals with Octave: Classic Mandelbrot and Julia](http://brunogirin.blogspot.com/2008/12/fractals-with-octave-classic-mandelbrot.html))
 Calculate a Julia set
@@ -60,7 +61,8 @@ end
 This code is the function that will calculate the Julia set. Save it to a file named `julia.m`. Since it is a function definition, the name of the file must match the name of the function.
 
 Open a second editor window with the New Script button and copy and paste the following code:
-```octave
+
+```{code-block} octave
 Jc1=julia(-1.6+1.2i, 1.6-1.2i, 640, 128, -0.75+0.2i);
 imagesc(Jc1)
 axis off

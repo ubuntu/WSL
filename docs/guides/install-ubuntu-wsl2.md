@@ -15,7 +15,7 @@
 
 You can install WSL from the command line. Open a PowerShell prompt as an Administrator (we recommend using [Windows Terminal](https://github.com/microsoft/terminal?tab=readme-ov-file#installing-and-running-windows-terminal)) and run:
 
-```text
+```{code-block} text
 wsl --install
 ```
 
@@ -42,7 +42,8 @@ Ubuntu will then be installed on your machine. Once installed, you can either la
 It is possible to install the same Ubuntu versions available on the Microsoft Store directly from the command line.
 In a PowerShell terminal, you can run `wsl --list --online` to see an output with all available distros and versions:
 
-```text
+```{code-block} text
+:class: no-copy
 The following is a list of valid distributions that can be installed.
 The default distribution is denoted by '*'.
 Install using 'wsl --install -d <Distro>'.
@@ -63,20 +64,22 @@ Your list may be different once new distributions become available.
 
 You can install a version using a NAME from the output:
 
-```text
+```{code-block} text
 wsl --install -d Ubuntu-24.04
 ```
 
 You'll see an indicator of the installation progress in the terminal:
 
-```text
+```{code-block} text
+:class: no-copy
 Installing: Ubuntu 24.04 LTS
 [==========================72,0%==========                 ]
 ```
 
 Use `wsl -l -v` to see all your currently installed distros and the version of WSL they are using:
 
-```text
+```{code-block} text
+:class: no-copy
   NAME            STATE           VERSION
   Ubuntu-20.04    Stopped         2
 * Ubuntu-24.04    Stopped         2
@@ -86,13 +89,13 @@ Use `wsl -l -v` to see all your currently installed distros and the version of W
 
 Open a PowerShell terminal and type:
 
-```text
+```{code-block} text
 winget show --name Ubuntu --source msstore
 ```
 
 You'll see a list of available distros and their Ids. Choose the one you prefer and install it. For instance, for `Ubuntu 24.04 LTS`:
 
-```text
+```{code-block} text
 winget install --Id "9NZ3KLHXDJP5" --source msstore
 ```
 
@@ -100,7 +103,7 @@ You'll be prompted to accept the source and package agreements before installing
 
 Check out [the documentation](../reference/distributions.md) to see which executable matches your application and run it.
 
-```text
+```{code-block} text
 ubuntu.exe
 ```
 
@@ -112,10 +115,11 @@ Once it has finished its initial setup, you will be prompted to create a usernam
 
 Finally, it’s always good practice to install the latest updates with the following commands, entering your password when prompted:
 
-```text
+```{code-block} text
 sudo apt update
 sudo apt full-upgrade -y
 ```
+
 ## Enjoy Ubuntu on WSL
 
 In this guide, we’ve shown you how to install Ubuntu WSL on Windows 10 or 11.
