@@ -1,0 +1,30 @@
+#cloud-config
+apt:
+  preserve_sources_list: false
+  disable_suites:
+    - backports
+  primary:
+    - arches:
+        - default
+      uri: http://br.archive.ubuntu.com/ubuntu
+locale: pt_BR.UTF-8
+users:
+  - name: nontestuser
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+  - name: anotheruser
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+  - name: testuser
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+write_files:
+  - path: /etc/wsl.conf
+    append: true
+    content: |
+      [user]
+      default=testuser

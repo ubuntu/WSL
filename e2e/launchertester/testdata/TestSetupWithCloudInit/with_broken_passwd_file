@@ -1,0 +1,35 @@
+#cloud-config
+locale: pt_BR.UTF-8
+
+# This not become the default user because the shell is not a login shell.
+users:
+  - gecos: Invalid user
+    name: invalid
+    groups: users, admin
+    lock_passwd: true
+    shell: /bin/false
+
+# This should become the default user in the end.
+runcmd:
+  - useradd --uid 71000 --create-home --shell /bin/sh --password '*' testmail
+
+# We're using cloud-init as double-agent, doing it's regular job but also breaking the system for tests.
+# Here we'll have a /etc/passwd file with:
+# - ubuntu user with UID 2000 but nologin
+# - u user with UID 2001 but nologin and an extra non-sense metadata field
+# - someuser with just a name and nothing else.
+# - UID 1001 without a name
+# - break_the_world user with UID 1002 missing fields (home and shell are not present)
+# - lxd user with UID 998 which shouldn't interfere with the results
+# No one of those lines are suitable for being the default user
+write_files:
+  - path: /etc/passwd
+    append: true
+    defer: true # So we don't interfere with the runcmd above
+    content: |
+      ubuntu:x:2000:2000:Ubuntu:/home/ubuntu:/usr/bin/nologin
+      u:x:2001:2001:Ubuntu:/home/ubuntu:/usr/bin/nologin:metadata
+      someuser:
+      :x:1001::Another User:/home/anotheruser:/bin/bash
+      break_the_world::1002:1003:Break The World
+      lxd:x:998:998:LXD User:/home/lxd:/bin/bash

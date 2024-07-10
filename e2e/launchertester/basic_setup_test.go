@@ -42,15 +42,19 @@ func TestBasicSetup(t *testing.T) {
 // TestSetupWithCloudInit runs a battery of assertions after installing with the distro launcher and cloud-init.
 func TestSetupWithCloudInit(t *testing.T) {
 	testCases := map[string]struct {
-		install_root bool
-		withRegistry bool
-		wantUser     string
-		wantFile     string
+		install_root     bool
+		withRegistryUser string
+		wantUser         string
+		wantFile         string
 	}{
 		"With default user in conf":     {wantUser: "testuser", wantFile: "/etc/with_default_user.done"},
-		"With default user in registry": {withRegistry: true, wantUser: "testuser", wantFile: "/etc/with_default_user.done"},
-		"Without default user in conf":  {wantUser: "testuser", wantFile: "/home/testuser/with_default_user.done"},
-		"Without checking user":         {install_root: true, wantUser: "root", wantFile: "/home/testuser/with_default_user.done"},
+		"With default user in registry": {withRegistryUser: "testuser", wantUser: "testuser", wantFile: "/etc/with_default_user.done"},
+		"With default user in both":     {withRegistryUser: "anotheruser", wantUser: "testuser"},
+		"With default user in none":     {wantUser: "testuser", wantFile: "/home/testuser/with_default_user.done"},
+
+		"With only remote users":  {wantUser: "testmail"},
+		"With broken passwd file": {wantUser: "testmail"},
+		"Without checking user":   {install_root: true, wantUser: "root", wantFile: "/home/testuser/with_default_user.done"},
 	}
 
 	home, err := os.UserHomeDir()
@@ -88,7 +92,7 @@ func TestSetupWithCloudInit(t *testing.T) {
 			}
 
 			registrySet := make(chan error)
-			if !tc.withRegistry {
+			if len(tc.withRegistryUser) == 0 {
 				close(registrySet)
 			} else {
 				go func() {
@@ -122,10 +126,10 @@ func TestSetupWithCloudInit(t *testing.T) {
 							continue
 						}
 						// if running or stopped
-						id := wslCommand(ctx, "id", "-u", tc.wantUser)
+						id := wslCommand(ctx, "id", "-u", tc.withRegistryUser)
 						out, err := id.CombinedOutput()
 						if err != nil {
-							t.Logf("Failed to get uid for %s: %v", tc.wantUser, err)
+							t.Logf("Failed to get uid for %s: %v", tc.withRegistryUser, err)
 							time.Sleep(300 * time.Millisecond)
 							continue
 						}
@@ -135,6 +139,7 @@ func TestSetupWithCloudInit(t *testing.T) {
 							time.Sleep(300 * time.Millisecond)
 							continue
 						}
+						// We use cloud-init to create the user with cloud-config data we control, so we expect it to be in the range of normal users.
 						if uid < 1000 || uid > 60000 {
 							registrySet <- fmt.Errorf("unexpected uid: %d", uid)
 							return
@@ -152,7 +157,9 @@ func TestSetupWithCloudInit(t *testing.T) {
 
 			testSystemdEnabled(t)
 			testInteropIsEnabled(t)
-			testFileExists(t, tc.wantFile)
+			if len(tc.wantFile) > 0 {
+				testFileExists(t, tc.wantFile)
+			}
 			testDefaultUser(t, tc.wantUser)
 		})
 	}
