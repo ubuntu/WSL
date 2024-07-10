@@ -25,7 +25,9 @@ jobs:
           path: repo
       - name: Copy under workDir (which has more space to build the package)
         shell: bash
+        # Bash.exe wouldn't know how to handle the symlinks inside docs/ without the export below.
         run: |
+          export MSYS=winsymlinks:nativestrict
           mkdir -p $(dirname ${{ env.workDir }})
           mv ${GITHUB_WORKSPACE}/repo ${{ env.workDir }}
           cd ${{ env.workDir }}
