@@ -75,10 +75,23 @@ runs:
         foreach ($release in $releaseList) {
           $data = $release -split "\s+"
 
+          if ($data.Count -lt 2) {
+            Write-Output "Error: not enough fields in release info: $release"
+            $allSuccess = $false
+            continue
+          }
+
           # $name is the one in inputs.distros
           $name = $data[0]
-          $file = ".\${name}.tar.gz"
           $url = $data[1]
+
+          if ($name.Length -eq 0 -or $url.Length -eq 0) {
+            Write-Output "Error: empty fields in release info: $release"
+            $allSuccess = $false
+            continue
+          }
+
+          $file = ".\${name}.tar.gz"
 
           & ${{ github.action_path }}\download-rootfs.ps1 -Path "${file}" -URL "$url"
           if ( ! $? ) {
@@ -86,6 +99,7 @@ runs:
             Write-Output "Error: Could not download ${name}"
           }
 
+          $allSuccess = $true
           Write-Output "::endgroup::"
         }
 
