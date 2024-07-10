@@ -71,7 +71,7 @@ This code calls the function defined in `julia.m`. You can later change the para
 
 Save it to a file named `juliatest.m`.
 
-And finally, press the button `Save File and Run`.
+And finally, press the button **Save File and Run**.
 
 ![|570x225](assets/data-science-engineering/save-file.png)
 

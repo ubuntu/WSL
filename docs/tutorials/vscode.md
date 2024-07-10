@@ -11,7 +11,7 @@ The easiest way to access your Ubuntu development environment in WSL is by using
 ## What you will need:
 
 * A PC with Windows 10 or 11
-* (Optional) This tutorial uses [Windows Terminal Preview](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n8g5rfz9xk3?activetab=pivot:overviewtab), which you can get from the Windows app store
+* (Optional) This tutorial uses [Windows Terminal Preview](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n8g5rfz9xk3?activetab=pivot:overviewtab), which you can get from the Microsoft Store
 
 ## Install Ubuntu on WSL2
 
@@ -27,9 +27,9 @@ Once you have completed the relevant tutorial, the following steps will work on 
 
 One of the advantages of WSL is that it can interact with the native Windows version of Visual Studio Code using its remote development extension.
 
-To install Visual Studio Code visit the Microsoft Store and search for `Visual Studio Code`.
+To install Visual Studio Code visit the Microsoft Store and search for Visual Studio Code.
 
-Then click `Install`.
+Then click **Install**.
 
 ![|624x483](assets/vscode/msstore.png)
 
@@ -37,7 +37,7 @@ Alternatively, you can install Visual Studio Code from the web link [here](https
 
 ![|624x353](assets/vscode/download-vs-code.png)
 
-During installation, under the `Additional Tasks` step, ensure the `Add to PATH` option is checked.
+During installation, under the 'Additional Tasks' step, ensure the `Add to PATH` option is checked.
 
 ![|624x492](assets/vscode/aditional-tasks.png)
 
@@ -59,7 +59,7 @@ Open your WSL Ubuntu terminal and ensure everything is up to date by typing:
 
 ` sudo apt update`
 
-And then
+Then:
 
 `sudo apt upgrade`
 
@@ -115,7 +115,7 @@ In Visual Studio Code, create a new file called `package.json` and add the follo
 
 Save the file and then, in the same folder, create a new one called `index.html`
 
-Add the following text, and then save and close:
+Add the following text, then save and close:
 
 `<h1>Hello World</h1>`
 
@@ -127,7 +127,7 @@ Finally, type the following to launch the web server:
 
 `npm start`
 
-You can now navigate to `localhost:10001` in your native Windows web browser by using `CTRL+Left Click` on the terminal links.
+You can now navigate to `localhost:10001` in your native Windows web browser by using `CTRL+LeftClick` on the terminal links.
 
 ![|624x351](assets/vscode/hello-world.png)
 
@@ -137,7 +137,7 @@ By using Ubuntu on WSL you’re able to take advantage of the latest Node.js pac
 
 ## Enjoy Ubuntu on WSL!
 
-That’s all folks! In this tutorial, we’ve shown you how to connect the Windows version of Visual Studio Code to your Ubuntu on WSL filesystem and launch a basic Node.js webserver.
+In this tutorial, we’ve shown you how to connect the Windows version of Visual Studio Code to your Ubuntu on WSL filesystem and launch a basic Node.js webserver.
 
 We hope you enjoy using Ubuntu inside WSL. Don’t forget to check out our other tutorials for tips on how to optimise your WSL setup for Data Science.
 

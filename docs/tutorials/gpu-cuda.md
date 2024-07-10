@@ -3,13 +3,13 @@
 
 While WSL's default setup allows you to develop cross-platform applications without leaving Windows, enabling GPU acceleration inside WSL provides users with direct access to the hardware. This provides support for GPU-accelerated AI/ML training and the ability to develop and test applications built on top of technologies, such as OpenVINO, OpenGL, and CUDA that target Ubuntu while staying on Windows.
 
-## What you will learn:
+## What you will learn
 
 * How to install a Windows graphical device driver compatible with WSL2
 * How to install the NVIDIA CUDA toolkit for WSL 2 on Ubuntu
 * How to compile and run a sample CUDA application on Ubuntu on WSL2
 
-## What you will need:
+## What you will need
 
 * A Windows 10 version 21H2 or newer physical machine equipped with an NVIDIA graphics card and administrative permission to be able to install device drivers
 * Ubuntu on WSL2 previously installed
@@ -75,7 +75,7 @@ The following commands will install the WSL-specific CUDA toolkit version 11.6 o
 
 > `sudo apt-key del 7fa2af80`
 
-Then setup the appropriate package for Ubuntu WSL:
+Then setup the appropriate package for Ubuntu WSL with the following commands:
 
 > `wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin`
 
@@ -111,11 +111,13 @@ To build the application, go to the cloned repository directory and type `make`:
 
 > `make`
 
-A successful build will look like the screenshot below. Once complete, run the application:
+A successful build will look like the screenshot below.
 
 ![|624x135](assets/gpu-cuda/make.png)
 
 > `./deviceQuery`
+Once complete, run the application with:
+
 
 You should see a similar output to the following detailing the functionality of your CUDA setup (the exact results depend on your hardware setup):
 

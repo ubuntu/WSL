@@ -6,18 +6,18 @@ Ubuntu WSL users can now leverage it to perform an automatic setup to get a work
 
 > See more:  [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
 
-The latest release of Ubuntu (Noble Numbat 24.04 LTS) comes with cloud-init already preinstalled, so you'll need that specific application to follow this tutorial. Ubuntu 24.04 LTS can be installed from [this link to the Microsoft Store](https://www.microsoft.com/store/productId/9NZ3KLHXDJP5?ocid=pdpshare). A previous version of this tutorial used Ubuntu-Preview, because that comes with the latest in-development features. You can still use it to follow the instructions below, if you prefer.
+The latest release of Ubuntu (Noble Numbat 24.04 LTS) comes with cloud-init already preinstalled, so you'll need that specific application to follow this tutorial. Ubuntu 24.04 LTS can be installed from [this link to the Microsoft Store](https://www.microsoft.com/store/productId/9NZ3KLHXDJP5?ocid=pdpshare). A previous version of this tutorial used Ubuntu Preview, because that comes with the latest in-development features. You can still use it to follow the instructions below, if you prefer.
 
-## What you will learn:
+## What you will learn
 
 - How to write cloud-config user data to a specific WSL instance.
 - How to automatically set up a WSL instance with cloud-init.
 - How to verify that cloud-init succeeded with the configuration supplied.
 
-## What you will need:
+## What you will need
 
 - Windows 11 with WSL 2 already enabled
-- The latest Ubuntu24.04LTS application from Microsoft Store.
+- The latest Ubuntu 24.04 LTS application from the Microsoft Store
 
 ## Write the cloud-config file
 
@@ -102,8 +102,10 @@ status: done
 
 ## Verify that it worked
 
-Restart the distro just to make sure the changes in `/etc/wsl.conf` made by cloud-init will take effect, as listed
-below:
+Restart the distro just to confirm that the changes in `/etc/wsl.conf` made by cloud-init will take effect.
+
+Terminate the running instance:
+
 
 ```powershell
 > wsl -t Ubuntu-24.04
@@ -124,7 +126,7 @@ This message is shown once a day. To disable it please create the
 jdoe@mib:~$
 ```
 
-Once logged in the new distro instance's shell, verify that:
+Once logged into the new distro instance's shell, verify that:
 
 1. The default user matches what was configured in the user data file (in our case `jdoe`).
 
@@ -162,7 +164,7 @@ LC_ALL=
 
 ```
 
-4. The packages were installed and the commands they provide are available
+4. The packages were installed and the commands they provide are available.
 
 ```sh
 jdoe@mib:~$ apt list --installed | egrep 'ginac|octave'
@@ -176,7 +178,7 @@ octave-doc/noble,now 8.4.0-1 all [installed,automatic]
 octave/noble,now 8.4.0-1 amd64 [installed]
 ```
 
-5. Verify that the commands requested were also run. In this case we set up `vcpkg` from git, as recommended by its
+5. Lastly, verify that the commands requested were also run. In this case we set up `vcpkg` from git, as recommended by its
    documentation (there is no deb or snap available for that program).
 
 ```sh

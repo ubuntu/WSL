@@ -103,13 +103,13 @@ First, get the IP address of your machine by running `ipconfig` in a PowerShell 
 
 ![|624x357](assets/dotnet-systemd/ipconfig.png)
 
-Then select the setting icon in the bottom-left corner of the Bot Framework Emulator and enter your IP under ‘localhost override'.
+Then select the settings icon in the bottom-left corner of the Bot Framework Emulator and enter your IP under ‘localhost override'.
 
 ![|624x411](assets/dotnet-systemd/emulator-settings.png)
 
-Click 'Save' and navigate back to the Welcome tab.
+Click **Save** and navigate back to the Welcome tab.
 
-Click ‘Open Bot’ and under ‘Bot URL’ input:
+Click **Open Bot** and under ‘Bot URL’ input:
 
 ```text
 http://localhost:3978/api/messages
@@ -117,7 +117,7 @@ http://localhost:3978/api/messages
 
 ![|624x411](assets/dotnet-systemd/open-a-bot.png)
 
-And click ‘Connect’ to connect to your Echo Bot running in WSL and start chatting!
+And click **Connect** to connect to your Echo Bot running in WSL and start chatting!
 
 ![|624x411](assets/dotnet-systemd/start-chatting.png)
 
@@ -160,8 +160,6 @@ SyslogIdentifier=echoes
 [Install]
 WantedBy=multi-user.target
 ```
-
-![|624x401](assets/dotnet-systemd/nano-service-file.png)
 
 Save your file and reload your services with:
 
