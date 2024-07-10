@@ -409,6 +409,10 @@ std::vector<UserEntry> getAllUsers(WslApiLoader& api) {
   // Where the boilerplate pays-off: splits the getent output by lines
   SplitView lines{output, '\n'};
   // and store the parsed results in the users vector.
+  // NOTE about ill-formed lines in passwd: this algorithm just skips them.
+  // Broken lines in /etc/passwd won't prevent the effects of the good lines.
+  // getent itself reports errors for broken lines but still output the good ones.
+  // The system behaves as if they don't exist. So we can ignore them as well.
   transform_maybe(lines.begin(), lines.end(), std::back_inserter(users), userEntryFromString);
   // Finally sort that vector by UID.
   std::sort(users.begin(), users.end(),
