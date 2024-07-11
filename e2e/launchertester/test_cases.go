@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"os/exec"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -14,23 +15,19 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-// testUserNotRoot ensures the default user is not root.
-func testUserNotRoot(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
-
+// testDefaultUser ensures the default user matches the expected.
+func testDefaultUser(t *testing.T, expected string) { //nolint: thelper, this is a test
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
 	out, err := wslCommand(ctx, "whoami").CombinedOutput()
 	require.NoErrorf(t, err, "Unexpected failure executing whoami: %s", out)
-
-	require.NotContains(t, string(out), "root", "Default user should not be root.")
+	got := strings.TrimSpace(string(out))
+	require.Equal(t, expected, got, "Default user should be %s, got %s", expected, got)
 }
 
 // testSystemdEnabled ensures systemd was enabled.
 func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
-
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
@@ -90,11 +87,10 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
 
 // testCorrectUpgradePolicy ensures upgrade policy matches the one expected for the app.
 func testCorrectUpgradePolicy(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
-
 	/* Ubuntu always upgrade to next lts */
 	wantPolicy := "lts"
-	if strings.HasPrefix(*distroName, "Ubuntu") && strings.HasSuffix(*distroName, "LTS") {
+	ltsRegex := regexp.MustCompile(`^Ubuntu-\d{2}\.\d{2}$`) // Ubuntu-WX.YZ
+	if ltsRegex.MatchString(*distroName) {
 		wantPolicy = "never"
 	} else if *distroName != "Ubuntu" {
 		// Preview and Dev
@@ -146,7 +142,6 @@ func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper, this is a te
 // testInteropIsEnabled ensures interop works fine.
 // See related issue: https://github.com/ubuntu/WSL/issues/334
 func testInteropIsEnabled(t *testing.T) { //nolint: thelper, this is a test
-	t.Parallel()
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
@@ -174,4 +169,12 @@ func testHelpFlag(t *testing.T) {
 	out, err = launcherCommand(ctx, "help").CombinedOutput()
 	require.NoError(t, err, "could not run '%s help': %v, %s", *launcherName, err, out)
 	require.Contains(t, string(out), usageFirstLine, "help command should have been picked up by the launcher")
+}
+
+func testFileExists(t *testing.T, linuxPath string) {
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	out, err := launcherCommand(ctx, "run", "test", "-e", linuxPath).CombinedOutput()
+	require.NoError(t, err, "Unexpected error checking file existence: %s", out)
 }

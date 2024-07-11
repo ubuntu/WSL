@@ -1,0 +1,16 @@
+#cloud-config
+apt:
+  preserve_sources_list: false
+  disable_suites:
+    - backports
+  primary:
+    - arches:
+        - default
+      uri: http://br.archive.ubuntu.com/ubuntu
+locale: pt_BR.UTF-8
+users: []
+# Here we're using cloud-init to pretend that the system has remote accounts (LDAP for example)
+# Hopefully the system won't have any non-system account with a lower UID. :)
+runcmd:
+  - useradd --uid 73101 --create-home --shell /bin/bash --password '*' somemail
+  - useradd --uid 71000 --create-home --shell /bin/bash --password '*' testmail

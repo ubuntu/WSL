@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="DistributionInfo.h" />
     <ClInclude Include="Helpers.h" />
+    <ClInclude Include="Ubuntu\InitTasks.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -149,6 +150,9 @@
     <ClCompile Include="DistributionInfo.cpp" />
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="DistroLauncher.cpp" />
+    <ClCompile Include="Ubuntu\InitTasks.cpp">
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

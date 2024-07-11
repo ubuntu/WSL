@@ -4,7 +4,7 @@ on:
   pull_request:
     paths-ignore:
       - docs/**
-      - *.md
+      - "*.md"
 concurrency: azure-vm
 
 env:
@@ -28,9 +28,10 @@ jobs:
     needs: vm-setup
     env:
       rootFsCache: "${env:USERPROFILE}\\Downloads\\rootfs"
-      distroName: Ubuntu-Preview
-      appID: UbuntuPreview
-      launcher: ubuntupreview.exe
+      # TODO: Move this to "Ubuntu" once we have backported everything and Ubuntu is transitionned to 24.04
+      distroName: Ubuntu-24.04
+      appID: Ubuntu24.04LTS
+      launcher: ubuntu2404.exe
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -88,7 +89,7 @@ jobs:
           Write-Output "::endgroup::"
 
           Write-Output "::group::Tests"
-          go test .\launchertester\ -timeout 15m -run TestBasicSetup --distro-name '${{ env.distroName }}' --launcher-name '${{ env.launcher }}'
+          go test .\launchertester\ -timeout 30m --distro-name '${{ env.distroName }}' --launcher-name '${{ env.launcher }}'
           $exitStatus=$?
           Write-Output "::endgroup::"
           if ( ! $exitStatus ) { Exit(1) }
