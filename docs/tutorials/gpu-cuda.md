@@ -74,23 +74,23 @@ This step ends with a screen similar to the image below.
 The following commands will install the WSL-specific CUDA toolkit version 11.6 on Ubuntu 22.04 AMD64 architecture. Be aware that older versions of CUDA (<=10) don’t support WSL 2. Also notice that attempting to install the CUDA toolkit packages straight from the Ubuntu repository (`cuda`, `cuda-11-0`, or `cuda-drivers`) will attempt to install the Linux NVIDIA graphics driver, which is not what you want on WSL 2. So, first remove the old GPG key:
 
 ```{code-block} text
-sudo apt-key del 7fa2af80
+$ sudo apt-key del 7fa2af80
 ```
 
 Then setup the appropriate package for Ubuntu WSL with the following commands:
 
 ```{code-block} text
-wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
+$ wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
 
-sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
+$ sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
 
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/3bf863cc.pub
+$ sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/3bf863cc.pub
 
-sudo add-apt-repository 'deb https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/ /'
+$ sudo add-apt-repository 'deb https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/ /'
 
-sudo apt-get update
+$ sudo apt-get update
 
-sudo apt-get -y install cuda
+$ sudo apt-get -y install cuda
 ```
 
 Once complete, you should see a series of outputs that end in `done.`:
@@ -106,15 +106,15 @@ NVIDIA provides an open source repository on GitHub with samples for CUDA Develo
 Let’s say you have a `~/Dev/` directory where you usually put your working projects. Navigate inside the directory and `git clone` the [cuda-samples repository](https://github.com/nvidia/cuda-samples):
 
 ```{code-block} text
-cd ~/Dev
-git clone https://github.com/nvidia/cuda-samples
+$ cd ~/Dev
+$ git clone https://github.com/nvidia/cuda-samples
 ```
 
 To build the application, go to the cloned repository directory and run `make`:
 
 ```{code-block} text
-cd ~/Dev/cuda-samples/Samples/1_Utilities/deviceQuery
-make
+$ cd ~/Dev/cuda-samples/Samples/1_Utilities/deviceQuery
+$ make
 ```
 
 A successful build will look like the screenshot below.
@@ -124,7 +124,7 @@ A successful build will look like the screenshot below.
 Once complete, run the application with:
 
 ```{code-block} text
-./deviceQuery
+$ ./deviceQuery
 ```
 
 You should see a similar output to the following detailing the functionality of your CUDA setup (the exact results depend on your hardware setup):

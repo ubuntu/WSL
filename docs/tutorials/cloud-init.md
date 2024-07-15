@@ -70,7 +70,7 @@ Save it and close it.
 In PowerShell, run:
 
 ```{code-block} text
-ubuntu2404.exe install --root
+> ubuntu2404.exe install --root
 ```
 
 We skip the user creation since we expect cloud-init to do it.
@@ -83,9 +83,8 @@ We skip the user creation since we expect cloud-init to do it.
 
 In PowerShell again run:
 
-
 ```{code-block} text
-ubuntu2404.exe run cloud-init status --wait
+> ubuntu2404.exe run cloud-init status --wait
 ```
 
 That will wait until cloud-init completes configuring the new instance we just created. When done, you should see an
@@ -107,7 +106,7 @@ Restart the distro just to confirm that the changes in `/etc/wsl.conf` made by c
 Terminate the running instance:
 
 ```{code-block} text
-wsl -t Ubuntu-24.04
+> wsl -t Ubuntu-24.04
 ```
 
 This should output a message confirming that the instance has stopped:
@@ -120,7 +119,7 @@ The operation completed successfully.
 Now start the instance again:
 
 ```{code-block} text
-ubuntu2404.exe
+> ubuntu2404.exe
 ```
 
 You should see the standard welcome text:
@@ -243,9 +242,9 @@ This workflow will guarantee a solid foundation for your next Ubuntu WSL project
 As a side note, users installing the distro with the `wsl --install` online command must take a few steps to ensure cloud-init has time to do its job. First, make sure to install with the `--no-launch` flag, then use the distro launcher to install without creating a user (if you expect cloud-init to do it for you as described in this tutorial) and finally watch cloud-init do its job. The commands are outlined below:
 
 ```text
-wsl --install --no-launch -d Ubuntu-24.04
-ubuntu2404.exe install --root
-ubuntu2404.exe run cloud-init status --wait
+> wsl --install --no-launch -d Ubuntu-24.04
+> ubuntu2404.exe install --root
+> ubuntu2404.exe run cloud-init status --wait
 ```
 
 We hope you enjoy using Ubuntu inside WSL!

@@ -19,13 +19,13 @@ Systemd support is required for this tutorial and is available on WSL version 0.
 In your PowerShell terminal, you can check your current WSL version by running:
 
 ```{code-block} text
-wsl --version
+> wsl --version
 ```
 
 Inside WSL, you can check that systemd is enabled on your Ubuntu distribution with the following command:
 
 ```{code-block} text
-cat /etc/wsl.conf
+$ cat /etc/wsl.conf
 ```
 
 If enabled the output will be:
@@ -50,13 +50,13 @@ If you are using Ubuntu 22.04 LTS you can skip the command for installing backpo
 Run this command to install backports, which includes .NET 6:
 
 ```{code-block} text
-sudo add-apt-repository ppa:dotnet/backports
+$ sudo add-apt-repository ppa:dotnet/backports
 ```
 
 To install a bundle with both the SDK and runtime for .NET 6 run:
 
 ```{code-block} text
-sudo apt install dotnet6
+$ sudo apt install dotnet6
 ```
 
 Run `dotnet --version` to confirm that the package was installed successfully.
@@ -66,20 +66,20 @@ Run `dotnet --version` to confirm that the package was installed successfully.
 Create a new directory for the project and navigate to it before proceeding:
 
 ```{code-block} text
-mkdir ~/mybot
-cd mybot
+$ mkdir ~/mybot
+$ cd mybot
 ```
 
 Once inside we can install the EchoBot C# template by running:
 
 ```{code-block} text
-dotnet new -i Microsoft.Bot.Framework.CSharp.EchoBot
+$ dotnet new -i Microsoft.Bot.Framework.CSharp.EchoBot
 ```
 
 We can then verify the template has been installed correctly:
 
 ```{code-block} text
-dotnet new --list
+$ dotnet new --list
 ```
 
 You should be able to find the `Bot Framework Echo Bot` template in the list.
@@ -89,19 +89,19 @@ You should be able to find the `Bot Framework Echo Bot` template in the list.
 Create a new Echo Bot project, with `echoes` as the name for our bot, using the following command:
 
 ```{code-block} text
-dotnet new echobot -n echoes
+$ dotnet new echobot -n echoes
 ```
 
 After this has completed we can navigate into the new directory that has been created.
 
 ```{code-block} text
-cd ~/mybot/echoes
+$ cd ~/mybot/echoes
 ```
 
 From inside this directory the project should be ready to run. Test it with:
 
 ```{code-block} text
-sudo dotnet run
+$ sudo dotnet run
 ```
 
 If everything was set up correctly you should see a similar output to the one below:
@@ -153,13 +153,13 @@ Return to your running WSL distro and end the app with `Ctrl+C`.
 Then install the .NET systemd extension with:
 
 ```{code-block} text
-sudo dotnet add package Microsoft.Extensions.Hosting.Systemd
+$ sudo dotnet add package Microsoft.Extensions.Hosting.Systemd
 ```
 
 We can open our project with VS Code by running this command in the 'echoes' directory:
 
 ```{code-block} text
-code .
+$ code .
 ```
 
 Navigate to ‘Program.cs’ and insert `.UseSystemd()` as a new line in the location shown in the screenshot.
@@ -171,7 +171,7 @@ Save and close the project in VS Code and return to your WSL terminal.
 Next we need to create a service file for your bot using your favourite editor, for example.
 
 ```{code-block} text
-sudo nano /etc/systemd/system/echoes.service
+$ sudo nano /etc/systemd/system/echoes.service
 ```
 
 Then paste the snippet below taking care to replace `<your-username>` with your username.
@@ -193,13 +193,13 @@ WantedBy=multi-user.target
 Save your file and reload your services with:
 
 ```{code-block} text
-sudo systemctl daemon-reload
+$ sudo systemctl daemon-reload
 ```
 
 To reload the services. You can check if your service is ready by running:
 
 ```{code-block} text
-systemctl status echoes.service
+$ systemctl status echoes.service
 ```
 
 You should get the following output:
@@ -209,13 +209,13 @@ You should get the following output:
 Now start your service:
 
 ```{code-block} text
-sudo systemctl start echoes.service
+$ sudo systemctl start echoes.service
 ```
 
 Then check its status again:
 
 ```{code-block} text
-sudo systemctl status echoes.service
+$ sudo systemctl status echoes.service
 ```
 
 If everything has been configured correctly you should get an output similar to the below.
@@ -229,7 +229,7 @@ Return to your Windows host and reconnect to your Bot Emulator using the same in
 You can stop your bot from running at any time with the command:
 
 ```{code-block} text
-sudo systemctl stop echoes.service
+$ sudo systemctl stop echoes.service
 ```
 
 ## Tutorial complete!

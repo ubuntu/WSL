@@ -11,17 +11,17 @@ First, you'll need to set up Ubuntu on WSL, see [here](../guides/install-ubuntu-
 
 We will use it to calculate and draw a beautiful Julia fractal. The goal here is to use Octave to demonstrate how WSLg works, not to go through the theory of fractals. 
 
-First thing is to install the software like we did for x11-apps, from the terminal prompt run:
+From an Ubuntu WSL terminal prompt run:
 
 ```{code-block} text
-sudo apt update
-sudo apt install -y octave
+$ sudo apt update
+$ sudo apt install -y octave
 ```
 
 Then start the application:
 
 ```{code-block} text
-octave --gui &
+$ octave --gui &
 ```
 
 Do not forget the ampersand `&` at the end of the line, so the application is started in the background and we can continue using the same terminal window.

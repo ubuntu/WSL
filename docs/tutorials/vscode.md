@@ -58,13 +58,13 @@ Once installed we can test it out by creating an example local web server with N
 Open your WSL Ubuntu terminal and ensure everything is up to date by typing:
 
 ```{code-block} text
-sudo apt update
+$ sudo apt update
 ```
 
 Then:
 
 ```{code-block} text
-sudo apt upgrade
+$ sudo apt upgrade
 ```
 
 Entering your password and pressing `Y` when prompted.
@@ -72,8 +72,8 @@ Entering your password and pressing `Y` when prompted.
 Next, install Node.js and npm:
 
 ```{code-block} text
-sudo apt-get install nodejs
-sudo apt install npm
+$ sudo apt-get install nodejs
+$ sudo apt install npm
 ```
 
 Press `Y` when prompted.
@@ -81,19 +81,19 @@ Press `Y` when prompted.
 Now, create a new folder for our server.
 
 ```{code-block} text
-mkdir serverexample/
+$ mkdir serverexample/
 ```
 
 Then navigate into it:
 
 ```{code-block} text
-cd serverexample/
+$ cd serverexample/
 ```
 
 Now, open up your folder in Visual Studio Code, you can do this by typing:
 
 ```{code-block} text
-code .
+$ code .
 ```
 
 The first time you do this, it will trigger a download for the necessary dependencies:
@@ -134,13 +134,13 @@ Add the following text, then save and close:
 Now return to your Ubuntu terminal (or use the Visual Studio Code terminal window) and type the following to install a server defined by the above specifications detailed in `package.json`:
 
 ```{code-block} text
-npm install
+$ npm install
 ```
 
 Finally, type the following to launch the web server:
 
 ```{code-block} text
-npm start
+$ npm start
 ```
 
 You can now navigate to `localhost:10001` in your native Windows web browser by using `CTRL+LeftClick` on the terminal links.

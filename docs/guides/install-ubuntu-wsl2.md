@@ -16,7 +16,7 @@
 You can install WSL from the command line. Open a PowerShell prompt as an Administrator (we recommend using [Windows Terminal](https://github.com/microsoft/terminal?tab=readme-ov-file#installing-and-running-windows-terminal)) and run:
 
 ```{code-block} text
-wsl --install
+> wsl --install
 ```
 
 This command will enable the features necessary to run WSL and also install the default Ubuntu distribution of Linux available in the Microsoft Store. It is recommended to reboot your machine after this initial installation to complete the setup. You can also install WSL from the Microsoft Store.
@@ -65,7 +65,7 @@ Your list may be different once new distributions become available.
 You can install a version using a NAME from the output:
 
 ```{code-block} text
-wsl --install -d Ubuntu-24.04
+> wsl --install -d Ubuntu-24.04
 ```
 
 You'll see an indicator of the installation progress in the terminal:
@@ -90,13 +90,13 @@ Use `wsl -l -v` to see all your currently installed distros and the version of W
 Open a PowerShell terminal and type:
 
 ```{code-block} text
-winget show --name Ubuntu --source msstore
+> winget show --name Ubuntu --source msstore
 ```
 
 You'll see a list of available distros and their Ids. Choose the one you prefer and install it. For instance, for `Ubuntu 24.04 LTS`:
 
 ```{code-block} text
-winget install --Id "9NZ3KLHXDJP5" --source msstore
+> winget install --Id "9NZ3KLHXDJP5" --source msstore
 ```
 
 You'll be prompted to accept the source and package agreements before installing. You need to accept them in order to proceed.
@@ -104,7 +104,7 @@ You'll be prompted to accept the source and package agreements before installing
 Check out [the documentation](../reference/distributions.md) to see which executable matches your application and run it.
 
 ```{code-block} text
-ubuntu.exe
+> ubuntu.exe
 ```
 
 ## Configure Ubuntu
@@ -116,8 +116,8 @@ Once it has finished its initial setup, you will be prompted to create a usernam
 Finally, it’s always good practice to install the latest updates with the following commands, entering your password when prompted:
 
 ```{code-block} text
-sudo apt update
-sudo apt full-upgrade -y
+$ sudo apt update
+$ sudo apt full-upgrade -y
 ```
 
 ## Enjoy Ubuntu on WSL
