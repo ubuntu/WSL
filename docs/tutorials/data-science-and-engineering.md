@@ -11,16 +11,17 @@ First, you'll need to set up Ubuntu on WSL, see [here](../guides/install-ubuntu-
 
 We will use it to calculate and draw a beautiful Julia fractal. The goal here is to use Octave to demonstrate how WSLg works, not to go through the theory of fractals. 
 
-First thing is to install the software like we did for x11-apps, from the terminal prompt run:
+From an Ubuntu WSL terminal prompt run:
 
-```
-sudo apt update
-sudo apt install -y octave
+```{code-block} text
+$ sudo apt update
+$ sudo apt install -y octave
 ```
 
 Then start the application:
-```
-octave --gui &
+
+```{code-block} text
+$ octave --gui &
 ```
 
 Do not forget the ampersand `&` at the end of the line, so the application is started in the background and we can continue using the same terminal window.
@@ -29,7 +30,7 @@ Do not forget the ampersand `&` at the end of the line, so the application is st
 
 In Octave, click on the `New script` icon to open a new editor window and copy/paste the following code:
 
-```octave
+```{code-block} octave
 #{
 Inspired by the work of Bruno Girin ([Geek Thoughts: Fractals with Octave: Classic Mandelbrot and Julia](http://brunogirin.blogspot.com/2008/12/fractals-with-octave-classic-mandelbrot.html))
 Calculate a Julia set
@@ -60,7 +61,8 @@ end
 This code is the function that will calculate the Julia set. Save it to a file named `julia.m`. Since it is a function definition, the name of the file must match the name of the function.
 
 Open a second editor window with the New Script button and copy and paste the following code:
-```octave
+
+```{code-block} octave
 Jc1=julia(-1.6+1.2i, 1.6-1.2i, 640, 128, -0.75+0.2i);
 imagesc(Jc1)
 axis off
@@ -71,7 +73,7 @@ This code calls the function defined in `julia.m`. You can later change the para
 
 Save it to a file named `juliatest.m`.
 
-And finally, press the button `Save File and Run`.
+And finally, press the button **Save File and Run**.
 
 ![|570x225](assets/data-science-engineering/save-file.png)
 

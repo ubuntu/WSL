@@ -6,18 +6,18 @@ Ubuntu WSL users can now leverage it to perform an automatic setup to get a work
 
 > See more:  [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
 
-The latest release of Ubuntu (Noble Numbat 24.04 LTS) comes with cloud-init already preinstalled, so you'll need that specific application to follow this tutorial. Ubuntu 24.04 LTS can be installed from [this link to the Microsoft Store](https://www.microsoft.com/store/productId/9NZ3KLHXDJP5?ocid=pdpshare). A previous version of this tutorial used Ubuntu-Preview, because that comes with the latest in-development features. You can still use it to follow the instructions below, if you prefer.
+The latest release of Ubuntu (Noble Numbat 24.04 LTS) comes with cloud-init already preinstalled, so you'll need that specific application to follow this tutorial. Ubuntu 24.04 LTS can be installed from [this link to the Microsoft Store](https://www.microsoft.com/store/productId/9NZ3KLHXDJP5?ocid=pdpshare). A previous version of this tutorial used Ubuntu (Preview), because that comes with the latest in-development features. You can still use it to follow the instructions below, if you prefer.
 
-## What you will learn:
+## What you will learn
 
 - How to write cloud-config user data to a specific WSL instance.
 - How to automatically set up a WSL instance with cloud-init.
 - How to verify that cloud-init succeeded with the configuration supplied.
 
-## What you will need:
+## What you will need
 
 - Windows 11 with WSL 2 already enabled
-- The latest Ubuntu24.04LTS application from Microsoft Store.
+- The latest Ubuntu 24.04 LTS application from the Microsoft Store
 
 ## Write the cloud-config file
 
@@ -31,7 +31,7 @@ match the name of the distro instance that will be created in the next step.
 
 Open that file with your text editor of choice (`notepad.exe` is just fine) and paste in the following contents:
 
-```yaml
+```{code-block} yaml
 #cloud-config
 locale: pt_BR
 users:
@@ -69,8 +69,8 @@ Save it and close it.
 
 In PowerShell, run:
 
-```powershell
-ubuntu2404.exe install --root
+```{code-block} text
+> ubuntu2404.exe install --root
 ```
 
 We skip the user creation since we expect cloud-init to do it.
@@ -83,15 +83,15 @@ We skip the user creation since we expect cloud-init to do it.
 
 In PowerShell again run:
 
-
-```powershell
-ubuntu2404.exe run cloud-init status --wait
+```{code-block} text
+> ubuntu2404.exe run cloud-init status --wait
 ```
 
 That will wait until cloud-init completes configuring the new instance we just created. When done, you should see an
 output similar to the following:
 
-```powershell
+```{code-block} text
+:class: no-copy
 ..............................................................................
 ..............................................................................
 ..............................................................................
@@ -99,16 +99,33 @@ output similar to the following:
 status: done
 ```
 
-
 ## Verify that it worked
 
-Restart the distro just to make sure the changes in `/etc/wsl.conf` made by cloud-init will take effect, as listed
-below:
+Restart the distro just to confirm that the changes in `/etc/wsl.conf` made by cloud-init will take effect.
 
-```powershell
+Terminate the running instance:
+
+```{code-block} text
 > wsl -t Ubuntu-24.04
+```
+
+This should output a message confirming that the instance has stopped:
+
+```{code-block} text
+:class: no-copy
 The operation completed successfully.
+```
+
+Now start the instance again:
+
+```{code-block} text
 > ubuntu2404.exe
+```
+
+You should see the standard welcome text:
+
+```{code-block} text
+:class: no-copy
 To run a command as administrator (user "root"), use "sudo <command>".
 See "man sudo_root" for details.
 
@@ -124,26 +141,44 @@ This message is shown once a day. To disable it please create the
 jdoe@mib:~$
 ```
 
-Once logged in the new distro instance's shell, verify that:
+Once logged into the new distro instance's shell, verify that:
 
 1. The default user matches what was configured in the user data file (in our case `jdoe`).
 
-```sh
+```{code-block} text
 jdoe@mib:~$ whoami
+```
+
+This should be verified with the output message:
+
+```{code-block} text
+:class: no-copy
 jdoe
 ```
 
 2. The supplied cloud-config user data was approved by cloud-init validation.
 
-```sh
+```{code-block} text
 jdoe@mib:~$ sudo cloud-init schema --system
+```
+
+Verified with the output:
+
+```{code-block} text
+:class: no-copy
 Valid schema user-data
 ```
 
 3. The locale is set
 
-```sh
+```{code-block} text
 jdoe@mib:~$ locale
+```
+
+Verified with:
+
+```{code-block} text
+:class: no-copy
 LANG=pt_BR
 LANGUAGE=
 LC_CTYPE="pt_BR"
@@ -162,10 +197,16 @@ LC_ALL=
 
 ```
 
-4. The packages were installed and the commands they provide are available
+4. The packages were installed and the commands they provide are available.
 
-```sh
+```{code-block} text
 jdoe@mib:~$ apt list --installed | egrep 'ginac|octave'
+```
+
+Verified:
+
+```{code-block} text
+:class: no-copy
 
 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
 
@@ -176,11 +217,17 @@ octave-doc/noble,now 8.4.0-1 all [installed,automatic]
 octave/noble,now 8.4.0-1 amd64 [installed]
 ```
 
-5. Verify that the commands requested were also run. In this case we set up `vcpkg` from git, as recommended by its
+5. Lastly, verify that the commands requested were also run. In this case we set up `vcpkg` from git, as recommended by its
    documentation (there is no deb or snap available for that program).
 
-```sh
+```{code-block} text
 jdoe@mib:~$ /opt/vcpkg/vcpkg version
+```
+
+This should also be verified with:
+
+```{code-block} text
+:class: no-copy
 vcpkg package management program version 2024-01-11-710a3116bbd615864eef5f9010af178034cb9b44
 
 See LICENSE.txt for license information.
@@ -194,10 +241,10 @@ This workflow will guarantee a solid foundation for your next Ubuntu WSL project
 
 As a side note, users installing the distro with the `wsl --install` online command must take a few steps to ensure cloud-init has time to do its job. First, make sure to install with the `--no-launch` flag, then use the distro launcher to install without creating a user (if you expect cloud-init to do it for you as described in this tutorial) and finally watch cloud-init do its job. The commands are outlined below:
 
-```powershell
-wsl --install --no-launch -d Ubuntu-24.04
-ubuntu2404.exe install --root
-ubuntu2404.exe run cloud-init status --wait
+```text
+> wsl --install --no-launch -d Ubuntu-24.04
+> ubuntu2404.exe install --root
+> ubuntu2404.exe run cloud-init status --wait
 ```
 
 We hope you enjoy using Ubuntu inside WSL!

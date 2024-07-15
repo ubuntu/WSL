@@ -11,7 +11,7 @@ The easiest way to access your Ubuntu development environment in WSL is by using
 ## What you will need:
 
 * A PC with Windows 10 or 11
-* (Optional) This tutorial uses [Windows Terminal Preview](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n8g5rfz9xk3?activetab=pivot:overviewtab), which you can get from the Windows app store
+* (Optional) This tutorial uses [Windows Terminal Preview](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n8g5rfz9xk3?activetab=pivot:overviewtab), which you can get from the Microsoft Store
 
 ## Install Ubuntu on WSL2
 
@@ -27,9 +27,9 @@ Once you have completed the relevant tutorial, the following steps will work on 
 
 One of the advantages of WSL is that it can interact with the native Windows version of Visual Studio Code using its remote development extension.
 
-To install Visual Studio Code visit the Microsoft Store and search for `Visual Studio Code`.
+To install Visual Studio Code visit the Microsoft Store and search for Visual Studio Code.
 
-Then click `Install`.
+Then click **Install**.
 
 ![|624x483](assets/vscode/msstore.png)
 
@@ -37,7 +37,7 @@ Alternatively, you can install Visual Studio Code from the web link [here](https
 
 ![|624x353](assets/vscode/download-vs-code.png)
 
-During installation, under the `Additional Tasks` step, ensure the `Add to PATH` option is checked.
+During installation, under the 'Additional Tasks' step, ensure the `Add to PATH` option is checked.
 
 ![|624x492](assets/vscode/aditional-tasks.png)
 
@@ -57,33 +57,44 @@ Once installed we can test it out by creating an example local web server with N
 
 Open your WSL Ubuntu terminal and ensure everything is up to date by typing:
 
-` sudo apt update`
+```{code-block} text
+$ sudo apt update
+```
 
-And then
+Then:
 
-`sudo apt upgrade`
+```{code-block} text
+$ sudo apt upgrade
+```
 
 Entering your password and pressing `Y` when prompted.
 
 Next, install Node.js and npm:
 
-    sudo apt-get install nodejs
-
-    sudo apt install npm
+```{code-block} text
+$ sudo apt-get install nodejs
+$ sudo apt install npm
+```
 
 Press `Y` when prompted.
 
 Now, create a new folder for our server.
 
-`mkdir serverexample/`
+```{code-block} text
+$ mkdir serverexample/
+```
 
 Then navigate into it:
 
-`cd serverexample/`
+```{code-block} text
+$ cd serverexample/
+```
 
 Now, open up your folder in Visual Studio Code, you can do this by typing:
 
-`code .`
+```{code-block} text
+$ code .
+```
 
 The first time you do this, it will trigger a download for the necessary dependencies:
 
@@ -95,8 +106,7 @@ Once complete, your native version of Visual Studio Code will open the folder.
 
 In Visual Studio Code, create a new file called `package.json` and add the following text ([original example](https://learn.microsoft.com/en-gb/archive/blogs/cdndevs/visual-studio-code-and-local-web-server#3-add-a-packagejson-file-to-the-project-folder))
 
-```json
-
+```{code-block} json
 {
     "name": "Demo",
     "version": "1.0.0",
@@ -115,19 +125,25 @@ In Visual Studio Code, create a new file called `package.json` and add the follo
 
 Save the file and then, in the same folder, create a new one called `index.html`
 
-Add the following text, and then save and close:
+Add the following text, then save and close:
 
-`<h1>Hello World</h1>`
+```{code-block} html
+<h1>Hello World</h1>
+```
 
 Now return to your Ubuntu terminal (or use the Visual Studio Code terminal window) and type the following to install a server defined by the above specifications detailed in `package.json`:
 
-`npm install`
+```{code-block} text
+$ npm install
+```
 
 Finally, type the following to launch the web server:
 
-`npm start`
+```{code-block} text
+$ npm start
+```
 
-You can now navigate to `localhost:10001` in your native Windows web browser by using `CTRL+Left Click` on the terminal links.
+You can now navigate to `localhost:10001` in your native Windows web browser by using `CTRL+LeftClick` on the terminal links.
 
 ![|624x351](assets/vscode/hello-world.png)
 
@@ -137,7 +153,7 @@ By using Ubuntu on WSL you’re able to take advantage of the latest Node.js pac
 
 ## Enjoy Ubuntu on WSL!
 
-That’s all folks! In this tutorial, we’ve shown you how to connect the Windows version of Visual Studio Code to your Ubuntu on WSL filesystem and launch a basic Node.js webserver.
+In this tutorial, we’ve shown you how to connect the Windows version of Visual Studio Code to your Ubuntu on WSL filesystem and launch a basic Node.js webserver.
 
 We hope you enjoy using Ubuntu inside WSL. Don’t forget to check out our other tutorials for tips on how to optimise your WSL setup for Data Science.
 
