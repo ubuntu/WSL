@@ -40,13 +40,13 @@ Note: in this tutorial, we consider that interoperability is turned on in WSL.co
 
 Let’s install [Jupyter notebook](https://jupyter.org/), a web-based interactive computing platform where we will generate some statistics.
 
-1. Start our WSL instance, on a terminal, using Ubuntu:
+1. In PowerShell, start an Ubuntu WSL instance:
 
 ```{code-block} text
-$ ubuntu.exe
+> ubuntu.exe
 ```
 
-2. Install the python package manager [pip](https://pypi.org/project/pip/):
+2. Now in the instance, install the python package manager [pip](https://pypi.org/project/pip/):
 
 ```{code-block} text
 $ sudo apt update
