@@ -191,6 +191,69 @@ Doing these checks locally is good practice. You are less likely to run into
 failed CI checks after your PR is submitted and the reviewer of your PR can
 more quickly focus on the contribution you have made.
 
+### Note on using code blocks
+
+In the Ubuntu WSL docs, code blocks are used to document:
+
+- Ubuntu terminal commands
+- PowerShell terminal commands
+- Terminal outputs
+- Code and config files
+
+We follow specific conventions when including code blocks so that they
+are readable and functional.
+
+#### Include prompts when documenting terminal commands
+
+It is common that Ubuntu and PowerShell terminal commands are included in the same page.
+We use prompts to ensure that the reader can distinguish between them.
+
+Here are some examples:
+
+- PowerShell prompt symbol: `>`
+- PowerShell prompt symbol with path: `C:\Users\myuser>`
+- PowerShell prompt symbol with path and PowerShell prefix: `PS C:\Users\myuser>`
+- Ubuntu prompt symbol: `$`
+- Ubuntu prompt symbol with user and host: `user@host:~$`
+
+Whether to include the path or user@host depends on whether it is useful in the context
+of the documentation being written.
+For example, if demonstrating the use of multiple WSL instances, including the user and host
+can make it easier to tell the instances apart.
+
+#### Exclude prompts from clipboard when using copy button
+
+The WSL docs automatically strips prompts when a user clicks the **copy** button on a code block.
+This is to prevent errors when a reader pastes the full content of a copy block into their terminal.
+
+We use a solution based on regular expressions, which identifies the first instance of a prompt symbol followed by whitespace on a particular line before removing the text before that symbol.
+
+There may be edge-cases when this creates problems; for example, you should include whitespace after a prompt but if you don't it may not be removed during copying.
+
+Always test code blocks when you include them to ensure that the correct text is captured during the copy operation.
+If you encounter a problem or edge-case contact the maintainers or file an issue.
+
+#### Separate input from output and remove copy button from output blocks
+
+Terminal commands are separated from the output that they generate.
+Explanatory text can be included to explain to the reader what is being presented:
+
+- "Run the following command..."
+- "This will generate the following output..."
+
+Copy buttons are not included in output blocks.
+This is to prevent an output being confused for an input.
+There are also few reasons why someone would copy an output from documentation.
+
+To exclude a copy button from an output block the `no-copy` CSS class must be included
+within the code block:
+
+```text
+:class: no-copy
+```
+
+Note: a code-block must be labelled with the [code-block directive](https://mystmd.org/guide/directives#directive-code) for this to work.
+
 ## Getting Help
 
 Join us in the [Ubuntu Community](https://discourse.ubuntu.com/c/wsl/27) and post your question there with a descriptive tag.
