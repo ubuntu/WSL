@@ -139,7 +139,6 @@ bool enforceDefaultUser(WslApiLoader& api) try {
     return setDefaultUserViaWslApi(api, found->uid);
   }
 
-  _putws(L"ERROR: no candidate default user was found\n");
   return false;
 } catch (const std::exception& err) {
   _putws(L"ERROR: Unexpected failure when enforcing the default user: ");
