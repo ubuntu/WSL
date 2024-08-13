@@ -92,7 +92,7 @@ html_context = {
 
     # Change to the Matrix channel you want to link to
     # (use an empty value if you don't want to link)
-    #'matrix': 'https://matrix.to/#/#documentation:ubuntu.com',
+    'matrix': 'https://matrix.to/#/#ubuntu-wsl:ubuntu.com',
 
     # Change to the GitHub URL for your project
     # This is used, for example, to link to the source files and allow creating GitHub issues directly from the documentation.
