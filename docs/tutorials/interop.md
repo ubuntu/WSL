@@ -98,7 +98,7 @@ However, this tutorial is not about running Linux GUI applications from WSL (whi
 
 Let’s try this right away: from Windows, launch a web browser and enter the `URL printed above` with the corresponding token, for example: `http://localhost:8888/?token=1d80ee69da6238f22bb683a4acd00025d32d15dde91cbdf4`.
 
-![|624x347](assets/interop/jupyter.png)
+![Jupyter Notebook running in a web browser on local host, showing an empty notebook list.](assets/interop/jupyter.png)
 
 It works! You can thus easily expose and share any services that are using network ports between your Windows machine and WSL instances!
 
@@ -218,7 +218,7 @@ Some preliminary warnings: accessing Windows filesystem from Ubuntu is using the
 
 From the main screen of Jupyter, create a new notebook to start developing an interactive Python solution. You can do this by clicking on the **New** button, and then clicking on the **Python 3** option, as we can see below.
 
-![Jupyter Notebook: A Beginner's Tutorial|624x251](assets/interop/jupyter-python.jpg)
+![Jupyter interface showing the creation of a new Python 3 notebook. The "New" button is clicked, revealing a dropdown menu with "Python 3" highlighted.](assets/interop/jupyter-python.jpg)
 
 Copy this to the first cell, taking care to edit the input directory:
 
@@ -252,7 +252,7 @@ This script will enumerate all files under `/mnt/c/Users/mysuser/path/my/subdire
 
 Let’s execute it by clicking on the “Run” button in the web interface.
 
-![|624x469](assets/interop/jupyter-script.png)
+![Python script in a Jupyter notebook.](assets/interop/jupyter-script.png)
 
 Note that while the entry is running, you will have a `In [*]` with the star marker. This will be replaced by `In [1]:` when completed. Once this is completed and the results have been printed, let’s ensure that the CSV file is present on disk using an Ubuntu terminal:
 
@@ -323,7 +323,7 @@ First, we are able to export the `HOME` variable to subprocess, telling us that 
 
 Open Windows Explorer and navigate to that path to confirm they are visible there:
 
-![|624x352](assets/interop/ubuntu-home.png)
+![Screenshot of Windows file explorer containing the stats-raw csv file.](assets/interop/ubuntu-home.png)
 
 Let’s now create a PowerShell script, from Windows, on this Ubuntu filesystem and save it there:
 
@@ -406,7 +406,7 @@ Note: You can’t deny it’s really amazing to be able to execute explorer.exe 
 
 This will open LibreOffice, Microsoft Excel, or any other tool you may have associated with CSV files. From there, you will be able to draw beautiful charts and do data analysis, but that’s another story…
 
-![|624x389](assets/interop/spreadsheet.png)
+![Windows desktop showing the PowerShell terminal and data visualizations for file statistics in LibreOffice Calc.](assets/interop/spreadsheet.png)
 
 ## Enjoy Ubuntu on WSL!
 

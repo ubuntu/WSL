@@ -84,7 +84,7 @@ $ dotnet new --list
 
 You should be able to find the `Bot Framework Echo Bot` template in the list.
 
-![|624x153](assets/dotnet-systemd/templates.png)
+![Selecting "Bot Framework Echo Bot" from Dotnet templates in a terminal.](assets/dotnet-systemd/templates.png)
 
 Create a new Echo Bot project, with `echoes` as the name for our bot, using the following command:
 
@@ -106,11 +106,11 @@ $ sudo dotnet run
 
 If everything was set up correctly you should see a similar output to the one below:
 
-![|624x357](assets/dotnet-systemd/welcome-to-dotnet.png)
+![Bash snippets confirming that Echo bot was installed and set up correctly.](assets/dotnet-systemd/welcome-to-dotnet.png)
 
 Leave the EchoBot App running in WSL for now. Open a new browser window on your Windows host and navigate to `localhost:3978` where you should see the following window:
 
-![|624x347](assets/dotnet-systemd/your-bot-is-ready.png)
+![Windows desktop showing the Echo bot app running in a browser on local host.](assets/dotnet-systemd/your-bot-is-ready.png)
 
 Leave everything running as we move to the next step.
 
@@ -120,15 +120,15 @@ Download the Bot Emulator from the official [Microsoft GitHub](https://github.co
 
 Running it will present you with the following screen, but before you can connect to your bot you need to change a few settings.
 
-![|624x411](assets/dotnet-systemd/bot-framework-emulator.png)
+![Bot Framework Emulator homepage.](assets/dotnet-systemd/bot-framework-emulator.png)
 
 First, get the IP address of your machine by running `ipconfig` in a PowerShell terminal.
 
-![|624x357](assets/dotnet-systemd/ipconfig.png)
+![Output of the "ipconfig" command showing network adapter details, including IPv4 addresses for Wi-Fi and WSL.](assets/dotnet-systemd/ipconfig.png)
 
 Then select the settings icon in the bottom-left corner of the Bot Framework Emulator and enter your IP under ‘localhost override'.
 
-![|624x411](assets/dotnet-systemd/emulator-settings.png)
+![Bot Emulator settings page.](assets/dotnet-systemd/emulator-settings.png)
 
 Click **Save** and navigate back to the Welcome tab.
 
@@ -138,11 +138,11 @@ Click **Open Bot** and under ‘Bot URL’ input:
 http://localhost:3978/api/messages
 ```
 
-![|624x411](assets/dotnet-systemd/open-a-bot.png)
+!["Open a bot" dialog.](assets/dotnet-systemd/open-a-bot.png)
 
 And click **Connect** to connect to your Echo Bot running in WSL and start chatting!
 
-![|624x411](assets/dotnet-systemd/start-chatting.png)
+![Live chat with Echo bot.](assets/dotnet-systemd/start-chatting.png)
 
 Congratulations, your Echo Chat Bot App is running on Ubuntu WSL as an App. Now it is time to make it run as a service.
 
@@ -164,7 +164,7 @@ $ code .
 
 Navigate to ‘Program.cs’ and insert `.UseSystemd()` as a new line in the location shown in the screenshot.
 
-![|624x381](assets/dotnet-systemd/program-cs.png)
+![The method for using systemd being added to line 21 of the file.](assets/dotnet-systemd/program-cs.png)
 
 Save and close the project in VS Code and return to your WSL terminal.
 
@@ -204,7 +204,7 @@ $ systemctl status echoes.service
 
 You should get the following output:
 
-![|624x77](assets/dotnet-systemd/systemctl-status-inactive.png)
+![Results of running "systemctl status echoes.service" in the terminal.](assets/dotnet-systemd/systemctl-status-inactive.png)
 
 Now start your service:
 
@@ -220,11 +220,11 @@ $ sudo systemctl status echoes.service
 
 If everything has been configured correctly you should get an output similar to the below.
 
-![|624x401](assets/dotnet-systemd/systemctl-status-running.png)
+![Results of running "sudo systemctl" in the terminal.](assets/dotnet-systemd/systemctl-status-running.png)
 
 Return to your Windows host and reconnect to your Bot Emulator using the same information as before and confirm that your bot is running, but this time as a systemd service!
 
-![|624x411](assets/dotnet-systemd/start-chatting-service.png)
+![Live chat with Echo bot.](assets/dotnet-systemd/start-chatting-service.png)
 
 You can stop your bot from running at any time with the command:
 

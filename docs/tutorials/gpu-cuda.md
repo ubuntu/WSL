@@ -35,37 +35,37 @@ Make sure the following prerequisites are met before moving forward:
 
 Please refer to the official [WSL documentation](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps) for up-to-date links matching your specific GPU vendor. You can find these in `Install support for Linux GUI apps > Prerequisites` . For this example, we will download the `NVIDIA GPU Driver for WSL`.
 
-![|624x283](assets/gpu-cuda/install-drivers.png)
+![Install support for Linux GUI apps page on Microsoft WSL documentation.](assets/gpu-cuda/install-drivers.png)
 
 > ⓘ **Note:** This is the only device driver you’ll need to install. Do not install any display driver on Ubuntu.
 
 Once downloaded, double-click on the executable file and click `Yes` to allow the program to make changes to your computer.
 
-![|624x136](assets/gpu-cuda/downloads-folder.png)
+![Windows file explorer showing the downloaded NVIDIA GPU driver for WSL.](assets/gpu-cuda/downloads-folder.png)
 
-![|358x312](assets/gpu-cuda/nvidia-allow-changes.png)
+![Windows Package Installer confirmation page for NVIDIA Package Launcher.](assets/gpu-cuda/nvidia-allow-changes.png)
 
 Confirm the default directory and allow the self-extraction process to proceed.
 
-![|369x175](assets/gpu-cuda/default-dir.png)
+![Default directory confirmation page for NVIDIA Display Driver.](assets/gpu-cuda/default-dir.png)
 
-![|368x168](assets/gpu-cuda/please-wait-install.png)
+![NVIDIA Display Driver installation progress screen.](assets/gpu-cuda/please-wait-install.png)
 
 A splash screen appears with the driver version number and quickly turns into the main installer window. Read and accept the license terms to continue.
 
-![|541x276](assets/gpu-cuda/splash-screen.png)
+![NVIDIA Graphics Driver startup page.](assets/gpu-cuda/splash-screen.png)
 
-![|542x412](assets/gpu-cuda/license.png)
+![NVIDIA software license agreement.](assets/gpu-cuda/license.png)
 
 Confirm the wizard defaults by clicking `Next` and wait until the end of the installation. You might be prompted to restart your computer.
 
-![|536x397](assets/gpu-cuda/installation-options.png)
+![NVIDIA Graphics Driver installation options with "Express" checked.](assets/gpu-cuda/installation-options.png)
 
-![|542x404](assets/gpu-cuda/installing.png)
+![NVIDIA Virtual Host controller installation progress.](assets/gpu-cuda/installing.png)
 
 This step ends with a screen similar to the image below.
 
-![|544x406](assets/gpu-cuda/install-finished.png)
+![NVIDIA Graphics Driver installation success page.](assets/gpu-cuda/install-finished.png)
 
 ## Install NVIDIA CUDA on Ubuntu
 
@@ -95,7 +95,7 @@ $ sudo apt-get -y install cuda
 
 Once complete, you should see a series of outputs that end in `done.`:
 
-![|544x559](assets/gpu-cuda/done-done.png)
+![Terminal output showing successful installation of NVIDIA CUDA toolkit on Ubuntu.](assets/gpu-cuda/done-done.png)
 
 Congratulations! You should have a working installation of CUDA by now. Let’s test it in the next step.
 
@@ -119,7 +119,7 @@ $ make
 
 A successful build will look like the screenshot below.
 
-![|624x135](assets/gpu-cuda/make.png)
+![Terminal output showing the successful compilation of a CUDA sample application.](assets/gpu-cuda/make.png)
 
 Once complete, run the application with:
 
@@ -129,7 +129,7 @@ $ ./deviceQuery
 
 You should see a similar output to the following detailing the functionality of your CUDA setup (the exact results depend on your hardware setup):
 
-![|548x599](assets/gpu-cuda/device-query.png)
+![Terminal output showing the results of running the device query sample application.](assets/gpu-cuda/device-query.png)
 
 ## Enjoy Ubuntu on WSL!
 

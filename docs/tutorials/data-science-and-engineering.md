@@ -26,7 +26,7 @@ $ octave --gui &
 
 Do not forget the ampersand `&` at the end of the line, so the application is started in the background and we can continue using the same terminal window.
 
-![|624x373](assets/data-science-engineering/octave.png)
+![Octave graphical interface running after the "octave" command was run with the gui flag in WSL.](assets/data-science-engineering/octave.png)
 
 In Octave, click on the `New script` icon to open a new editor window and copy/paste the following code:
 
@@ -75,11 +75,11 @@ Save it to a file named `juliatest.m`.
 
 And finally, press the button **Save File and Run**.
 
-![|570x225](assets/data-science-engineering/save-file.png)
+![Octave graphical interface showing the "Save and Run button" for the julia test file.](assets/data-science-engineering/save-file.png)
 
 After a few seconds, depending on your hardware and the parameters, a Julia fractal is displayed.
 
-![|579x540](assets/data-science-engineering/julia-fractal.png)
+![Visualisation of a julia fractal.](assets/data-science-engineering/julia-fractal.png)
 
 Like Octave, this window is displayed using WSLg completely transparently to the user.
 
