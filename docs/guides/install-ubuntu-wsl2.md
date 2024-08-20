@@ -31,11 +31,11 @@ There are multiple ways of installing distros on WSL, here we show three: Micros
 
 Find the distribution you prefer on the Microsoft Store and then click **Get**. 
 
-![|624x489](assets/install-ubuntu-wsl2/choose-distribution.png)
+![Installation page for Ubuntu 24.04 LTS in the Microsoft store.](assets/install-ubuntu-wsl2/choose-distribution.png)
 
 Ubuntu will then be installed on your machine. Once installed, you can either launch the application directly from the Microsoft Store or search for Ubuntu in your Windows search bar.
 
-![|624x580](assets/install-ubuntu-wsl2/search-ubuntu-windows.png)
+![Search results for Ubuntu 24.04 LTS in Windows search bar.](assets/install-ubuntu-wsl2/search-ubuntu-windows.png)
 
 ### Method 2: WSL commands
 

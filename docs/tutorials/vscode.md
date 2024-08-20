@@ -31,15 +31,15 @@ To install Visual Studio Code visit the Microsoft Store and search for Visual St
 
 Then click **Install**.
 
-![|624x483](assets/vscode/msstore.png)
+![Installation page for Visual Studio Code on the Microsoft Store.](assets/vscode/msstore.png)
 
 Alternatively, you can install Visual Studio Code from the web link [here](https://code.visualstudio.com/Download).
 
-![|624x353](assets/vscode/download-vs-code.png)
+![Visual Studio Code download page showing download options for Windows, Linux, and Mac.](assets/vscode/download-vs-code.png)
 
 During installation, under the 'Additional Tasks' step, ensure the `Add to PATH` option is checked.
 
-![|624x492](assets/vscode/aditional-tasks.png)
+![Visual Studio Code's "Additional Tasks" setup dialog with the "Add to Path" and "Register Code as an editor for supported file types" options checked.](assets/vscode/aditional-tasks.png)
 
 Once the installation is complete, open Visual Studio Code.
 
@@ -49,7 +49,7 @@ Navigate to the `Extensions` menu in the sidebar and search for `Remote Developm
 
 This is an extension pack that allows you to open any folder in a container, remote machine, or in WSL. Alternatively, you can just install `Remote - WSL`.
 
-![|624x469](assets/vscode/remote-extension.png)
+![Installation page for the Remote Development Visual Studio Code extension.](assets/vscode/remote-extension.png)
 
 Once installed we can test it out by creating an example local web server with Node.js
 
@@ -98,7 +98,7 @@ $ code .
 
 The first time you do this, it will trigger a download for the necessary dependencies:
 
-![|624x321](assets/vscode/downloading-vscode-server.png)
+![Bash snippet showing the installation of Visual Studio Code Server's required dependencies.](assets/vscode/downloading-vscode-server.png)
 
 Once complete, your native version of Visual Studio Code will open the folder.
 
@@ -145,7 +145,7 @@ $ npm start
 
 You can now navigate to `localhost:10001` in your native Windows web browser by using `CTRL+LeftClick` on the terminal links.
 
-![|624x351](assets/vscode/hello-world.png)
+![Windows desktop showing a web server being run from a terminal with "npm start", A Visual Studio Code project with a "hello world" html file, and a web browser showing the "hello world" page being served on local host.](assets/vscode/hello-world.png)
 
 That’s it!
 
