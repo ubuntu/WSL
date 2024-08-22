@@ -35,42 +35,13 @@ bool CheckInitTasks(WslApiLoader& api, bool checkDefaultUser) {
 
 namespace {
 void waitForInitTasks(WslApiLoader& api) {
-  _putws(L"Checking for initialization tasks...\n");
-
   DWORD exitCode = -1;
-  // Try running cloud-init unconditionally, but avoid printing to console if it doesn't exist.
-  auto hr = api.WslLaunchInteractive(
-      L"function command_not_found_handle() { return 127; }; cloud-init status --wait", FALSE,
-      &exitCode);
+  // Try running cloud-init unconditionally, but avoid printing to console.
+  auto hr = api.WslLaunchInteractive(L"cloud-init status --wait >/dev/null 2>&1", FALSE, &exitCode);
   if (FAILED(hr)) {
     Helpers::PrintErrorMessage(hr);
     return;
   }
-
-  // 127 for command not found, 0 for "success" or 2 for "recoverable error" - sometimes we get that
-  // while status shows "done".
-  // https://cloudinit.readthedocs.io/en/latest/explanation/failure_states.html#cloud-init-error-codes
-  // If that's the case we should inspect the system to check whether we should skip or proceed with
-  // user creation.
-  switch (exitCode) {
-    case 0: {
-      return;
-    }
-    case 127: {
-      _putws(L"INFO: this release doesn't support initialization tasks.\n");
-      return;
-    }
-    case 2: {
-      _putws(L"WARNING: initialization tasks partially succeeded, see below:");
-      break;
-    }
-    default: {
-      wprintf(L"ERROR: initialization failed with exit code: %u\n", exitCode);
-      break;
-    }
-  }
-  // We don't really care if the command below fails, it's just informative.
-  api.WslLaunchInteractive(L"cloud-init status --long", FALSE, &exitCode);
 }
 
 namespace fs = std::filesystem;
