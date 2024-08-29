@@ -99,21 +99,19 @@ You'll see a list of available distros and their Ids. Choose the one you prefer 
 > winget install --Id "9NZ3KLHXDJP5" --source msstore
 ```
 
-You'll be prompted to accept the source and package agreements before installing. You need to accept them in order to proceed.
+## Run and configure Ubuntu
 
-Check out [the documentation](../reference/distributions.md) to see which executable matches your application and run it.
+To open an Ubuntu 24.04 terminal run the following command in PowerShell:
 
 ```{code-block} text
-> ubuntu.exe
+> ubuntu2404.exe 
 ```
-
-## Configure Ubuntu
 
 Congratulations, you now have an Ubuntu terminal running on your Windows machine.
 
 Once it has finished its initial setup, you will be prompted to create a username and password. They don't need to match your Windows user credentials.
 
-Finally, it’s always good practice to install the latest updates with the following commands, entering your password when prompted:
+Finally, it’s always good practice to install the latest updates by running the following commands within the Ubuntu terminal, entering your password when prompted:
 
 ```{code-block} text
 $ sudo apt update
