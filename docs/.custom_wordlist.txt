@@ -1,3 +1,4 @@
+Appx
 AppxPackage
 awk
 backports
@@ -28,6 +29,7 @@ js
 Jupyter
 localhost
 LTS
+MSIX
 npm
 Numbat
 OpenGL

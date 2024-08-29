@@ -4,7 +4,7 @@
 ## What you will learn
 
 * How to enable and install WSL on Windows 10 and Windows 11
-* How to install `Ubuntu 24.04 LTS` using the Microsoft Store, WSL commands or the Winget package manager 
+* How to install `Ubuntu 24.04 LTS` using the Microsoft Store or WSL commands in the terminal
 
 ## What you will need
 
@@ -23,11 +23,11 @@ This command will enable the features necessary to run WSL and also install the 
 
 ## Install Ubuntu WSL
 
-WSL supports a variety of Linux distributions including the latest Ubuntu LTS release. Check out [the documentation](../reference/distributions.md) to see which one you prefer.
+WSL supports a variety of Linux distributions including the latest Ubuntu LTS release. Check our [reference on distributions](../reference/distributions.md) to see which one you prefer.
 
-There are multiple ways of installing distros on WSL, here we show three: Microsoft Store, WSL commands and the Winget package manager. The result is the same regardless of the method.
+There are multiple ways of installing distros on WSL, here we focus on two: the Microsoft Store application and WSL commands run in the terminal. The result is the same regardless of the method.
 
-### Method 1: Microsoft Store
+### Method 1: Microsoft Store application
 
 Find the distribution you prefer on the Microsoft Store and then click **Get**. 
 
@@ -37,7 +37,7 @@ Ubuntu will then be installed on your machine. Once installed, you can either la
 
 ![Search results for Ubuntu 24.04 LTS in Windows search bar.](assets/install-ubuntu-wsl2/search-ubuntu-windows.png)
 
-### Method 2: WSL commands
+### Method 2: WSL commands in the terminal
 
 It is possible to install the same Ubuntu versions available on the Microsoft Store directly from the command line.
 In a PowerShell terminal, you can run `wsl --list --online` to see an output with all available distros and versions:
@@ -85,35 +85,39 @@ Use `wsl -l -v` to see all your currently installed distros and the version of W
 * Ubuntu-24.04    Stopped         2
 ```
 
-### Method 3: Win package manager
+## Note on installing images without the Microsoft Store
 
-Open a PowerShell terminal and type:
-
-```{code-block} text
-> winget show --name Ubuntu --source msstore
-```
-
-You'll see a list of available distros and their Ids. Choose the one you prefer and install it. For instance, for `Ubuntu 24.04 LTS`:
+If you do not have access to the Microsoft Store or need to install
+a custom image it is possible to import a distribution as a tar file:
 
 ```{code-block} text
-> winget install --Id "9NZ3KLHXDJP5" --source msstore
+> wsl --import <DistroName> <InstallLocation> <InstallTarFile>
+```
+Appx and MSIX packages for a given distro can also be downloaded and installed.
+Please refer to Microsoft's documentation for more detailed information on these installation methods:
+
+- [Importing Linux distributions](https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro)
+- [Installing distributions without the Microsoft Store](https://learn.microsoft.com/en-us/windows/wsl/install-manual#downloading-distributions) 
+
+```{warning}
+You should always try to use the latest LTS release of Ubuntu, as it offers the best security, reliability and support when using Ubuntu WSL.
+
+Currently we do not have a recommended store for downloading tar and Appx/MSIX files for Ubuntu distros. 
 ```
 
-You'll be prompted to accept the source and package agreements before installing. You need to accept them in order to proceed.
+## Run and configure Ubuntu
 
-Check out [the documentation](../reference/distributions.md) to see which executable matches your application and run it.
+To open an Ubuntu 24.04 terminal run the following command in PowerShell:
 
 ```{code-block} text
-> ubuntu.exe
+> ubuntu2404.exe 
 ```
-
-## Configure Ubuntu
 
 Congratulations, you now have an Ubuntu terminal running on your Windows machine.
 
 Once it has finished its initial setup, you will be prompted to create a username and password. They don't need to match your Windows user credentials.
 
-Finally, it’s always good practice to install the latest updates with the following commands, entering your password when prompted:
+Finally, it’s always good practice to install the latest updates by running the following commands within the Ubuntu terminal, entering your password when prompted:
 
 ```{code-block} text
 $ sudo apt update
