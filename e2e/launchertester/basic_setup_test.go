@@ -32,6 +32,7 @@ func TestBasicSetup(t *testing.T) {
 		"UpgradePolicyIdempotent": testUpgradePolicyIdempotent,
 		"InteropIsEnabled":        testInteropIsEnabled,
 		"HelpFlag":                testHelpFlag,
+		"SnapdWorks":              testSnapdWorks,
 	}
 
 	for name, tc := range testCases {
