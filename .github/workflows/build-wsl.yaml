@@ -162,21 +162,21 @@ jobs:
           done
 
       - name: Allow downloading sideload appxbundle
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: sideload-${{ matrix.AppID }}
           path: |
             ${{ env.workDir }}/AppPackages/Ubuntu/Ubuntu_*/*
           retention-days: 7
       - name: Allow downloading store appxupload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: store-${{ matrix.AppID }}
           path: |
             ${{ env.workDir }}/AppPackages/Ubuntu/Ubuntu_*.appxupload
           retention-days: 7
       - name: Allow downloading the program debug artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: debug-database-${{ matrix.AppID }}
           path: |
@@ -279,7 +279,7 @@ jobs:
 
       - name: Upload build artifacts
         if: ${{ steps.detect-changes.outputs.has-changes == 'true' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ matrix.AppID }}
           path: ${{ env.workDir }}/${{ env.buildInfoPath }}/${{ matrix.AppID }}-*
@@ -299,7 +299,7 @@ jobs:
         with:
           repository: ubuntu/wsl.wiki
       - name: Download artifacts from all previous matrix runs
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           path: ${{ env.artifactsPath }}
       - name: Copy modified artifacts to base wiki
@@ -351,7 +351,7 @@ jobs:
           ISOTRACKER_PASSWORD: ${{ secrets.ISOTRACKER_PASSWORD }}
         run: |
           [ -f /tmp/all-releases.csv ] || ${{ env.codeDir }}/wsl-builder/lp-distro-info > /tmp/all-releases.csv
-          # There might have been more than one build in the latest commit 
+          # There might have been more than one build in the latest commit
           for build in $(git diff-tree --no-commit-id --name-only -r HEAD | grep buildid); do
             AppID=$(basename $build);
             AppID=${AppID%-buildid.md};
