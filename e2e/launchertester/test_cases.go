@@ -150,6 +150,19 @@ func testInteropIsEnabled(t *testing.T) { //nolint: thelper, this is a test
 	require.Equal(t, "Hello, world!\r\n", string(got), "Unexpected output from powershell")
 }
 
+func testSnapdWorks(t *testing.T) { //nolint: thelper, this is a test
+	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
+	defer cancel()
+
+	installOut, err := launcherCommand(ctx, "run", "snap", "install", "hello").CombinedOutput()
+	require.NoError(t, err, "Failed to execute snap install hello: %s", installOut)
+
+	runOut, err := launcherCommand(ctx, "run", "snap", "run", "hello").CombinedOutput()
+	require.NoError(t, err, "Failed to execute snap run hello: %s", runOut)
+
+	require.Equal(t, string(runOut), "Hello, world!\n", "Unexpected output from hello snap")
+}
+
 func testHelpFlag(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
