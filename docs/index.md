@@ -64,7 +64,7 @@ If you have identified a problem or bug in WSL then submit an Issue in
 
 ```
 
-- [Code of Conduct](https://ubuntu.com/community/code-of-conduct)
+- [Code of Conduct](https://ubuntu.com/community/ethos/code-of-conduct)
 - [Contribute to the project](guides/contributing)
 - [Ask and answer questions on the forum](https://discourse.ubuntu.com/c/wsl/27)
 
