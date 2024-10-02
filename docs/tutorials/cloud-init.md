@@ -6,7 +6,7 @@ Ubuntu WSL users can now leverage it to perform an automatic setup to get a work
 
 > See more:  [cloud-init official documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
 
-The latest release of Ubuntu (Noble Numbat 24.04 LTS) comes with cloud-init already preinstalled, so you'll need that specific application to follow this tutorial. Ubuntu 24.04 LTS can be installed from [this link to the Microsoft Store](https://www.microsoft.com/store/productId/9NZ3KLHXDJP5?ocid=pdpshare). A previous version of this tutorial used Ubuntu (Preview), because that comes with the latest in-development features. You can still use it to follow the instructions below, if you prefer.
+The latest release of Ubuntu (Noble Numbat 24.04 LTS) comes with cloud-init already preinstalled, so you'll need that specific application to follow this tutorial. Ubuntu 24.04 LTS can be installed from [this link to the Microsoft Store](https://apps.microsoft.com/detail/9nz3klhxdjp5?hl=en-us&gl=US). A previous version of this tutorial used Ubuntu (Preview), because that comes with the latest in-development features. You can still use it to follow the instructions below, if you prefer. This feature is now available in the default Ubuntu application as well as Ubuntu 22.04 LTS.
 
 ## What you will learn
 
@@ -70,75 +70,45 @@ Save it and close it.
 In PowerShell, run:
 
 ```{code-block} text
-> ubuntu2404.exe install --root
+> ubuntu2404.exe
 ```
 
-We skip the user creation since we expect cloud-init to do it.
+This command will register a new Ubuntu-24.04 instance that will be configured automatically by cloud-init.
+The process can take several minutes, depending on your computer and network speeds.
 
 > If you want to be sure that there is now an Ubuntu-24.04 instance, run `wsl -l -v`.
 > Notice that the application is named `Ubuntu24.04LTS` but the WSL instance created is named `Ubuntu-24.04`.
 > See more about that naming convention in [our reference documentation](naming).
 
-## Check that cloud-init is running
+## Verify automatic configuration by cloud-init
 
-In PowerShell again run:
-
-```{code-block} text
-> ubuntu2404.exe run cloud-init status --wait
-```
-
-That will wait until cloud-init completes configuring the new instance we just created. When done, you should see an
-output similar to the following:
-
-```{code-block} text
-:class: no-copy
-..............................................................................
-..............................................................................
-..............................................................................
-...................
-status: done
-```
-
-## Verify that it worked
-
-Restart the distro just to confirm that the changes in `/etc/wsl.conf` made by cloud-init will take effect.
-
-Terminate the running instance:
-
-```{code-block} text
-> wsl -t Ubuntu-24.04
-```
-
-This should output a message confirming that the instance has stopped:
-
-```{code-block} text
-:class: no-copy
-The operation completed successfully.
-```
-
-Now start the instance again:
-
-```{code-block} text
-> ubuntu2404.exe
-```
-
+When the setup is complete, the WSL instance's shell will be logged in as the user `jdoe`.
 You should see the standard welcome text:
 
 ```{code-block} text
 :class: no-copy
+Installing, this may take a few minutes...
+Installation successful!
 To run a command as administrator (user "root"), use "sudo <command>".
 See "man sudo_root" for details.
 
-Welcome to Ubuntu Noble Numbat (GNU/Linux 5.15.137.3-microsoft-standard-WSL2 x86_64)
+Welcome to Ubuntu 24.04.1 LTS (GNU/Linux 6.6.36.3-microsoft-standard-WSL2 x86_64)
 
  * Documentation:  https://help.ubuntu.com
  * Management:     https://landscape.canonical.com
  * Support:        https://ubuntu.com/pro
 
+ System information as of ter 01 out 2024 14:32:47 -03
+
+  System load:  1.64                Processes:             63
+  Usage of /:   0.2% of 1006.85GB   Users logged in:       0
+  Memory usage: 4%                  IPv4 address for eth0: 172.22.8.90
+  Swap usage:   0%
+
 
 This message is shown once a day. To disable it please create the
-/home/cn/.hushlogin file.
-jdoe@mib:~$
+/home/jdoe/.hushlogin file.
+jdoe@mib01:~$
 ```
 
 Once logged into the new distro instance's shell, verify that:
@@ -238,14 +208,6 @@ See LICENSE.txt for license information.
 That’s all folks! In this tutorial, we’ve shown you how to use cloud-init to automatically set up Ubuntu on WSL 2 with minimal touch.
 
 This workflow will guarantee a solid foundation for your next Ubuntu WSL project.
-
-As a side note, users installing the distro with the `wsl --install` online command must take a few steps to ensure cloud-init has time to do its job. First, make sure to install with the `--no-launch` flag, then use the distro launcher to install without creating a user (if you expect cloud-init to do it for you as described in this tutorial) and finally watch cloud-init do its job. The commands are outlined below:
-
-```text
-> wsl --install --no-launch -d Ubuntu-24.04
-> ubuntu2404.exe install --root
-> ubuntu2404.exe run cloud-init status --wait
-```
 
 We hope you enjoy using Ubuntu inside WSL!
 

@@ -38,7 +38,7 @@ propose changes to this document in a pull request.
 
 ## Code of conduct
 
-We take our community seriously and hold ourselves and other contributors to high standards of communication. By participating and contributing, you agree to uphold the Ubuntu Community [Code of Conduct](https://ubuntu.com/community/code-of-conduct).
+We take our community seriously and hold ourselves and other contributors to high standards of communication. By participating and contributing, you agree to uphold the Ubuntu Community [Code of Conduct](https://ubuntu.com/community/ethos/code-of-conduct).
 
 ## Getting started
 
