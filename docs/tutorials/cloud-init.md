@@ -73,14 +73,14 @@ In PowerShell, run:
 > ubuntu2404.exe
 ```
 
-It will register a new Ubuntu-24.04 instance and wait for cloud-init to perform its initialisation tasks.
-That process can take several minutes, depending on the computer and network speeds.
+This command will register a new Ubuntu-24.04 instance that will be configured automatically by cloud-init.
+The process can take several minutes, depending on your computer and network speeds.
 
 > If you want to be sure that there is now an Ubuntu-24.04 instance, run `wsl -l -v`.
 > Notice that the application is named `Ubuntu24.04LTS` but the WSL instance created is named `Ubuntu-24.04`.
 > See more about that naming convention in [our reference documentation](naming).
 
-## Verify that it worked
+## Verify automatic configuration by cloud-init
 
 When the setup is complete, the WSL instance's shell will be logged in as the user `jdoe`.
 You should see the standard welcome text:
