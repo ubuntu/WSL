@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -45,6 +46,7 @@ func TestSetupWithCloudInit(t *testing.T) {
 	testCases := map[string]struct {
 		install_root     bool
 		withRegistryUser string
+		withWSL1         bool
 		wantUser         string
 		wantFile         string
 	}{
@@ -56,6 +58,7 @@ func TestSetupWithCloudInit(t *testing.T) {
 		"With only remote users":  {wantUser: "testmail"},
 		"With broken passwd file": {wantUser: "testmail"},
 		"Without checking user":   {install_root: true, wantUser: "root", wantFile: "/home/testuser/with_default_user.done"},
+		"Do not block on WSL1":    {install_root: true, wantUser: "root"},
 	}
 
 	home, err := os.UserHomeDir()
@@ -77,6 +80,13 @@ func TestSetupWithCloudInit(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
+			if tc.withWSL1 {
+				require.NoError(t, exec.Command("wsl.exe", "--set-default-version", "1").Run(), "Setup: Cannot set WSL1 as default version")
+				t.Cleanup(func() {
+					t.Log("Cleaning up: Setting WSL2 back as default version")
+					require.NoError(t, exec.Command("wsl.exe", "--set-default-version", "2").Run(), "Setup: Cannot set WSL2 back as default version")
+				})
+			}
 			wslSetup(t)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
