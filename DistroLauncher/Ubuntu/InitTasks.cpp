@@ -35,9 +35,14 @@ bool CheckInitTasks(WslApiLoader& api, bool checkDefaultUser) {
 
 namespace {
 void waitForInitTasks(WslApiLoader& api) {
+  // Wait for cloud-init to finish if systemd and its service is enabled.
+  static constexpr wchar_t script[] = LR"(
+if status=$(LANG=C systemctl is-system-running 2>/dev/null) || [ "${status}" != "offline" ] && systemctl is-enabled --quiet cloud-init.service 2>/dev/null; then
+  cloud-init status --wait > /dev/null 2>&1 || true
+fi
+)";
   DWORD exitCode = -1;
-  // Try running cloud-init unconditionally, but avoid printing to console.
-  auto hr = api.WslLaunchInteractive(L"cloud-init status --wait >/dev/null 2>&1", FALSE, &exitCode);
+  auto hr = api.WslLaunchInteractive(script, FALSE, &exitCode);
   if (FAILED(hr)) {
     Helpers::PrintErrorMessage(hr);
     return;
