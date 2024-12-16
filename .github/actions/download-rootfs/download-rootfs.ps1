@@ -63,9 +63,14 @@ function Test-Checksums {
 
     # Parse checksum file
     $image = $URL.Segments[$Url.Segments.Length - 1]
-    $pattern = "(\w+)  ${image}"
+    $pattern = "(\w+) \*${image}"
+    $matched = (Select-String -Pattern "${pattern}" -Path "${Checksums}").Matches
+    if ($null -eq $matched -or $matched.Count -eq 0) {
+        Write-Warning "Could not find $image in checksums file"
+        return $false
+    }
 
-    $newSHA256 = (Select-String -Pattern "${pattern}" -Path "${Checksums}").Matches[0].Groups[1]
+    $newSHA256 = $matched.Groups[1]
     if ($newSHA256 -eq "") {
         Write-Warning "Could not find $image in checksums file"
         return $false
