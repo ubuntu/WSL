@@ -82,6 +82,7 @@ func TestSetupWithCloudInit(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			if tc.withWSL1 {
 				require.NoError(t, exec.Command("wsl.exe", "--set-default-version", "1").Run(), "Setup: Cannot set WSL1 as default version")
+				require.NoError(t, exec.Command("wsl.exe", "--shutdown").Run(), "Setup: Cannot enforce WSL1 as default version y shutting down the VM")
 				t.Cleanup(func() {
 					t.Log("Cleaning up: Setting WSL2 back as default version")
 					require.NoError(t, exec.Command("wsl.exe", "--set-default-version", "2").Run(), "Setup: Cannot set WSL2 back as default version")
