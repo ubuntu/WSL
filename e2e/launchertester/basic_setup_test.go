@@ -27,7 +27,7 @@ func TestBasicSetup(t *testing.T) {
 	require.NoErrorf(t, err, "Unexpected error installing: %s\n%v", out, err)
 
 	testCases := map[string]func(t *testing.T){
-		"SystemdEnabled":          testSystemdEnabled,
+		"SystemdEnabled":          testSystemdIsEnabled,
 		"SystemdUnits":            testSystemdUnits,
 		"CorrectUpgradePolicy":    testCorrectUpgradePolicy,
 		"UpgradePolicyIdempotent": testUpgradePolicyIdempotent,
@@ -58,7 +58,7 @@ func TestSetupWithCloudInit(t *testing.T) {
 		"With only remote users":  {wantUser: "testmail"},
 		"With broken passwd file": {wantUser: "testmail"},
 		"Without checking user":   {install_root: true, wantUser: "root", wantFile: "/home/testuser/with_default_user.done"},
-		"Do not block on WSL1":    {install_root: true, wantUser: "root"},
+		"Do not block on WSL1":    {install_root: true, withWSL1: true, wantUser: "root"},
 	}
 
 	home, err := os.UserHomeDir()
@@ -168,7 +168,7 @@ func TestSetupWithCloudInit(t *testing.T) {
 			// launcher checks for the default user. Either way the user assertion in the end of this test case will work as exoected.
 			require.NoError(t, <-registrySet, "Setup: Failed to set default user via GoWSL/registry")
 
-			testSystemdEnabled(t)
+			testSystemdEnabled(t, !tc.withWSL1)
 			testInteropIsEnabled(t)
 			if len(tc.wantFile) > 0 {
 				testFileExists(t, tc.wantFile)
