@@ -70,7 +70,7 @@ function Test-Checksums {
         return $false
     }
 
-    $newSHA256 = $matched.Groups[1]
+    $newSHA256 = $matched[0].Groups[1]
     if ($newSHA256 -eq "") {
         Write-Warning "Could not find $image in checksums file"
         return $false
