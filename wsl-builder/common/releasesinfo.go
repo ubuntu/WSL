@@ -235,20 +235,19 @@ func (w *WslReleaseInfo) refreshedTerminalProfileID() error {
 
 // RootfsURL returns the URL to the rootfs tarball for the given architecture.
 // The base image name is in the format:
-// ubuntu-<version>-wsl-<arch>-<upgrade-flavor>.rootfs.tar.gz
-// before 24.04, upgrade-flavor is always "wsl"
+// ubuntu-<version>-wsl-<arch>-<upgrade-type>.rootfs.tar.gz
+// before 22.04, upgrade-type is always "wsl"
 // otherwise:
-// - ubuntu -> wsl (upgade: lts)
+// - ubuntu -> wsl (upgrade: lts)
 // - ubuntupreview -> preview (upgrade: always)
-// - ubuntu24.04lts -> 24.04lts (upgrade: never)
+// - ubuntu24.04lts -> ubuntu24.04lts (upgrade: never)
 func (w *WslReleaseInfo) RootfsURL(arch string) string {
 	imageBaseName := fmt.Sprintf("ubuntu-%s-wsl-%s", w.CodeName, arch)
 
 	suffix := "wsl"
 	// We have multiple versions with different upgrade policy management. Pick the one based on the app name.
-	if strings.Compare(w.BuildVersion, "2404") >= 0 {
-		// The CPC publisher strip the "ubuntu" prefix
-		suffix = strings.TrimPrefix(strings.ToLower(w.AppID), "ubuntu")
+	if strings.Compare(w.BuildVersion, "2204") >= 0 {
+		suffix = strings.ToLower(w.AppID)
 		if suffix == "" {
 			suffix = "wsl"
 		}

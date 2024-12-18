@@ -26,14 +26,24 @@ func testDefaultUser(t *testing.T, expected string) { //nolint: thelper, this is
 	require.Equal(t, expected, got, "Default user should be %s, got %s", expected, got)
 }
 
-// testSystemdEnabled ensures systemd was enabled.
-func testSystemdEnabled(t *testing.T) { //nolint: thelper, this is a test
+// testSystemdIsEnabled ensures systemd was enabled.
+func testSystemdIsEnabled(t *testing.T) { //nolint: thelper, this is a test
+	testSystemdEnabled(t, true)
+}
+
+// testSystemdEnabled checks whether systemd was enabled or not as expected.
+func testSystemdEnabled(t *testing.T, wantEnabled bool) { //nolint: thelper, this is a test
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
 	out, err := wslCommand(ctx, "systemctl", "is-system-running", "--wait").CombinedOutput()
 	if err == nil {
 		return // Success: Non-deterministic
+	}
+
+	if !wantEnabled {
+		require.Contains(t, string(out), "offline", "systemd output should be offline")
+		return
 	}
 
 	// Only acceptable alternative is "degraded"

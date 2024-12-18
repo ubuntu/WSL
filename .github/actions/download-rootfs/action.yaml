@@ -1,5 +1,5 @@
 name: Download Ubuntu WSL Rootfs
-description: Download the latest Rootfs for a particular release of Ubuntu WSL 
+description: Download the latest Rootfs for a particular release of Ubuntu WSL
 
 inputs:
   distros:
@@ -92,6 +92,8 @@ runs:
           }
 
           $file = ".\${name}.tar.gz"
+
+          Write-Output "Saving $($url[0..19] -join '')***$($url[-19..-1] -join '') to $file"
 
           & ${{ github.action_path }}\download-rootfs.ps1 -Path "${file}" -URL "$url"
           if ( ! $? ) {
