@@ -58,7 +58,8 @@ func TestSetupWithCloudInit(t *testing.T) {
 		"With only remote users":  {wantUser: "testmail"},
 		"With broken passwd file": {wantUser: "testmail"},
 		"Without checking user":   {install_root: true, wantUser: "root", wantFile: "/home/testuser/with_default_user.done"},
-		"Do not block on WSL1":    {install_root: true, withWSL1: true, wantUser: "root"},
+		// TODO: Investigate why this causes the CI VM to crash and reenable it.
+		//"Do not block on WSL1":    {install_root: true, withWSL1: true, wantUser: "root"},
 	}
 
 	home, err := os.UserHomeDir()
