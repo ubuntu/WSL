@@ -15,7 +15,7 @@ jobs:
     runs-on: windows-latest
     if: ${{ !github.event.pull_request.draft }}
     env:
-      rootfs64: 'http://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-ubuntu.rootfs.tar.gz'
+      rootfs64: 'http://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-ubuntu22.04lts.rootfs.tar.gz'
       workDir: 'C:/Temp/builddir'
     steps:
       - name: Checkout WSL
