@@ -45,13 +45,10 @@ runs:
         wsl.exe --unregister ${{ inputs.distro }} 3>&1 2>&1 | Out-Null
 
         Write-Output "::group::Install a new distro"
-        winget install --id "${storeId}" --accept-source-agreements --accept-package-agreements --silent
+        wsl.exe --install "${{ inputs.distro }}" --web-download --no-launch
         Write-Output "::endgroup::"
 
-        # Register the new distro
-        & ${launcher} install --root --ui=none
-
-        # Testing succesful install
-        & ${launcher} run echo Created a new distro with user: '$(whoami)'
+        # Testing successful install
+        wsl.exe -d "${{ inputs.distro }}" -- echo Created a new distro with user: '$(whoami)'
 
         if ( ! $? ) { Exit(1) }
