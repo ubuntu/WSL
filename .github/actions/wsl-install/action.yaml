@@ -31,6 +31,7 @@ runs:
         {
             "Ubuntu"         { $storeId="9PDXGNCFSCZV" ; $launcher="ubuntu.exe"         ;  $appxname="Ubuntu"          }
             "Ubuntu-Preview" { $storeId="9P7BDVKVNXZ6" ; $launcher="ubuntupreview.exe"  ;  $appxname="UbuntuPreview"   }
+            "Ubuntu-24.04"   { $storeId="9NZ3KLHXDJP5" ; $launcher="ubuntu2404.exe"     ;  $appxname="Ubuntu24.04LTS"  }
             "Ubuntu-22.04"   { $storeId="9PN20MSR04DW" ; $launcher="ubuntu2204.exe"     ;  $appxname="Ubuntu22.04LTS"  }
             "Ubuntu-20.04"   { $storeId="9MTTCL66CPXJ" ; $launcher="ubuntu2004.exe"     ;  $appxname="Ubuntu20.04LTS"  }
             "Ubuntu-18.04"   { $storeId="9PNKSF5ZN4SW" ; $launcher="ubuntu1804.exe"     ;  $appxname="Ubuntu18.04LTS"  }
