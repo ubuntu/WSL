@@ -2,13 +2,9 @@
 
 <!-- Include start contributing intro -->
 
-## Ubuntu WSL and Ubuntu Pro for WSL
+## Ubuntu on WSL distribution
 
-The documentation for Ubuntu WSL and Ubuntu Pro for WSL are currently
-in the process of being merged. These contribution guidelines refer
-to both products.
-
-Contributions to Ubuntu WSL and Ubuntu Pro for WSL are welcomed and encouraged.
+Contributions to Ubuntu on WSL are welcomed and encouraged.
 
 ## Guidelines for your contributions
 
@@ -44,21 +40,19 @@ We take our community seriously and hold ourselves and other contributors to hig
 
 The source code for Ubuntu WSL and Ubuntu Pro for WSL can be found on GitHub:
 
-- [Ubuntu WSL repo](https://github.com/ubuntu/WSL) 
-- [Ubuntu Pro for WSL repo](https://github.com/canonical/ubuntu-pro-for-wsl) 
+- [Ubuntu on WSL distribution](https://github.com/ubuntu/WSL)
+- [Ubuntu Pro for WSL application](https://github.com/canonical/ubuntu-pro-for-wsl)
 
 ### Issues with WSL should be directed to Microsoft's WSL project
 
-<!-- TODO: a breakdown of responsibilities or example issues (Ubuntu/Microsft) could be helpful here -->
-
-We accept any contributions relating to Ubuntu WSL and Ubuntu Pro for WSL.
+We accept any contributions relating to the Ubuntu on WSL distribution.
 However, we do not directly maintain WSL itself, which is a Microsoft product.
 If you have identified a problem or bug in WSL then file an issue in
 [Microsoft's WSL project repository](https://github.com/microsoft/WSL/issues/).
 
 If you are unsure whether your problem relates to an Ubuntu project or the Microsoft project then familiarise yourself with their documentation.
 
-- [Ubuntu WSL docs](https://canonical-ubuntu-wsl.readthedocs-hosted.com/en/latest/)
+- [Ubuntu WSL docs](https://documentation.ubuntu.com/wsl/en/latest/)
 - [Microsoft WSL docs](https://learn.microsoft.com/en-us/windows/wsl/)
 
 At this point, if you are still not sure, try to contact a maintainer of one of the projects who will advise you where best to submit your Issue.
@@ -115,26 +109,7 @@ Each module has its own package tests and you can also find the integration test
 
 The test suite must pass before merging the PR to our main branch. Any new feature, change or fix must be covered by corresponding tests.
 
-### Required dependencies for UP4W
-
-You'll need a Windows Machine with the following applications installed:
-
-* Windows Subsystem for Linux
-* Ubuntu-24.04
-* Visual Studio Community 2019 or above
-* Go
-* Flutter
-
-### Building and running the binaries for UP4W
-
-For building, you can use the following two scripts:
-
-* [Build the Windows Agent](https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/tools/build/build-deb.sh)
-* [Build the Wsl Pro Service](https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/tools/build/build-appx.ps1)
-
-Note that you'll need to [create a self-signing certificate](https://learn.microsoft.com/en-us/windows/msix/package/create-certificate-package-signing) to build the Windows Agent.
-
-## Contributor License Agreement
+### Contributor License Agreement
 
 It is requirement that you sign the [Contributor License
 Agreement](https://ubuntu.com/legal/contributors) in order to contribute.
@@ -144,10 +119,9 @@ sign it again.
 
 An automated test is executed on PRs to check if it has been accepted.
 
-Please refer to the licences for Ubuntu WSL and Ubuntu Pro for WSL below:
+Please refer to the licences for Ubuntu on WSL:
 
-- [Ubuntu WSL](https://github.com/ubuntu/WSL/blob/main/LICENSE).
-- [Ubuntu Pro for WSL](https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/LICENSE).
+- [Ubuntu on WSL](https://github.com/ubuntu/WSL/blob/main/LICENSE).
 
 ## Contributing to the docs
 
