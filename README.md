@@ -24,7 +24,14 @@ These are the applications we develop and maintain:
 > If you are interested in contributing to the documentation, please submit your Issues and Pull Requests there.
 
 # This repository
-This repository contains code relevant to Ubuntu on WSL. It builds on top of [Microsoft's reference implementation](https://github.com/microsoft/WSL-DistroLauncher). Head there for any documentation needs.
+
+This repository contains code relevant to the Ubuntu distribution on WSL.
+It builds on top of [Microsoft's distro launcher reference implementation](https://github.com/microsoft/WSL-DistroLauncher).
+
+> [!TIP]
+> There is a [newer method](https://learn.microsoft.com/en-gb/windows/wsl/build-custom-distro) for creating the Ubuntu on WSL distro.
+> We will be updating the Ubuntu on WSL documentation as this method is adopted.
+> Refer to this [blog about installing Ubuntu with the new distribution format](https://ubuntu.com/blog/ubuntu-wsl-new-format-available).
 
 # Issues & Contact
 You are welcome to [create a new issue](https://github.com/ubuntu/WSL/issues/new/choose) on this repository if you find bugs you believe may be particular to Ubuntu running on WSL.
