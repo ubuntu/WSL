@@ -6,6 +6,10 @@ inputs:
     description: Distro name as shown in 'wsl -l -v'. Leave blank to install no distro.
     required: false
     default: ""
+  useStore:
+    description: Whether to use the Microsoft Store for distro installs or not
+    required: false
+    default: false
 
 runs:
   using: 'composite'
@@ -27,6 +31,7 @@ runs:
         {
             "Ubuntu"         { $storeId="9PDXGNCFSCZV" ; $launcher="ubuntu.exe"         ;  $appxname="Ubuntu"          }
             "Ubuntu-Preview" { $storeId="9P7BDVKVNXZ6" ; $launcher="ubuntupreview.exe"  ;  $appxname="UbuntuPreview"   }
+            "Ubuntu-24.04"   { $storeId="9NZ3KLHXDJP5" ; $launcher="ubuntu2404.exe"     ;  $appxname="Ubuntu24.04LTS"  }
             "Ubuntu-22.04"   { $storeId="9PN20MSR04DW" ; $launcher="ubuntu2204.exe"     ;  $appxname="Ubuntu22.04LTS"  }
             "Ubuntu-20.04"   { $storeId="9MTTCL66CPXJ" ; $launcher="ubuntu2004.exe"     ;  $appxname="Ubuntu20.04LTS"  }
             "Ubuntu-18.04"   { $storeId="9PNKSF5ZN4SW" ; $launcher="ubuntu1804.exe"     ;  $appxname="Ubuntu18.04LTS"  }
@@ -45,13 +50,15 @@ runs:
         wsl.exe --unregister ${{ inputs.distro }} 3>&1 2>&1 | Out-Null
 
         Write-Output "::group::Install a new distro"
-        winget install --id "${storeId}" --accept-source-agreements --accept-package-agreements --silent
+        if ( "${{ inputs.useStore }}" -eq "true" ) {
+          winget install --id "${storeId}" --accept-source-agreements --accept-package-agreements --silent
+          & ${launcher} install --root --ui=none
+        } else {
+          wsl.exe --install "${{ inputs.distro }}" --web-download --no-launch
+        }
         Write-Output "::endgroup::"
 
-        # Register the new distro
-        & ${launcher} install --root --ui=none
-
-        # Testing succesful install
-        & ${launcher} run echo Created a new distro with user: '$(whoami)'
+        # Testing successful install
+        wsl.exe -d "${{ inputs.distro }}" -- echo Created a new distro with user: '$(whoami)'
 
         if ( ! $? ) { Exit(1) }
