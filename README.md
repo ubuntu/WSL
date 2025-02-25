@@ -18,6 +18,10 @@ These are the applications we develop and maintain:
 - [Ubuntu](https://apps.microsoft.com/store/detail/ubuntu/9PDXGNCFSCZV) ships the latest stable LTS release of Ubuntu. When new LTS versions are released, Ubuntu can be upgraded once the first point release is available
 - [Ubuntu 18.04.5 LTS](https://apps.microsoft.com/store/detail/ubuntu-18045-lts/9PNKSF5ZN4SW), [Ubuntu 20.04.5 LTS](https://apps.microsoft.com/store/detail/ubuntu-20045-lts/9MTTCL66CPXJ), [Ubuntu 22.04.1 LTS](https://apps.microsoft.com/store/detail/ubuntu-22041-lts/9PN20MSR04DW) are the LTS versions of Ubuntu and receive updates for five years. Upgrades to future LTS releases will not be proposed.
 - [Ubuntu (Preview)](https://apps.microsoft.com/store/detail/ubuntu-preview/9P7BDVKVNXZ6) is a daily build of the latest development version of Ubuntu previewing new features as they are developed. It does not receive the same level of QA as stable releases and should not be used for production workloads.
+> [!NOTE]
+> The **documentation** for Ubuntu on WSL can be found at [https://documentation.ubuntu.com/wsl/](documentation.ubuntu.com/wsl).
+> The source for that documentation can be found in the [Ubuntu Pro for WSL repo](https://github.com/canonical/ubuntu-pro-for-wsl).
+> If you are interested in contributing to the documentation, please submit your Issues and Pull Requests there.
 
 # This repository
 This repository contains code relevant to Ubuntu on WSL. It builds on top of [Microsoft's reference implementation](https://github.com/microsoft/WSL-DistroLauncher). Head there for any documentation needs.
