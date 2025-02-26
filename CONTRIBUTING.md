@@ -2,13 +2,9 @@
 
 <!-- Include start contributing intro -->
 
-## Ubuntu WSL and Ubuntu Pro for WSL
+## Ubuntu on WSL distribution
 
-The documentation for Ubuntu WSL and Ubuntu Pro for WSL are currently
-in the process of being merged. These contribution guidelines refer
-to both products.
-
-Contributions to Ubuntu WSL and Ubuntu Pro for WSL are welcomed and encouraged.
+Contributions to Ubuntu on WSL are welcomed and encouraged.
 
 ## Guidelines for your contributions
 
@@ -44,21 +40,19 @@ We take our community seriously and hold ourselves and other contributors to hig
 
 The source code for Ubuntu WSL and Ubuntu Pro for WSL can be found on GitHub:
 
-- [Ubuntu WSL repo](https://github.com/ubuntu/WSL) 
-- [Ubuntu Pro for WSL repo](https://github.com/canonical/ubuntu-pro-for-wsl) 
+- [Ubuntu on WSL distribution](https://github.com/ubuntu/WSL)
+- [Ubuntu Pro for WSL application](https://github.com/canonical/ubuntu-pro-for-wsl)
 
 ### Issues with WSL should be directed to Microsoft's WSL project
 
-<!-- TODO: a breakdown of responsibilities or example issues (Ubuntu/Microsft) could be helpful here -->
-
-We accept any contributions relating to Ubuntu WSL and Ubuntu Pro for WSL.
+We accept any contributions relating to the Ubuntu on WSL distribution.
 However, we do not directly maintain WSL itself, which is a Microsoft product.
 If you have identified a problem or bug in WSL then file an issue in
 [Microsoft's WSL project repository](https://github.com/microsoft/WSL/issues/).
 
 If you are unsure whether your problem relates to an Ubuntu project or the Microsoft project then familiarise yourself with their documentation.
 
-- [Ubuntu WSL docs](https://canonical-ubuntu-wsl.readthedocs-hosted.com/en/latest/)
+- [Ubuntu WSL docs](https://documentation.ubuntu.com/wsl/en/latest/)
 - [Microsoft WSL docs](https://learn.microsoft.com/en-us/windows/wsl/)
 
 At this point, if you are still not sure, try to contact a maintainer of one of the projects who will advise you where best to submit your Issue.
@@ -115,26 +109,7 @@ Each module has its own package tests and you can also find the integration test
 
 The test suite must pass before merging the PR to our main branch. Any new feature, change or fix must be covered by corresponding tests.
 
-### Required dependencies for UP4W
-
-You'll need a Windows Machine with the following applications installed:
-
-* Windows Subsystem for Linux
-* Ubuntu-24.04
-* Visual Studio Community 2019 or above
-* Go
-* Flutter
-
-### Building and running the binaries for UP4W
-
-For building, you can use the following two scripts:
-
-* [Build the Windows Agent](https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/tools/build/build-deb.sh)
-* [Build the Wsl Pro Service](https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/tools/build/build-appx.ps1)
-
-Note that you'll need to [create a self-signing certificate](https://learn.microsoft.com/en-us/windows/msix/package/create-certificate-package-signing) to build the Windows Agent.
-
-## Contributor License Agreement
+### Contributor License Agreement
 
 It is requirement that you sign the [Contributor License
 Agreement](https://ubuntu.com/legal/contributors) in order to contribute.
@@ -144,115 +119,16 @@ sign it again.
 
 An automated test is executed on PRs to check if it has been accepted.
 
-Please refer to the licences for Ubuntu WSL and Ubuntu Pro for WSL below:
+Please refer to the licences for Ubuntu on WSL:
 
-- [Ubuntu WSL](https://github.com/ubuntu/WSL/blob/main/LICENSE).
-- [Ubuntu Pro for WSL](https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/LICENSE).
+- [Ubuntu on WSL](https://github.com/ubuntu/WSL/blob/main/LICENSE).
 
 ## Contributing to the docs
 
-The documentation for Ubuntu WSL and Ubuntu Pro for WSL is maintained [here](https://github.com/ubuntu/WSL/tree/main/docs).
-
-Our goal is to provide documentation that gives users the information that they need to get what they need from Ubuntu WSL.
-
-You can contribute to the documentation in various different ways. If you are not a developer but want to help make the product better then helping us to improve the documentation is a way to achieve that.
-
-At the top of each page in the documentation, you will find a feedback button.
-Clicking this button will open an Issue submission page in the Ubuntu WSL GitHub repo.
-A template will automatically be loaded that you can modify before submitting the Issue.
-
-You can also find a pencil icon for editing the page on GitHub, which will open up the source file in GitHub so that you can make changes before committing them and submitting a PR.
-This can be a good option if you want to make a small change, e.g., fixing a single typo.
-
-Lastly, at the bottom of the page you will find various links, including a link to the Discourse forum for Ubuntu WSL, where you can ask questions and participate in discussions.
-
-### Types of contribution
-
-<!-- TODO: if PR title conventions are in place these should be specified here -->
-
-Some common contributions to documentation are:
-
-- Add or update documentation for new features or feature improvements by submitting a PR
-- Add or update documentation that clarifies any doubts you had when working with the product by submitting a PR
-- Request a fix to the documentation, by opening an issue on GitHub.
-- Post a question or suggestion on the forum.
-
-### Automatic documentation checks
-
-Automatic checks will be run on any PR relating to documentation to verify the spelling, the validity of links, correct formatting of the Markdown files and the use of inclusive language.
-
-You should run these tests locally before submitting a PR by running the following commands:
-
-- Check the spelling: `make spelling`
-- Check the validity of links: `make linkcheck`
-- Check for inclusive language: `make woke`
-
-Doing these checks locally is good practice. You are less likely to run into
-failed CI checks after your PR is submitted and the reviewer of your PR can
-more quickly focus on the contribution you have made.
-
-### Note on using code blocks
-
-In the Ubuntu WSL docs, code blocks are used to document:
-
-- Ubuntu terminal commands
-- PowerShell terminal commands
-- Terminal outputs
-- Code and config files
-
-We follow specific conventions when including code blocks so that they
-are readable and functional.
-
-#### Include prompts when documenting terminal commands
-
-It is common that Ubuntu and PowerShell terminal commands are included in the same page.
-We use prompts to ensure that the reader can distinguish between them.
-
-Here are some examples:
-
-- PowerShell prompt symbol: `>`
-- PowerShell prompt symbol with path: `C:\Users\myuser>`
-- PowerShell prompt symbol with path and PowerShell prefix: `PS C:\Users\myuser>`
-- Ubuntu prompt symbol: `$`
-- Ubuntu prompt symbol with user and host: `user@host:~$`
-
-Whether to include the path or user@host depends on whether it is useful in the context
-of the documentation being written.
-For example, if demonstrating the use of multiple WSL instances, including the user and host
-can make it easier to tell the instances apart.
-
-#### Exclude prompts from clipboard when using copy button
-
-The WSL docs automatically strips prompts when a user clicks the **copy** button on a code block.
-This is to prevent errors when a reader pastes the full content of a copy block into their terminal.
-
-We use a solution based on regular expressions, which identifies the first instance of a prompt symbol followed by whitespace on a particular line before removing the text before that symbol.
-
-There may be edge-cases when this creates problems; for example, you should include whitespace after a prompt but if you don't it may not be removed during copying.
-
-Always test code blocks when you include them to ensure that the correct text is captured during the copy operation.
-If you encounter a problem or edge-case contact the maintainers or file an issue.
-
-#### Separate input from output and remove copy button from output blocks
-
-Terminal commands are separated from the output that they generate.
-Explanatory text can be included to explain to the reader what is being presented:
-
-- "Run the following command..."
-- "This will generate the following output..."
-
-Copy buttons are not included in output blocks.
-This is to prevent an output being confused for an input.
-There are also few reasons why someone would copy an output from documentation.
-
-To exclude a copy button from an output block the `no-copy` CSS class must be included
-within the code block:
-
-```text
-:class: no-copy
-```
-
-Note: a code-block must be labelled with the [code-block directive](https://mystmd.org/guide/directives#directive-code) for this to work.
+> [!WARNING]
+> The **documentation** for Ubuntu on WSL can be found at [https://documentation.ubuntu.com/wsl/](documentation.ubuntu.com/wsl).
+> The source for that documentation can be found in the [Ubuntu Pro for WSL repo](https://github.com/canonical/ubuntu-pro-for-wsl).
+> If you are interested in contributing to the documentation, please submit your Issues and Pull Requests there.
 
 ## Getting Help
 
