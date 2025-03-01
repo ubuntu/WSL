@@ -18,7 +18,7 @@ Key features:
   - A consistent development to deployment workflow when using Ubuntu in the cloud
   - 5 years of security patching with Ubuntu Long Term Support (LTS) releases
 
-Ubuntu currently provides the 24.04.1 LTS release. When new LTS versions are released, Ubuntu can be upgraded once the first point release is available. This can be done from the command line by using:
+Ubuntu currently provides the 24.04.2 LTS release. When new LTS versions are released, Ubuntu can be upgraded once the first point release is available. This can be done from the command line by using:
 
     sudo do-release-upgrade
 

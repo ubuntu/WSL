@@ -28,7 +28,7 @@ For more information about Ubuntu WSL and how Canonical supports developers plea
 
 https://ubuntu.com/wsl
 </Description>
-  <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver=24.10</ReleaseNotes>
+  <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver=25.04</ReleaseNotes>
   <DevStudio>Canonical Ltd. and the OpenSource community</DevStudio>
   <ScreenshotCaptions>
     <!-- Valid length: 200 character limit, up to 9 elements per platform -->
