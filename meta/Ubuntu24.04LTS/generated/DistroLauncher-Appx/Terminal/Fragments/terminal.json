@@ -7,10 +7,10 @@
         "hidden": true
       },
       {
-        "name": "Ubuntu 24.04.1 LTS",
+        "name": "Ubuntu 24.04.2 LTS",
         "colorScheme": "Ubuntu-24.04-ColorScheme",
         "commandline": "ubuntu2404.exe",
-        "tabTitle": "Ubuntu 24.04.1 LTS",
+        "tabTitle": "Ubuntu 24.04.2 LTS",
         // This would be the idea once https://github.com/microsoft/terminal/issues/10359 is fixed.
         // "icon": "ms-appx:///Assets/Square44x44Logo.targetsize-32.png",
         "icon": "https://assets.ubuntu.com/v1/49a1a858-favicon-32x32.png",
