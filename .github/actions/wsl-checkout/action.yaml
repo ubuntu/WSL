@@ -1,5 +1,5 @@
 name: Azure WSL repo clone
-description: 'Clones your repo into WSL.'
+description: "Clones your repo into WSL."
 
 inputs:
   distro:
@@ -13,9 +13,13 @@ inputs:
     description: Whether to fetch submodules or not
     required: false
     default: "false"
+  token:
+    description: GitHub access token used to fetch the repository. This is required for checking out private repositories. The token will persist in the git config of the checked out repository and is not cleaned up automatically.
+    required: false
+    default: ""
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Clone repo
       uses: ubuntu/WSL/.github/actions/wsl-bash@main
@@ -27,7 +31,12 @@ runs:
           export GIT_TERMINAL_PROMPT=0
 
           mkdir -p ${{ inputs.working-dir }}
-          git clone --quiet --depth 1 https://github.com/${{ github.repository }}.git ${{ inputs.working-dir }}
+
+          CLONE_URL="https://github.com/${{ github.repository }}.git"
+          if [ -n "${{ inputs.token }}" ] ; then
+              CLONE_URL="https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git"
+          fi
+          git clone --quiet --depth 1 "$CLONE_URL" ${{ inputs.working-dir }}
 
           cd ${{ inputs.working-dir }}
           git fetch --quiet --depth 1 --no-tags --prune --update-head-ok origin +${{ github.sha }}:${{ github.ref }}
