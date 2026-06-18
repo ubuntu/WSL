@@ -19,9 +19,6 @@ on:
         required: true
         default: 'yes'
 
-env:
-  goversion: '1.21.4'
-
 jobs:
   build-matrix:
     name: Build Matrix for AppIDs to run on with rootfses, which can be manually supplied or automatically.
@@ -33,10 +30,10 @@ jobs:
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt update
           sudo DEBIAN_FRONTEND=noninteractive apt install -y jq
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.goversion }}
+          go-version-file: go.work
       - name: Build Matrix for AppIDs to run on with rootfses, which can be manually supplied or automatically
         id: build-matrix-release
         run: |
@@ -102,9 +99,9 @@ jobs:
         run: |
           mkdir -p ${{ env.workDir }}/wiki/
           git clone https://github.com/ubuntu/wsl.wiki ${{ env.workDir }}/wiki --depth 1
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.goversion }}
+          go-version-file: ${{ env.workDir }}/go.work
       - name: Prepare project metadata, assets and download rootfses
         working-directory: ${{ env.workDir }}
         shell: bash

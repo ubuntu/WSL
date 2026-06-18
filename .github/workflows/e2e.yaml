@@ -33,7 +33,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: ./e2e/go.work
+          go-version-file: go.work
       - name: Install or update WSL
         uses: ./.github/actions/wsl-install
       - name: Download rootfs

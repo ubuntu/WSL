@@ -11,9 +11,6 @@ on:
       - '.github/workflows/detect-update-releases.yaml'
       - 'wsl-builder/**'
 
-env:
-  goversion: '1.21.4'
-
 jobs:
   update-releases:
     name: Update and create metadata and assets for releases
@@ -28,10 +25,10 @@ jobs:
           apt install -y python3-launchpadlib libmagickwand-dev git pngquant fonts-ubuntu
       - name: work around permission issue with git vulnerability (we are local here). TO REMOVE
         run: git config --global --add safe.directory /__w/WSL/WSL
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.goversion }}
+          go-version-file: go.work
       - name: Fetch current available releases from launchpad
         run: |
           wsl-builder/lp-distro-info > /tmp/all-releases.csv
