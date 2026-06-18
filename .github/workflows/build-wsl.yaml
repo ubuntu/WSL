@@ -39,7 +39,7 @@ jobs:
         run: |
           set -eux
           # Manual build
-          if [ ${{ github.event_name }} = 'workflow_dispatch' ]; then
+          if [ "${{ github.event_name }}" = 'workflow_dispatch' ]; then
             appID="${{ github.event.inputs.appID }}"
             if [ -z "${appID}" ]; then
               appID="UbuntuPreview"
@@ -62,7 +62,7 @@ jobs:
             wsl-builder/lp-distro-info > /tmp/all-releases.csv
             go build ./wsl-builder/prepare-build
             builds_config="$(./prepare-build build-github-matrix /tmp/all-releases.csv)"
-            if [ "${builds_config}" == "null" ]; then
+            if [ "${builds_config}" = "null" ]; then
               echo "No active application to build"
               exit 0
             fi
@@ -70,7 +70,7 @@ jobs:
           fi
 
           echo "${builds}"
-          echo "::set-output name=matrix::${builds}"
+          echo "matrix=${builds}" >> $GITHUB_OUTPUT
           echo "::notice::Building for: $(echo "${builds}" | jq '.include[] | "\(.AppID): \(.Rootfses). RootfsesChecksum: \(.RootfsesChecksum). Upload to store: \(.Upload)"')"
 
   build-wsl:
@@ -110,7 +110,7 @@ jobs:
           # Download rootfses, checksum and place them at the correct place
           go build ./wsl-builder/prepare-build
           extraArgs=""
-          if [ ${{ matrix.RootfsesChecksum }} != "yes" ]; then
+          if [ "${{ matrix.RootfsesChecksum }}" != "yes" ]; then
             extraArgs="--no-checksum"
           fi
           archsBundle="$(./prepare-build prepare ${{ env.buildInfoPath }}/${{ matrix.AppID }}-buildid.md ${{ matrix.AppID }} ${{ matrix.Rootfses }} ${extraArgs})"
@@ -120,7 +120,7 @@ jobs:
           buildMode="StoreUpload"
           echo "UapAppxPackageBuildMode=${buildMode}" >> $GITHUB_ENV
       - name: Setup MSBuild (PATH)
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v3
       - name: Install certificate
         shell: powershell
         working-directory: ${{ env.workDir }}
@@ -142,7 +142,6 @@ jobs:
           set -eu
 
           # Launcher PDBs
-
           for arch in "x64" "ARM64"; do
             collectTo="debug-database-${{ matrix.AppID }}/launcher/$arch/"
             mkdir -p "$collectTo"
@@ -157,14 +156,14 @@ jobs:
           done
 
       - name: Allow downloading sideload appxbundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sideload-${{ matrix.AppID }}
           path: |
             ${{ env.workDir }}/AppPackages/Ubuntu/Ubuntu_*/*
           retention-days: 7
       - name: Allow downloading store appxupload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: store-${{ matrix.AppID }}
           path: |
@@ -186,8 +185,8 @@ jobs:
 
           build_id=$(cat "${{ env.buildInfoPath }}/${{ matrix.AppID }}-buildid.md")
 
-          echo "::set-output name=has-changes::false"
-          echo "::set-output name=should-upload::false"
+          echo "has-changes=false" >> $GITHUB_OUTPUT
+          echo "should-upload=false" >> $GITHUB_OUTPUT
 
           # Store md5sum of rootfs, launcher and assets related code
           fingerprint_file="${{ matrix.AppID }}-fingerprint.md"
@@ -217,7 +216,7 @@ jobs:
             exit 0
           fi
 
-          echo "::set-output name=has-changes::true"
+          echo "has-changes=true" >> $GITHUB_OUTPUT
 
           if [ ${{ matrix.Upload }} != "yes" ]; then
             echo "::notice::${{ matrix.AppID }} build ${build_id} ready for sideload or manual submission to the Microsoft Store"
@@ -232,7 +231,7 @@ jobs:
             exit 0
           fi
           echo "::notice::Uploading to the store ${{ matrix.AppID }} build ${build_id}"
-          echo "::set-output name=should-upload::true"
+          echo "should-upload=true" >> $GITHUB_OUTPUT
 
           echo "Uploading new version as some files have changed:"
           echo "${hasChanges}"
@@ -305,7 +304,7 @@ jobs:
           mkdir -p build-info/
 
           cp -a ${{ env.artifactsPath }}/build-artifacts-*/*.md build-info/ || exit 0
-          echo "::set-output name=needs-wiki-update::true"
+          echo "needs-wiki-update=true" >> $GITHUB_OUTPUT
 
       # Pushing PDB's to the wiki only makes sense if we uploaded new app versions to the store.
       - name: Copy debug databases to base wiki
@@ -319,7 +318,7 @@ jobs:
           find  ${{ env.artifactsPath }} -name "debug-database-*" -maxdepth 1 -exec sh -c 'tar -cavf debug-databases/"$(basename $1)".tar.zst' sh '{}' \; || \
             exit 0
 
-          echo "::set-output name=needs-wiki-update::true"
+          echo "needs-wiki-update=true" >> $GITHUB_OUTPUT
 
       - name: Sync wiki to repository documentation
         if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
@@ -338,17 +337,3 @@ jobs:
           git clone https://github.com/ubuntu/wsl.git ${{ env.codeDir }} --depth 1
           mkdir -p ${{ env.codeDir }}/uat
           git clone https://git.launchpad.net/ubuntu-archive-tools ${{ env.codeDir }}/uat --depth 1
-
-      - name: Notify ISO Tracker
-        if: ${{ steps.modified-artifacts.outputs.needs-wiki-update == 'true' }}
-        env:
-          ISOTRACKER_USERNAME: ${{ secrets.ISOTRACKER_USERNAME }}
-          ISOTRACKER_PASSWORD: ${{ secrets.ISOTRACKER_PASSWORD }}
-        run: |
-          [ -f /tmp/all-releases.csv ] || ${{ env.codeDir }}/wsl-builder/lp-distro-info > /tmp/all-releases.csv
-          # There might have been more than one build in the latest commit
-          for build in $(git diff-tree --no-commit-id --name-only -r HEAD | grep buildid); do
-            AppID=$(basename $build);
-            AppID=${AppID%-buildid.md};
-            PYTHONPATH=${{ env.codeDir }}/uat ${{ env.codeDir }}/wsl-builder/notify-isotracker --debug $AppID $GITHUB_RUN_ID
-          done
