@@ -18,11 +18,10 @@
         "font": {
           // Not possible right now as we have multiple appx which could ship it and needs a store
           // permission: https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-extensions#share-fonts-with-other-windows-applications
-          // Also, referencing it if it does not exist will show an error message when opening
-          // the profile.
-          //"face": "Ubuntu Mono",
+          // Also, referencing it if it does not exist will show an error message when opening the app.
+          //"face": "Ubuntu Sans Mono",
           "face": "Cascadia Mono",
-          "size": 13
+          "size": 12
         }
       }
     ],
@@ -30,26 +29,50 @@
       {
         "name": "UbuntuDev.WslID.Dev-ColorScheme",
 
-        "background": "#300A24",
-        "black": "#171421",
-        "blue": "#0037DA",
-        "brightBlack": "#767676",
-        "brightBlue": "#08458F",
-        "brightCyan": "#2C9FB3",
-        "brightGreen": "#26A269",
-        "brightPurple": "#A347BA",
-        "brightRed": "#C01C28",
-        "brightWhite": "#F2F2F2",
-        "brightYellow": "#A2734C",
-        "cursorColor": "#FFFFFF",
-        "cyan": "#3A96DD",
-        "foreground": "#FFFFFF",
-        "green": "#26A269",
-        "purple": "#881798",
-        "red": "#C21A23",
-        "selectionBackground": "#FFFFFF",
-        "white": "#CCCCCC",
-        "yellow": "#A2734C"
+	"background": "#300A24",
+	"black": "#1B1B1B",
+	"blue": "#3667A6",
+	"brightBlack": "#838383",
+	"brightBlue": "#729FCF",
+	"brightCyan": "#34E2E2",
+	"brightGreen": "#8AE234",
+	"brightPurple": "#AD7FA8",
+	"brightRed": "#F93632",
+	"brightWhite": "#EEEEEC",
+	"brightYellow": "#FCE94F",
+	"cursorColor": "#FFFFFF",
+	"cyan": "#06989A",
+	"foreground": "#FFFFFF",
+	"green": "#4E9A06",
+	"purple": "#7F5985",
+	"red": "#CC1A12",
+	"selectionBackground": "#FFFFFF",
+	"white": "#D5D5D5",
+	"yellow": "#C4A000"
+      },
+      {
+        "name": "UbuntuDev.WslID.Dev-Light-ColorScheme",
+
+	"background": "#F8F8F8",
+	"black": "#F2F2F2",
+	"blue": "#5B91D7",
+	"brightBlack": "#707070",
+	"brightBlue": "#395E86",
+	"brightCyan": "#064141",
+	"brightGreen": "#26420C",
+	"brightPurple": "#80577C",
+	"brightRed": "#CE191C",
+	"brightWhite": "#212121",
+	"brightYellow": "#80721B",
+	"cursorColor": "#121212",
+	"cyan": "#047B7D",
+	"foreground": "#121212",
+	"green": "#3F7E04",
+	"purple": "#A77DAD",
+	"red": "#F93B2E",
+	"selectionBackground": "#000000",
+	"white": "#1B1B1B",
+	"yellow": "#A88F00"
       }
     ]
   }
