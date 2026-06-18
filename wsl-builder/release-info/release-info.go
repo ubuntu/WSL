@@ -14,7 +14,7 @@ import (
 
 type columns struct {
 	rootfsArch                                 *string
-	appId, fullName, launcher, codeName, short *bool
+	appID, fullName, launcher, codeName, short *bool
 }
 
 func writeReleaseInfo(csvPath string, distros []string, cols columns) error {
@@ -51,7 +51,7 @@ func writeHeader(w io.Writer, f columns) error {
 
 	text := []string{}
 	text = append(text, "WslID")
-	if *f.appId {
+	if *f.appID {
 		text = append(text, "AppID")
 	}
 	if *f.fullName {
@@ -76,7 +76,7 @@ func writeHeader(w io.Writer, f columns) error {
 func writeRow(w io.Writer, r common.WslReleaseInfo, f columns) error {
 	var text []string
 	text = append(text, r.WslID)
-	if *f.appId {
+	if *f.appID {
 		text = append(text, r.AppID)
 	}
 	if *f.fullName {
@@ -123,7 +123,7 @@ func selectReleases(csvPath string, targets []string) (releases []common.WslRele
 	}
 
 	if end < len(targets) {
-		end := partition(targets, func(t string) bool { return len(t) != 0 })
+		end = partition(targets, func(t string) bool { return len(t) != 0 })
 		return nil, fmt.Errorf("the following releases were not found: %s", strings.Join(targets[:end], ", "))
 	}
 	return releases[:end], nil
