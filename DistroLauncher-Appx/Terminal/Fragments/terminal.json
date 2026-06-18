@@ -11,9 +11,7 @@
         "colorScheme": "UbuntuDev.WslID.Dev-ColorScheme",
         "commandline": "UbuntuDev.LauncherName.Dev.exe",
         "tabTitle": "UbuntuDev.FullName.Dev",
-        // This would be the idea once https://github.com/microsoft/terminal/issues/10359 is fixed.
-        // "icon": "ms-appx:///Assets/Square44x44Logo.targetsize-32.png",
-        "icon": "https://assets.ubuntu.com/v1/49a1a858-favicon-32x32.png",
+        "icon": "ms-appx:///Assets/Square44x44Logo.targetsize-32.png",
         "cursorShape": "filledBox",
         "font": {
           // Not possible right now as we have multiple appx which could ship it and needs a store
