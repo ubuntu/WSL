@@ -7,7 +7,6 @@ import (
 	"image"
 	_ "image/png"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,7 +16,7 @@ import (
 
 	shutil "github.com/termie/go-shutil"
 	"github.com/ubuntu/wsl/wsl-builder/common"
-	"gopkg.in/gographics/imagick.v2/imagick"
+	"gopkg.in/gographics/imagick.v3/imagick"
 )
 
 const (
@@ -68,7 +67,7 @@ func updateAssets(csvPath string) error {
 		generatedPath := filepath.Join(wslPath, common.GeneratedDir)
 
 		// Cleanup previous generated directory
-		if err := os.RemoveAll(generatedPath); err != nil {
+		if err = os.RemoveAll(generatedPath); err != nil {
 			return err
 		}
 
@@ -85,7 +84,7 @@ func updateAssets(csvPath string) error {
 		}
 
 		// And now, generate the application meta from xml template
-		if err := generateMetaForRelease(r, refFiles, rootPath, generatedPath); err != nil {
+		if err := generateMetaForRelease(r, refFiles, generatedPath); err != nil {
 			return err
 		}
 
@@ -163,7 +162,7 @@ func listFilesForMeta(existing map[string]string, refPath string, blacklist []st
 }
 
 // generateMetaForRelease updates all templated non img files for a given release.
-func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, rootPath, generatedPath string) (err error) {
+func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, generatedPath string) (err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("can't generate metadata file for %s: %v", r.AppID, err)
@@ -187,7 +186,7 @@ func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, ro
 		}
 
 		dest := filepath.Join(generatedPath, relPath)
-		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
+		if err = os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 			return err
 		}
 
@@ -203,7 +202,7 @@ func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, ro
 
 		// Not a template or file we will replace later: direct copy
 		if !strings.Contains(templateData, textualStartTag) || filepath.Base(dest) == "ProductDescription.xml" {
-			if err := shutil.CopyFile(src, dest, false); err != nil {
+			if err = shutil.CopyFile(src, dest, false); err != nil {
 				return err
 			}
 			continue
@@ -215,7 +214,7 @@ func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, ro
 		if err != nil {
 			return nil
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		if err := t.Execute(f, r); err != nil {
 			return err
 		}
@@ -254,7 +253,7 @@ func generateMetaForRelease(r common.WslReleaseInfo, files map[string]string, ro
 		if err != nil {
 			return nil
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		return t.Execute(f, rWithScreenshots)
 	})
 
@@ -281,7 +280,7 @@ func listAndSortImagesIn(path string) ([]string, error) {
 }
 
 // generateImages creates .png and icons using templated svg.
-func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPath, generatedPath string) (err error) {
+func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPath, generatedPath string) error {
 	// Iterates and generates over generated assets as a reference
 
 	// A. Store and application images
@@ -290,19 +289,19 @@ func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPa
 		return err
 	}
 	assetsRefPath := filepath.Join(rootPath, relDir)
-	images, err := ioutil.ReadDir(assetsRefPath)
+	images, err := os.ReadDir(assetsRefPath)
 	if err != nil {
 		return err
 	}
 
 	mwTemplates := make(map[string]*imagick.MagickWand)
 	for _, f := range images {
-		// 1. Load size of the ressource image
+		// 1. Load size of the resource image
 		refF, err := os.Open(filepath.Join(assetsRefPath, f.Name()))
 		if err != nil {
 			return err
 		}
-		defer refF.Close()
+		defer func() { _ = refF.Close() }()
 
 		ref, _, err := image.DecodeConfig(refF)
 		if err != nil {
@@ -333,7 +332,7 @@ func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPa
 		}
 		t := template.Must(template.New("").Parse(string(templateData)))
 		var templateBuf bytes.Buffer
-		if err := t.Execute(&templateBuf, r); err != nil {
+		if err = t.Execute(&templateBuf, r); err != nil {
 			return err
 		}
 
@@ -345,10 +344,10 @@ func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPa
 			pw.SetColor("none")
 			mw = imagick.NewMagickWand()
 			defer mw.Destroy()
-			if err := mw.SetBackgroundColor(pw); err != nil {
+			if err = mw.SetBackgroundColor(pw); err != nil {
 				return err
 			}
-			if err := mw.ReadImageBlob(templateBuf.Bytes()); err != nil {
+			if err = mw.ReadImageBlob(templateBuf.Bytes()); err != nil {
 				return err
 			}
 			mwTemplates[templateName] = mw
@@ -357,27 +356,30 @@ func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPa
 		defer mw.Destroy()
 
 		// There is a limitation of 200K to the image size uploaded to the store. All source images are 8 bits.
-		if err := mw.SetImageDepth(8); err != nil {
+		if err = mw.SetImageDepth(8); err != nil {
 			return err
 		}
-		if err := mw.SetImageFormat(strings.TrimPrefix(filepath.Ext(f.Name()), ".")); err != nil {
+		if err = mw.SetImageFormat(strings.TrimPrefix(filepath.Ext(f.Name()), ".")); err != nil {
 			return err
 		}
-		if err := mw.ResizeImage(uint(ref.Width), uint(ref.Height), imagick.FILTER_LANCZOS, 1); err != nil {
+		if err = mw.ResizeImage(uint(ref.Width), uint(ref.Height), imagick.FILTER_LANCZOS); err != nil {
 			return err
 		}
-		if err := mw.StripImage(); err != nil {
+		if err = mw.StripImage(); err != nil {
 			return err
 		}
 
 		// Crush the image size for png files
-		var img = mw.GetImageBlob()
+		img, err := mw.GetImageBlob()
+		if err != nil {
+			return err
+		}
 		if filepath.Ext(f.Name()) == ".png" {
 			cmd := exec.Command("pngquant", "-")
 			var out bytes.Buffer
 			cmd.Stdin = bytes.NewBuffer(img)
 			cmd.Stdout = &out
-			err := cmd.Run()
+			err = cmd.Run()
 			if err != nil {
 				return err
 			}
@@ -385,49 +387,49 @@ func generateImages(r common.WslReleaseInfo, templates map[string]string, rootPa
 		}
 
 		assetsDest := filepath.Join(generatedPath, relDir, f.Name())
-		if err := os.MkdirAll(filepath.Dir(assetsDest), 0755); err != nil {
+		if err = os.MkdirAll(filepath.Dir(assetsDest), 0755); err != nil {
 			return err
 		}
 		f, err := os.Create(assetsDest)
 		if err != nil {
 			return err
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		if _, err := f.Write(img); err != nil {
 			return err
 		}
-		f.Close()
+		_ = f.Close()
 	}
 
 	// B. Icon files
 	iconRelPath := filepath.Join("DistroLauncher", "images", "icon.svg")
-	if err := os.MkdirAll(filepath.Join(generatedPath, filepath.Dir(iconRelPath)), 0755); err != nil {
+	if err = os.MkdirAll(filepath.Join(generatedPath, filepath.Dir(iconRelPath)), 0755); err != nil {
 		return err
 	}
 	tmpDir, err := os.MkdirTemp("", "update-releases-*")
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 	src := filepath.Join(tmpDir, "icon.svg")
 	srcF, err := os.Create(src)
 	if err != nil {
 		return err
 	}
-	defer srcF.Close()
+	defer func() { _ = srcF.Close() }()
 
 	templateData, err := os.ReadFile(templates[iconRelPath])
 	if err != nil {
 		return err
 	}
 	t := template.Must(template.New("").Parse(string(templateData)))
-	if err := t.Execute(srcF, r); err != nil {
+	if err = t.Execute(srcF, r); err != nil {
 		return err
 	}
-	srcF.Close()
+	_ = srcF.Close()
 
 	dest := filepath.Join(generatedPath, strings.ReplaceAll(iconRelPath, ".svg", ".ico"))
-	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
+	if err = os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 		return err
 	}
 
