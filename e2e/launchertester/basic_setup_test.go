@@ -65,17 +65,15 @@ func TestSetupWithCloudInit(t *testing.T) {
 	home, err := os.UserHomeDir()
 	require.NoError(t, err, "Setup: Cannot get user home directory")
 	cloudinitdir := filepath.Join(home, ".cloud-init")
-	backupDir := filepath.Join(t.TempDir(), "cloud-init-backup")
 	if _, err = os.Stat(cloudinitdir); err == nil {
+		backupDir := filepath.Join(t.TempDir(), "cloud-init-backup")
+		_ = os.RemoveAll(backupDir) // Just in case, to ensure the backup dir is clean before moving the cloud-init directory there.
 		require.NoError(t, os.Rename(cloudinitdir, backupDir), "Failed to backup cloud-init directory")
 	}
 	require.NoError(t, os.MkdirAll(cloudinitdir, 0755), "Setup: Cannot create cloud-init directory")
 	t.Cleanup(func() {
-		if err := os.RemoveAll(cloudinitdir); err != nil {
+		if err = os.RemoveAll(cloudinitdir); err != nil {
 			t.Logf("Setup: Failed to remove user-data file after test: %v", err)
-		}
-		if err = os.Rename(backupDir, cloudinitdir); err != nil {
-			t.Logf("Setup: Failed to restore cloud-init directory after test: %v", err)
 		}
 	})
 

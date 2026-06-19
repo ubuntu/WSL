@@ -199,5 +199,5 @@ func testFileExists(t *testing.T, linuxPath string) {
 	defer cancel()
 
 	out, err := launcherCommand(ctx, "run", "test", "-e", linuxPath).CombinedOutput()
-	require.NoError(t, err, "Unexpected error checking file existence: %s", out)
+	require.NoError(t, err, "Unexpected error checking file existence: %s\n%s", out, err)
 }
