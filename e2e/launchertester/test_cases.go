@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -124,8 +126,11 @@ func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper, this is a te
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
-	wantsDate, err := launcherCommand(ctx, "run", "date", "-r", "/etc/update-manager/release-upgrades").CombinedOutput()
-	require.NoError(t, err, "Failed to execute date: %s", wantsDate)
+	path := filepath.Join(`\\wsl.localhost\`, *distroName, `etc\update-manager\release-upgrades`)
+	wantsInfo, err := os.Stat(path)
+
+	require.NoError(t, err, "Failed to stat release-upgrades file: %s", err)
+	wantsDate := wantsInfo.ModTime()
 
 	terminateDistro(t)
 
@@ -134,10 +139,14 @@ func testUpgradePolicyIdempotent(t *testing.T) { //nolint: thelper, this is a te
 	ctx, cancel = context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
-	gotDate, err := launcherCommand(ctx, "run", "date", "-r", "/etc/update-manager/release-upgrades").CombinedOutput()
-	require.NoError(t, err, "Failed to execute date: %s", gotDate)
+	_, err = launcherCommand(ctx, "run", "exit", "0").CombinedOutput()
+	require.NoError(t, err, "Failed to execute the distro launcher: %s", err)
+	gotInfo, err := os.Stat(path)
 
-	require.Equal(t, string(wantsDate), string(gotDate), "Launcher is modifying release upgrade every boot")
+	require.NoError(t, err, "Failed to stat release-upgrades file the second time: %s", err)
+	gotDate := gotInfo.ModTime()
+
+	require.Equal(t, wantsDate, gotDate, "Launcher is modifying release upgrade every boot")
 }
 
 // testInteropIsEnabled ensures interop works fine.
@@ -186,9 +195,7 @@ func testHelpFlag(t *testing.T) {
 }
 
 func testFileExists(t *testing.T, linuxPath string) {
-	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
-	defer cancel()
-
-	out, err := wslCommand(ctx, "test", "-e", linuxPath).CombinedOutput()
-	require.NoError(t, err, "Unexpected error checking file existence: %s\n%s", out, err)
+	stat, err := os.Stat(filepath.Join(`\\wsl.localhost\`, *distroName, linuxPath))
+	require.NoError(t, err, "Unexpected error checking file existence: %s", err)
+	require.True(t, stat.Mode().IsRegular(), "Expected %s to be a regular file", linuxPath)
 }
