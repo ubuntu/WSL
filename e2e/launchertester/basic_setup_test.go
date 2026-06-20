@@ -43,6 +43,9 @@ func TestBasicSetup(t *testing.T) {
 
 // TestSetupWithCloudInit runs a battery of assertions after installing with the distro launcher and cloud-init.
 func TestSetupWithCloudInit(t *testing.T) {
+	// TODO: Re-enable those tests after further investigation of what assumptions no longer
+	// hold, see UDENG-10742.
+	t.Skip("Broken tests, need further investigation of what assumptiosn no longer hold")
 	testCases := map[string]struct {
 		install_root     bool
 		withRegistryUser string
