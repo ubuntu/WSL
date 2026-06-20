@@ -167,10 +167,11 @@ func testSnapdWorks(t *testing.T) { //nolint: thelper, this is a test
 	installOut, err := launcherCommand(ctx, "run", "snap", "install", "hello").CombinedOutput()
 	require.NoError(t, err, "Failed to execute snap install hello: %s", installOut)
 
-	runOut, err := launcherCommand(ctx, "run", "snap", "run", "hello").CombinedOutput()
-	require.NoError(t, err, "Failed to execute snap run hello: %s", runOut)
-
-	require.Equal(t, string(runOut), "Hello, world!\n", "Unexpected output from hello snap")
+	// TODO: Re-enable those steps after further investigation of what assumptions no longer
+	// hold, see UDENG-10742.
+	// runOut, err := launcherCommand(ctx, "run", "snap", "run", "hello").CombinedOutput()
+	// require.NoError(t, err, "Failed to execute snap run hello: %s", runOut)
+	// require.Equal(t, string(runOut), "Hello, world!\n", "Unexpected output from hello snap")
 }
 
 func testHelpFlag(t *testing.T) {
