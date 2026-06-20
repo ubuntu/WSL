@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/ini.v1"
 )
@@ -58,19 +57,6 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
 	// Terminating to start systemd, and to ensure no services from previous tests are running
 	terminateDistro(t)
 
-	distroNameToFailedUnits := map[string][]string{
-		"Ubuntu-18.04":   {"user@0.service", "atd.service"},
-		"Ubuntu-20.04":   {"user@0.service", "atd.service"},
-		"Ubuntu-22.04":   {"user@0.service"},
-		"Ubuntu":         {"user@0.service"},
-		"Ubuntu-Preview": {"user@0.service"},
-	}
-
-	expectedFailure, ok := distroNameToFailedUnits[*distroName]
-	if !ok { // Development version
-		expectedFailure = distroNameToFailedUnits["Ubuntu-Preview"]
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), systemdBootTimeout)
 	defer cancel()
 
@@ -81,18 +67,23 @@ func testSystemdUnits(t *testing.T) { //nolint: thelper, this is a test
 	s := bufio.NewScanner(bytes.NewReader(out))
 	var failedUnits []string
 	for s.Scan() {
+		text := s.Text()
+		if strings.HasPrefix(text, "Failed to start the systemd user session for 'root'") {
+			// Kinda expected, though we need to investigate it further.
+			continue
+		}
 		data := strings.Fields(s.Text())
 		if len(data) == 0 {
 			continue
 		}
 		unit := strings.TrimSpace(data[0])
+		if unit == "user@0.service" {
+			continue //  Ditto.
+		}
 		failedUnits = append(failedUnits, unit)
 	}
 	require.NoError(t, s.Err(), "Error scanning output of systemctl")
-
-	for _, u := range failedUnits {
-		assert.Contains(t, expectedFailure, u, "Unexpected failing unit")
-	}
+	require.Emptyf(t, failedUnits, "There are failed systemd units: %v\n. systemctl output was:\n%s", failedUnits, out)
 }
 
 // testCorrectUpgradePolicy ensures upgrade policy matches the one expected for the app.
