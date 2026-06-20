@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProductDescription language="en-us" xmlns="http://schemas.microsoft.com/appx/2012/ProductDescription" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-us" Release="">
+  <AppStoreName></AppStoreName>
+  <Keywords>
+    <!-- Valid length: 30 character limit, up to 7 elements -->
+    <Keyword>wsl</Keyword>
+    <Keyword>ubuntu</Keyword>
+    <Keyword>linux</Keyword>
+    <Keyword>bash</Keyword>
+  </Keywords>
+  <Description>
+Install a complete Ubuntu terminal environment in minutes with Windows Subsystem for Linux (WSL). Develop cross-platform applications, improve your data science or web development workflows and manage IT infrastructure without leaving Windows.
+
+Key features:
+  - Efficient command line utilities including bash, ssh, git, apt, npm, pip and many more
+  - Manage Docker containers with improved performance and startup times
+  - Leverage GPU acceleration for AI/ML workloads with NVIDIA CUDA
+  - A consistent development to deployment workflow when using Ubuntu in the cloud
+  - 5 years of security patching with Ubuntu Long Term Support (LTS) releases
+
+Ubuntu 26.04.1 LTS is the LTS version of Ubuntu and receives updates for five years. Upgrades to future LTS releases will not be proposed.
+
+Installation tips:
+  - Search for "Turn Windows features on or off" in the Windows search bar and ensure that "Windows Subsystem for Linux" is turned on before restarting your machine.
+  - To launch, use "ubuntu2604" on the command-line prompt or Windows Terminal, or click on the Ubuntu 26.04.1 LTS tile in the Start Menu.
+
+For more information about Ubuntu WSL and how Canonical supports developers please visit:
+
+https://ubuntu.com/wsl
+</Description>
+  <ReleaseNotes>http://www.ubuntu.com/getubuntu/releasenotes?os=ubuntu&amp;ver=26.04</ReleaseNotes>
+  <DevStudio>Canonical Ltd. and the OpenSource community</DevStudio>
+  <ScreenshotCaptions>
+    <!-- Valid length: 200 character limit, up to 9 elements per platform -->
+    <Caption DesktopImage="Ubuntu_WSL.png">Ubuntu WSL</Caption>
+  </ScreenshotCaptions>
+  <AppFeatures>
+    <!-- Valid length: 200 character limit, up to 20 elements -->
+    <AppFeature>Ubuntu</AppFeature>
+    <AppFeature>bash</AppFeature>
+    <AppFeature>Linux Terminal</AppFeature>
+    <AppFeature>GUI</AppFeature>
+  </AppFeatures>
+  <CopyrightAndTrademark>© 2022 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.</CopyrightAndTrademark>
+  <AdditionalLicenseTerms>https://www.ubuntu.com/legal/terms-and-policies</AdditionalLicenseTerms>
+
+  <!-- Empty fields to overwrite them with every updates -->
+  <ShortDescription></ShortDescription>
+  <ShortTitle></ShortTitle>
+  <SortTitle></SortTitle>
+  <VoiceTitle></VoiceTitle>
+  <AdditionalAssets></AdditionalAssets>
+  <Trailers></Trailers>
+  <RecommendedHardware></RecommendedHardware>
+  <MinimumHardware></MinimumHardware>
+  <WebsiteURL></WebsiteURL>
+  <SupportContactInfo></SupportContactInfo>
+  <PrivacyPolicyURL></PrivacyPolicyURL>
+
+</ProductDescription>
