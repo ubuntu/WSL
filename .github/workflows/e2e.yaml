@@ -4,41 +4,22 @@ on:
   pull_request:
     paths-ignore:
       - docs/**
-      - "*.md"
-concurrency: azure-vm
-
-env:
-  az_name: wsl-ci
-  az_resource_group: wsl
+      - '*.md'
 
 jobs:
-  vm-setup:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_VM_CREDS }}
-      - name: Start the Runner
-        shell: bash
-        run: |
-          az vm start --name ${{ env.az_name }} --resource-group ${{ env.az_resource_group }}
-
   end-to-end-tests:
-    runs-on: self-hosted
-    needs: vm-setup
+    runs-on: windows-2025
     env:
       rootFsCache: "${env:USERPROFILE}\\Downloads\\rootfs"
       # TODO: Move this to "Ubuntu" once we have backported everything and Ubuntu is transitionned to 24.04
-      distroName: Ubuntu-24.04
-      appID: Ubuntu24.04LTS
-      launcher: ubuntu2404.exe
+      distroName: Ubuntu
+      appID: Ubuntu
+      launcher: ubuntu.exe
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
+        uses: actions/checkout@v6
       - name: Set up MSBuild (PATH)
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v3
       - name: Install certificate
         shell: powershell
         run: |
@@ -50,14 +31,14 @@ jobs:
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v6
         with:
-          go-version-file: ./e2e/go.work
+          go-version-file: go.work
       - name: Install or update WSL
         uses: ./.github/actions/wsl-install
       - name: Download rootfs
         uses: ./.github/actions/download-rootfs
-        with:  
+        with:
           distros: ${{ env.distroName }}
           path: ${{ env.rootFsCache }}
       - name: Build and install the appxbundle for testing
@@ -99,16 +80,3 @@ jobs:
         shell: powershell
         run: |
           Remove-AppxPackage "$(Get-AppxPackage | Where-Object PackageFullName -like *${{ env.appID }}*)"
-
-  stop-vm:
-    runs-on: ubuntu-latest
-    needs: [vm-setup, end-to-end-tests]
-    if: always()
-    steps:
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_VM_CREDS }}
-      - name: Deallocate the Runner
-        shell: bash
-        run: |
-          az vm deallocate --name ${{ env.az_name }} --resource-group ${{ env.az_resource_group }}

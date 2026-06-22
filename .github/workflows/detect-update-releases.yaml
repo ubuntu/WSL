@@ -11,15 +11,15 @@ on:
       - '.github/workflows/detect-update-releases.yaml'
       - 'wsl-builder/**'
 
-env:
-  goversion: '1.21.4'
-
 jobs:
   update-releases:
     name: Update and create metadata and assets for releases
     runs-on: ubuntu-latest
     container:
       image: ubuntu:rolling
+    permissions:
+      contents: write
+      pull-requests: write # To create PRs
     steps:
       - name: Install git and dependencies
         run: |
@@ -28,10 +28,10 @@ jobs:
           apt install -y python3-launchpadlib libmagickwand-dev git pngquant fonts-ubuntu
       - name: work around permission issue with git vulnerability (we are local here). TO REMOVE
         run: git config --global --add safe.directory /__w/WSL/WSL
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.goversion }}
+          go-version-file: go.work
       - name: Fetch current available releases from launchpad
         run: |
           wsl-builder/lp-distro-info > /tmp/all-releases.csv
@@ -47,14 +47,14 @@ jobs:
       - name: Get destination branch for branch name
         id: get-branch-name
         shell: bash
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: Refreshes releases and assets
           title: Refresh releases and assets
           labels: automated pr
-          body: "[Auto-generated pull request](https://github.com/ubuntu/WSL/actions/workflows/detect-update-releases.yaml) by GitHub Action"
+          body: '[Auto-generated pull request](https://github.com/ubuntu/WSL/actions/workflows/detect-update-releases.yaml) by GitHub Action'
           branch: auto-update-releases-${{ steps.get-branch-name.outputs.branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
           delete-branch: true

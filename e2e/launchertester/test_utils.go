@@ -86,8 +86,8 @@ func distroState(t *testing.T) string {
 	// We use $env:WSL_UTF8=1 to prevent this (Available from 0.64.0 onwards https://github.com/microsoft/WSL/releases/tag/0.64.0)
 	out, err := exec.Command("powershell.exe", "-noninteractive", "-nologo", "-noprofile", "-command", "$env:WSL_UTF8=1 ; wsl -l -v").CombinedOutput()
 	if err != nil {
-		// This error shows up when there is no distro installed
-		require.Containsf(t, string(out), "WSL_E_DEFAULT_DISTRO_NOT_FOUND", "Unexpected error calling 'wsl -l -v'. Error: %v\nOutput: %s", err, out)
+		// A hint for this command is shown when there is no distro instance registered.
+		require.Containsf(t, string(out), "wsl.exe --list --online", "Unexpected error calling 'wsl -l -v'. Error: %v\nOutput: %s", err, out)
 		return distroNotFoundMsg
 	}
 

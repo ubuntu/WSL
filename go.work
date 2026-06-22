@@ -1,6 +1,7 @@
-go 1.21.4
+go 1.23.0
 
 use (
+	./e2e
 	./wsl-builder/common
 	./wsl-builder/prepare-assets
 	./wsl-builder/prepare-build

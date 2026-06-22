@@ -15,11 +15,11 @@ jobs:
     runs-on: windows-latest
     if: ${{ !github.event.pull_request.draft }}
     env:
-      rootfs64: 'http://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-ubuntu22.04lts.rootfs.tar.gz'
+      rootfs64: 'https://releases.ubuntu.com/resolute/ubuntu-26.04-wsl-amd64.wsl'
       workDir: 'C:/Temp/builddir'
     steps:
       - name: Checkout WSL
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           # we need to use a subdirectory as we can't move back base GITHUB_WORKSPACE directory
           path: repo
@@ -42,7 +42,7 @@ jobs:
           $client = new-object System.Net.WebClient
           $client.DownloadFile("${{ env.rootfs64}}","x64/install.tar.gz")
       - name: Setup MSBuild (PATH)
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v3
       - name: Install certificate
         shell: powershell
         working-directory: ${{ env.workDir }}
@@ -58,7 +58,7 @@ jobs:
         working-directory: ${{ env.workDir }}
         run: msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:UapAppxPackageBuildMode=SideloadOnly -verbosity:normal
       - name: Allow downloading sideload appxbundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sideload-build
           path: |

@@ -24,7 +24,7 @@ Fields are always in the same order, regardless of the order the flags are passe
 		},
 	}
 
-	f.appId = rootCmd.Flags().Bool("app-id", false, "Display the App ID as shown in the store.")
+	f.appID = rootCmd.Flags().Bool("app-id", false, "Display the App ID as shown in the store.")
 	f.fullName = rootCmd.Flags().Bool("full-name", false, "Display the App FullName as shown in your machine.")
 	f.launcher = rootCmd.Flags().Bool("launcher", false, "Display the launcher executable name.")
 	f.codeName = rootCmd.Flags().Bool("code-name", false, "Display the code name, i.e. the distro's adjective.")
