@@ -52,7 +52,7 @@ If you have identified a problem or bug in WSL then file an issue in
 
 If you are unsure whether your problem relates to an Ubuntu project or the Microsoft project then familiarise yourself with their documentation.
 
-- [Ubuntu WSL docs](https://documentation.ubuntu.com/wsl/en/latest/)
+- [Ubuntu WSL docs](https://ubuntu.com/wsl/docs/)
 - [Microsoft WSL docs](https://learn.microsoft.com/en-us/windows/wsl/)
 
 At this point, if you are still not sure, try to contact a maintainer of one of the projects who will advise you where best to submit your Issue.
@@ -126,7 +126,7 @@ Please refer to the licences for Ubuntu on WSL:
 ## Contributing to the docs
 
 > [!WARNING]
-> The **documentation** for Ubuntu on WSL can be found at [https://documentation.ubuntu.com/wsl/](documentation.ubuntu.com/wsl).
+> The **documentation** for Ubuntu on WSL can be found at [ubuntu.com/wsl/docs/](https://ubuntu.com/wsl/docs/).
 > The source for that documentation can be found in the [Ubuntu Pro for WSL repo](https://github.com/canonical/ubuntu-pro-for-wsl).
 > If you are interested in contributing to the documentation, please submit your Issues and Pull Requests there.
 
