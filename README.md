@@ -2,7 +2,7 @@
 
 Install a complete Ubuntu terminal environment in minutes with Windows Subsystem for Linux (WSL). Develop cross-platform applications, improve your data science or web development workflows and manage IT infrastructure without leaving Windows.
 
-Read about the [distributions of Ubuntu available for WSL](https://documentation.ubuntu.com/wsl/en/latest/reference/distributions/).
+Read about the [distributions of Ubuntu available for WSL](https://ubuntu.com/wsl/docs/reference/distributions/).
 
 Key features:
   - Efficient command line utilities including bash, ssh, git, apt, npm, pip and many more
@@ -16,7 +16,7 @@ For more information about Ubuntu WSL and how Canonical supports developers plea
 https://ubuntu.com/wsl
 
 > [!NOTE]
-> The **documentation** for Ubuntu on WSL can be found at [https://documentation.ubuntu.com/wsl/](documentation.ubuntu.com/wsl).
+> The **documentation** for Ubuntu on WSL can be found at [ubuntu.com/wsl/docs/](https://ubuntu.com/wsl/docs/).
 > The source for that documentation can be found in the [Ubuntu Pro for WSL repo](https://github.com/canonical/ubuntu-pro-for-wsl).
 > If you are interested in contributing to the documentation, please submit your Issues and Pull Requests there.
 

@@ -53,7 +53,7 @@ contains more information about what you can expect when you contact us, and wha
 - [Canonical's Security Site](https://ubuntu.com/security)
 - [Ubuntu Security disclosure and embargo policy](https://ubuntu.com/security/disclosure-policy)
 - [Ubuntu Security Notices](https://ubuntu.com/security/notices)
-- [Ubuntu on WSL documentation](https://documentation.ubuntu.com/wsl/en/latest/)
+- [Ubuntu on WSL documentation](https://ubuntu.com/wsl/docs/)
 - [Ubuntu Pro for WSL documentation](https://canonical-ubuntu-pro-for-wsl.readthedocs-hosted.com/en/latest/)
 
 If you have any questions regarding security vulnerabilities, please reach out
