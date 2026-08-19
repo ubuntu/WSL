@@ -7,10 +7,10 @@
         "hidden": true
       },
       {
-        "name": "Ubuntu 24.04.4 LTS",
+        "name": "Ubuntu 24.04.5 LTS",
         "colorScheme": "Ubuntu-24.04-ColorScheme",
         "commandline": "ubuntu2404.exe",
-        "tabTitle": "Ubuntu 24.04.4 LTS",
+        "tabTitle": "Ubuntu 24.04.5 LTS",
         "icon": "ms-appx:///Assets/Square44x44Logo.targetsize-32.png",
         "cursorShape": "filledBox",
         "font": {
