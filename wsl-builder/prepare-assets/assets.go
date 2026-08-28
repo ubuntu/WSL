@@ -61,8 +61,11 @@ func updateAssets(csvPath string) error {
 		return err
 	}
 
-	// Update each application
+	// Update only the 'default' application
 	for _, r := range releasesInfo {
+		if r.AppID != "Ubuntu" {
+			continue
+		}
 		wslPath := filepath.Join(metaPath, r.AppID)
 		generatedPath := filepath.Join(wslPath, common.GeneratedDir)
 
