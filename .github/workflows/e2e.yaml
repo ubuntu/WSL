@@ -26,16 +26,16 @@ jobs:
         uses: actions/checkout@v6
       - name: Set up MSBuild (PATH)
         uses: microsoft/setup-msbuild@v3
-      - name: Install certificate
+      - name: Create and trust a self-signed certificate
         shell: powershell
         run: |
-          New-Item -ItemType directory -Path certificate
-          Set-Content -Path certificate\certificate.txt -Value '${{ secrets.CERTIFICATE }}'
-          certutil -decode certificate\certificate.txt certificate\certificate.pfx
-
-          $pwd = ConvertTo-SecureString  '${{ secrets.CERTIFICATE_PASSWORD }}' -AsPlainText -Force
-          Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:LocalMachine\Trust -FilePath certificate\certificate.pfx
-          Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
+          [xml]$manifest = Get-Content -Path "DistroLauncher-Appx/MyDistro.appxmanifest"
+          $publisher = $manifest.SelectSingleNode("/*[local-name()='Package']/*[local-name()='Identity']").GetAttribute("Publisher")
+          $certificate = New-SelfSignedCertificate -Type CodeSigningCert -Subject $publisher -CertStoreLocation Cert:\CurrentUser\My
+          $line = "CERTIFICATE_THUMBPRINT=$($certificate.Thumbprint)$([Environment]::NewLine)"
+          [System.IO.File]::AppendAllText($env:GITHUB_ENV, $line, [System.Text.UTF8Encoding]::new($false))
+          Export-Certificate -Cert $certificate -FilePath "$env:RUNNER_TEMP\e2e-signing.cer" | Out-Null
+          Import-Certificate -FilePath "$env:RUNNER_TEMP\e2e-signing.cer" -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
@@ -58,7 +58,7 @@ jobs:
           Write-Output "::endgroup::"
 
           Write-Output "::group::Building and installing appbundle"
-          .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 "${{ env.rootFsCache }}/${{ env.distroName }}.tar.gz"
+          .\e2e\pre-e2e-testing.ps1 -AppID ${{ env.appID }} -RootfsX64 "${{ env.rootFsCache }}/${{ env.distroName }}.tar.gz" -CertificateThumbprint $env:CERTIFICATE_THUMBPRINT
           Write-Output "::endgroup::"
       - name: Run tests
         shell: powershell

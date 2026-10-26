@@ -14,7 +14,6 @@ jobs:
   build-wsl:
     name: Build
     runs-on: windows-latest
-    if: ${{ !github.event.pull_request.draft }}
     env:
       rootfs64: 'https://releases.ubuntu.com/resolute/ubuntu-26.04-wsl-amd64.wsl'
       workDir: 'C:/Temp/builddir'
