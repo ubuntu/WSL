@@ -2,7 +2,7 @@
 
 Install a complete Ubuntu terminal environment in minutes with Windows Subsystem for Linux (WSL). Develop cross-platform applications, improve your data science or web development workflows and manage IT infrastructure without leaving Windows.
 
-Read about the [distributions of Ubuntu available for WSL](https://ubuntu.com/wsl/docs/reference/distributions/).
+Read about the [distributions of Ubuntu available for WSL](https://ubuntu.com/wsl/docs/stable/reference/distributions/).
 
 Key features:
   - Efficient command line utilities including bash, ssh, git, apt, npm, pip and many more
