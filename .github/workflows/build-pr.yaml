@@ -8,15 +8,16 @@ on:
       - ready_for_review
     paths-ignore:
       - docs/**
+      - '*.md'
 
 jobs:
   build-wsl:
     name: Build
     runs-on: windows-latest
-    if: ${{ !github.event.pull_request.draft }}
     env:
       rootfs64: 'https://releases.ubuntu.com/resolute/ubuntu-26.04-wsl-amd64.wsl'
       workDir: 'C:/Temp/builddir'
+      signingEnabled: ${{ !github.event.pull_request.head.repo.fork }}
     steps:
       - name: Checkout WSL
         uses: actions/checkout@v6
@@ -44,6 +45,7 @@ jobs:
       - name: Setup MSBuild (PATH)
         uses: microsoft/setup-msbuild@v3
       - name: Install certificate
+        if: ${{ env.signingEnabled == 'true' }}
         shell: powershell
         working-directory: ${{ env.workDir }}
         run: |
@@ -56,7 +58,7 @@ jobs:
           Import-PfxCertificate -Password $pwd -CertStoreLocation Cert:CurrentUser\My -FilePath certificate\certificate.pfx
       - name: Build Bundle
         working-directory: ${{ env.workDir }}
-        run: msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:UapAppxPackageBuildMode=SideloadOnly -verbosity:normal
+        run: msbuild .\DistroLauncher.sln /t:Build /m /nr:false /p:Configuration=Release /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:UapAppxPackageBuildMode=SideloadOnly /p:AppxPackageSigningEnabled=${{ env.signingEnabled }} -verbosity:normal
       - name: Allow downloading sideload appxbundle
         uses: actions/upload-artifact@v7
         with:
